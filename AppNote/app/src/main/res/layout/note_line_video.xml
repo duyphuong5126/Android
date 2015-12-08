@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="89dip"
+        android:paddingTop="10dip">
+
+        <ImageView
+            android:id="@+id/FileThumbnail"
+            android:layout_width="0dip"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:contentDescription="No image"
+            android:src="@drawable/ic_launcher" />
+
+        <LinearLayout
+            android:layout_width="0dip"
+            android:layout_height="fill_parent"
+            android:layout_weight="4"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="0dip"
+                android:layout_weight="3">
+
+                <TextView
+                    android:id="@+id/FileName"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="2"
+                    android:text="Video name"
+                    android:paddingLeft="10dip"
+                    android:gravity="center_vertical" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="0dip"
+                android:layout_weight="4">
+
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="2">
+
+                    <TextView
+                        android:id="@+id/FileInfor"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_weight="1"
+                        android:paddingLeft="10dip"
+                        android:text="Video information"
+                        android:gravity="center_vertical" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="end">
+
+                    <LinearLayout
+                        android:layout_width="0dip"
+                        android:layout_height="fill_parent"
+                        android:layout_weight="1"
+                        android:gravity="end|center_vertical">
+
+                        <ImageButton
+                            android:id="@+id/buttonPlayVideo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_play_circle_outline_black_24dp"
+                            android:background="@drawable/transparent"
+                            android:layout_marginRight="10dip" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layoutButtonDelete"
+                        android:layout_width="0dip"
+                        android:layout_height="fill_parent"
+                        android:layout_weight="1"
+                        android:gravity="center">
+
+                        <ImageButton
+                            android:id="@+id/buttonDeleteThis"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_cancel_black_24dp"
+                            android:background="@drawable/transparent"
+                            android:layout_marginRight="10dip" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutDivider"
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:orientation="vertical"
+        android:background="#ccc"></LinearLayout>
+
+</LinearLayout>

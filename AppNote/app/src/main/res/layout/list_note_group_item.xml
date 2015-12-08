@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingTop="10dip">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="35dip"
+            android:background="#075c52"
+            android:gravity="center"
+            android:paddingLeft="15dip"
+            android:paddingRight="15dip">
+
+            <TextView
+                android:id="@+id/tvGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Group here"
+                android:textColor="#fff"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="40dip"
+            android:layout_height="35dip"
+            android:background="@drawable/right_arrow"/>
+    </LinearLayout>
+</LinearLayout>

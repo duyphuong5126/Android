@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/itemHome" android:title="Trang chủ"/>
+    <item android:id="@+id/itemViewAccount" android:title="Tài khoản"/>
+    <item android:id="@+id/itemAboutUs" android:title="Về chúng tôi"/>
+    <item android:id="@+id/itemLogOut" android:title="Đăng xuất"/>
+</menu>

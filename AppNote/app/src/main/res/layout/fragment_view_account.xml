@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:paddingLeft="10dip"
+    android:paddingRight="10dip"
+    android:background="#ddd">
+
+    <com.horical.appnote.MyView.RoundImageView
+        android:id="@+id/imageAvatar"
+        android:layout_width="150dip"
+        android:layout_height="150dip"
+        android:src="@drawable/avatar"
+        android:layout_marginTop="30dip"
+        android:layout_marginBottom="20dip"
+        android:background="#ddd" />
+
+    <TextView
+        android:id="@+id/tvUserName"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Username"
+        android:textSize="17sp"
+        android:background="@drawable/bottom_border_black"
+        android:paddingBottom="5dip"
+        android:layout_marginBottom="10dip"/>
+
+    <TextView
+        android:id="@+id/tvEmail"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="E-mail"
+        android:textSize="17sp"
+        android:background="@drawable/bottom_border_black"
+        android:paddingBottom="5dip"
+        android:layout_marginBottom="10dip"/>
+
+    <LinearLayout
+        android:id="@+id/layoutEditPassword"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="20dip"
+        android:visibility="gone">
+        <EditText
+            android:id="@+id/edtOldPassword"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="Old password"
+            android:inputType="textPassword"
+            android:textSize="17sp"
+            android:background="@drawable/bottom_border_black"
+            android:paddingBottom="5dip"
+            android:layout_marginBottom="10dip"/>
+        <EditText
+            android:id="@+id/edtNewPassword"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="New password"
+            android:inputType="textPassword"
+            android:textSize="17sp"
+            android:background="@drawable/bottom_border_black"
+            android:paddingBottom="5dip"
+            android:layout_marginBottom="20dip"/>
+
+        <Button
+            android:id="@+id/buttonSaveChangePassword"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="#075c52"
+            android:textColor="#fff"
+            android:text="SAVE CHANGE"
+            android:layout_marginTop="20dip"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/buttonChangePassword"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="#075c52"
+        android:textColor="#fff"
+        android:text="CHANGE PASSWORD"/>
+
+</LinearLayout>

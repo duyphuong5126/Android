@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff"
+    android:padding="20dip">
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/layoutSettingAccount"
+                android:layout_width="fill_parent"
+                android:layout_height="70dip"
+                android:orientation="horizontal"
+                android:background="@drawable/bottom_border_gray">
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical"
+                    android:layout_weight="3">
+                    <TextView
+                        android:id="@+id/tvCurrentUserTitle"
+                        android:layout_width="fill_parent"
+                        android:layout_height="0dip"
+                        android:layout_weight="4"
+                        android:text="Account"
+                        android:textSize="20sp"/>
+                    <TextView
+                        android:id="@+id/tvCurrentUser"
+                        android:layout_width="fill_parent"
+                        android:layout_height="0dip"
+                        android:layout_weight="5"
+                        android:text="Current user"
+                        android:textSize="13sp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="fill_parent"
+                    android:gravity="right"
+                    android:layout_weight="1">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_chevron_right_black_36dp"/>
+                </LinearLayout>
+            </LinearLayout>
+
+
+
+            <LinearLayout
+                android:id="@+id/layoutSettingLanguage"
+                android:layout_width="fill_parent"
+                android:layout_height="70dip"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dip"
+                android:background="@drawable/bottom_border_gray">
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical"
+                    android:layout_weight="3">
+                    <TextView
+                        android:id="@+id/tvCurrentLanguageTitle"
+                        android:layout_width="fill_parent"
+                        android:layout_height="0dip"
+                        android:layout_weight="4"
+                        android:text="Language"
+                        android:textSize="20sp"/>
+                    <TextView
+                        android:id="@+id/tvCurrentLanguage"
+                        android:layout_width="fill_parent"
+                        android:layout_height="0dip"
+                        android:layout_weight="5"
+                        android:text="Current language"
+                        android:textSize="13sp"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutUseGuide"
+                android:layout_width="fill_parent"
+                android:layout_height="70dip"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dip"
+                android:background="@drawable/bottom_border_gray">
+                <TextView
+                    android:id="@+id/tvHowToUseTitle"
+                    android:layout_width="0dip"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="3"
+                    android:text="How to use"
+                    android:textSize="20sp"/>
+
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="fill_parent"
+                    android:gravity="right"
+                    android:layout_weight="1">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_chevron_right_black_36dp"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutAutoSave"
+                android:layout_width="fill_parent"
+                android:layout_height="70dip"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dip"
+                android:background="@drawable/bottom_border_gray">
+                <TextView
+                    android:id="@+id/tvAutoSave"
+                    android:layout_width="0dip"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="3"
+                    android:text="Auto save note on exit editor"
+                    android:textSize="20sp"/>
+
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="fill_parent"
+                    android:gravity="right"
+                    android:layout_weight="1">
+                    <Switch
+                        android:id="@+id/chooseSaveOnExit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

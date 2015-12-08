@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="0dp"
+        android:layout_height="60dip"
+        android:gravity="center_vertical"
+        android:layout_weight="2">
+
+        <LinearLayout
+            android:id="@+id/isFocus"
+            android:visibility="visible"
+            android:orientation="vertical"
+            android:layout_width="5dip"
+            android:layout_height="fill_parent"
+            android:layout_marginTop="10dip"
+            android:layout_marginBottom="10dip"
+            android:background="#075c52" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="center">
+            <ImageView
+                android:id="@+id/MainImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_launcher"
+                android:background="#00000000" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="7">
+
+        <TextView
+            android:id="@+id/ItemTitleName"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:text="Item title here"
+            android:textColor="#000000"
+            android:textSize="15sp"
+            android:gravity="center_vertical" />
+    </LinearLayout>
+</LinearLayout>

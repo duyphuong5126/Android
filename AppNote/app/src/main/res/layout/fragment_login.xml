@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#075c52">
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="30dip"
+        android:paddingBottom="50dip"
+        android:gravity="center"
+        android:text="@string/app_name"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        android:textColor="#fff" />
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20dip"
+        android:paddingRight="20dip">
+
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <EditText
+                    android:id="@+id/edtUsername"
+                    android:layout_width="fill_parent"
+                    android:layout_height="39dip"
+                    android:hint="Username or e-mail"
+                    android:textColor="#fff"
+                    android:textColorHint="#fff"
+                    android:inputType="textEmailAddress"
+                    android:background="@drawable/transparent_bottom_white" />
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dip"
+                    android:background="#fff"></LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="20dip">
+                <EditText
+                    android:id="@+id/edtPassword"
+                    android:layout_width="fill_parent"
+                    android:layout_height="39dip"
+                    android:hint="Password"
+                    android:textColor="#fff"
+                    android:textColorHint="#fff"
+                    android:inputType="textPassword"
+                    android:background="@drawable/transparent_bottom_white" />
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dip"
+                    android:background="#fff"></LinearLayout>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/buttonLogin"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/round_border_white"
+                android:text="LOGIN"
+                android:textColor="#075c52"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:layout_marginTop="30dip"/>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="10dip">
+
+                <Button
+                    android:id="@+id/buttonForgetPassword"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="Forgot password?"
+                    android:textColor="#fff"
+                    android:background="@android:color/transparent" />
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="50dip"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dip"
+                        android:layout_height="24dip"
+                        android:layout_weight="2"
+                        android:gravity="bottom"
+                        android:paddingLeft="30dip">
+
+                        <LinearLayout
+                            android:layout_width="fill_parent"
+                            android:layout_height="1dip"
+                            android:background="#fff"></LinearLayout>
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvDivider"
+                        android:layout_width="0dip"
+                        android:layout_height="fill_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="or"
+                        android:textColor="#fff"
+                        android:textSize="20sp"
+                        android:paddingBottom="5dip"/>
+
+                    <LinearLayout
+                        android:layout_width="0dip"
+                        android:layout_height="24dip"
+                        android:layout_weight="2"
+                        android:gravity="bottom"
+                        android:paddingRight="30dip">
+
+                        <LinearLayout
+                            android:layout_width="fill_parent"
+                            android:layout_height="1dip"
+                            android:background="#fff"></LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/buttonSignup"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Sign up"
+                    android:textColor="#fff"
+                    android:background="@android:color/transparent" />
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="10dip"
+                    android:paddingTop="5dip"
+                    android:paddingBottom="5dip">
+
+                    <ImageView
+                        android:id="@+id/imgInternetSignal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_signal_wifi_4_bar_white_24dp"/>
+
+                    <TextView
+                        android:id="@+id/tvInternetSignal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Intenet connection"
+                        android:layout_marginLeft="5dip"
+                        android:textSize="20sp"
+                        android:textColor="#fff"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutLoginProcess"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="#075c52"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="0dip"
+                android:gravity="center"
+                android:layout_weight="2">
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="0dip"
+                android:layout_weight="1">
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Log-in is processing, please wait..."
+                    android:textSize="20sp"
+                    android:textColor="#fff"/>
+            </LinearLayout>
+        </LinearLayout>
+
+    </FrameLayout>
+</LinearLayout>

@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Daily Note</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="bannerMorning_EN">Good morning.\nHave a nice day and good luck with your work!\nLet take a note whenever you need!</string>
+    <string name="bannerMorning_VI">Chào buổi sáng.\nChúc bạn một ngày tốt lành và làm việc tốt!\nHãy viết ghi chú khi cần nhé!</string>
+    <string name="bannerMorningWork_EN">Hello, let have a nice day at work!\nDaily Note will help you to write all your ideas out and save them.</string>
+    <string name="bannerMorningWork_VI">Xin chào, hãy làm việc thật vui nhé!\nDaily Note sẽ giúp bạn viết ra và lưu lại các ý tưởng của mình.</string>
+    <string name="bannerNight_EN">Good night!\nLet Daily Note take care of yours reminder.</string>
+    <string name="bannerNight_VI">Chúc ngủ ngon!\nDaily Note sẽ thực hiện các nhắc nhở của bạn.</string>
+    <string name="bannerMidday_EN">Midday now, time for lunch!\nLet relax before your afternoon works!</string>
+    <string name="bannerMidday_VI">Tới giờ nghỉ trưa rồi!\nHãy thư giãn để chuẩn bị cho công việc buổi chiều nhé!</string>
+    <string name="bannerAfternoon_EN">Let work! Follow your time table and plans!\nTry your best and enjoy the work!</string>
+    <string name="bannerAfternoon_VI">Làm việc thôi! Hãy theo sát lịch trình và kế hoạch!\nCố gắng lên và tận hưởng công việc nhé!</string>
+    <string name="bannerEvening_EN">We hope you had a nice day at work!\nNow is the time for taking care of yourself and family. Have fun!</string>
+    <string name="bannerEvening_VI">Mong là bạn đã có một ngày thật đẹp!\nGiờ là lúc chăm sóc cho bản thân và gia đình. Chúc vui!</string>
+    <string name="bannerDayOff_EN">Its weekend!\nTime to relax after working-hard days! Enjoy!</string>
+    <string name="bannerDayOff_VI"> Cuối tuần rồi!\n Giờ là lúc xả hơi sau những ngày làm việc căng thẳng!\n Chúc vui</string>
+    <string name="bannerWeekend_EN">Weekend</string>
+    <string name="bannerWeekend_VI">Ngày Cuối Tuần</string>
+    <string name="bannerSunday_EN">Sunday</string>
+    <string name="bannerSunday_VI">Chủ Nhật</string>
+    <string name="bannerSaturday_EN">Saturday</string>
+    <string name="bannerSaturday_VI">Thứ 7</string>
+
+    <string-array id="Items_En" name="Items_En">
+        <item>New</item>
+        <item>List Notes</item>
+        <item>Calendar</item>
+        <item>Files Manager</item>
+        <item>Settings</item>
+    </string-array>
+    <string-array id="Items_Vi" name="Items_Vi">
+        <item>Tạo ghi chú</item>
+        <item>Danh sách</item>
+        <item>Lịch</item>
+        <item>Quản lý tập tin</item>
+        <item>Cài đặt</item>
+    </string-array>
+
+    <string name="my_little_lady">my_little_lady</string>
+
+    <string name="Calendar_EN">Calendar</string>
+    <string name="Calendar_VI">Lịch</string>
+
+    <string name="Files_EN">Files</string>
+    <string name="Files_VI">Tập tin</string>
+
+    <string name="Setting_EN">Settings</string>
+    <string name="Setting_VI">Cài đặt</string>
+
+    <string name="Account_EN">Account</string>
+    <string name="Account_VI">Tài khoản</string>
+
+    <string name="NewNote_EN">New</string>
+    <string name="NewNote_VI">Tạo ghi chú</string>
+
+    <string name="ListNotes_EN">List Notes</string>
+    <string name="ListNotes_VI">Danh sách</string>
+
+    <string name="FilesManager_EN">Files Manager</string>
+    <string name="FilesManager_VI">Quản lý tập tin</string>
+
+    <string name="Language_EN">Language</string>
+    <string name="Language_VI">Ngôn ngữ</string>
+
+    <string name="UseGuide_EN">How to use</string>
+    <string name="UseGuide_VI">Hướng dẫn</string>
+
+    <string name="AutoSave_EN">Auto save note</string>
+    <string name="AutoSave_VI">Tự động lưu ghi chú</string>
+
+    <string name="LastWeek_EN">Last week</string>
+    <string name="LastWeek_VI">Tuần trước</string>
+
+    <string name="ThisWeek_EN">This week</string>
+    <string name="ThisWeek_VI">Tuần này</string>
+
+    <string name="Processing_EN">Processing, please wait...</string>
+    <string name="Processing_VI">Xin chờ một chút...</string>
+
+    <string name="SyncTitle_EN">Click the circle to start sync</string>
+    <string name="SyncTitle_VI">Nhấn nút tròn để đồng bộ</string>
+
+    <string name="InternetOffline_EN">Internet is not available</string>
+    <string name="InternetOffline_VI">Bạn hiện đang offline</string>
+
+    <string name="InternetOnline_EN">Internet is connected</string>
+    <string name="InternetOnline_VI">Bạn hiện đang online</string>
+
+    <string name="CreateNew_EN">Create new</string>
+    <string name="CreateNew_VI">Tạo mới</string>
+
+    <string name="Attach_EN">Attach</string>
+    <string name="Attach_VI">Đính kèm</string>
+
+    <string name="TakePhoto_EN">Take a photo</string>
+    <string name="TakePhoto_VI">Chụp ảnh</string>
+
+    <string name="RecordAudio_EN">Record audio</string>
+    <string name="RecordAudio_VI">Ghi âm</string>
+
+    <string name="VideoCapture_EN">Video capture</string>
+    <string name="VideoCapture_VI">Quay video</string>
+
+    <string name="NoteTitleHint_EN">Note title</string>
+    <string name="NoteTitleHint_VI">Tiêu đề</string>
+
+    <string name="NoteContentHint_EN">Content here</string>
+    <string name="NoteContentHint_VI">Nội dung</string>
+
+    <string name="Image_EN">Image</string>
+    <string name="Image_VI">Ảnh</string>
+
+    <string name="Audio_EN">Audio</string>
+    <string name="Audio_VI">Âm thanh</string>
+
+    <string name="NothingListNote_EN">Not any note yet</string>
+    <string name="NothingListNote_VI">Bạn chưa tạo ghi chú nào</string>
+
+    <string name="NothingListFile_EN">Not any file yet</string>
+    <string name="NothingListFile_VI">Chưa có tập tin chú nào</string>
+
+    <string name="Date_EN">Date</string>
+    <string name="Date_VI">Ngày</string>
+
+    <string name="Time_EN">Time</string>
+    <string name="Time_VI">Giờ</string>
+
+    <string name="Cancel_EN">Cancel</string>
+    <string name="Cancel_VI">Hủy</string>
+
+    <string name="FileTooBig_EN">Your file is too big</string>
+    <string name="FileTooBig_VI">File của bạn quá lớn</string>
+
+    <string name="BrowseVoice_EN">Browse voice</string>
+    <string name="BrowseVoice_VI">Chọn âm thanh</string>
+
+    <string name="Content_EN">Content</string>
+    <string name="Content_VI">Nội dung</string>
+
+    <string name="CreateReminder_EN">Create reminder</string>
+    <string name="CreateReminder_VI">Tạo nhắc nhở</string>
+
+    <string name="UsernameOrEmail_EN">Username or e-mail</string>
+    <string name="UsernameOrEmail_VI">Tên đăng nhập hoặc e-mail</string>
+
+    <string name="Password_EN">Password</string>
+    <string name="Password_VI">Mật khẩu</string>
+
+    <string name="Login_EN">Login</string>
+    <string name="Login_VI">Đăng nhập</string>
+
+    <string name="ForgotPassword_EN">Forgot Password</string>
+    <string name="ForgotPassword_VI">Quên mật khẩu</string>
+
+    <string name="SignUp_EN">Sign up</string>
+    <string name="SignUp_VI">Đăng ký</string>
+
+    <string name="Or_EN">Or</string>
+    <string name="Or_VI">Hoặc</string>
+
+    <string name="Username_EN">Username</string>
+    <string name="Username_VI">Tài khoản</string>
+
+    <string name="DisplayName_EN">Display name</string>
+    <string name="DisplayName_VI">Tên</string>
+
+    <string name="ChangePassword_EN">Change password</string>
+    <string name="ChangePassword_VI">Đổi Mật Khẩu</string>
+
+    <string name="SaveChange_EN">Save changes</string>
+    <string name="SaveChange_VI">Lưu thay đổi</string>
+
+    <string name="OldPassword_EN">Old Password</string>
+    <string name="OldPassword_VI">Mật khẩu cũ</string>
+
+    <string name="NewPassword_EN">New Password</string>
+    <string name="NewPassword_VI">Mật khẩu mới</string>
+
+    <string name="SelectAction_EN">Select an action</string>
+    <string name="SelectAction_VI">Chọn thao tác</string>
+
+    <string name="SelectAudio_EN">Select a voice file</string>
+    <string name="SelectAudio_VI">Chọn tập tin âm thanh</string>
+
+    <string name="NotifySameScreen_EN">You are already in this screen</string>
+    <string name="NotifySameScreen_VI">Bạn hiện đang ở màn hình này</string>
+
+    <string name="NotifyPressAgain_EN">Press gain to exit</string>
+    <string name="NotifyPressAgain_VI">Nhấn một lần nữa để thoát</string>
+
+    <string name="NotifySyncSuccess_EN">Sync finished successfully!</string>
+    <string name="NotifySyncSuccess_VI">Đồng bộ thành công!</string>
+
+    <string name="NotifySyncFail_EN">Sync failed!</string>
+    <string name="NotifySyncFail_VI">Đồng bộ thhất bại!</string>
+
+    <string name="NotifyDownloadSuccess_EN">Download successfully!</string>
+    <string name="NotifyDownloadSuccess_VI">Tải dữ liệu hoàn tất!</string>
+
+    <string name="NotifyDownloadFail_EN">Download failed!</string>
+    <string name="NotifyDownloadFail_VI">Tải dữ liệu không thành công!</string>
+
+    <string name="NotifyLimit_EN">Please make sure that each file you upload is less than 2 Mb</string>
+    <string name="NotifyLimit_VI">Hãy đảm bảo là mọi tập tin tải lên đều không quá 10 Mb</string>
+
+    <string name="NotifyNothingUpload_EN">Nothing to upload!</string>
+    <string name="NotifyNothingUpload_VI">Không có gì để tải lên!</string>
+
+    <string name="NotifyNothingDownload_EN">Nothing to download!</string>
+    <string name="NotifyNothingDownload_VI">Không có gì để tải xuống!</string>
+
+    <string name="NotifyNothingDelete_EN">Nothing to delete!</string>
+    <string name="NotifyNothingDelete_VI">Không có gì để xóa!</string>
+
+    <string name="NotifyFileExisted_EN">This file is already exists!</string>
+    <string name="NotifyFileExisted_VI">Tập tin đã tồn tại</string>
+
+    <string name="NotifyNoteExisted_EN">This note is already exists!</string>
+    <string name="NotifyNoteExisted_VI">Ghi chú đã tồn tại</string>
+
+    <string name="NotifyUploadSuccess_EN">Upload successfully</string>
+    <string name="NotifyUploadSuccess_VI">Tải lên hoàn tất</string>
+
+    <string name="NotifyUploadFail_EN">Upload failed</string>
+    <string name="NotifyUploadFail_VI">Tải lên thất bại</string>
+
+    <string name="NotifyCompleted_EN">Completed</string>
+    <string name="NotifyCompleted_VI">Hoàn tất</string>
+
+    <string name="NotifyFailed_EN">Failed</string>
+    <string name="NotifyFailed_VI">Thất bại</string>
+
+    <string name="SelectMediaPlayer_EN">Choose an media player</string>
+    <string name="SelectMediaPlayer_VI">Chọn trình phát nhạc</string>
+
+    <string name="SlideShowBegun_EN">Slide show has already begun</string>
+    <string name="SlideShowBegun_VI">Slide-show đã bắt đầu</string>
+
+    <string name="DeleteFileSuccess_EN">Delete files successfully</string>
+    <string name="DeleteFileSuccess_VI">Xóa file hoàn tất</string>
+
+    <string name="DeleteFileFail_EN">Delete files failure! Please check your files</string>
+    <string name="DeleteFileFail_VI">Xóa file thất bại! Hãy kiểm tra lại các file của bạn</string>
+
+
+    <string-array name="ListNoteContextItem_EN">
+        <item>View</item>
+        <item>Update</item>
+        <item>Delete</item>
+    </string-array>
+    <string-array name="ListNoteContextItem_VI">
+        <item>Xem</item>
+        <item>Cập nhật</item>
+        <item>Xóa</item>
+    </string-array>
+
+    <string name="LoginSuccess_EN">Login successfully</string>
+    <string name="LoginSuccess_VI">Đăng nhập thành công</string>
+
+    <string name="SignUpSuccess_EN">Signup successfully</string>
+    <string name="SignUpSuccess_VI">Đăng ký thành công</string>
+
+    <string name="WrongAccount_EN">Wrong username or password!</string>
+    <string name="WrongAccount_VI">Tên đăng nhập hoặc tài khoản không tồn tại</string>
+
+    <string name="AccountExisted_EN">This account is already exists</string>
+    <string name="AccountExisted_VI">Tài khoản này đã tồn tại</string>
+
+    <string name="PasswordChange_EN">Your password is change</string>
+    <string name="PasswordChange_VI">Mật khẩu đã được thay đổi</string>
+
+    <string name="CurrentPasswordWrong_EN">Current password is wrong</string>
+    <string name="CurrentPasswordWrong_VI">Mật khẩu hiện tại sai</string>
+
+    <string name="ReminderSaved_EN">Your reminder is saved!</string>
+    <string name="ReminderSaved_VI">Nhắc nhở đã được lưu</string>
+
+    <string name="ReminderAddFailed_EN">Some thing wrong! It seems that your reminder is at the same time with another!</string>
+    <string name="ReminderAddFailed_VI">Không thể lưu nhắc nhở này! Dường như đã có một nhắc nhở khác tại thời điểm này</string>
+
+    <string name="View_EN">View</string>
+    <string name="View_VI">Xem</string>
+
+    <string name="Update_EN">Update</string>
+    <string name="Update_VI">Cập nhật</string>
+
+    <string name="Delete_EN">Delete</string>
+    <string name="Delete_VI">Xóa</string>
+
+    <string name="AddReminderSuccess_EN">Add reminder successfully</string>
+    <string name="AddReminderSuccess_VI">Nhắc nhở đã được lưu</string>
+
+    <string name="AddReminderFail_EN">Can not save your reminder. Please try again!</string>
+    <string name="AddReminderFail_VI">Không thể lưu nhắc nhở. Hãy thử lại!</string>
+
+    <string name="MissFields_EN">Some important information are missing! Please fill them!</string>
+    <string name="MissFields_VI">Thiếu một số thông tin quan trọng! Hãy điền vào</string>
+
+    <string name="SelectFile_EN">Select a file</string>
+    <string name="SelectFile_VI">Chọn tập tin</string>
+
+    <string name="ConfirmSave_EN">Confirm save?</string>
+    <string name="ConfirmSave_VI">Xác nhận lưu?</string>
+
+    <string name="LoadFileError_EN">Can not read files from this application</string>
+    <string name="LoadFileError_VI">Không thể lấy dữ liệu từ ứng dụng này</string>
+
+    <string name="LoadImageError_EN">Daily Diary can not load this image! Please check your file!</string>
+    <string name="LoadImageError_VI">Daily Diary không thể đọc được hình ảnh này! Hãy kiểm tra lại!</string>
+
+    <string name="LoadVideoError_EN">Daily Diary can not load this video! Please check your file!</string>
+    <string name="LoadVideoError_VI">Daily Diary không thể đọc được video này! Hãy kiểm tra lại!</string>
+
+    <string name="EmptyNote_EN">Can not save an empty note!</string>
+    <string name="EmptyNote_VI">Không thể lưu ghi chú rỗng!</string>
+
+    <string name="ListReminderEmpty_EN">Your reminder list is empty</string>
+    <string name="ListReminderEmpty_VI">Hiện không có nhắc nhở nào</string>
+
+    <string name="AddNewReminder_EN">Add new reminder</string>
+    <string name="AddNewReminder_VI">Thêm nhắc nhở</string>
+
+    <string name="InsertNoteSuccess_EN">Your note is saved</string>
+    <string name="InsertNoteSuccess_VI">Ghi chú đã được lưu</string>
+
+    <string name="InsertNoteFail_EN">Your note is saved</string>
+    <string name="InsertNoteFail_VI">Ghi chú đã được lưu</string>
+
+    <string name="Yes_EN">Yes</string>
+    <string name="Yes_VI">Có</string>
+
+    <string name="No_EN">No</string>
+    <string name="No_VI">Không</string>
+
+    <string-array name="ImageViewContextItem">
+        <item>Delete</item>
+        <item>View</item>
+        <item>Information</item>
+    </string-array>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_media_player">MediaPlayerActivity</string>
+    <string name="title_activity_first">FirstActivity</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="cm_confirm_exit_msg">Tap back button again to exit app</string>
+    <string name="cm_server_error_msg">There is error from server. Please try again.</string>
+    <string name="cm_action_settings">Settings</string>
+    <string name="cm_loading_msg">Loading ...</string>
+
+    <!-- Tab -->
+    <string name="tab_home">Home</string>
+    <string name="tab_activity">Activity</string>
+    <string name="tab_training">Training</string>
+    <string name="tab_map">Map</string>
+
+    <!-- Home Fragment -->
+    <string name="home_title">Home Fragment</string>
+
+    <!-- Activity Fragment -->
+    <string name="activity_title">Activity Fragment</string>
+
+    <!-- Training Fragment -->
+    <string name="training_title">Training Fragment</string>
+
+    <!-- Map Fragment -->
+    <string name="map_title">Map Fragment</string>
+    <string name="title_activity_start_fragment">StartFragment</string>
+    <string name="title_activity_signup">SignupActivity</string>
+    <string name="title_activity_pairing_fragment">PairingFragment</string>
+    <string name="title_activity_video_recorder">VideoRecorderActivity</string>
+
+</resources>

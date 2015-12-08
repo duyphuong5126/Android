@@ -1,0 +1,272 @@
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/MainLayout"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/MainContent"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/ActionBar"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:background="#075c52">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+
+                <ImageButton
+                    android:id="@+id/buttonNavigation"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_menu_white_24dp"
+                    android:background="#00000000" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"></LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="4">
+
+                <TextView
+                    android:id="@+id/tvAppTitle"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:text="Daily Note"
+                    android:textColor="#ffffff"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:gravity="center" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+
+                <ImageButton
+                    android:id="@+id/buttonSearch"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:background="@drawable/transparent"
+                    android:src="@drawable/ic_search_white_24dp" />
+
+                <ImageButton
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:visibility="gone"
+                    android:background="@drawable/transparent"
+                    android:src="@drawable/ic_menu_white_24dp" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+
+                <ImageButton
+                    android:id="@+id/buttonOptionMenu"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:background="@drawable/transparent"
+                    android:src="@drawable/ic_more_vert_white_24dp" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="13">
+            <LinearLayout
+                android:id="@+id/fragmentsContainer"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical"></LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ProgressBarArea"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:background="#D9000000"
+                android:gravity="center">
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="0dip"
+                    android:layout_weight="3"
+                    android:gravity="center_horizontal|bottom">
+                    <ProgressBar
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dip"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="0dip"
+                    android:gravity="center_horizontal"
+                    android:layout_weight="2">
+                    <TextView
+                        android:id="@+id/tvMainProcess"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Please wait..."
+                        android:textSize="25sp"
+                        android:textColor="#fff"/>
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/areaSideMenu"
+        android:layout_gravity="left"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#ffffff">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="2"
+            android:background="#075c52">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:id="@+id/BackArea"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="10dip"
+                    android:paddingLeft="10dip"
+                    android:layout_weight="3"
+                    android:gravity="center_horizontal">
+
+                    <com.horical.appnote.MyView.RoundImageView
+                        android:id="@+id/imageAvatar"
+                        android:layout_width="90dip"
+                        android:layout_height="90dip"
+                        android:src="@drawable/avatar"
+                        android:background="#075c52" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="5">
+
+                    <TextView
+                        android:id="@+id/TitleHeader"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:text="Title"
+                        android:textColor="#ffffff"
+                        android:textStyle="bold"
+                        android:textSize="20sp"
+                        android:gravity="center_vertical" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/sideMenu"
+            android:entries="@array/Items_En"
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="7"
+            android:divider="@null"></ListView>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="2"
+            android:paddingTop="20dip"
+            android:layout_gravity="center">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:background="#bbb"></LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dip">
+
+                <FrameLayout
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+                    <ImageButton
+                        android:id="@+id/buttonSyncToServer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:background="@drawable/transparent"
+                        android:src="@drawable/ic_sync_black_36dp" />
+
+                    <ProgressBar
+                        android:id="@+id/SyncBar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:layout_gravity="center"/>
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_weight="4">
+
+                    <TextView
+                        android:id="@+id/LogView"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Click the circle to sync!"
+                        android:textStyle="bold"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/tvInternet"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Internet connection"
+                        android:textSize="15sp"
+                        android:paddingTop="5dip"
+                        android:paddingBottom="5dip"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+</android.support.v4.widget.DrawerLayout>

@@ -1,0 +1,188 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <LinearLayout
+                android:id="@+id/DrawerArea"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1">
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:background="#ffffff"
+                    android:orientation="horizontal"
+                    android:layout_weight="5">
+                    <RelativeLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent">
+                        <com.horical.appnote.TouchPaint.DrawingView
+                            android:id="@+id/DrawArea"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent" />
+                        <LinearLayout
+                            android:id="@+id/layoutCloseDrawerTool"
+                            android:visibility="gone"
+                            android:layout_width="50dip"
+                            android:layout_height="50dip"
+                            android:layout_alignRight="@+id/DrawArea"
+                            android:layout_alignBottom="@+id/DrawArea">
+                            <ImageButton
+                                android:id="@+id/buttonCloseDrawerTool"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/transparent_image_button"
+                                android:src="@drawable/ic_cancel_black_36dp"/>
+                        </LinearLayout>
+                    </RelativeLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/DrawerTool"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:layout_marginTop="10dip">
+
+                        <ImageButton
+                            android:id="@+id/buttonLoadImageSDCard"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/transparent_image_button"
+                            android:src="@drawable/ic_add_to_photos_black_36dp" />
+
+                        <ImageButton
+                            android:id="@+id/buttonSaveImage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/transparent_image_button"
+                            android:src="@drawable/ic_sd_storage_black_36dp" />
+
+                        <ImageButton
+                            android:id="@+id/buttonDelete"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/transparent_image_button"
+                            android:src="@drawable/ic_delete_black_36dp" />
+
+                        <ImageButton
+                            android:id="@+id/buttonCamera"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/transparent_image_button"
+                            android:src="@drawable/ic_photo_camera_black_36dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:layout_marginTop="10dip">
+
+                        <ImageButton
+                            android:id="@+id/buttonErase"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/transparent_image_button"
+                            android:src="@drawable/ic_eraser_black" />
+
+                        <ImageButton
+                            android:id="@+id/buttonPaintPalette"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/transparent_image_button"
+                            android:src="@drawable/ic_color_lens_black_36dp" />
+
+                        <ImageButton
+                            android:id="@+id/buttonUndo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/transparent_image_button"
+                            android:src="@drawable/ic_undo_black_36dp" />
+
+                        <ImageButton
+                            android:id="@+id/buttonRedo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/transparent_image_button"
+                            android:src="@drawable/ic_redo_black_36dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginRight="3dip"
+                        android:layout_marginBottom="5dip"
+                        android:layout_marginTop="5dip"
+                        android:layout_weight="4">
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="fill_parent">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="fill_parent"
+                                    android:text="Color and size: "
+                                    android:textStyle="bold"
+                                    android:padding="10dip" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/ColorShow"
+                                android:orientation="vertical"
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent"
+                                android:gravity="center_vertical">
+
+                                <SeekBar
+                                    android:id="@+id/seekbarChangeSize"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:max="50" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/buttonOpenDrawerTool"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_brush_black_36dp"
+                android:background="#00000000"
+                android:layout_marginLeft="20dip"
+                android:layout_marginBottom="20dip"
+                android:layout_alignBottom="@+id/DrawerArea" />
+        </RelativeLayout>
+    </FrameLayout>
+
+</LinearLayout>

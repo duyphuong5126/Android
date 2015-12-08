@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/dateTextView"
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        android:layout_marginTop="10dip"
+        android:layout_marginLeft="20dip"
+        android:layout_marginRight="20dip"
+        android:text="11-08-2015"
+        android:textColor="#075c52"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        android:gravity="center_vertical"
+        android:paddingLeft="20dip"
+        android:background="@drawable/corner_radius_white" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:layout_weight="10"
+        android:orientation="vertical"
+        android:layout_marginTop="20dip"
+        android:layout_marginLeft="20dip"
+        android:layout_marginRight="20dip"
+        android:layout_marginBottom="20dip"
+        android:background="@drawable/corner_radius_white">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="50dip"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dip"
+                android:layout_height="fill_parent"
+                android:layout_weight="4"
+                android:text="Reminders"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#075c52"
+                android:gravity="center_vertical"
+                android:paddingLeft="20dip" />
+
+            <LinearLayout
+                android:layout_width="0dip"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <ImageButton
+                    android:id="@+id/btn_float"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_blue_sky"
+                    android:src="@drawable/ic_add_white_24dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <TextView
+                android:id="@+id/noticeTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/dateTextView"
+                android:gravity="center_horizontal"
+                android:padding="20px"
+                android:text="There is no reminder."
+                android:visibility="gone"
+                android:textSize="18dp" />
+
+            <ListView
+                android:id="@+id/view_reminder_listview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/border_gray"
+                android:scrollbars="none"
+                android:divider="@null"
+                android:layout_margin="10dip"
+                android:padding="1dip"/>
+        </FrameLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

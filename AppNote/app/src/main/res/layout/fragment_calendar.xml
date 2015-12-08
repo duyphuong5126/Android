@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/nowTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10px"
+        android:paddingLeft="10px"
+        android:paddingTop="10px"
+        android:text="Now"
+        android:textStyle="normal" />
+
+    <LinearLayout
+        android:id="@+id/calendar_navi"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/nowTextView"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="right">
+
+            <ImageButton
+                android:id="@+id/arrow_left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_chevron_left_black_36dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/monthyearTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="text" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="2">
+
+            <ImageButton
+                android:id="@+id/arrow_right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_chevron_right_black_36dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <GridView
+        android:id="@+id/calendarHeaderGridView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/calendar_navi"
+        android:layout_marginTop="10dip"
+        android:background="@android:color/darker_gray"
+        android:gravity="center_horizontal"
+        android:numColumns="7"
+        android:stretchMode="columnWidth" />
+
+    <GridView
+        android:id="@+id/calendarGridView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/calendarHeaderGridView"
+        android:background="#fff"
+        android:gravity="center"
+        android:numColumns="7"
+        android:paddingTop="5dip"
+        android:stretchMode="columnWidth" />
+
+
+</RelativeLayout>
