@@ -18,7 +18,7 @@
     <string name="bannerEvening_EN">We hope you had a nice day at work!\nNow is the time for taking care of yourself and family. Have fun!</string>
     <string name="bannerEvening_VI">Mong là bạn đã có một ngày thật đẹp!\nGiờ là lúc chăm sóc cho bản thân và gia đình. Chúc vui!</string>
     <string name="bannerDayOff_EN">Its weekend!\nTime to relax after working-hard days! Enjoy!</string>
-    <string name="bannerDayOff_VI"> Cuối tuần rồi!\n Giờ là lúc xả hơi sau những ngày làm việc căng thẳng!\n Chúc vui</string>
+    <string name="bannerDayOff_VI"> Cuối tuần rồi!\nGiờ là lúc xả hơi sau những ngày làm việc căng thẳng!\nChúc vui</string>
     <string name="bannerWeekend_EN">Weekend</string>
     <string name="bannerWeekend_VI">Ngày Cuối Tuần</string>
     <string name="bannerSunday_EN">Sunday</string>
@@ -336,6 +336,21 @@
 
     <string name="No_EN">No</string>
     <string name="No_VI">Không</string>
+
+    <string name="StartOf_EN">Start of</string>
+    <string name="StartOf_VI">Đầu</string>
+
+    <string name="EndOf_EN">End of</string>
+    <string name="EndOf_VI">Cuối</string>
+
+    <string name="Month_EN">Month</string>
+    <string name="Month_VI">Tháng</string>
+
+    <string name="Week_EN">Week</string>
+    <string name="Week_VI">Tuần</string>
+
+    <string name="YourNote_EN">Your note book</string>
+    <string name="YourNote_VI">Ghi chú của bạn</string>
 
     <string-array name="ImageViewContextItem">
         <item>Delete</item>

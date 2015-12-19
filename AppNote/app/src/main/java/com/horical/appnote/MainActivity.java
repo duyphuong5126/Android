@@ -285,6 +285,7 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
         mTvAppTitle = (TextView) findViewById(R.id.tvAppTitle);
         mSyncProgress = (ProgressBar) findViewById(R.id.SyncBar);
         mProgressbarLayout = (LinearLayout) findViewById(R.id.ProgressBarArea);
+        mProgressbarLayout.setOnClickListener(this);
         mLogView = (TextView) findViewById(R.id.LogView);
         mLogView.setText(LanguageUtils.getSyncTitleString());
         mMainProcess = (TextView) findViewById(R.id.tvMainProcess);
@@ -365,6 +366,9 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
                     default:
                         break;
                 }
+                return;
+            case R.id.ProgressBarArea:
+                showLoadingEffect(false, "");
                 return;
             case R.id.buttonSyncToServer:
                 if (mInternetAvailibility) {

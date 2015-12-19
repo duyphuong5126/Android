@@ -938,12 +938,57 @@ public class LanguageUtils {
         }
     }
 
+    public static String getStartOfString() {
+        switch (CURRENT_LANGUAGE) {
+            case VIETNAMESE:
+                return mContext.getResources().getString(R.string.StartOf_VI);
+            default:
+                return mContext.getResources().getString(R.string.StartOf_EN);
+        }
+    }
+
+    public static String getEndOfString() {
+        switch (CURRENT_LANGUAGE) {
+            case VIETNAMESE:
+                return mContext.getResources().getString(R.string.EndOf_VI);
+            default:
+                return mContext.getResources().getString(R.string.EndOf_EN);
+        }
+    }
+
+    public static String getMonthString() {
+        switch (CURRENT_LANGUAGE) {
+            case VIETNAMESE:
+                return mContext.getResources().getString(R.string.Month_VI);
+            default:
+                return mContext.getResources().getString(R.string.Month_EN);
+        }
+    }
+
+    public static String getWeekString() {
+        switch (CURRENT_LANGUAGE) {
+            case VIETNAMESE:
+                return mContext.getResources().getString(R.string.Week_VI);
+            default:
+                return mContext.getResources().getString(R.string.Week_EN);
+        }
+    }
+
     public static String getSaturdayString() {
         switch (CURRENT_LANGUAGE) {
             case VIETNAMESE:
                 return mContext.getResources().getString(R.string.bannerSaturday_VI);
             default:
                 return mContext.getResources().getString(R.string.bannerSaturday_EN);
+        }
+    }
+
+    public static String getYourNoteString() {
+        switch (CURRENT_LANGUAGE) {
+            case VIETNAMESE:
+                return mContext.getResources().getString(R.string.YourNote_VI);
+            default:
+                return mContext.getResources().getString(R.string.YourNote_EN);
         }
     }
 
@@ -989,6 +1034,36 @@ public class LanguageUtils {
             default:
                 return R.menu.menu_create_note_en;
         }
+    }
+
+    public static String getMonthString(int month) {
+        switch (month) {
+            case 0:
+                return (CURRENT_LANGUAGE.equals(ENGLISH))?"January":"Tháng 1";
+            case 1:
+                return (CURRENT_LANGUAGE.equals(ENGLISH))?"February":"Tháng 2";
+            case 2:
+                return (CURRENT_LANGUAGE.equals(ENGLISH))?"March":"Tháng 3";
+            case 3:
+                return (CURRENT_LANGUAGE.equals(ENGLISH))?"April":"Tháng 4";
+            case 4:
+                return (CURRENT_LANGUAGE.equals(ENGLISH))?"May":"Tháng 5";
+            case 5:
+                return (CURRENT_LANGUAGE.equals(ENGLISH))?"June":"Tháng 6";
+            case 6:
+                return (CURRENT_LANGUAGE.equals(ENGLISH))?"July":"Tháng 7";
+            case 7:
+                return (CURRENT_LANGUAGE.equals(ENGLISH))?"August":"Tháng 8";
+            case 8:
+                return (CURRENT_LANGUAGE.equals(ENGLISH))?"September":"Tháng 9";
+            case 9:
+                return (CURRENT_LANGUAGE.equals(ENGLISH))?"October":"Tháng 10";
+            case 10:
+                return (CURRENT_LANGUAGE.equals(ENGLISH))?"November":"Tháng 11";
+            case 11:
+                return (CURRENT_LANGUAGE.equals(ENGLISH))?"December":"Tháng 12";
+        }
+        return "";
     }
 
 }

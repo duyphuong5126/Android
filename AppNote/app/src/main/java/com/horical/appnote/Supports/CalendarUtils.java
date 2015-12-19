@@ -45,11 +45,11 @@ public class CalendarUtils {
                             return LanguageUtils.getLastWeekString();
                         }
                     } else {
-                        return getWeekStamp(calendar) + " - " + monthOfYear[calendar.get(Calendar.MONTH)];
+                        return getWeekStamp(calendar) + LanguageUtils.getMonthString(calendar.get(Calendar.MONTH));
                     }
                 }
             } else {
-                return getWeekStamp(calendar) + " - " + monthOfYear[calendar.get(Calendar.MONTH)];
+                return getWeekStamp(calendar) + LanguageUtils.getMonthString(calendar.get(Calendar.MONTH));
             }
         }
         return calendar.get(Calendar.MONTH) +"/"+ calendar.get(Calendar.YEAR);
@@ -60,13 +60,13 @@ public class CalendarUtils {
 
         switch (calendar.get(Calendar.WEEK_OF_MONTH)) {
             case 1:
-                return "Start of";
+                return LanguageUtils.getStartOfString() + " ";
             case 2:
-                return "Week 2";
+                return LanguageUtils.getWeekString() + " 2 - ";
             case 3:
-                return "Week 3";
+                return LanguageUtils.getWeekString() + " 3 - ";
             default:
-                return "End of";
+                return LanguageUtils.getEndOfString() + " ";
         }
     }
 

@@ -125,7 +125,7 @@
                                 android:src="@drawable/ic_book" />
 
                             <TextView
-                                android:id="@+id/textviewChooseBook"
+                                android:id="@+id/tvScreenTitle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:background="@drawable/transparent"

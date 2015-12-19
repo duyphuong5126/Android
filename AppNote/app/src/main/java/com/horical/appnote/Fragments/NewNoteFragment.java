@@ -105,8 +105,9 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
 
     private TextView mTvCreateNew, mTvAttach;
     private TextView mTvTakePhoto, mTvAudioRecord, mTvVideoCapture, mTvImage, mTvAudio;
+    private TextView mTvScreenTitle;
 
-    private ArrayList<String> mContextmenuImageView;
+    private ArrayList<String> mContextMenuImageView;
     private int mCurrentImageViewSelected;
 
     public interface CreateNoteCallback {
@@ -136,12 +137,15 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
         mTvVideoCapture = (TextView) mFragmentView.findViewById(R.id.tvVideoCapture);
         mTvImage = (TextView) mFragmentView.findViewById(R.id.tvImage);
         mTvAudio = (TextView) mFragmentView.findViewById(R.id.tvAudio);
+        mTvScreenTitle = (TextView) mFragmentView.findViewById(R.id.tvScreenTitle);
+
+        mTvScreenTitle.setText(LanguageUtils.getYourNoteString());
 
         this.mListFormatEditor = new ArrayList<FormattedText>();
 
-        this.mContextmenuImageView = new ArrayList<String>();
+        this.mContextMenuImageView = new ArrayList<String>();
         for (String resource : mActivity.getResources().getStringArray(R.array.ImageViewContextItem)) {
-            mContextmenuImageView.add(resource);
+            mContextMenuImageView.add(resource);
         }
 
         mNoteSummary = new NoteSummary();
@@ -892,7 +896,7 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.setHeaderTitle(LanguageUtils.getSelectActionString());
-        for (String action : mContextmenuImageView) {
+        for (String action : mContextMenuImageView) {
             menu.add(action);
         }
         this.mCurrentImageViewSelected = v.getId();
