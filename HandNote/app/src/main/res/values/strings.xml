@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Hand Note</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="list_en">List</string>
+    <string name="list_vi">Danh Sách</string>
+
+    <string name="training_en">Training</string>
+    <string name="training_vi">Huấn Luyện</string>
+</resources>
