@@ -3,6 +3,7 @@ package com.horical.appnote.Fragments;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.Switch;
@@ -70,6 +71,13 @@ public class SettingFragment extends BaseFragment {
         mLayoutUseGuide = (LinearLayout) mFragmentView.findViewById(R.id.layoutUseGuide);
 
         mChooseSaveOnExit = (Switch) mFragmentView.findViewById(R.id.chooseSaveOnExit);
+        mChooseSaveOnExit.setChecked(ApplicationSharedData.isAutoSave());
+        mChooseSaveOnExit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                ApplicationSharedData.setAutoSave(isChecked);
+            }
+        });
     }
 
     @Override

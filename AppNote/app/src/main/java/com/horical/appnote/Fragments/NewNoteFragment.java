@@ -38,6 +38,7 @@ import com.horical.appnote.DTO.NoteDTO.NoteSummary;
 import com.horical.appnote.DTO.NoteDTO.NoteText;
 import com.horical.appnote.DTO.NoteDTO.NoteVideoClip;
 import com.horical.appnote.DTO.NoteDTO.NoteVoice;
+import com.horical.appnote.LocalStorage.ApplicationSharedData;
 import com.horical.appnote.LocalStorage.DAO.NoteDataDAO;
 import com.horical.appnote.LocalStorage.DAO.NoteReminderDAO;
 import com.horical.appnote.LocalStorage.DataConstant;
@@ -584,7 +585,7 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.dismiss();
-                        saveNote();
+                        saveNote(true);
                     }
                 }).setNegativeButton(LanguageUtils.getNoString(), new DialogInterface.OnClickListener() {
                     @Override
@@ -729,13 +730,15 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
 
     }
 
-    private void saveNote() {
-        mLayoutProgress.setVisibility(View.VISIBLE);
-        mMainInterface.showLoadingEffect(true, "Save in process...");
+    private void saveNote(boolean show) {
+        if (show) {
+            mLayoutProgress.setVisibility(View.VISIBLE);
+            mMainInterface.showLoadingEffect(true, "Save in process...");
+        }
         //store note content and note summary
         mNoteSummary.setTitle(getFormatedString(((EditText) mFragmentView.findViewById(R.id.editNoteTitle))));
 
-        ArrayList<NoteDataLine> listData = new ArrayList<NoteDataLine>();
+        ArrayList<NoteDataLine> listData = new ArrayList<>();
         for (PairDataView pairDataView : mListContent) {
             NoteDataLine noteDataLine = pairDataView.getNoteDataInterface();
             View v = pairDataView.getView();
@@ -826,10 +829,14 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
             mMainInterface.reloadListFile(DataConstant.TYPE_VIDEOCLIP);
             mMainInterface.reloadListFile(DataConstant.TYPE_VOICE);
             mMainInterface.reloadListNote();
-            mMainInterface.ChangeFragment(BaseFragment.NewNoteFragment, BaseFragment.ListNotesFragment);
+            if (show) {
+                mMainInterface.ChangeFragment(BaseFragment.NewNoteFragment, BaseFragment.ListNotesFragment);
+            }
         } else {
-            mMainInterface.showLoadingEffect(false, "");
-            Toast.makeText(mActivity, LanguageUtils.getEmptyNoteString(), Toast.LENGTH_SHORT).show();
+            if (show) {
+                mMainInterface.showLoadingEffect(false, "");
+                Toast.makeText(mActivity, LanguageUtils.getEmptyNoteString(), Toast.LENGTH_SHORT).show();
+            }
         }
         mLayoutProgress.setVisibility(View.GONE);
     }
@@ -943,5 +950,14 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
     public void OpenFile(String path) {
         mMediaChooserDialog.setMediaPath(path);
         mMediaChooserDialog.show();
+    }
+
+    @Override
+    public void onStop() {
+        if (ApplicationSharedData.isAutoSave()) {
+            saveNote(false);
+        }
+        this.hideSoftKeyboard();
+        super.onStop();
     }
 }

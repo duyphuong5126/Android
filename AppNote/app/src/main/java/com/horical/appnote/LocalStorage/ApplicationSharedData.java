@@ -19,6 +19,7 @@ public abstract class ApplicationSharedData {
     private static final String EMAIL = "email";
     private static final String DISPLAYNAME = "displayname";
     private static final String LANGUAGE = "language";
+    private static final String AUTOSAVE = "autosave";
     private static Activity mActivity;
 
     public static void initResource(Activity activity) {
@@ -43,7 +44,19 @@ public abstract class ApplicationSharedData {
         SharedPreferences preferences = mActivity.getSharedPreferences(PreferencesName, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(LANGUAGE, language);
-        editor.commit();
+        editor.apply();
+    }
+
+    public static void setAutoSave(boolean auto) {
+        SharedPreferences preferences = mActivity.getSharedPreferences(PreferencesName, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(AUTOSAVE, String.valueOf(auto));
+        editor.apply();
+    }
+
+    public static boolean isAutoSave() {
+        SharedPreferences preferences = mActivity.getSharedPreferences(PreferencesName, Context.MODE_PRIVATE);
+        return Boolean.valueOf(preferences.getString(AUTOSAVE, "false"));
     }
 
     public static String getUser(){
