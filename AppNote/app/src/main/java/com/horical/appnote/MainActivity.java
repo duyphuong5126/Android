@@ -188,10 +188,10 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
         service.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                int pos = -1;
                 for (int i = 0; i < mListReminders.size(); i++) {
                     final NoteReminder noteReminder = mListReminders.get(i);
                     if (noteReminder.readyToRemind() == 0) {
+                        final int pos = i;
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -205,6 +205,7 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
                                         if (fragment != null) {
                                             fragment.refreshListReminder();
                                         }
+                                        mListReminders.remove(pos);
                                     }
                                 });
                                 mDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -226,7 +227,6 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
                                     Intent des = new Intent(MainActivity.this, MainActivity.class);
                                     PendingIntent pendingIntent = PendingIntent.getActivity(MainActivity.this, 0, des, 0);
 
-
                                     Notification notification = new Notification.Builder(MainActivity.this)
                                             .setContentTitle(textNotify)
                                             .setContentText(notifyContent)
@@ -240,11 +240,7 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
                             }
                         });
                         startMedia(noteReminder.getVoice());
-                        pos = i;
                     }
-                }
-                if (pos >= 0) {
-                    mListReminders.remove(pos);
                 }
             }
         }, 5, 5, TimeUnit.SECONDS);
