@@ -38,6 +38,7 @@ import com.horical.appnote.DTO.NoteDTO.NoteSummary;
 import com.horical.appnote.DTO.NoteDTO.NoteText;
 import com.horical.appnote.DTO.NoteDTO.NoteVideoClip;
 import com.horical.appnote.DTO.NoteDTO.NoteVoice;
+import com.horical.appnote.Interfaces.EditNoteListener;
 import com.horical.appnote.LocalStorage.ApplicationSharedData;
 import com.horical.appnote.LocalStorage.DAO.NoteDataDAO;
 import com.horical.appnote.LocalStorage.DAO.NoteReminderDAO;
@@ -68,7 +69,7 @@ import java.util.Stack;
  * Created by Phuong on 24/07/2015.
  */
 public class NewNoteFragment extends BaseFragment implements View.OnClickListener, EditText.OnTouchListener,
-        AddReminderDialog.ReminderCallback, MediaChooserDialog.MediaCallback, OpenMediaInterface {
+        AddReminderDialog.ReminderCallback, MediaChooserDialog.MediaCallback, OpenMediaInterface, EditNoteListener {
 
     private static final int LOAD_IMAGE_SUCCESS = 1;
     private static final int LOAD_VIDEO_SUCCESS = 2;
@@ -730,7 +731,8 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
 
     }
 
-    private void saveNote(boolean show) {
+    @Override
+    public void saveNote(boolean show) {
         if (show) {
             mLayoutProgress.setVisibility(View.VISIBLE);
             mMainInterface.showLoadingEffect(true, "Save in process...");
@@ -950,14 +952,5 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
     public void OpenFile(String path) {
         mMediaChooserDialog.setMediaPath(path);
         mMediaChooserDialog.show();
-    }
-
-    @Override
-    public void onStop() {
-        if (ApplicationSharedData.isAutoSave()) {
-            saveNote(false);
-        }
-        this.hideSoftKeyboard();
-        super.onStop();
     }
 }

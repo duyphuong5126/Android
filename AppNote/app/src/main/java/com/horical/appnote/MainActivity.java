@@ -35,6 +35,7 @@ import com.horical.appnote.DTO.FileDTO.FileData;
 import com.horical.appnote.DTO.NoteDTO.NoteData;
 import com.horical.appnote.DTO.NoteDTO.NoteReminder;
 import com.horical.appnote.DTO.NoteDTO.NoteSummary;
+import com.horical.appnote.Interfaces.EditNoteListener;
 import com.horical.appnote.LocalStorage.ApplicationSharedData;
 import com.horical.appnote.LocalStorage.DAO.NoteDataDAO;
 import com.horical.appnote.LocalStorage.DAO.NoteReminderDAO;
@@ -141,6 +142,8 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
 
     private boolean mInternetAvailibility;
 
+    private EditNoteListener mEditNoteListener;
+
     private boolean mListImagesIsReloading, mListVideosIsReloading, mListAudiosIsReloading;
 
     private enum SameFragmentProperty {
@@ -217,25 +220,6 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
                                 });
                                 if (MainActivity.this.hasWindowFocus()) {
                                     mDialog.show();
-                                } else {
-                                    NotificationManager notificationManager =
-                                            (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                                    String textNotify = "Your reminder";
-                                    int iconNotify = R.drawable.ic_alarm_black_24dp;
-                                    String notifyContent = noteReminder.getContent();
-
-                                    Intent des = new Intent(MainActivity.this, MainActivity.class);
-                                    PendingIntent pendingIntent = PendingIntent.getActivity(MainActivity.this, 0, des, 0);
-
-                                    Notification notification = new Notification.Builder(MainActivity.this)
-                                            .setContentTitle(textNotify)
-                                            .setContentText(notifyContent)
-                                            .setSmallIcon(iconNotify)
-                                            .setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(), iconNotify))
-                                            .setFullScreenIntent(pendingIntent, false)
-                                            .build();
-
-                                    notificationManager.notify(5, notification);
                                 }
                             }
                         });
@@ -449,6 +433,10 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
             if (mListFragments.size() <= 0) {
                 Toast.makeText(this, LanguageUtils.getNotifyPressAgainString(), Toast.LENGTH_SHORT).show();
             }
+
+            if (mEditNoteListener != null && ApplicationSharedData.isAutoSave()) {
+                mEditNoteListener.saveNote(false);
+            }
         }
     }
 
@@ -476,6 +464,7 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
                     mBundle.putBoolean("isCreate", true);
                     fragment.setArguments(mBundle);
                     this.updateSideMenuUI(LanguageUtils.getNewNoteString());
+                    mEditNoteListener = (NewNoteFragment) fragment;
                     break;
 
                 case BaseFragment.UpdateNoteFragment:
@@ -484,59 +473,70 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
                     mBundle.putBoolean("isCreate", false);
                     fragment.setArguments(mBundle);
                     this.updateSideMenuUI(LanguageUtils.getNewNoteString());
+                    mEditNoteListener = (NewNoteFragment) fragment;
                     break;
 
                 case BaseFragment.ListNotesFragment:
                     fragment = new ListNotesFragment();
                     mListFragments.clear();
                     this.updateSideMenuUI(LanguageUtils.getListNotesString());
+                    mEditNoteListener = null;
                     break;
 
                 case BaseFragment.ViewNoteFragment:
                     fragment = new ViewNoteFragment();
                     fragment.setArguments(mBundle);
                     this.updateSideMenuUI(LanguageUtils.getListNotesString());
+                    mEditNoteListener = null;
                     break;
 
                 case BaseFragment.CalendarFragment:
                     fragment = new CalendarFragment();
                     ((CalendarFragment) fragment).setCallback(this);
                     this.updateSideMenuUI(LanguageUtils.getCalendarString());
+                    mEditNoteListener = null;
                     break;
 
                 case BaseFragment.ViewReminderFragment:
                     fragment = new ViewReminderFragment();
                     fragment.setArguments(mBundle);
                     this.updateSideMenuUI(LanguageUtils.getCalendarString());
+                    mEditNoteListener = null;
                     break;
 
                 case BaseFragment.FileManagerFragment:
                     fragment = new FilesManagerFragment();
                     this.updateSideMenuUI(LanguageUtils.getFileManagerString());
+                    mEditNoteListener = null;
                     break;
 
                 case BaseFragment.SettingsFragment:
                     fragment = new SettingFragment();
                     this.updateSideMenuUI(LanguageUtils.getSettingString());
+                    mEditNoteListener = null;
                     break;
 
                 case BaseFragment.SignUpFragment:
                     fragment = new SignUpFragment();
                     ((SignUpFragment) fragment).setListener(this);
+                    mEditNoteListener = null;
                     break;
 
                 case BaseFragment.ForgotAccountFragment:
                     fragment = new ForgotAccountFragment();
+                    mEditNoteListener = null;
                     break;
 
                 case BaseFragment.ViewAccountFragment:
                     fragment = new ViewAccountFragment();
                     this.updateSideMenuUI(LanguageUtils.getSettingString());
+                    mEditNoteListener = null;
                     break;
 
                 case BaseFragment.LoginFragment:
                     fragment = new LoginFragment();
                     ((LoginFragment) fragment).setListener(this);
+                    mEditNoteListener = null;
                     break;
 
                 default:
