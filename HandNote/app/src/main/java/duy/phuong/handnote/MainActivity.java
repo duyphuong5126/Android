@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 
 import duy.phuong.handnote.Fragment.BaseFragment;
 import duy.phuong.handnote.Fragment.CreateTextFragment;
+import duy.phuong.handnote.Fragment.MainFragment;
 import duy.phuong.handnote.Listener.MainListener;
 
 public class MainActivity extends FragmentActivity implements MainListener, ImageButton.OnClickListener {
@@ -23,7 +24,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     private DrawerLayout mMainNavigator;
     private LinearLayout mSideMenu;
     private FrameLayout mLayoutBottomTabs;
-    private ImageButton mButtonNavigator;
+    private ImageButton mButtonNavigator, mButtonCreate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,10 +35,12 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         mMainNavigator = (DrawerLayout) findViewById(R.id.layoutMainNavigator);
         mButtonNavigator = (ImageButton) findViewById(R.id.buttonMainNavigator);
         mButtonNavigator.setOnClickListener(this);
+        mButtonCreate = (ImageButton) findViewById(R.id.buttonCreate);
+        mButtonCreate.setOnClickListener(this);
 
         mFragmentManager = getSupportFragmentManager();
 
-        this.showFragment(BaseFragment.CREATE_TEXT_FRAGMENT);
+        this.showFragment(BaseFragment.MAIN_FRAGMENT);
 
     }
 
@@ -72,6 +75,13 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                 CreateTextFragment createTextFragment = new CreateTextFragment();
                 createTextFragment.setListener(this);
                 transaction.replace(R.id.layoutFragmentContainer, createTextFragment, createTextFragment.fragmentIdentify());
+                transaction.commit();
+                break;
+
+            case BaseFragment.MAIN_FRAGMENT:
+                MainFragment mainFragment = new MainFragment();
+                mainFragment.setListener(this);
+                transaction.replace(R.id.layoutFragmentContainer, mainFragment, mainFragment.fragmentIdentify());
                 transaction.commit();
                 break;
             default:
@@ -112,6 +122,9 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         switch (v.getId()) {
             case R.id.buttonMainNavigator:
                 this.toggleMainNavigator(true);
+                break;
+            case R.id.buttonCreate:
+                showFragment(BaseFragment.CREATE_TEXT_FRAGMENT);
                 break;
         }
     }

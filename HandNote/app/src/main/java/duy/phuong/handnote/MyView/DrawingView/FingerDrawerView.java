@@ -30,7 +30,7 @@ import duy.phuong.handnote.Support.SupportUtils;
  */
 public class FingerDrawerView extends View {
 
-    private ArrayList<ArrayList<Point>> mListPaths;
+    private ArrayList<MyPath> mListPaths;
 
     private Bitmap mBitmap, mCacheBitmap;
     private float mCurrentWidth = 5f;
@@ -102,13 +102,72 @@ public class FingerDrawerView extends View {
     }
 
     private void detectCharacterWithAPI() {
-        mAPI.onDetectCharacter(mCacheBitmap, new RecognitionCallback() {
-            @Override
-            public void onRecognizeSuccess(ArrayList<Bitmap> listBitmaps) {
-                mListener.onRecognizeSuccess(listBitmaps);
-                invalidate();
+        ArrayList<MyShape> listShapes = new ArrayList<>();
+
+        for (int i = 0; i< mListPaths.size(); i++) {
+            MyPath myPath = mListPaths.get(i);
+            if (!myPath.isChecked()) {
+                ArrayList<MyPath> list = new ArrayList<>();
+                list.add(myPath);
+                for (int j = i + 1; j < mListPaths.size(); j++) {
+                    MyPath path = mListPaths.get(j);
+                    if (!path.isChecked()) {
+                        if (path.isIntersect(myPath, CurrentWidth, CurrentHeight)) {
+                            for (Point point : path.getListPoint()) {
+                                if (!list.contains(point)) {
+                                    list.add(path);
+                                }
+                            }
+                            mListPaths.get(j).setChecked(true);
+                        }
+                    }
+                }
+                mListPaths.get(i).setChecked(true);
+
+                if (!list.isEmpty()) {
+                    MyShape myShape = new MyShape(list);
+                    myShape.mergeRect();
+                    listShapes.add(myShape);
+                }
             }
-        });
+        }
+
+        for (int i = 0; i < mListPaths.size(); i++) {
+            mListPaths.get(i).setChecked(false);
+        }
+
+        final ArrayList<Bitmap> bitmaps = new ArrayList<>();
+
+        if (!listShapes.isEmpty()) {
+            for (MyShape myShape : listShapes) {
+                Bitmap bitmap = Bitmap.createBitmap(mCacheBitmap.getWidth(), mCacheBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(bitmap);
+                canvas.drawColor(Color.WHITE);
+                for (MyPath myPath : myShape.getListPaths()) {
+                    Path path = new Path();
+                    boolean first = true;
+                    for (Point point : myPath.getListPoint()) {
+                        if (first) {
+                            first = false;
+                            path.moveTo(point.x, point.y);
+                        } else {
+                            path.lineTo(point.x, point.y);
+                        }
+                    }
+
+                    canvas.drawPath(path, mPaint);
+                }
+
+                mAPI.onDetectCharacter(bitmap, new RecognitionCallback() {
+                    @Override
+                    public void onRecognizeSuccess(ArrayList<Bitmap> listBitmaps) {
+                        bitmaps.addAll(listBitmaps);
+                    }
+                });
+            }
+        }
+        mListener.onRecognizeSuccess(bitmaps);
+
     }
 
 
@@ -119,10 +178,10 @@ public class FingerDrawerView extends View {
             mCanvas.drawColor(Color.WHITE);
             mCacheCanvas.drawColor(Color.WHITE);
         }
-        for (ArrayList<Point> listPoint : mListPaths) {
+        for (MyPath myPath : mListPaths) {
             Path path = new Path();
             boolean first = true;
-            for (Point point : listPoint) {
+            for (Point point : myPath.getListPoint()) {
                 if (first) {
                     first = false;
                     path.moveTo(point.x, point.y);
@@ -143,15 +202,17 @@ public class FingerDrawerView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 ArrayList<Point> listPoint = new ArrayList<>();
+                MyPath myPath = new MyPath(listPoint);
                 listPoint.add(new Point((int) x, (int) y));
-                mListPaths.add(listPoint);
+                mListPaths.add(myPath);
                 mStartRecognizeTime = System.currentTimeMillis();
                 return true;
             case MotionEvent.ACTION_MOVE:
-                mListPaths.get(mCurrentPath).add(new Point((int) x, (int) y));
+                mListPaths.get(mCurrentPath).getListPoint().add(new Point((int) x, (int) y));
                 break;
             case MotionEvent.ACTION_UP:
-                mListPaths.get(mCurrentPath).add(new Point((int) x, (int) y));
+                mListPaths.get(mCurrentPath).getListPoint().add(new Point((int) x, (int) y));
+                mListPaths.get(mCurrentPath).initRect();
                 mCurrentPath++;
                 isReadyForRecognize = true;
                 break;

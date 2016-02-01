@@ -1,54 +1,58 @@
-package nguyenhoang.duy.phuong.helicoptergame;
+package nguyenhoang.duy.phuong.helicoptergame.GameComponents.GamePlayers;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
+import nguyenhoang.duy.phuong.helicoptergame.GameComponents.GameUtils.Animation;
+import nguyenhoang.duy.phuong.helicoptergame.GameComponents.GameObject;
+import nguyenhoang.duy.phuong.helicoptergame.GameComponents.GamePanel;
+
 /**
  * Created by Phuong on 09/06/2015.
  */
-public class Player extends GameObject{
-    protected Bitmap spritesheet;
-    protected int score;
-    protected boolean up;
-    protected boolean playing;
-    protected Animation animate = new Animation();
+public class Player extends GameObject {
+    protected Bitmap mSpriteSheet;
+    protected int mScore;
+    protected boolean Up;
+    protected boolean Playing;
+    protected Animation mAnimate = new Animation();
     protected long startTime;
-    protected boolean dissapear;
-    private int status;
+    protected boolean Disapear;
+    private int mStatus;
     private int Life;
 
     public Player(int w, int h){
         dy = 0;
-        score = 0;
+        mScore = 0;
         height = h;
         width = w;
-        status = 0;
+        mStatus = 0;
         Life = 1;
     }
 
     public void initSprites(Bitmap res, int numFrames){
         Bitmap[] images = new Bitmap[numFrames];
-        spritesheet = res;
+        mSpriteSheet = res;
         for (int i=0; i<images.length; i++) {
-            images[i] = Bitmap.createBitmap(spritesheet, i*width, 0, width, height);
+            images[i] = Bitmap.createBitmap(mSpriteSheet, i*width, 0, width, height);
         }
-        animate.setFrames(images);
-        animate.setDelay(10);
+        mAnimate.setFrames(images);
+        mAnimate.setDelay(10);
         startTime = System.nanoTime();
     }
 
     public void setUp(boolean up) {
-        this.up = up;
+        this.Up = up;
     }
     public void update(GamePanel gamePanel){
         long eslapsed = (System.nanoTime() - startTime)/1000000;
         if(eslapsed>100){
-            score++;
+            mScore++;
             startTime = System.nanoTime();
         }
-        animate.update();
+        mAnimate.update();
 
-        if(up){
+        if(Up){
             dy -= 1;
         }
         else{
@@ -63,44 +67,44 @@ public class Player extends GameObject{
     }
 
     public void draw(Canvas canvas){
-        canvas.drawBitmap(animate.getImage(),x,y,null);
+        canvas.drawBitmap(mAnimate.getImage(),x,y,null);
     }
 
     public int getScore() {
-        return score;
+        return mScore;
     }
 
     public boolean isPlaying() {
-        return playing;
+        return Playing;
     }
 
     public void setPlaying(boolean playing) {
-        this.playing = playing;
+        this.Playing = playing;
     }
     public void resetScore(){
-        score=0;
-        status = 0;
+        mScore =0;
+        mStatus = 0;
     }
     public void resetDY(){ dy=0; }
 
     public void setScore(int score) {
-        this.score = score;
+        this.mScore = score;
     }
 
     public boolean isDissapear() {
-        return dissapear;
+        return Disapear;
     }
 
     public void setDissapear(boolean dissapear) {
-        this.dissapear = dissapear;
+        this.Disapear = dissapear;
     }
 
     public void setStatus(int status) {
-        this.status = status;
+        this.mStatus = status;
     }
 
     public int getStatus() {
-        return status;
+        return mStatus;
     }
 
     public int getLife() {

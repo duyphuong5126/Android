@@ -1,4 +1,4 @@
-package nguyenhoang.duy.phuong.helicoptergame;
+package nguyenhoang.duy.phuong.helicoptergame.GameComponents;
 
 import android.graphics.Rect;
 

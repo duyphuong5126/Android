@@ -7,6 +7,8 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 
+import nguyenhoang.duy.phuong.helicoptergame.GameComponents.GamePanel;
+
 
 public class MainActivity extends Activity {
 

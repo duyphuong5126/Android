@@ -30,7 +30,7 @@ public class RoundImageView extends ImageView {
         Bitmap drawable = ((BitmapDrawable) getDrawable()).getBitmap();
         Bitmap src = drawable.copy(Bitmap.Config.ARGB_8888, true);
         Bitmap roundedBitmap = RoundImageView.getRoundedBitmap(src, (getWidth() >= getHeight()) ? getHeight() : getWidth());
-        canvas.drawColor(Color.parseColor("c03"));
+        canvas.drawColor(Color.parseColor("#FFCC0033"));
         canvas.drawBitmap(roundedBitmap, (getWidth() - roundedBitmap.getWidth()) / 2, (getHeight() - roundedBitmap.getHeight()) / 2, null);
     }
 

@@ -147,6 +147,7 @@
                     android:gravity="center">
 
                     <ImageButton
+                        android:id="@+id/buttonCreate"
                         android:layout_width="75dip"
                         android:layout_height="75dip"
                         android:background="@drawable/circle_heavy_red"
@@ -162,6 +163,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="#fff"
+        android:layout_gravity="left"
         android:orientation="vertical">
 
         <LinearLayout
@@ -174,7 +176,7 @@
             <LinearLayout
                 android:layout_width="0dip"
                 android:layout_height="fill_parent"
-                android:gravity="center_vertical"
+                android:gravity="center"
                 android:layout_weight="2">
 
 
@@ -183,7 +185,7 @@
                     android:layout_width="70dip"
                     android:layout_height="70dip"
                     android:src="@drawable/avatar"
-                    android:layout_marginLeft="20dip"
+                    android:layout_marginLeft="10dip"
                     android:background="#c03"/>
             </LinearLayout>
 

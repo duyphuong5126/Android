@@ -3,45 +3,48 @@ package nguyenhoang.duy.phuong.helicoptergame;
 import android.graphics.Canvas;
 import android.view.SurfaceHolder;
 
+import nguyenhoang.duy.phuong.helicoptergame.GameComponents.GamePanel;
+
 /**
  * Created by Phuong on 09/06/2015.
  */
 public class MainThread extends Thread {
-    private int FPS = 30;
-    private double avarageFPS;
-    private SurfaceHolder holder;
-    private GamePanel gamePanel;
-    private boolean running;
-    private static Canvas canvas;
+    private int mFPS = 30;
+    private double mAverageFPS;
+    private SurfaceHolder mHolder;
+    private GamePanel mGamePanel;
+    private boolean mRunning;
+
+    private static Canvas CANVAS;
 
     public MainThread(SurfaceHolder sf, GamePanel gp){
         super();
-        this.holder = sf;
-        this.gamePanel = gp;
+        this.mHolder = sf;
+        this.mGamePanel = gp;
     }
 
     @Override
     public void run() {
-        long startTime, timeMilis, waitTime, totalTime = 0, targetTime = 1000 / FPS;
+        long startTime, timeMilis, waitTime, totalTime = 0, targetTime = 1000 / mFPS;
         int frameCount = 0;
-        while (running){
+        while (mRunning){
             startTime = System.nanoTime();
-            canvas = null;
+            CANVAS = null;
 
-            //lock the canvas to pixel editing
+            //lock the CANVAS to pixel editing
             try{
-                canvas = this.holder.lockCanvas();
-                synchronized (holder){
-                    this.gamePanel.update();
-                    this.gamePanel.draw(canvas);
+                CANVAS = this.mHolder.lockCanvas();
+                synchronized (mHolder){
+                    this.mGamePanel.update();
+                    this.mGamePanel.draw(CANVAS);
                 }
             } catch (Exception e){
 
             }
             finally {
-                if(canvas != null){
+                if(CANVAS != null){
                     try {
-                        holder.unlockCanvasAndPost(canvas);
+                        mHolder.unlockCanvasAndPost(CANVAS);
                     }catch (Exception e){
                         e.printStackTrace();
                     }
@@ -57,8 +60,8 @@ public class MainThread extends Thread {
 
             totalTime += System.nanoTime() - startTime;
             frameCount++;
-            if(frameCount == FPS){
-                avarageFPS = 1000/((totalTime/frameCount)/1000000);
+            if(frameCount == mFPS){
+                mAverageFPS = 1000/((totalTime/frameCount)/1000000);
                 frameCount = 0;
                 totalTime = 0;
             }
@@ -66,6 +69,6 @@ public class MainThread extends Thread {
     }
 
     public void setRunning(boolean running){
-        this.running = running;
+        this.mRunning = running;
     }
 }

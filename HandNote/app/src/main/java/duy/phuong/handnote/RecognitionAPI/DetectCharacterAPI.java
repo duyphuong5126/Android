@@ -11,6 +11,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 
 import duy.phuong.handnote.Listener.RecognitionCallback;
 import duy.phuong.handnote.MyView.DrawingView.MyPoint;
@@ -25,9 +26,23 @@ public class DetectCharacterAPI {
     private ArrayList<Rect> mListRectangle;
     private Context mContext;
 
+    private ArrayList<Integer> mListColor;
+    private int mCurrentColorID;
+
     public DetectCharacterAPI(Context context) {
         mListRectangle = new ArrayList<>();
         mContext = context;
+
+        mListColor = new ArrayList<>();
+        mListColor.add(Color.RED);
+        mListColor.add(Color.GREEN);
+        mListColor.add(Color.BLUE);
+        mListColor.add(Color.YELLOW);
+        mListColor.add(Color.CYAN);
+        mListColor.add(Color.MAGENTA);
+        mListColor.add(Color.DKGRAY);
+
+        mCurrentColorID = -1;
     }
 
     public void onDetectCharacter(final Bitmap src, RecognitionCallback callback) {
@@ -58,17 +73,17 @@ public class DetectCharacterAPI {
             resultBitmaps.add(SupportUtils.cropBitmap(src, rect.left, rect.top, rect.width(), rect.height()));
         }
 
-        for (Bitmap bitmap : resultBitmaps) {
+        /*for (Bitmap bitmap : resultBitmaps) {
             this.detectCharacters(bitmap);
-        }
+        }*/
 
         callback.onRecognizeSuccess(resultBitmaps);
 
         this.mListRectangle.clear();
     }
 
-    private void detectCharacters(Bitmap src) {
-        ArrayList<MyPoint> listMyPoints = new ArrayList<>();
+    private void detectCharacters(final Bitmap src) {
+        final ArrayList<MyPoint> listMyPoints = new ArrayList<>();
 
         for (int i = 0; i < src.getWidth(); i++)
             for (int j = 0; j < src.getHeight(); j++) {
@@ -81,31 +96,61 @@ public class DetectCharacterAPI {
                 }
             }
 
+        final ThreadGroup threadGroup = new ThreadGroup("DFSThreadsGroup");
 
-        ThreadGroup threadGroup = new ThreadGroup("DFSThreadsGroup");
-
-        doDFS(listMyPoints.get(0), src, threadGroup);
-        Log.d("Size", "" + listMyPoints.size());
-    }
-
-    private void doDFS(final MyPoint point, final Bitmap src, final ThreadGroup threadGroup) {
         Thread thread = new Thread(threadGroup, new Runnable() {
             @Override
             public void run() {
-                src.setPixel(point.x, point.y, Color.RED);
-                for (MyPoint myPoint : getNeighborsPoint(point, src)) {
-                    if (src.getPixel(myPoint.x, myPoint.y) == Color.BLACK) {
-                        doDFS(myPoint, src, threadGroup);
-                    }
-                }
+                mCurrentColorID = 0;
+                doDFS(listMyPoints.get(0), src, threadGroup);
             }
-        }, "DFS" + System.currentTimeMillis(), 20000000);
+        }, "DFS" + System.currentTimeMillis(), 50000000);
         try {
             thread.start();
             thread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    private MyPoint getFirstBlackPixel(Bitmap src) {
+        for (int i = 0; i < src.getWidth(); i++) {
+            for (int j = 0; j < src.getHeight(); j++) {
+                if (src.getPixel(i, j) == Color.BLACK) {
+                    return new MyPoint(i, j);
+                }
+            }
+        }
+        return null;
+    }
+
+    private boolean doDFS(final MyPoint point, final Bitmap src, final ThreadGroup threadGroup) {
+        Thread thread = new Thread(threadGroup, new Runnable() {
+            @Override
+            public void run() {
+                src.setPixel(point.x, point.y, mListColor.get(mCurrentColorID));
+                ArrayList<MyPoint> list = new ArrayList<>();
+                list.addAll(getNeighborsPoint(point, src));
+                if (!list.isEmpty()) {
+                    for (MyPoint myPoint : list) {
+                        if (src.getPixel(myPoint.x, myPoint.y) == Color.BLACK) {
+                            doDFS(myPoint, src, threadGroup);
+                        }
+                    }
+                }
+            }
+        }, "DFS" + System.currentTimeMillis(), 50000000);
+        try {
+            thread.start();
+            thread.join();
+            return false;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("Count", "" + threadGroup.activeCount());
+
+        return true;
     }
 
     private ArrayList<MyPoint> getNeighborsPoint(MyPoint point, Bitmap src) {
@@ -144,6 +189,7 @@ public class DetectCharacterAPI {
                 list.add(new MyPoint(right, under));
             }
         }
+        Log.d("Count", "" + list.size());
         return list;
     }
 

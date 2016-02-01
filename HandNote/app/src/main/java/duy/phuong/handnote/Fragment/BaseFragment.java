@@ -15,6 +15,7 @@ import duy.phuong.handnote.Listener.MainListener;
  */
 public abstract class BaseFragment extends Fragment {
     public static final String CREATE_TEXT_FRAGMENT = "CreateTextFragment";
+    public static final String MAIN_FRAGMENT = "MainFragment";
     protected Activity mActivity;
     protected View mFragmentView;
     protected int mLayoutRes;
