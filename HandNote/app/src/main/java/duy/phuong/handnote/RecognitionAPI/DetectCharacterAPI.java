@@ -21,137 +21,26 @@ import duy.phuong.handnote.Support.SupportUtils;
  * Created by Phuong on 26/11/2015.
  */
 public class DetectCharacterAPI {
-    private Canvas mCanvas;
 
     private ArrayList<Rect> mListRectangle;
-    private Context mContext;
 
-    private ArrayList<Integer> mListColor;
-    private int mCurrentColorID;
-
-    public DetectCharacterAPI(Context context) {
+    public DetectCharacterAPI() {
         mListRectangle = new ArrayList<>();
-        mContext = context;
-
-        mListColor = new ArrayList<>();
-        mListColor.add(Color.RED);
-        mListColor.add(Color.GREEN);
-        mListColor.add(Color.BLUE);
-        mListColor.add(Color.YELLOW);
-        mListColor.add(Color.CYAN);
-        mListColor.add(Color.MAGENTA);
-        mListColor.add(Color.DKGRAY);
-
-        mCurrentColorID = -1;
     }
 
     public void onDetectCharacter(final Bitmap src, RecognitionCallback callback) {
-        ArrayList<Rect> listDetectedArea;
-
-        //detect level 1
-        listDetectedArea = detectAreasOnBitmap(src, 0, 0);
-
-        //detect level 2
-        HashMap<Integer, Bitmap> listDetectedAreas = new HashMap<>();
-        for (int i = 0; i < listDetectedArea.size(); i++) {
-            Rect rect = listDetectedArea.get(i);
-            listDetectedAreas.put(i, SupportUtils.cropBitmap(src, rect.left, rect.top, rect.width(), rect.height()));
-        }
-
-        if (!listDetectedAreas.isEmpty()) {
-            for (Map.Entry<Integer, Bitmap> entry : listDetectedAreas.entrySet()) {
-                Rect rect = listDetectedArea.get(entry.getKey());
-                ArrayList<Rect> listRect = detectAreasOnBitmap(entry.getValue(), rect.left, rect.top);
-                if (!listRect.isEmpty()) {
-                    mListRectangle.addAll(listRect);
-                }
-            }
-        }
+        this.mListRectangle.addAll(detectAreasOnBitmap(src, 0, 0));
 
         ArrayList<Bitmap> resultBitmaps = new ArrayList<>();
         for (Rect rect : mListRectangle) {
             resultBitmaps.add(SupportUtils.cropBitmap(src, rect.left, rect.top, rect.width(), rect.height()));
         }
 
-        /*for (Bitmap bitmap : resultBitmaps) {
-            this.detectCharacters(bitmap);
-        }*/
-
         callback.onRecognizeSuccess(resultBitmaps);
 
         this.mListRectangle.clear();
     }
 
-    private void detectCharacters(final Bitmap src) {
-        final ArrayList<MyPoint> listMyPoints = new ArrayList<>();
-
-        for (int i = 0; i < src.getWidth(); i++)
-            for (int j = 0; j < src.getHeight(); j++) {
-                if (src.getPixel(i, j) == Color.BLACK) {
-                    MyPoint myPoint = new MyPoint(i, j);
-                    for (MyPoint point : getNeighborsPoint(myPoint, src)) {
-                        myPoint.newNeighbor(point);
-                    }
-                    listMyPoints.add(myPoint);
-                }
-            }
-
-        final ThreadGroup threadGroup = new ThreadGroup("DFSThreadsGroup");
-
-        Thread thread = new Thread(threadGroup, new Runnable() {
-            @Override
-            public void run() {
-                mCurrentColorID = 0;
-                doDFS(listMyPoints.get(0), src, threadGroup);
-            }
-        }, "DFS" + System.currentTimeMillis(), 50000000);
-        try {
-            thread.start();
-            thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private MyPoint getFirstBlackPixel(Bitmap src) {
-        for (int i = 0; i < src.getWidth(); i++) {
-            for (int j = 0; j < src.getHeight(); j++) {
-                if (src.getPixel(i, j) == Color.BLACK) {
-                    return new MyPoint(i, j);
-                }
-            }
-        }
-        return null;
-    }
-
-    private boolean doDFS(final MyPoint point, final Bitmap src, final ThreadGroup threadGroup) {
-        Thread thread = new Thread(threadGroup, new Runnable() {
-            @Override
-            public void run() {
-                src.setPixel(point.x, point.y, mListColor.get(mCurrentColorID));
-                ArrayList<MyPoint> list = new ArrayList<>();
-                list.addAll(getNeighborsPoint(point, src));
-                if (!list.isEmpty()) {
-                    for (MyPoint myPoint : list) {
-                        if (src.getPixel(myPoint.x, myPoint.y) == Color.BLACK) {
-                            doDFS(myPoint, src, threadGroup);
-                        }
-                    }
-                }
-            }
-        }, "DFS" + System.currentTimeMillis(), 50000000);
-        try {
-            thread.start();
-            thread.join();
-            return false;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        Log.d("Count", "" + threadGroup.activeCount());
-
-        return true;
-    }
 
     private ArrayList<MyPoint> getNeighborsPoint(MyPoint point, Bitmap src) {
         ArrayList<MyPoint> list = new ArrayList<>();

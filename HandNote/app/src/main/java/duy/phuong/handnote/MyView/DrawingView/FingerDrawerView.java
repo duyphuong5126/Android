@@ -10,20 +10,16 @@ import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import duy.phuong.handnote.Listener.RecognitionCallback;
 import duy.phuong.handnote.RecognitionAPI.DetectCharacterAPI;
-import duy.phuong.handnote.Support.SupportUtils;
 
 /**
  * Created by Phuong on 23/11/2015.
@@ -33,7 +29,7 @@ public class FingerDrawerView extends View {
     private ArrayList<MyPath> mListPaths;
 
     private Bitmap mBitmap, mCacheBitmap;
-    private float mCurrentWidth = 5f;
+    public static float CurrentPaintSize = 5f;
     private Canvas mCanvas, mCacheCanvas;
 
     private int mCurrentPath = 0;
@@ -59,7 +55,7 @@ public class FingerDrawerView extends View {
         mRectPaint = new Paint();
         mRectPaint.setColor(Color.RED);
         mRectPaint.setStrokeWidth(1);
-        mAPI = new DetectCharacterAPI(context);
+        mAPI = new DetectCharacterAPI();
     }
 
     public void setListener(RecognitionCallback callback) {
@@ -90,10 +86,8 @@ public class FingerDrawerView extends View {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                if (isReadyForRecognize && mStartRecognizeTime > 0) {
-                    if (System.currentTimeMillis() - mStartRecognizeTime > 3000) {
-                        handler.sendMessage(handler.obtainMessage());
-                    }
+                if (isReadyForRecognize && mStartRecognizeTime > 0 && System.currentTimeMillis() - mStartRecognizeTime > 3000) {
+                    handler.sendMessage(handler.obtainMessage());
                 }
                 handler.postDelayed(this, 10);
             }
@@ -112,7 +106,7 @@ public class FingerDrawerView extends View {
                 for (int j = i + 1; j < mListPaths.size(); j++) {
                     MyPath path = mListPaths.get(j);
                     if (!path.isChecked()) {
-                        if (path.isIntersect(myPath, CurrentWidth, CurrentHeight)) {
+                        if (path.isIntersect(myPath, CurrentWidth, CurrentHeight, mPaint)) {
                             for (Point point : path.getListPoint()) {
                                 if (!list.contains(point)) {
                                     list.add(path);
@@ -230,7 +224,7 @@ public class FingerDrawerView extends View {
         tempPaint.setStrokeJoin(Paint.Join.ROUND);
         tempPaint.setAntiAlias(true);
         tempPaint.setDither(true);
-        tempPaint.setStrokeWidth(mCurrentWidth);
+        tempPaint.setStrokeWidth(CurrentPaintSize);
         return tempPaint;
     }
 
@@ -238,9 +232,9 @@ public class FingerDrawerView extends View {
         Paint eraser = new Paint();
         eraser.setAntiAlias(true);
         eraser.setAlpha(0xFF);
-        eraser.setColor(Color.RED);
+        eraser.setColor(Color.WHITE);
         eraser.setStyle(Paint.Style.STROKE);
-        eraser.setStrokeWidth(mCurrentWidth);
+        eraser.setStrokeWidth(CurrentPaintSize);
         eraser.setStrokeJoin(Paint.Join.ROUND);
         eraser.setXfermode(null);
         eraser.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));

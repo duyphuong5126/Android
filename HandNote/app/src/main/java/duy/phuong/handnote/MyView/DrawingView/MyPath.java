@@ -1,13 +1,15 @@
 package duy.phuong.handnote.MyView.DrawingView;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.CornerPathEffect;
+import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.graphics.Region;
 
 import java.util.ArrayList;
-
-import duy.phuong.handnote.Support.SupportUtils;
 
 /**
  * Created by Phuong on 27/01/2016.
@@ -67,11 +69,7 @@ public class MyPath {
         mRect = new Rect(left, top, right, bot);
     }
 
-    public boolean isOverlay(MyPath path) {
-        return mRect.intersect(path.getRect());
-    }
-
-    public boolean isIntersect(MyPath myPath, int width, int height) {
+    public boolean isIntersect(MyPath myPath, int width, int height, Paint tempPaint) {
         Path path1 = new Path();
         Path path2 = new Path();
         boolean first = true;
@@ -95,6 +93,26 @@ public class MyPath {
                 path2.lineTo(point.x, point.y);
             }
         }
-        return SupportUtils.checkIntersect(path1, path2, width, height);
+        return checkIntersect(path1, path2, width, height, tempPaint);
+    }
+
+    private boolean checkIntersect(Path p1, Path p2, int width, int height, Paint tempPaint) {
+        Bitmap bmp1 = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas c1 = new Canvas(bmp1);
+        c1.drawColor(Color.WHITE);
+        c1.drawPath(p1, tempPaint);
+        Bitmap bmp2 = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas c2 = new Canvas(bmp2);
+        c2.drawColor(Color.WHITE);
+        c2.drawPath(p2, tempPaint);
+
+        for (int i = 0; i < width; i++)
+            for (int j = 0; j < height; j++) {
+                if (bmp1.getPixel(i, j) == Color.BLACK && bmp2.getPixel(i, j) == Color.BLACK) {
+                    return true;
+                }
+            }
+
+        return false;
     }
 }
