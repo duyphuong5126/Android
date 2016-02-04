@@ -106,10 +106,11 @@
                         android:layout_weight="1"
                         android:gravity="center_vertical">
 
-                        <TextView
+                        <Button
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="30dip"
+                            android:background="#0000"
+                            android:layout_marginLeft="20dip"
                             android:text="@string/list_en"
                             android:textColor="#fff"
                             android:textSize="20sp"
@@ -122,9 +123,11 @@
                         android:layout_weight="1"
                         android:gravity="center_vertical|right">
 
-                        <TextView
+                        <Button
+                            android:id="@+id/buttonTraining"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:background="#0000"
                             android:layout_marginRight="20dip"
                             android:text="@string/training_en"
                             android:textColor="#fff"

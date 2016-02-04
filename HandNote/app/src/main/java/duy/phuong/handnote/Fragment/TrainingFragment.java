@@ -2,9 +2,10 @@ package duy.phuong.handnote.Fragment;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
 import android.widget.GridView;
-import android.widget.ListView;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -12,20 +13,29 @@ import duy.phuong.handnote.Listener.RecognitionCallback;
 import duy.phuong.handnote.MyView.DrawingView.FingerDrawerView;
 import duy.phuong.handnote.MyView.DrawingView.BitmapAdapter;
 import duy.phuong.handnote.R;
+import duy.phuong.handnote.Support.SupportUtils;
 
 /**
  * Created by Phuong on 23/11/2015.
  */
-public class CreateTextFragment extends BaseFragment{
+public class TrainingFragment extends BaseFragment implements View.OnClickListener{
     private GridView mListDetectedBitmap;
     private BitmapAdapter mBitmapAdapter;
     private ArrayList<Bitmap> mListBitmap;
+    private ImageButton mButtonSave;
 
     private FingerDrawerView mDrawer;
 
-    public CreateTextFragment() {
-        this.mLayoutRes = R.layout.fragment_create;
+    public TrainingFragment() {
+        this.mLayoutRes = R.layout.fragment_training;
         mListBitmap = new ArrayList<>();
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mButtonSave = (ImageButton) mFragmentView.findViewById(R.id.buttonSave);
+        mButtonSave.setOnClickListener(this);
     }
 
     @Override
@@ -51,6 +61,23 @@ public class CreateTextFragment extends BaseFragment{
 
     @Override
     public String fragmentIdentify() {
-        return CREATE_TEXT_FRAGMENT;
+        return TRAINING_FRAGMENT;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.buttonSave:
+                for (Bitmap bitmap : mListBitmap) {
+                    if (!SupportUtils.saveImage(bitmap, "", ".png")) {
+                        Toast.makeText(mActivity, "Save images error", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+                Toast.makeText(mActivity, "Done", Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                break;
+        }
     }
 }

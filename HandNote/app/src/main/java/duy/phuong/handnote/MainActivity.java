@@ -14,7 +14,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import duy.phuong.handnote.Fragment.BaseFragment;
-import duy.phuong.handnote.Fragment.CreateTextFragment;
+import duy.phuong.handnote.Fragment.TrainingFragment;
 import duy.phuong.handnote.Fragment.MainFragment;
 import duy.phuong.handnote.Listener.MainListener;
 
@@ -25,6 +25,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     private LinearLayout mSideMenu;
     private FrameLayout mLayoutBottomTabs;
     private ImageButton mButtonNavigator, mButtonCreate;
+    private Button mButtonTraining;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +38,8 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         mButtonNavigator.setOnClickListener(this);
         mButtonCreate = (ImageButton) findViewById(R.id.buttonCreate);
         mButtonCreate.setOnClickListener(this);
+        mButtonTraining = (Button) findViewById(R.id.buttonTraining);
+        mButtonTraining.setOnClickListener(this);
 
         mFragmentManager = getSupportFragmentManager();
 
@@ -71,10 +74,10 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         this.clearBackStack();
         FragmentTransaction transaction = mFragmentManager.beginTransaction();
         switch (name) {
-            case BaseFragment.CREATE_TEXT_FRAGMENT:
-                CreateTextFragment createTextFragment = new CreateTextFragment();
-                createTextFragment.setListener(this);
-                transaction.replace(R.id.layoutFragmentContainer, createTextFragment, createTextFragment.fragmentIdentify());
+            case BaseFragment.TRAINING_FRAGMENT:
+                TrainingFragment trainingFragment = new TrainingFragment();
+                trainingFragment.setListener(this);
+                transaction.replace(R.id.layoutFragmentContainer, trainingFragment, trainingFragment.fragmentIdentify());
                 transaction.commit();
                 break;
 
@@ -88,7 +91,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                 break;
         }
         switch (name) {
-            case BaseFragment.CREATE_TEXT_FRAGMENT:
+            case BaseFragment.TRAINING_FRAGMENT:
                 this.toggleMainBottomTabs(false);
                 break;
             default:
@@ -124,7 +127,9 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                 this.toggleMainNavigator(true);
                 break;
             case R.id.buttonCreate:
-                showFragment(BaseFragment.CREATE_TEXT_FRAGMENT);
+                break;
+            case R.id.buttonTraining:
+                showFragment(BaseFragment.TRAINING_FRAGMENT);
                 break;
         }
     }
