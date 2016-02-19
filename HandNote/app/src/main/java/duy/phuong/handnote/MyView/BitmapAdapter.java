@@ -1,4 +1,4 @@
-package duy.phuong.handnote.MyView.DrawingView;
+package duy.phuong.handnote.MyView;
 
 import android.app.Activity;
 import android.content.Context;

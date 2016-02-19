@@ -183,7 +183,7 @@
                 android:layout_weight="2">
 
 
-                <duy.phuong.handnote.MyView.DrawingView.RoundImageView
+                <duy.phuong.handnote.MyView.RoundImageView
                     android:id="@+id/imageAvatar"
                     android:layout_width="70dip"
                     android:layout_height="70dip"

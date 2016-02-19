@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 import duy.phuong.handnote.Listener.RecognitionCallback;
 import duy.phuong.handnote.MyView.DrawingView.FingerDrawerView;
-import duy.phuong.handnote.MyView.DrawingView.BitmapAdapter;
+import duy.phuong.handnote.MyView.BitmapAdapter;
 import duy.phuong.handnote.R;
 import duy.phuong.handnote.Support.SupportUtils;
 
@@ -22,7 +22,7 @@ public class TrainingFragment extends BaseFragment implements View.OnClickListen
     private GridView mListDetectedBitmap;
     private BitmapAdapter mBitmapAdapter;
     private ArrayList<Bitmap> mListBitmap;
-    private ImageButton mButtonSave;
+    private ImageButton mButtonSave, mButtonEmpty;
 
     private FingerDrawerView mDrawer;
 
@@ -36,6 +36,8 @@ public class TrainingFragment extends BaseFragment implements View.OnClickListen
         super.onViewCreated(view, savedInstanceState);
         mButtonSave = (ImageButton) mFragmentView.findViewById(R.id.buttonSave);
         mButtonSave.setOnClickListener(this);
+        mButtonEmpty = (ImageButton) mFragmentView.findViewById(R.id.buttonDelete);
+        mButtonEmpty.setOnClickListener(this);
     }
 
     @Override
@@ -75,6 +77,11 @@ public class TrainingFragment extends BaseFragment implements View.OnClickListen
                     }
                 }
                 Toast.makeText(mActivity, "Done", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.buttonDelete:
+                mDrawer.emptyDrawer();
+                mListBitmap.clear();
+                mBitmapAdapter.notifyDataSetChanged();
                 break;
             default:
                 break;

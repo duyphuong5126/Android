@@ -95,6 +95,36 @@ public class FingerDrawerView extends View {
         runnable.run();
     }
 
+    private ArrayList<MyPath> doDFS(ArrayList<MyPath> list, MyPath myPath) {
+        boolean flag = false;
+        if (hasMoreEdges()) {
+            for (MyPath path : mListPaths) {
+                if (path.isIntersect(myPath, CurrentWidth, CurrentHeight, mPaint) && !path.isChecked()) {
+                    list.add(path);
+                    path.setChecked(true);
+                    flag = true;
+                }
+            }
+            if (flag) {
+                for (MyPath path : list) {
+                    doDFS(list, path);
+                }
+            } else {
+                return list;
+            }
+        }
+        return list;
+    }
+
+    private boolean hasMoreEdges() {
+        for (MyPath path : mListPaths) {
+            if (!path.isChecked()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void detectCharacterWithAPI() {
         ArrayList<MyShape> listShapes = new ArrayList<>();
 
@@ -103,20 +133,7 @@ public class FingerDrawerView extends View {
             if (!myPath.isChecked()) {
                 ArrayList<MyPath> list = new ArrayList<>();
                 list.add(myPath);
-                for (int j = i + 1; j < mListPaths.size(); j++) {
-                    MyPath path = mListPaths.get(j);
-                    if (!path.isChecked()) {
-                        if (path.isIntersect(myPath, CurrentWidth, CurrentHeight, mPaint)) {
-                            for (Point point : path.getListPoint()) {
-                                if (!list.contains(point)) {
-                                    list.add(path);
-                                }
-                            }
-                            mListPaths.get(j).setChecked(true);
-                        }
-                    }
-                }
-                mListPaths.get(i).setChecked(true);
+                list.addAll(doDFS(list, myPath));
 
                 if (!list.isEmpty()) {
                     MyShape myShape = new MyShape(list);
@@ -239,5 +256,11 @@ public class FingerDrawerView extends View {
         eraser.setXfermode(null);
         eraser.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         return eraser;
+    }
+
+    public void emptyDrawer() {
+        mListPaths.clear();
+        mCurrentPath = 0;
+        invalidate();
     }
 }
