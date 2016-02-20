@@ -99,14 +99,16 @@ public class FingerDrawerView extends View {
         boolean flag = false;
         if (hasMoreEdges()) {
             for (MyPath path : mListPaths) {
-                if (path.isIntersect(myPath, CurrentWidth, CurrentHeight, mPaint) && !path.isChecked()) {
+                if (!path.isChecked() && path.isIntersect(myPath, CurrentWidth, CurrentHeight, mPaint)) {
                     list.add(path);
                     path.setChecked(true);
                     flag = true;
                 }
             }
             if (flag) {
-                for (MyPath path : list) {
+                ArrayList<MyPath> listPaths = new ArrayList<>();
+                listPaths.addAll(list);
+                for (MyPath path : listPaths) {
                     doDFS(list, path);
                 }
             } else {
@@ -133,6 +135,7 @@ public class FingerDrawerView extends View {
             if (!myPath.isChecked()) {
                 ArrayList<MyPath> list = new ArrayList<>();
                 list.add(myPath);
+                myPath.setChecked(true);
                 list.addAll(doDFS(list, myPath));
 
                 if (!list.isEmpty()) {
