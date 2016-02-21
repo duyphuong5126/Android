@@ -41,47 +41,6 @@ public class DetectCharacterAPI {
         this.mListRectangle.clear();
     }
 
-
-    private ArrayList<MyPoint> getNeighborsPoint(MyPoint point, Bitmap src) {
-        ArrayList<MyPoint> list = new ArrayList<>();
-        int left = point.x - 1, right = point.x + 1, above = point.y - 1, under = point.y + 1;
-        if (left >= 0) {
-            if (src.getPixel(left, point.y) == Color.BLACK) {
-                list.add(new MyPoint(left, point.y));
-            }
-            if (above >= 0 && src.getPixel(left, above) == Color.BLACK) {
-                list.add(new MyPoint(left, above));
-            }
-
-            if (under < src.getHeight() && src.getPixel(left, under) == Color.BLACK) {
-                list.add(new MyPoint(left, under));
-            }
-        }
-
-        if (above >= 0 && src.getPixel(point.x, above) == Color.BLACK) {
-            list.add(new MyPoint(point.x, above));
-        }
-
-        if (under < src.getHeight() && src.getPixel(point.x, under) == Color.BLACK) {
-            list.add(new MyPoint(point.x, under));
-        }
-
-        if (right < src.getWidth()) {
-            if (src.getPixel(right, point.y) == Color.BLACK) {
-                list.add(new MyPoint(right, point.y));
-            }
-            if (above >= 0 && src.getPixel(right, above) == Color.BLACK) {
-                list.add(new MyPoint(right, above));
-            }
-
-            if (under < src.getHeight() && src.getPixel(right, under) == Color.BLACK) {
-                list.add(new MyPoint(right, under));
-            }
-        }
-        Log.d("Count", "" + list.size());
-        return list;
-    }
-
     private ArrayList<Rect> detectAreasOnBitmap(final Bitmap bitmap, int dx, int dy) {
         ArrayList<Rect> listDetectedArea = new ArrayList<>();
         HashMap<Integer, Integer> listColumns = new HashMap<>();
@@ -92,7 +51,8 @@ public class DetectCharacterAPI {
         for (int c = 0; c < bitmap.getWidth(); c++) {
             //find the start column
             if (checkEmptyColumn(c, bitmap)) {
-                startCol = (c > 0) ? c - 1 : c;
+                /*startCol = (c > 0) ? c - 1 : c;*/
+                startCol = c;
             }
 
             boolean hasEndCol = false;
@@ -101,7 +61,8 @@ public class DetectCharacterAPI {
                 while (!hasEndCol) {
                     //find the end column
                     if (!checkEmptyColumn(c1, bitmap)) {
-                        endCol = (c1 >= bitmap.getWidth()) ? c1 : c1 + 1;
+                        //endCol = (c1 >= bitmap.getWidth()) ? c1 : c1 + 1;
+                        endCol = c1;
                     }
 
                     if (endCol > startCol) {
@@ -129,7 +90,8 @@ public class DetectCharacterAPI {
                 for (int r = 0; r < bitmap.getHeight(); r++) {
                     //find the start row
                     if (checkEmptyRow(r, startCol, endCol, bitmap)) {
-                        startRow = (r > 0) ? r - 1 : r;
+                        /*startRow = (r > 0) ? r - 1 : r;*/
+                        startRow = r;
                     }
 
                     boolean hasEndRow = false;
@@ -138,7 +100,8 @@ public class DetectCharacterAPI {
                         while (!hasEndRow) {
                             //find the endRow
                             if (!checkEmptyRow(r1, startCol, endCol, bitmap)) {
-                                endRow = (r1 >= bitmap.getHeight()) ? r1 : r1 + 1;
+                                /*endRow = (r1 >= bitmap.getHeight()) ? r1 : r1 + 1;*/
+                                endRow = r1;
                             }
 
                             if (endRow > startRow) {
@@ -168,7 +131,6 @@ public class DetectCharacterAPI {
                 return true;
             }
         }
-        int m = 1, n = 2;
         return false;
     }
 

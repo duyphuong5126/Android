@@ -16,6 +16,7 @@ import java.io.IOException;
 public abstract class SupportUtils {
     private static final String RootPath = Environment.getExternalStorageDirectory().getAbsolutePath();
     private static final String ApplicationDirectory = "/HandNote/";
+
     public static Bitmap cropBitmap(Bitmap src, int x, int y, int w, int h) {
         Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         for (int i = x; i < x + w; i++ ) {

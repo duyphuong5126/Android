@@ -154,7 +154,7 @@ public class FingerDrawerView extends View {
 
         if (!listShapes.isEmpty()) {
             for (MyShape myShape : listShapes) {
-                Bitmap bitmap = Bitmap.createBitmap(mCacheBitmap.getWidth(), mCacheBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                final Bitmap bitmap = Bitmap.createBitmap(mCacheBitmap.getWidth(), mCacheBitmap.getHeight(), Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(bitmap);
                 canvas.drawColor(Color.WHITE);
                 for (MyPath myPath : myShape.getListPaths()) {
@@ -175,6 +175,9 @@ public class FingerDrawerView extends View {
                 mAPI.onDetectCharacter(bitmap, new RecognitionCallback() {
                     @Override
                     public void onRecognizeSuccess(ArrayList<Bitmap> listBitmaps) {
+                        /*for (Bitmap bmp : listBitmaps) {
+                            bitmaps.add(Bitmap.createScaledBitmap(bmp, 5, 7, false));
+                        }*/
                         bitmaps.addAll(listBitmaps);
                     }
                 });
