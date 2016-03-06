@@ -3,19 +3,22 @@ package duy.phuong.handnote.Support;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Environment;
+import android.util.Log;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 
 /**
  * Created by Phuong on 28/11/2015.
  */
 public abstract class SupportUtils {
-    private static final String RootPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-    private static final String ApplicationDirectory = "/HandNote/";
+    public static final String RootPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+    public static final String ApplicationDirectory = "/HandNote/";
 
     public static Bitmap cropBitmap(Bitmap src, int x, int y, int w, int h) {
         Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
@@ -29,11 +32,11 @@ public abstract class SupportUtils {
         return bitmap;
     }
 
-    public static boolean saveImage(Bitmap bitmap, String folderName, String fileType) {
+    public static boolean saveImage(Bitmap bitmap, String folderName, String fileName, String fileType) {
         File dir = new File(RootPath + ApplicationDirectory + folderName);
-        dir.mkdir();
+        dir.mkdirs();
 
-        File file = new File(dir, folderName + System.currentTimeMillis() + fileType);
+        File file = new File(dir, folderName + "_" + fileName + "_" + System.currentTimeMillis() + fileType);
         if (file.exists()) {
             file.delete();
         }
@@ -71,7 +74,62 @@ public abstract class SupportUtils {
         return bitmap;
     }
 
+    public static ArrayList<String> getListFilePaths(String path) {
+        File fileDir = new File(path);
+        File[] listFiles = fileDir.listFiles();
+
+        if (listFiles == null || listFiles.length == 0) {
+            Log.e("Error", "Get list files failed");
+            return new ArrayList<>();
+        }
+
+        ArrayList<String> paths = new ArrayList<>();
+        for (File file : listFiles) {
+            paths.add(file.getAbsolutePath());
+        }
+
+        return paths;
+    }
+
     public static String getApplicationDir(String folderName) {
         return "";
+    }
+
+    public static boolean emptyDirectory(String path) {
+        File fileDir = new File(path);
+        File[] listFiles = fileDir.listFiles();
+
+        if (listFiles == null || listFiles.length == 0) {
+            Log.e("Error", "Get list files failed");
+        } else {
+            for (File file : listFiles) {
+                if (!file.delete()) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public static boolean writeFile(String data, String folder, String name) {
+        File fileDir = new File(RootPath + ApplicationDirectory + folder);
+        fileDir.mkdirs();
+
+        File output = new File(fileDir, name);
+        if (output.exists()) {
+            output.delete();
+        }
+
+        try {
+            output.createNewFile();
+            FileOutputStream fileOutputStream = new FileOutputStream(output);
+            fileOutputStream.write(data.getBytes());
+            fileOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 }

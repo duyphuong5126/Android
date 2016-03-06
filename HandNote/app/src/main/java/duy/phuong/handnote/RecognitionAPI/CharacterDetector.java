@@ -20,11 +20,11 @@ import duy.phuong.handnote.Support.SupportUtils;
 /**
  * Created by Phuong on 26/11/2015.
  */
-public class DetectCharacterAPI {
+public class CharacterDetector {
 
     private ArrayList<Rect> mListRectangle;
 
-    public DetectCharacterAPI() {
+    public CharacterDetector() {
         mListRectangle = new ArrayList<>();
     }
 

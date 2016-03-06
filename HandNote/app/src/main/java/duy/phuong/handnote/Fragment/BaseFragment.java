@@ -14,8 +14,10 @@ import duy.phuong.handnote.Listener.MainListener;
  * Created by Phuong on 23/11/2015.
  */
 public abstract class BaseFragment extends Fragment {
-    public static final String TRAINING_FRAGMENT = "TrainingFragment";
+    public static final String DRAWING_FRAGMENT = "DrawingFragment";
     public static final String MAIN_FRAGMENT = "MainFragment";
+    public static final String LEARNING_FRAGMENT = "LearningFragment";
+    public static final String CREATE_NOTE_FRAGMENT = "CreateNoteFragment";
     protected Activity mActivity;
     protected View mFragmentView;
     protected int mLayoutRes;

@@ -8,8 +8,6 @@ import android.graphics.CornerPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
@@ -17,9 +15,10 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 import duy.phuong.handnote.Listener.RecognitionCallback;
-import duy.phuong.handnote.RecognitionAPI.DetectCharacterAPI;
+import duy.phuong.handnote.RecognitionAPI.CharacterDetector;
 
 /**
  * Created by Phuong on 23/11/2015.
@@ -27,6 +26,7 @@ import duy.phuong.handnote.RecognitionAPI.DetectCharacterAPI;
 public class FingerDrawerView extends View {
 
     private ArrayList<MyPath> mListPaths;
+    private Stack<MyPath> mUndoRedoStack;
 
     private Bitmap mBitmap, mCacheBitmap;
     public static float CurrentPaintSize = 5f;
@@ -35,7 +35,6 @@ public class FingerDrawerView extends View {
     private int mCurrentPath = 0;
 
     private Paint mPaint;
-    private Paint mRectPaint;
 
     private long mStartRecognizeTime = -1;
     private boolean isReadyForRecognize = false;
@@ -45,17 +44,15 @@ public class FingerDrawerView extends View {
 
     private RecognitionCallback mListener;
 
-    private DetectCharacterAPI mAPI;
+    private CharacterDetector mDetector;
 
     public FingerDrawerView(Context context, AttributeSet attrs) {
         super(context, attrs);
         mListPaths = new ArrayList<>();
+        mUndoRedoStack = new Stack<>();
         mPaint = createPaint();
 
-        mRectPaint = new Paint();
-        mRectPaint.setColor(Color.RED);
-        mRectPaint.setStrokeWidth(1);
-        mAPI = new DetectCharacterAPI();
+        mDetector = new CharacterDetector();
     }
 
     public void setListener(RecognitionCallback callback) {
@@ -78,7 +75,7 @@ public class FingerDrawerView extends View {
             public void handleMessage(Message msg) {
                 if (isReadyForRecognize) {
                     super.handleMessage(msg);
-                    detectCharacterWithAPI();
+                    detectCharacters();
                     isReadyForRecognize = false;
                 }
             }
@@ -93,6 +90,28 @@ public class FingerDrawerView extends View {
             }
         };
         runnable.run();
+    }
+
+    public void undo() {
+        if (mListPaths.size() > 0) {
+            mUndoRedoStack.add(mListPaths.remove(mListPaths.size() - 1));
+            mCurrentPath--;
+            detectCharacters();
+            invalidate();
+        }
+    }
+
+    public void redo() {
+        if (mUndoRedoStack.size() > 0) {
+            mListPaths.add(mUndoRedoStack.pop());
+            mCurrentPath++;
+            detectCharacters();
+            invalidate();
+        }
+    }
+
+    private void resetStack() {
+        mUndoRedoStack = new Stack<>();
     }
 
     private ArrayList<MyPath> doDFS(ArrayList<MyPath> list, MyPath myPath) {
@@ -127,7 +146,7 @@ public class FingerDrawerView extends View {
         return false;
     }
 
-    private void detectCharacterWithAPI() {
+    private void detectCharacters() {
         ArrayList<MyShape> listShapes = new ArrayList<>();
 
         for (int i = 0; i< mListPaths.size(); i++) {
@@ -140,7 +159,6 @@ public class FingerDrawerView extends View {
 
                 if (!list.isEmpty()) {
                     MyShape myShape = new MyShape(list);
-                    myShape.mergeRect();
                     listShapes.add(myShape);
                 }
             }
@@ -172,7 +190,7 @@ public class FingerDrawerView extends View {
                     canvas.drawPath(path, mPaint);
                 }
 
-                mAPI.onDetectCharacter(bitmap, new RecognitionCallback() {
+                mDetector.onDetectCharacter(bitmap, new RecognitionCallback() {
                     @Override
                     public void onRecognizeSuccess(ArrayList<Bitmap> listBitmaps) {
                         /*for (Bitmap bmp : listBitmaps) {
@@ -218,6 +236,7 @@ public class FingerDrawerView extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                resetStack();
                 ArrayList<Point> listPoint = new ArrayList<>();
                 MyPath myPath = new MyPath(listPoint);
                 listPoint.add(new Point((int) x, (int) y));
@@ -249,19 +268,6 @@ public class FingerDrawerView extends View {
         tempPaint.setDither(true);
         tempPaint.setStrokeWidth(CurrentPaintSize);
         return tempPaint;
-    }
-
-    private Paint createEraser(){
-        Paint eraser = new Paint();
-        eraser.setAntiAlias(true);
-        eraser.setAlpha(0xFF);
-        eraser.setColor(Color.WHITE);
-        eraser.setStyle(Paint.Style.STROKE);
-        eraser.setStrokeWidth(CurrentPaintSize);
-        eraser.setStrokeJoin(Paint.Join.ROUND);
-        eraser.setXfermode(null);
-        eraser.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-        return eraser;
     }
 
     public void emptyDrawer() {

@@ -5,6 +5,18 @@
     <string name="list_en">List</string>
     <string name="list_vi">Danh Sách</string>
 
+    <string name="notes_en">Notes</string>
+    <string name="notes_vi">Ghi Chú</string>
+
     <string name="training_en">Training</string>
     <string name="training_vi">Huấn Luyện</string>
+
+    <string name="dictionary_en">Dictionary</string>
+    <string name="dictionary_vi">Từ điển</string>
+
+    <string name="enter_number_en">Enter the number</string>
+    <string name="enter_number_vi">Nhập số lượng</string>
+
+    <string name="cancel_en">Cancel</string>
+    <string name="cancel_vi">Hủy</string>
 </resources>

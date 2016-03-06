@@ -1,5 +1,6 @@
 package duy.phuong.handnote;
 
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -8,24 +9,35 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
+import java.util.Stack;
+
 import duy.phuong.handnote.Fragment.BaseFragment;
-import duy.phuong.handnote.Fragment.TrainingFragment;
+import duy.phuong.handnote.Fragment.CreateNoteFragment;
+import duy.phuong.handnote.Fragment.DrawingFragment;
+import duy.phuong.handnote.Fragment.LearningFragment;
 import duy.phuong.handnote.Fragment.MainFragment;
+import duy.phuong.handnote.Listener.BackPressListener;
 import duy.phuong.handnote.Listener.MainListener;
 
-public class MainActivity extends FragmentActivity implements MainListener, ImageButton.OnClickListener {
+public class MainActivity extends FragmentActivity implements MainListener, ImageButton.OnClickListener, BackPressListener {
 
     private FragmentManager mFragmentManager;
     private DrawerLayout mMainNavigator;
     private LinearLayout mSideMenu;
     private FrameLayout mLayoutBottomTabs;
-    private ImageButton mButtonNavigator, mButtonCreate;
-    private Button mButtonTraining;
+    private ImageButton mButtonNavigator, mButtonCreate, mButtonBack;
+    private LinearLayout mButtonTraining;
+
+    private BackPressListener mBackPressListener;
+    private Stack<String> mStack;
+
+    private boolean mCanExit;
+
+    private String mCurrentUser = "Admin";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,13 +50,22 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         mButtonNavigator.setOnClickListener(this);
         mButtonCreate = (ImageButton) findViewById(R.id.buttonCreate);
         mButtonCreate.setOnClickListener(this);
-        mButtonTraining = (Button) findViewById(R.id.buttonTraining);
+        mButtonTraining = (LinearLayout) findViewById(R.id.buttonTraining);
         mButtonTraining.setOnClickListener(this);
+        mButtonBack = (ImageButton) findViewById(R.id.buttonBack);
+        mButtonBack.setOnClickListener(this);
+
+        mCanExit = false;
+
+        mStack = new Stack<>();
+
+        if ("Admin".equals(mCurrentUser)) {
+            mButtonTraining.setVisibility(View.VISIBLE);
+        }
 
         mFragmentManager = getSupportFragmentManager();
 
         this.showFragment(BaseFragment.MAIN_FRAGMENT);
-
     }
 
     @Override
@@ -71,32 +92,60 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
 
     @Override
     public void showFragment(String name) {
-        this.clearBackStack();
-        FragmentTransaction transaction = mFragmentManager.beginTransaction();
+        BaseFragment baseFragment = null;
         switch (name) {
-            case BaseFragment.TRAINING_FRAGMENT:
-                TrainingFragment trainingFragment = new TrainingFragment();
-                trainingFragment.setListener(this);
-                transaction.replace(R.id.layoutFragmentContainer, trainingFragment, trainingFragment.fragmentIdentify());
-                transaction.commit();
+            case BaseFragment.MAIN_FRAGMENT:
+                baseFragment = new MainFragment();
                 break;
 
-            case BaseFragment.MAIN_FRAGMENT:
-                MainFragment mainFragment = new MainFragment();
-                mainFragment.setListener(this);
-                transaction.replace(R.id.layoutFragmentContainer, mainFragment, mainFragment.fragmentIdentify());
-                transaction.commit();
+            case BaseFragment.DRAWING_FRAGMENT:
+                baseFragment = new DrawingFragment();
+                mBackPressListener = (DrawingFragment) baseFragment;
                 break;
+
+            case BaseFragment.LEARNING_FRAGMENT:
+                baseFragment = new LearningFragment();
+                break;
+
+            case BaseFragment.CREATE_NOTE_FRAGMENT:
+                baseFragment = new CreateNoteFragment();
+                break;
+
             default:
                 break;
         }
-        switch (name) {
-            case BaseFragment.TRAINING_FRAGMENT:
-                this.toggleMainBottomTabs(false);
-                break;
-            default:
-                this.toggleMainBottomTabs(true);
-                break;
+
+        if (baseFragment != null) {
+            baseFragment.setListener(this);
+            mStack.push(name);
+            addFragment(baseFragment, baseFragment.fragmentIdentify());
+            mCanExit = false;
+        }
+
+        checkScreen();
+    }
+
+    private void checkScreen() {
+        if (!mStack.isEmpty()) {
+            String name = mStack.peek();
+            switch (name) {
+                case BaseFragment.DRAWING_FRAGMENT:
+                case BaseFragment.LEARNING_FRAGMENT:
+                case BaseFragment.CREATE_NOTE_FRAGMENT:
+                    this.toggleMainBottomTabs(false);
+                    break;
+                default:
+                    this.toggleMainBottomTabs(true);
+                    break;
+            }
+
+            if (mStack.size() > 1) {
+                mButtonBack.setVisibility(View.VISIBLE);
+                mButtonNavigator.setVisibility(View.GONE);
+            } else {
+                mButtonBack.setVisibility(View.GONE);
+                mButtonNavigator.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -111,13 +160,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
 
     @Override
     public void toggleMainBottomTabs(boolean show) {
-        mLayoutBottomTabs.setVisibility((show)?View.VISIBLE:View.GONE);
-    }
-
-    private void clearBackStack() {
-        for (int i = 0; i < mFragmentManager.getBackStackEntryCount(); i++) {
-            mFragmentManager.popBackStack();
-        }
+        mLayoutBottomTabs.setVisibility((show) ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -127,10 +170,50 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                 this.toggleMainNavigator(true);
                 break;
             case R.id.buttonCreate:
+                showFragment(BaseFragment.CREATE_NOTE_FRAGMENT);
                 break;
             case R.id.buttonTraining:
-                showFragment(BaseFragment.TRAINING_FRAGMENT);
+                showFragment(BaseFragment.DRAWING_FRAGMENT);
+                mMainNavigator.closeDrawer(mSideMenu);
                 break;
+            case R.id.buttonBack:
+                onBackPressed();
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mBackPressListener == null || !mBackPressListener.doBack()) {
+            if (!doBack()) {
+                super.onBackPressed();
+            } else {
+                finish();
+            }
+            if (!mStack.isEmpty()) {
+                mStack.pop();
+            }
+            checkScreen();
+        }
+    }
+
+    @Override
+    public boolean doBack() {
+        return (mFragmentManager.getBackStackEntryCount() == 1);
+    }
+
+    private void addFragment(Fragment fragment, String name) {
+        FragmentTransaction transaction = mFragmentManager.beginTransaction();
+        transaction.replace(R.id.layoutFragmentContainer, fragment, name);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    private void clearBackStack() {
+        for (int i = 0; i < mFragmentManager.getBackStackEntryCount(); i++) {
+            mFragmentManager.popBackStack();
         }
     }
 }
