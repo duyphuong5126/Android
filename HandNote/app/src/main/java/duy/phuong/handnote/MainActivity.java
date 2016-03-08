@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,7 +14,10 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Stack;
+import java.util.StringTokenizer;
 
 import duy.phuong.handnote.Fragment.BaseFragment;
 import duy.phuong.handnote.Fragment.CreateNoteFragment;
@@ -22,6 +26,9 @@ import duy.phuong.handnote.Fragment.LearningFragment;
 import duy.phuong.handnote.Fragment.MainFragment;
 import duy.phuong.handnote.Listener.BackPressListener;
 import duy.phuong.handnote.Listener.MainListener;
+import duy.phuong.handnote.RecognitionAPI.MachineLearning.Input;
+import duy.phuong.handnote.RecognitionAPI.MachineLearning.SOM;
+import duy.phuong.handnote.Support.SupportUtils;
 
 public class MainActivity extends FragmentActivity implements MainListener, ImageButton.OnClickListener, BackPressListener {
 
@@ -35,7 +42,8 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     private BackPressListener mBackPressListener;
     private Stack<String> mStack;
 
-    private boolean mCanExit;
+    private SOM mGlobalSOM;
+    private ArrayList<String> mGlobalMapNames;
 
     private String mCurrentUser = "Admin";
 
@@ -55,8 +63,6 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         mButtonBack = (ImageButton) findViewById(R.id.buttonBack);
         mButtonBack.setOnClickListener(this);
 
-        mCanExit = false;
-
         mStack = new Stack<>();
 
         if ("Admin".equals(mCurrentUser)) {
@@ -66,6 +72,92 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         mFragmentManager = getSupportFragmentManager();
 
         this.showFragment(BaseFragment.MAIN_FRAGMENT);
+
+        initMapNames();
+        initSOM();
+    }
+
+    private void initMapNames() {
+        mGlobalMapNames = new ArrayList<>();
+        try {
+            String data = SupportUtils.getStringResource(this, R.raw.map_names);
+            StringTokenizer tokenizer = new StringTokenizer(data, "\n");
+            ArrayList<String> listTokens = new ArrayList<>();
+            while (tokenizer.hasMoreTokens()) {
+                String token = tokenizer.nextToken();
+                if (token != null && !"".equals(token)) {
+                    listTokens.add(token);
+                }
+            }
+
+            if (!listTokens.isEmpty()) {
+                for (int i = 0; i < listTokens.size(); i++) {
+                    StringTokenizer tokenizer1 = new StringTokenizer(listTokens.get(i), ";");
+                    ArrayList<String> strings = new ArrayList<>();
+                    while (tokenizer1.hasMoreTokens()) {
+                        String string = tokenizer1.nextToken();
+                        if (!"".equals(string)) {
+                            strings.add(string);
+                        }
+                    }
+
+                    int count_max = -1;
+                    String character = "";
+                    if (!strings.isEmpty()) {
+                        for (String string : strings) {
+                            if (!"\r".equals(string)) {
+                                int count = Integer.valueOf(string.substring(2));
+                                if (count > count_max) {
+                                    count_max = count;
+                                    character = string.substring(0, 1);
+                                }
+                            }
+                        }
+                    }
+
+                    mGlobalMapNames.add(character);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initSOM() {
+        try {
+            String data = SupportUtils.getStringResource(this, R.raw.som);
+            StringTokenizer tokenizer = new StringTokenizer(data, "|");
+            ArrayList<String> listTokens = new ArrayList<>();
+            while (tokenizer.hasMoreTokens()) {
+                String token = tokenizer.nextToken();
+                if (token != null && !"".equals(token)) {
+                    listTokens.add(token);
+                }
+            }
+
+            if (!listTokens.isEmpty()) {
+                double[][] weightMatrix = new double[SOM.NUMBERS_OF_CLUSTER][Input.VECTOR_DIMENSIONS];
+                for (int i = 0; i < listTokens.size(); i++) {
+                    String stringWeight = listTokens.get(i);
+                    StringTokenizer stringTokenizer = new StringTokenizer(stringWeight, ";");
+                    if (stringTokenizer.countTokens() == Input.VECTOR_DIMENSIONS + 1) {
+                        int index = -1;
+                        while (stringTokenizer.hasMoreTokens()) {
+                            if (index >= 0) {
+                                weightMatrix[i][index] = Double.valueOf(stringTokenizer.nextToken());
+                            } else {
+                                stringTokenizer.nextToken();
+                            }
+                            index++;
+                        }
+                    }
+                }
+
+                mGlobalSOM = new SOM(weightMatrix);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -109,6 +201,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
 
             case BaseFragment.CREATE_NOTE_FRAGMENT:
                 baseFragment = new CreateNoteFragment();
+                mBackPressListener = (CreateNoteFragment) baseFragment;
                 break;
 
             default:
@@ -119,7 +212,6 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
             baseFragment.setListener(this);
             mStack.push(name);
             addFragment(baseFragment, baseFragment.fragmentIdentify());
-            mCanExit = false;
         }
 
         checkScreen();
@@ -161,6 +253,16 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     @Override
     public void toggleMainBottomTabs(boolean show) {
         mLayoutBottomTabs.setVisibility((show) ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public SOM getGlobalSOM() {
+        return mGlobalSOM;
+    }
+
+    @Override
+    public ArrayList<String> getMapNames() {
+        return mGlobalMapNames;
     }
 
     @Override

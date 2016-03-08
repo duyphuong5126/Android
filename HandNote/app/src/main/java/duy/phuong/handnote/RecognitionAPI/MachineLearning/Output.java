@@ -15,7 +15,19 @@ public class Output {
         mWeights = new double[Input.VECTOR_DIMENSIONS];
         for (int i = 0; i < mWeights.length; i += 2) {
             mWeights[i] = randomWeight();
-            mWeights[i+1] = randomWeight();
+            mWeights[i + 1] = randomWeight();
+        }
+
+        resetMapName();
+    }
+
+    public Output(double[] weightVector) {
+        if (weightVector.length == Input.VECTOR_DIMENSIONS) {
+            mWeights = new double[Input.VECTOR_DIMENSIONS];
+            for (int i = 0; i < mWeights.length; i += 2) {
+                mWeights[i] = weightVector[i];
+                mWeights[i + 1] = weightVector[i + 1];
+            }
         }
 
         resetMapName();
@@ -24,7 +36,7 @@ public class Output {
     public String getLabel() {
         String label = "";
         int max = getMaxValue();
-        for (Map.Entry<String , Integer> entry : mMapNames.entrySet()) {
+        for (Map.Entry<String, Integer> entry : mMapNames.entrySet()) {
             if (entry.getValue() >= max) {
                 label += entry.getKey();
             }
@@ -50,19 +62,32 @@ public class Output {
         } else {
             mMapNames.clear();
         }
-        mMapNames.put("A", 0); mMapNames.put("B", 0);
-        mMapNames.put("C", 0); mMapNames.put("D", 0);
-        mMapNames.put("E", 0); mMapNames.put("F", 0);
-        mMapNames.put("G", 0); mMapNames.put("H", 0);
-        mMapNames.put("I", 0); mMapNames.put("J", 0);
-        mMapNames.put("K", 0); mMapNames.put("L", 0);
-        mMapNames.put("M", 0); mMapNames.put("N", 0);
-        mMapNames.put("O", 0); mMapNames.put("P", 0);
-        mMapNames.put("Q", 0); mMapNames.put("R", 0);
-        mMapNames.put("S", 0); mMapNames.put("T", 0);
-        mMapNames.put("W", 0); mMapNames.put("U", 0);
-        mMapNames.put("V", 0); mMapNames.put("X", 0);
-        mMapNames.put("Y", 0); mMapNames.put("Z", 0);
+        mMapNames.put("A", 0);
+        mMapNames.put("B", 0);
+        mMapNames.put("C", 0);
+        mMapNames.put("D", 0);
+        mMapNames.put("E", 0);
+        mMapNames.put("F", 0);
+        mMapNames.put("G", 0);
+        mMapNames.put("H", 0);
+        mMapNames.put("I", 0);
+        mMapNames.put("J", 0);
+        mMapNames.put("K", 0);
+        mMapNames.put("L", 0);
+        mMapNames.put("M", 0);
+        mMapNames.put("N", 0);
+        mMapNames.put("O", 0);
+        mMapNames.put("P", 0);
+        mMapNames.put("Q", 0);
+        mMapNames.put("R", 0);
+        mMapNames.put("S", 0);
+        mMapNames.put("T", 0);
+        mMapNames.put("W", 0);
+        mMapNames.put("U", 0);
+        mMapNames.put("V", 0);
+        mMapNames.put("X", 0);
+        mMapNames.put("Y", 0);
+        mMapNames.put("Z", 0);
     }
 
     private double randomWeight() {

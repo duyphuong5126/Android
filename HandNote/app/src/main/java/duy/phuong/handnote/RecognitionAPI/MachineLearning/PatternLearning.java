@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import duy.phuong.handnote.DTO.TrainingImage;
+import duy.phuong.handnote.RecognitionAPI.Recognizer;
 import duy.phuong.handnote.Support.SupportUtils;
 
 /**
@@ -15,11 +16,10 @@ import duy.phuong.handnote.Support.SupportUtils;
  */
 
 /*Kohonen Algorithm*/
-public class PatternLearning {
+public class PatternLearning extends Recognizer{
     private static final double INITIAL_LEARNING_RATE = 0.5;
     private static final double INITIAL_NEIGHBOR_RADIUS = SOM.NUMBERS_OF_CLUSTER - 1; //the epsilon(0)
 
-    private SOM mMap;
     private ArrayList<TrainingImage> mSamples;
     private int mEpochs; //learning rate time const (T2)
     private double mNeighborRadius;
@@ -38,9 +38,7 @@ public class PatternLearning {
         //init parameters
         mLearningRate = INITIAL_LEARNING_RATE;
         mNeighborRadius = INITIAL_NEIGHBOR_RADIUS;
-        mNeighbor_Time_Const = mEpochs / Math.log10(INITIAL_NEIGHBOR_RADIUS);
-
-
+        mNeighbor_Time_Const = mEpochs / Math.log(INITIAL_NEIGHBOR_RADIUS);
     }
 
     public boolean learn() {
@@ -137,74 +135,21 @@ public class PatternLearning {
     }
 
     private void updateNeighborRadius(int iteration) {
-        /*mNeighborRadius = INITIAL_NEIGHBOR_RADIUS * Math.exp((-1.d * iteration) / mNeighbor_Time_Const);*/
-        int offset = (int) Math.round(mEpochs * 1.d / INITIAL_NEIGHBOR_RADIUS);
+        mNeighborRadius = INITIAL_NEIGHBOR_RADIUS * Math.exp((-1.d * iteration) / mNeighbor_Time_Const);
+        /*int offset = (int) Math.round(mEpochs * 1.d / INITIAL_NEIGHBOR_RADIUS);
         if (iteration % offset == 0) {
             mNeighborRadius--;
         }
 
         if (mNeighborRadius < 0) {
             mNeighborRadius = 0;
-        }
+        }*/
     }
 
     private double neighborInfluence(int neighborIndex, int BMU_index) {
-        double value = -1 * Math.pow(getDistance(mMap.getOutputs()[neighborIndex], mMap.getOutputs()[BMU_index]), 2);
+        double distance = /*getDistance(mMap.getOutputs()[neighborIndex], mMap.getOutputs()[BMU_index])*/ BMU_index - neighborIndex;
+        double value = -1 * Math.pow(distance, 2);
         value /= (2 * (Math.pow(mNeighborRadius, 2)));
         return Math.exp(value);
-    }
-
-    private Input normalizeData(Bitmap bitmap) {
-        if (bitmap.getWidth() * bitmap.getHeight() != Input.VECTOR_DIMENSIONS) {
-            Log.e("Error", "Input data error!");
-            return null;
-        }
-
-        Input input = new Input();
-
-        int horizontalOffset = Input.VECTOR_DIMENSIONS / bitmap.getHeight();
-        for (int i = 0; i < bitmap.getHeight(); i++)
-            for (int j = 0; j < bitmap.getWidth(); j++) {
-                int position = i * horizontalOffset + j;
-                input.mInputData[position] = (byte) ((bitmap.getPixel(j, i) == Color.WHITE) ? 0 : 1);
-            }
-
-        return input;
-    }
-
-    private double getDistance(Input input, Output output) {
-        double result = 0;
-        for (int i = 0; i < Input.VECTOR_DIMENSIONS; i += 4) {
-            double d = input.mInputData[i] - output.mWeights[i];
-            result += Math.pow(d, 2);
-
-            d = input.mInputData[i + 1] - output.mWeights[i + 1];
-            result += Math.pow(d, 2);
-
-            d = input.mInputData[i + 2] - output.mWeights[i + 2];
-            result += Math.pow(d, 2);
-
-            d = input.mInputData[i + 3] - output.mWeights[i + 3];
-            result += Math.pow(d, 2);
-        }
-        return Math.sqrt(result);
-    }
-
-    private double getDistance(Output output1, Output output2) {
-        double result = 0;
-        for (int i = 0; i < Input.VECTOR_DIMENSIONS; i += 4) {
-            double d = output1.mWeights[i] - output2.mWeights[i];
-            result += Math.pow(d, 2);
-
-            d = output1.mWeights[i + 1] - output2.mWeights[i + 1];
-            result += Math.pow(d, 2);
-
-            d = output1.mWeights[i + 2] - output2.mWeights[i + 2];
-            result += Math.pow(d, 2);
-
-            d = output1.mWeights[i + 3] - output2.mWeights[i + 3];
-            result += Math.pow(d, 2);
-        }
-        return Math.sqrt(result);
     }
 }

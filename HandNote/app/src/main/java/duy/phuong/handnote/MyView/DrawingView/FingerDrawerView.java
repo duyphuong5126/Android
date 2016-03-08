@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import duy.phuong.handnote.Listener.RecognitionCallback;
-import duy.phuong.handnote.RecognitionAPI.CharacterDetector;
+import duy.phuong.handnote.RecognitionAPI.BitmapProcessor;
 
 /**
  * Created by Phuong on 23/11/2015.
@@ -44,7 +44,7 @@ public class FingerDrawerView extends View {
 
     private RecognitionCallback mListener;
 
-    private CharacterDetector mDetector;
+    private BitmapProcessor mBitmapProcessor;
 
     public FingerDrawerView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -52,7 +52,7 @@ public class FingerDrawerView extends View {
         mUndoRedoStack = new Stack<>();
         mPaint = createPaint();
 
-        mDetector = new CharacterDetector();
+        mBitmapProcessor = new BitmapProcessor();
     }
 
     public void setListener(RecognitionCallback callback) {
@@ -190,7 +190,7 @@ public class FingerDrawerView extends View {
                     canvas.drawPath(path, mPaint);
                 }
 
-                mDetector.onDetectCharacter(bitmap, new RecognitionCallback() {
+                mBitmapProcessor.onDetectCharacter(bitmap, new RecognitionCallback() {
                     @Override
                     public void onRecognizeSuccess(ArrayList<Bitmap> listBitmaps) {
                         /*for (Bitmap bmp : listBitmaps) {
@@ -274,5 +274,9 @@ public class FingerDrawerView extends View {
         mListPaths.clear();
         mCurrentPath = 0;
         invalidate();
+    }
+
+    public boolean isEmpty() {
+        return mListPaths.isEmpty();
     }
 }

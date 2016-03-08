@@ -15,10 +15,24 @@ public class SOM {
         init();
     }
 
+    public SOM(double[][] weightMatrix) {
+        init(weightMatrix);
+    }
+
     private void init() {
         mOutputs = new Output[NUMBERS_OF_CLUSTER];
         for (int i = 0; i < mOutputs.length; i++) {
             mOutputs[i] = new Output();
+        }
+    }
+
+    private void init(double[][] weightMatrix) {
+        if (weightMatrix.length == NUMBERS_OF_CLUSTER && weightMatrix[0].length == Input.VECTOR_DIMENSIONS) {
+            mOutputs = new Output[NUMBERS_OF_CLUSTER];
+            for (int i = 0; i < mOutputs.length; i += 2) {
+                mOutputs[i] = new Output(weightMatrix[i]);
+                mOutputs[i + 1] = new Output(weightMatrix[i + 1]);
+            }
         }
     }
 

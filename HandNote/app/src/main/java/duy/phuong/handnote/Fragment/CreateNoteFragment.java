@@ -2,6 +2,7 @@ package duy.phuong.handnote.Fragment;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -11,13 +12,20 @@ import duy.phuong.handnote.Listener.BackPressListener;
 import duy.phuong.handnote.Listener.RecognitionCallback;
 import duy.phuong.handnote.MyView.DrawingView.FingerDrawerView;
 import duy.phuong.handnote.R;
+import duy.phuong.handnote.RecognitionAPI.BitmapProcessor;
+import duy.phuong.handnote.RecognitionAPI.Recognizer;
+import duy.phuong.handnote.Support.SupportUtils;
 
 /**
  * Created by Phuong on 06/03/2016.
  */
-public class CreateNoteFragment extends BaseFragment implements BackPressListener, View.OnClickListener, RecognitionCallback{
+public class CreateNoteFragment extends BaseFragment implements BackPressListener, View.OnClickListener, RecognitionCallback {
     private FingerDrawerView mDrawer;
     private ImageButton mButtonSave, mButtonDelete, mButtonUndo, mButtonRedo, mButtonColor;
+    private BitmapProcessor mBitmapProcessor;
+
+    private Recognizer mRecognizer;
+
     public CreateNoteFragment() {
         mLayoutRes = R.layout.fragment_create_note;
     }
@@ -37,6 +45,10 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
         mButtonUndo.setOnClickListener(this);
         mButtonRedo = (ImageButton) mFragmentView.findViewById(R.id.buttonRedo);
         mButtonRedo.setOnClickListener(this);
+
+        mBitmapProcessor = new BitmapProcessor();
+
+        mRecognizer = new Recognizer(mListener.getGlobalSOM(), mListener.getMapNames());
     }
 
     @Override
@@ -46,6 +58,10 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
 
     @Override
     public boolean doBack() {
+        if (!mDrawer.isEmpty()) {
+            mDrawer.emptyDrawer();
+            return true;
+        }
         return false;
     }
 
@@ -70,6 +86,8 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
 
     @Override
     public void onRecognizeSuccess(ArrayList<Bitmap> listBitmaps) {
-
+        for (int i = 0; i < listBitmaps.size(); i++) {
+            Log.d("Result", "bitmap " + i + " :" + mRecognizer.recognize(SupportUtils.resizeBitmap(listBitmaps.get(i), 20, 28)));
+        }
     }
 }
