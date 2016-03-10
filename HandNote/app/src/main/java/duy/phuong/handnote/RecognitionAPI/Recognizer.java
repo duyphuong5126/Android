@@ -6,6 +6,8 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
+import duy.phuong.handnote.DTO.ClusterLabel;
+import duy.phuong.handnote.DTO.StandardImage;
 import duy.phuong.handnote.RecognitionAPI.MachineLearning.Input;
 import duy.phuong.handnote.RecognitionAPI.MachineLearning.Output;
 import duy.phuong.handnote.RecognitionAPI.MachineLearning.SOM;
@@ -15,14 +17,14 @@ import duy.phuong.handnote.RecognitionAPI.MachineLearning.SOM;
  */
 public class Recognizer {
     protected SOM mMap;
-    private ArrayList<String> mMapNames;
+    private ArrayList<ClusterLabel> mMapNames;
 
     public Recognizer() {
         mMap = new SOM();
         mMapNames = new ArrayList<>();
     }
 
-    public Recognizer(SOM som, ArrayList<String> MapNames) {
+    public Recognizer(SOM som, ArrayList<ClusterLabel> MapNames) {
         mMap = som;
         mMapNames = new ArrayList<>();
         mMapNames.addAll(MapNames);
@@ -42,13 +44,20 @@ public class Recognizer {
             }
         }
         if (win_neuron >= 0) {
-            return mMapNames.get(win_neuron);
+            /*String string = "";
+            switch (mMapNames.get(win_neuron).toString()) {
+                case "MV":
+                    return string;
+                default:
+                    break;
+            }*/
+            return mMapNames.get(win_neuron).toString();
         }
         return "";
     }
 
     protected Input normalizeData(Bitmap bitmap) {
-        if (bitmap.getWidth() * bitmap.getHeight() != Input.VECTOR_DIMENSIONS) {
+        if (bitmap == null || bitmap.getWidth() != StandardImage.WIDTH || bitmap.getHeight() != StandardImage.HEIGHT) {
             Log.e("Error", "Input data error!");
             return null;
         }
@@ -67,18 +76,20 @@ public class Recognizer {
 
     protected double getDistance(Input input, Output output) {
         double result = 0;
-        for (int i = 0; i < Input.VECTOR_DIMENSIONS; i += 4) {
-            double d = input.mInputData[i] - output.mWeights[i];
-            result += Math.pow(d, 2);
+        if (input != null && output != null) {
+            for (int i = 0; i < Input.VECTOR_DIMENSIONS; i += 4) {
+                double d = input.mInputData[i] - output.mWeights[i];
+                result += Math.pow(d, 2);
 
-            d = input.mInputData[i + 1] - output.mWeights[i + 1];
-            result += Math.pow(d, 2);
+                d = input.mInputData[i + 1] - output.mWeights[i + 1];
+                result += Math.pow(d, 2);
 
-            d = input.mInputData[i + 2] - output.mWeights[i + 2];
-            result += Math.pow(d, 2);
+                d = input.mInputData[i + 2] - output.mWeights[i + 2];
+                result += Math.pow(d, 2);
 
-            d = input.mInputData[i + 3] - output.mWeights[i + 3];
-            result += Math.pow(d, 2);
+                d = input.mInputData[i + 3] - output.mWeights[i + 3];
+                result += Math.pow(d, 2);
+            }
         }
         return Math.sqrt(result);
     }

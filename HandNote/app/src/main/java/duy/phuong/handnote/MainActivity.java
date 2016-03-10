@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
+import duy.phuong.handnote.DTO.ClusterLabel;
+import duy.phuong.handnote.DTO.Label;
 import duy.phuong.handnote.Fragment.BaseFragment;
 import duy.phuong.handnote.Fragment.CreateNoteFragment;
 import duy.phuong.handnote.Fragment.DrawingFragment;
@@ -43,7 +45,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     private Stack<String> mStack;
 
     private SOM mGlobalSOM;
-    private ArrayList<String> mGlobalMapNames;
+    private ArrayList<ClusterLabel> mGlobalMapNames;
 
     private String mCurrentUser = "Admin";
 
@@ -81,7 +83,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         mGlobalMapNames = new ArrayList<>();
         try {
             String data = SupportUtils.getStringResource(this, R.raw.map_names);
-            StringTokenizer tokenizer = new StringTokenizer(data, "\n");
+            StringTokenizer tokenizer = new StringTokenizer(data, "\r\n");
             ArrayList<String> listTokens = new ArrayList<>();
             while (tokenizer.hasMoreTokens()) {
                 String token = tokenizer.nextToken();
@@ -92,6 +94,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
 
             if (!listTokens.isEmpty()) {
                 for (int i = 0; i < listTokens.size(); i++) {
+                    ClusterLabel clusterLabel = new ClusterLabel();
                     StringTokenizer tokenizer1 = new StringTokenizer(listTokens.get(i), ";");
                     ArrayList<String> strings = new ArrayList<>();
                     while (tokenizer1.hasMoreTokens()) {
@@ -101,26 +104,27 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                         }
                     }
 
-                    int count_max = -1;
-                    String character = "";
                     if (!strings.isEmpty()) {
                         for (String string : strings) {
-                            if (!"\r".equals(string)) {
-                                int count = Integer.valueOf(string.substring(2));
-                                if (count > count_max) {
-                                    count_max = count;
-                                    character = string.substring(0, 1);
-                                }
+                            int count = Integer.valueOf(string.substring(2));
+                            if (count > 0) {
+                                clusterLabel.addNewLabel(new Label(string.substring(0, 1), count));
                             }
                         }
                     }
 
-                    mGlobalMapNames.add(character);
+                    mGlobalMapNames.add(clusterLabel);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        int sum = 0;
+        for (ClusterLabel clusterLabel : mGlobalMapNames) {
+            sum += clusterLabel.getTotal();
+        }
+        Log.d("Sum: ", "" + sum);
     }
 
     private void initSOM() {
@@ -261,7 +265,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     }
 
     @Override
-    public ArrayList<String> getMapNames() {
+    public ArrayList<ClusterLabel> getMapNames() {
         return mGlobalMapNames;
     }
 

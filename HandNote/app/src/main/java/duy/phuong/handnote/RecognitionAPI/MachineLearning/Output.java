@@ -9,6 +9,8 @@ import java.util.Random;
  */
 public class Output {
     public double[] mWeights;
+    public double mCurrentMinDistance;
+    public String mCurrentLabel;
     public HashMap<String, Integer> mMapNames;
 
     public Output() {
@@ -18,7 +20,7 @@ public class Output {
             mWeights[i + 1] = randomWeight();
         }
 
-        resetMapName();
+        resetLabel();
     }
 
     public Output(double[] weightVector) {
@@ -30,30 +32,22 @@ public class Output {
             }
         }
 
+        resetLabel();
+    }
+
+    public boolean checkConverge() {
+        for (Map.Entry<String, Integer> entry : mMapNames.entrySet()) {
+            if (entry.getValue() >= 30) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void resetLabel() {
+        mCurrentMinDistance = 1000000000;
+        mCurrentLabel = "";
         resetMapName();
-    }
-
-    public String getLabel() {
-        String label = "";
-        int max = getMaxValue();
-        for (Map.Entry<String, Integer> entry : mMapNames.entrySet()) {
-            if (entry.getValue() >= max) {
-                label += entry.getKey();
-            }
-        }
-
-        return label;
-    }
-
-    private int getMaxValue() {
-        int max = 0;
-        for (Map.Entry<String, Integer> entry : mMapNames.entrySet()) {
-            int count = entry.getValue();
-            if (count > max) {
-                max = count;
-            }
-        }
-        return max;
     }
 
     public void resetMapName() {
@@ -117,6 +111,33 @@ public class Output {
             string += entry.getKey() + ":" + entry.getValue() + ";";
         }
         return string;
+    }
+
+    private int getMaxValue() {
+        int max = 0;
+        for (Map.Entry<String, Integer> entry : mMapNames.entrySet()) {
+            int count = entry.getValue();
+            if (count > max) {
+                max = count;
+            }
+        }
+        return max;
+    }
+
+    public String getLabel() {
+        String label = "";
+        int max = getMaxValue();
+        for (Map.Entry<String, Integer> entry : mMapNames.entrySet()) {
+            if (entry.getValue() >= max) {
+                label += entry.getKey();
+            }
+        }
+
+        return label;
+    }
+
+    public String getLabelInfo() {
+        return mCurrentLabel + ":" + mCurrentMinDistance;
     }
 
     @Override

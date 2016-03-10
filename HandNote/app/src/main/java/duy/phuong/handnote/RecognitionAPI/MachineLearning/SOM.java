@@ -36,7 +36,18 @@ public class SOM {
         }
     }
 
-    public void updateLabelForCluster(int index, String label) {
+    public void updateLabelForCluster(int index, double distance, String label) {
+        //update label by min distance
+        if (mOutputs[index].mCurrentMinDistance > distance) {
+            mOutputs[index].mCurrentMinDistance = distance;
+            mOutputs[index].mCurrentLabel = label;
+        } else {
+            if (mOutputs[index].mCurrentMinDistance == distance && !mOutputs[index].mCurrentLabel.contains(label)) {
+                mOutputs[index].mCurrentLabel += label;
+            }
+        }
+
+        //update map name by counting patterns
         if (mOutputs[index].mMapNames.get(label) != null) {
             mOutputs[index].mMapNames.put(label, mOutputs[index].mMapNames.get(label) + 1);
         } else {
@@ -46,11 +57,10 @@ public class SOM {
 
     public void resetMapName() {
         for (Output output : mOutputs) {
-            output.resetMapName();
+            output.resetLabel();
         }
     }
 
-    /*w j (t +1) = w j (t) +η(t)(il − w j (t))*/
     public boolean updateWeightVector(int position, Input input, double learningRate, double neighborInfluence) {
         if (position < 0 || position >= mOutputs.length || learningRate < 0 || input.mInputData.length != mOutputs[position].mWeights.length) {
             Log.e("Error", "Input data error!");
@@ -78,11 +88,19 @@ public class SOM {
         return string;
     }
 
+    public String getLabels() {
+        String string = "";
+        for (Output output : mOutputs) {
+            string += output.getLabelInfo() + "\r\n";
+        }
+        return string;
+    }
+
     @Override
     public String toString() {
         String string = "";
         for (Output output : mOutputs) {
-            string += output.getLabel() + ";" + output.toString() + "|";
+            string += output.mCurrentLabel + ";" + output.toString() + "|";
         }
         return string;
     }

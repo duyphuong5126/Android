@@ -1,10 +1,8 @@
 package duy.phuong.handnote.Fragment;
 
 import android.app.Dialog;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,7 +18,8 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import duy.phuong.handnote.R;
-import duy.phuong.handnote.DTO.TrainingImage;
+import duy.phuong.handnote.DTO.StandardImage;
+import duy.phuong.handnote.RecognitionAPI.BitmapProcessor;
 import duy.phuong.handnote.RecognitionAPI.MachineLearning.PatternLearning;
 import duy.phuong.handnote.Support.SupportUtils;
 
@@ -100,7 +99,7 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                     Runnable runnable = new Runnable() {
                         @Override
                         public void run() {
-                            Bitmap bitmap = SupportUtils.resizeBitmap(BitmapFactory.decodeFile(path), 20, 28);
+                            Bitmap bitmap = BitmapProcessor.resizeBitmap(BitmapFactory.decodeFile(path), 20, 28);
                             String name = "";
                             StringTokenizer tokenizer = new StringTokenizer(path, "/");
                             while (tokenizer.hasMoreTokens()) {
@@ -122,7 +121,7 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                 break;
 
             case R.id.buttonTrain:
-                final ArrayList<TrainingImage> trainingImages = new ArrayList<>();
+                final ArrayList<StandardImage> standardImages = new ArrayList<>();
                 mCurrentImage = mListResourcePaths.size();
                 for (final String path : mListResourcePaths) {
                     Runnable runnable = new Runnable() {
@@ -130,7 +129,7 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                         public void run() {
                             String name = getNameFromPath(path);
                             String alphabet = name.substring(6, 7);
-                            trainingImages.add(new TrainingImage(BitmapFactory.decodeFile(path), alphabet));
+                            standardImages.add(new StandardImage(BitmapFactory.decodeFile(path), alphabet));
 
                             mCurrentImage--;
                             if (mCurrentImage <= 0) {
@@ -150,7 +149,7 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                                         } else {
                                             Toast.makeText(mActivity, "Training begin", Toast.LENGTH_LONG).show();
                                             dialog.dismiss();
-                                            PatternLearning patternLearning = new PatternLearning(trainingImages, number_of_iterations);
+                                            PatternLearning patternLearning = new PatternLearning(standardImages, number_of_iterations);
                                             patternLearning.learn();
                                             Toast.makeText(mActivity, "Training done", Toast.LENGTH_LONG).show();
                                         }
@@ -175,10 +174,6 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
             default:
                 break;
         }
-    }
-
-    private boolean checkName(String name) {
-        return (name.charAt(6) >= 65 || name.charAt(0) <= 90);
     }
 
     private String getNameFromPath(String path) {

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -23,6 +24,7 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
     private FingerDrawerView mDrawer;
     private ImageButton mButtonSave, mButtonDelete, mButtonUndo, mButtonRedo, mButtonColor;
     private BitmapProcessor mBitmapProcessor;
+    private TextView mTvResult;
 
     private Recognizer mRecognizer;
 
@@ -45,6 +47,7 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
         mButtonUndo.setOnClickListener(this);
         mButtonRedo = (ImageButton) mFragmentView.findViewById(R.id.buttonRedo);
         mButtonRedo.setOnClickListener(this);
+        mTvResult = (TextView) mFragmentView.findViewById(R.id.tvResult);
 
         mBitmapProcessor = new BitmapProcessor();
 
@@ -59,7 +62,7 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
     @Override
     public boolean doBack() {
         if (!mDrawer.isEmpty()) {
-            mDrawer.emptyDrawer();
+            deleteData();
             return true;
         }
         return false;
@@ -71,7 +74,7 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
             case R.id.buttonSave:
                 break;
             case R.id.buttonDelete:
-                mDrawer.emptyDrawer();
+                deleteData();
                 break;
             case R.id.buttonColor:
                 break;
@@ -86,8 +89,17 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
 
     @Override
     public void onRecognizeSuccess(ArrayList<Bitmap> listBitmaps) {
+        String text = "";
         for (int i = 0; i < listBitmaps.size(); i++) {
-            Log.d("Result", "bitmap " + i + " :" + mRecognizer.recognize(SupportUtils.resizeBitmap(listBitmaps.get(i), 20, 28)));
+            String t = mRecognizer.recognize(BitmapProcessor.resizeBitmap(listBitmaps.get(i), 20, 28));
+            Log.d("Result", "bitmap " + i + " :" + t);
+            text += t + " - ";
         }
+        mTvResult.setText(text);
+    }
+
+    private void deleteData() {
+        mDrawer.emptyDrawer();
+        mTvResult.setText("");
     }
 }

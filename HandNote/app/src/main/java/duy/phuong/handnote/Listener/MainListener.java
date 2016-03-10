@@ -2,6 +2,7 @@ package duy.phuong.handnote.Listener;
 
 import java.util.ArrayList;
 
+import duy.phuong.handnote.DTO.ClusterLabel;
 import duy.phuong.handnote.RecognitionAPI.MachineLearning.SOM;
 
 /**
@@ -12,5 +13,5 @@ public interface MainListener {
     void toggleMainNavigator(boolean show);
     void toggleMainBottomTabs(boolean show);
     SOM getGlobalSOM();
-    ArrayList<String> getMapNames();
+    ArrayList<ClusterLabel> getMapNames();
 }

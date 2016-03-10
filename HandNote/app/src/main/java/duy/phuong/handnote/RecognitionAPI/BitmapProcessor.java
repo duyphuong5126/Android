@@ -2,6 +2,7 @@ package duy.phuong.handnote.RecognitionAPI;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.util.Log;
 
@@ -34,6 +35,18 @@ public class BitmapProcessor {
         callback.onRecognizeSuccess(resultBitmaps);
 
         this.mListRectangle.clear();
+    }
+
+    public static Bitmap resizeBitmap(Bitmap bitmap, int newWidth, int newHeight) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        return Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, false);
     }
 
     private ArrayList<Rect> detectAreasOnBitmap(final Bitmap bitmap, int dx, int dy) {

@@ -1,13 +1,11 @@
 package duy.phuong.handnote.RecognitionAPI.MachineLearning;
 
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import duy.phuong.handnote.DTO.TrainingImage;
+import duy.phuong.handnote.DTO.StandardImage;
 import duy.phuong.handnote.RecognitionAPI.Recognizer;
 import duy.phuong.handnote.Support.SupportUtils;
 
@@ -16,24 +14,29 @@ import duy.phuong.handnote.Support.SupportUtils;
  */
 
 /*Kohonen Algorithm*/
-public class PatternLearning extends Recognizer{
-    private static final double INITIAL_LEARNING_RATE = 0.5;
-    private static final double INITIAL_NEIGHBOR_RADIUS = SOM.NUMBERS_OF_CLUSTER - 1; //the epsilon(0)
+public class PatternLearning extends Recognizer {
+    private static final double INITIAL_LEARNING_RATE = 0.5;//the initial learning rate
+    private static final double INITIAL_NEIGHBOR_RADIUS = SOM.NUMBERS_OF_CLUSTER - 1; //the initial neighbor radius
 
-    private ArrayList<TrainingImage> mSamples;
+    private ArrayList<Input> mSamples;//training set
     private int mEpochs; //learning rate time const (T2)
     private double mNeighborRadius;
     private double mLearningRate;
-    private double mNeighbor_Time_Const; //neighbor function time const (T1)
+    private double mNeighbor_Time_Const; //time const (lambda)
 
-    public PatternLearning(ArrayList<TrainingImage> samples, int epochs) {
+    public PatternLearning(ArrayList<StandardImage> samples, int epochs) {
         mMap = new SOM();
-        mEpochs = epochs; //init T2
+        mEpochs = epochs; //init time const
         if (mEpochs < 0) {
             mEpochs = 0;
         }
         mSamples = new ArrayList<>();
-        mSamples.addAll(samples);
+        for (StandardImage standardImage : samples) {
+            Input input = normalizeData(standardImage.getBitmap());
+            input.mLabel = standardImage.getName();
+
+            mSamples.add(input);
+        }
 
         //init parameters
         mLearningRate = INITIAL_LEARNING_RATE;
@@ -47,15 +50,14 @@ public class PatternLearning extends Recognizer{
             mMap.resetMapName();
             Log.d("Epoch", "" + i);
 
-            ArrayList<TrainingImage> bitmaps = new ArrayList<>();
-            bitmaps.addAll(mSamples);
+            ArrayList<Input> inputs = new ArrayList<>();
+            inputs.addAll(mSamples);
 
-            while (bitmaps.size() > 0) {
+            while (inputs.size() > 0) {
                 //1. grab a random input
                 Random rd = new Random();
-                int position = rd.nextInt(bitmaps.size());
-                TrainingImage trainingImage = bitmaps.remove(position);
-                Input input = normalizeData(trainingImage.getBitmap());
+                int position = rd.nextInt(inputs.size());
+                Input input = inputs.remove(position);
 
                 //2. find best matching unit
                 double min_distance = 1000000;
@@ -94,15 +96,13 @@ public class PatternLearning extends Recognizer{
                 }
 
                 //5. update map of names
-                mMap.updateLabelForCluster(win_neuron_position, trainingImage.getName());
+                mMap.updateLabelForCluster(win_neuron_position, min_distance, input.mLabel);
 
-                Log.d("Trained", "bitmap: " + trainingImage.getName() + ", cluster: " + win_neuron_position);
+                Log.d("Trained", "bitmap: " + input.mLabel + ", cluster: " + win_neuron_position);
             }
 
             //check converge condition
             converge = checkConverge();
-
-            //Log.d("Names", mMap.getMapNames());
 
             updateLearningRate(i);
             updateNeighborRadius(i);
@@ -110,21 +110,15 @@ public class PatternLearning extends Recognizer{
 
         SupportUtils.writeFile(mMap.toString(), "Trained", "SOM.txt");
         SupportUtils.writeFile(mMap.getMapNames(), "Trained", "MapNames.txt");
+        SupportUtils.writeFile(mMap.getLabels(), "Trained", "Labels.txt");
         return true;
     }
 
     private boolean checkConverge() {
         Output[] outputs = mMap.getOutputs();
-        for (int j = 0; j < outputs.length - 1; j++) {
-            String label = outputs[j].getLabel();
-            if ("".equals(label) || label.length() != 1) {
+        for (Output output : outputs) {
+            if (!output.checkConverge()) {
                 return false;
-            } else {
-                for (int k = j + 1; k < outputs.length; k++) {
-                    if (outputs[k].getLabel().contains(label) || "".equals(outputs[k].getLabel()) || outputs[k].getLabel().length() != 1) {
-                        return false;
-                    }
-                }
             }
         }
         return true;
