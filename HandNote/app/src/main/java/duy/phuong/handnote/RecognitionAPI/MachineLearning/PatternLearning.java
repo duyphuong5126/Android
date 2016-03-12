@@ -16,13 +16,15 @@ import duy.phuong.handnote.Support.SupportUtils;
 /*Kohonen Algorithm*/
 public class PatternLearning extends Recognizer {
     private static final double INITIAL_LEARNING_RATE = 0.5;//the initial learning rate
-    private static final double INITIAL_NEIGHBOR_RADIUS = SOM.NUMBERS_OF_CLUSTER - 1; //the initial neighbor radius
+    private static final double MAP_RADIUS = (SOM.NUMBERS_OF_CLUSTER / 4);
 
     private ArrayList<Input> mSamples;//training set
     private int mEpochs; //learning rate time const (T2)
     private double mNeighborRadius;
     private double mLearningRate;
     private double mNeighbor_Time_Const; //time const (lambda)
+
+    private double mAverageMemberPerCluster;
 
     public PatternLearning(ArrayList<StandardImage> samples, int epochs) {
         mMap = new SOM();
@@ -40,8 +42,9 @@ public class PatternLearning extends Recognizer {
 
         //init parameters
         mLearningRate = INITIAL_LEARNING_RATE;
-        mNeighborRadius = INITIAL_NEIGHBOR_RADIUS;
-        mNeighbor_Time_Const = mEpochs / Math.log(INITIAL_NEIGHBOR_RADIUS);
+        mNeighborRadius = MAP_RADIUS;
+        mNeighbor_Time_Const = mEpochs / Math.log(MAP_RADIUS);
+        mAverageMemberPerCluster = ((double) mSamples.size()) / SOM.NUMBERS_OF_CLUSTER;
     }
 
     public boolean learn() {
@@ -53,6 +56,7 @@ public class PatternLearning extends Recognizer {
             ArrayList<Input> inputs = new ArrayList<>();
             inputs.addAll(mSamples);
 
+            int count = 0;
             while (inputs.size() > 0) {
                 //1. grab a random input
                 Random rd = new Random();
@@ -60,46 +64,64 @@ public class PatternLearning extends Recognizer {
                 Input input = inputs.remove(position);
 
                 //2. find best matching unit
-                double min_distance = 1000000;
-                int win_neuron_position = -1;
-                for (int j = 0; j < mMap.getOutputs().length; j++) {
-                    double d = getDistance(input, mMap.getOutputs()[j]);
-                    if (min_distance > d) {
-                        min_distance = d;
-                        win_neuron_position = j;
+                double min_distance = 1000000000;
+                int win_neuron_position_X = -1;
+                int win_neuron_position_Y = -1;
+                for (int j = 0; j < mMap.getOutputs().length; j++)
+                    for (int k = 0; k < mMap.getOutputs()[j].length; k++) {
+                        double d = getDistance(input, mMap.getOutputs()[j][k]);
+                        if (min_distance > d) {
+                            min_distance = d;
+                            win_neuron_position_Y = j;
+                            win_neuron_position_X = k;
+                        }
                     }
-                }
 
-                if (win_neuron_position < 0) {
+                if (win_neuron_position_X < 0 || win_neuron_position_Y < 0) {
                     Log.d("Error", "An error occur");
                     return false;
                 }
 
                 //3. find the neighbor area
                 long radius = Math.round(mNeighborRadius);
-                long lowerBoundary = win_neuron_position - radius;
-                if (lowerBoundary < 0) {
-                    lowerBoundary = 0;
+                long lowerBoundary_X = win_neuron_position_X - radius;
+                if (lowerBoundary_X < 0) {
+                    lowerBoundary_X = 0;
                 }
-                long upperBoundary = win_neuron_position + radius;
-                if (upperBoundary > mMap.getOutputs().length - 1) {
-                    upperBoundary = mMap.getOutputs().length - 1;
+                long upperBoundary_X = win_neuron_position_X + radius;
+                if (upperBoundary_X > mMap.getOutputs()[0].length - 1) {
+                    upperBoundary_X = mMap.getOutputs()[0].length - 1;
+                }
+                long lowerBoundary_Y = win_neuron_position_Y - radius;
+                if (lowerBoundary_Y < 0) {
+                    lowerBoundary_Y = 0;
+                }
+                long upperBoundary_Y = win_neuron_position_Y + radius;
+                if (upperBoundary_Y > mMap.getOutputs().length - 1) {
+                    upperBoundary_Y = mMap.getOutputs().length - 1;
                 }
 
                 //4. update weight vector
-                mMap.updateWeightVector(win_neuron_position, input, mLearningRate, 1);
-                for (long j = lowerBoundary; j <= upperBoundary; j++) {
-                    int index = (int) j;
-                    if (index != win_neuron_position) {
-                        mMap.updateWeightVector(index, input, mLearningRate, neighborInfluence(index, win_neuron_position));
+                mMap.updateWeightVector(win_neuron_position_X, win_neuron_position_Y, input, mLearningRate, 1);
+                for (long j = lowerBoundary_Y; j <= upperBoundary_Y; j++) {
+                    int index_Y = (int) j;
+                    for (long k = lowerBoundary_X; k <= upperBoundary_X; k++) {
+                        int index_X = (int) k;
+                        if (index_X != win_neuron_position_X && index_Y != win_neuron_position_Y) {
+                            mMap.updateWeightVector(index_X, index_Y, input, mLearningRate,
+                                    neighborInfluence(index_X, index_Y, win_neuron_position_X, win_neuron_position_Y));
+                        }
                     }
                 }
 
                 //5. update map of names
-                mMap.updateLabelForCluster(win_neuron_position, min_distance, input.mLabel);
+                mMap.updateLabelForCluster(win_neuron_position_X, win_neuron_position_Y, min_distance, input.mLabel);
 
-                Log.d("Trained", "bitmap: " + input.mLabel + ", cluster: " + win_neuron_position);
+                //Log.d("Trained", "bitmap: " + input.mLabel + ", cluster: " + win_neuron_position);
+                count++;
             }
+
+            Log.d("Count", "" + count);
 
             //check converge condition
             converge = checkConverge();
@@ -108,17 +130,19 @@ public class PatternLearning extends Recognizer {
             updateNeighborRadius(i);
         }
 
-        SupportUtils.writeFile(mMap.toString(), "Trained", "SOM.txt");
-        SupportUtils.writeFile(mMap.getMapNames(), "Trained", "MapNames.txt");
-        SupportUtils.writeFile(mMap.getLabels(), "Trained", "Labels.txt");
+        SupportUtils.writeFile(mMap.toString(), "Trained", "som.txt");
+        SupportUtils.writeFile(mMap.getMapNames(), "Trained", "map_names.txt");
+        SupportUtils.writeFile(mMap.getLabels(), "Trained", "labels.txt");
         return true;
     }
 
     private boolean checkConverge() {
-        Output[] outputs = mMap.getOutputs();
-        for (Output output : outputs) {
-            if (!output.checkConverge()) {
-                return false;
+        for (Output[] outputs : mMap.getOutputs()) {
+            for (Output output : outputs) {
+                if (!(output.getCount() >= 50)) {
+                    Log.d("Label", output.getNameList());
+                    return false;
+                }
             }
         }
         return true;
@@ -129,7 +153,7 @@ public class PatternLearning extends Recognizer {
     }
 
     private void updateNeighborRadius(int iteration) {
-        mNeighborRadius = INITIAL_NEIGHBOR_RADIUS * Math.exp((-1.d * iteration) / mNeighbor_Time_Const);
+        mNeighborRadius = MAP_RADIUS * Math.exp((-1.d * iteration) / mNeighbor_Time_Const);
         /*int offset = (int) Math.round(mEpochs * 1.d / INITIAL_NEIGHBOR_RADIUS);
         if (iteration % offset == 0) {
             mNeighborRadius--;
@@ -140,9 +164,9 @@ public class PatternLearning extends Recognizer {
         }*/
     }
 
-    private double neighborInfluence(int neighborIndex, int BMU_index) {
-        double distance = /*getDistance(mMap.getOutputs()[neighborIndex], mMap.getOutputs()[BMU_index])*/ BMU_index - neighborIndex;
-        double value = -1 * Math.pow(distance, 2);
+    private double neighborInfluence(int neighborIndex_X, int neighborIndex_Y, int BMU_index_X, int BMU_index_Y) {
+        double distance = Math.pow(neighborIndex_X - BMU_index_X, 2) + Math.pow(neighborIndex_Y - BMU_index_Y, 2);
+        double value = -1 * distance;
         value /= (2 * (Math.pow(mNeighborRadius, 2)));
         return Math.exp(value);
     }

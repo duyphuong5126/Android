@@ -91,9 +91,18 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
     public void onRecognizeSuccess(ArrayList<Bitmap> listBitmaps) {
         String text = "";
         for (int i = 0; i < listBitmaps.size(); i++) {
-            String t = mRecognizer.recognize(BitmapProcessor.resizeBitmap(listBitmaps.get(i), 20, 28));
-            Log.d("Result", "bitmap " + i + " :" + t);
-            text += t + " - ";
+            String result = mRecognizer.recognize(BitmapProcessor.resizeBitmap(listBitmaps.get(i), 20, 28));
+            Log.d("Result", "bitmap " + i + " :" + result);
+
+            String[] list = new String[result.length()];
+            for (int j = 0; j < result.length(); j++) {
+                list[j] = result.substring(j, j + 1);
+            }
+
+            if (list.length > 0) {
+                mBitmapProcessor.featureExtraction(listBitmaps.get(i), list);
+            }
+            text += result + " - ";
         }
         mTvResult.setText(text);
     }

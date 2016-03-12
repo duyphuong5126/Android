@@ -119,10 +119,15 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         int sum = 0;
         for (ClusterLabel clusterLabel : mGlobalMapNames) {
             sum += clusterLabel.getTotal();
+            String mapNames = "";
+            for (Label label : clusterLabel.getListLabel()) {
+                mapNames += label.getLabel() + ":" + label.getCount() + ";";
+            }
+
+            Log.d("List names", mapNames);
         }
         Log.d("Sum: ", "" + sum);
     }

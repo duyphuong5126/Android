@@ -15,9 +15,15 @@ public class Output {
 
     public Output() {
         mWeights = new double[Input.VECTOR_DIMENSIONS];
-        for (int i = 0; i < mWeights.length; i += 2) {
+        for (int i = 0; i < mWeights.length; i += 8) {
             mWeights[i] = randomWeight();
             mWeights[i + 1] = randomWeight();
+            mWeights[i + 2] = randomWeight();
+            mWeights[i + 3] = randomWeight();
+            mWeights[i + 4] = randomWeight();
+            mWeights[i + 5] = randomWeight();
+            mWeights[i + 6] = randomWeight();
+            mWeights[i + 7] = randomWeight();
         }
 
         resetLabel();
@@ -26,22 +32,27 @@ public class Output {
     public Output(double[] weightVector) {
         if (weightVector.length == Input.VECTOR_DIMENSIONS) {
             mWeights = new double[Input.VECTOR_DIMENSIONS];
-            for (int i = 0; i < mWeights.length; i += 2) {
+            for (int i = 0; i < mWeights.length; i += 8) {
                 mWeights[i] = weightVector[i];
                 mWeights[i + 1] = weightVector[i + 1];
+                mWeights[i + 2] = weightVector[i + 2];
+                mWeights[i + 3] = weightVector[i + 3];
+                mWeights[i + 4] = weightVector[i + 4];
+                mWeights[i + 5] = weightVector[i + 5];
+                mWeights[i + 6] = weightVector[i + 6];
+                mWeights[i + 7] = weightVector[i + 7];
             }
         }
 
         resetLabel();
     }
 
-    public boolean checkConverge() {
+    public int getCount() {
+        int result = 0;
         for (Map.Entry<String, Integer> entry : mMapNames.entrySet()) {
-            if (entry.getValue() >= 30) {
-                return true;
-            }
+            result += entry.getValue();
         }
-        return false;
+        return result;
     }
 
     public void resetLabel() {

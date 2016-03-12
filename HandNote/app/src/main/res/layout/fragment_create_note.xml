@@ -106,16 +106,26 @@
         android:id="@+id/FingerDrawer"
         android:layout_width="match_parent"
         android:layout_height="0dip"
-        android:layout_weight="10"/>
+        android:layout_weight="10" />
 
-    <TextView
-        android:id="@+id/tvResult"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dip"
-        android:layout_weight="2"
-        android:inputType="textMultiLine"
-        android:textSize="25sp"
-        android:gravity="center"
-        android:textColor="#c03"/>
+        android:layout_weight="2">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvResult"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:inputType="textMultiLine"
+                android:textColor="#c03"
+                android:textSize="25sp" />
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

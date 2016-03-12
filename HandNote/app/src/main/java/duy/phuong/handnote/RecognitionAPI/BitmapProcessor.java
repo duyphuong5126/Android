@@ -3,6 +3,7 @@ package duy.phuong.handnote.RecognitionAPI;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
 
@@ -11,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import duy.phuong.handnote.Listener.RecognitionCallback;
+import duy.phuong.handnote.MyView.DrawingView.MyPath;
+import duy.phuong.handnote.MyView.DrawingView.MyShape;
 import duy.phuong.handnote.Support.SupportUtils;
 
 /**
@@ -341,5 +344,151 @@ public class BitmapProcessor {
         }
 
         return count;
+    }
+
+    public String featureExtraction(Bitmap bitmap, String[] list) {
+        String result = "";
+        for (String string : list) {
+            switch (string) {
+                case "A":
+                    isA(bitmap);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+        return result;
+    }
+
+    private boolean isA(Bitmap bitmap) {
+        boolean result = false;
+        ArrayList<MyPath> myPaths = getAreas(bitmap);
+        Log.d("Ares", "" + myPaths.size());
+        return result;
+    }
+
+    private ArrayList<MyPath> getAreas(Bitmap bitmap) {
+        ArrayList<MyPath> myPaths = new ArrayList<>();
+        myPaths.add(new MyPath(new ArrayList<Point>()));
+        int index = 0;
+
+        ArrayList<Point> points = new ArrayList<>();
+        points.addAll(getListBlankPoint(bitmap));
+
+        myPaths.get(index).getListPoint().add(points.remove(0));
+
+        while (!points.isEmpty()) {
+            ArrayList<Point> listPos = new ArrayList<>();
+            for (int i = 0; i < points.size(); i++) {
+                boolean flag = false;
+                for (int j = 0; j < myPaths.get(index).getListPoint().size() && !flag; j++) {
+                    if (isContiguous(myPaths.get(index).getListPoint().get(j), points.get(i))) {
+                        listPos.add(points.get(i));
+                        flag = true;
+                    }
+                }
+            }
+
+            if (listPos.size() > 0) {
+                for (Point point: listPos) {
+                    myPaths.get(index).getListPoint().add(point);
+                    points.remove(point);
+                }
+            } else {
+                myPaths.add(new MyPath(new ArrayList<Point>()));
+                index++;
+                if (!points.isEmpty()) {
+                    myPaths.get(index).getListPoint().add(points.remove(0));
+                }
+            }
+        }
+        return myPaths;
+    }
+
+    private boolean isContiguous(Point point1, Point point2) {
+        return ((Math.abs(point1.x - point2.x) <= 1) && (Math.abs(point1.y - point2.y) <= 1));
+    }
+
+    private ArrayList<Point> getListBlankPoint(Bitmap bitmap) {
+        ArrayList<Point> points = new ArrayList<>();
+        for (int i = 0; i < bitmap.getHeight(); i++)
+            for (int j = 0; j < bitmap.getWidth(); j++) {
+                if (bitmap.getPixel(j, i) == Color.WHITE) {
+                    points.add(new Point(j, i));
+                }
+            }
+
+        return points;
+    }
+
+    private int countClosedAreas(byte[][] matrix) {
+        int result = 0;
+        byte color = 2;
+        Point point = getFirstBlankPoint(matrix);
+        while (point != null) {
+            colorMatrix(color, point.x, point.y, matrix);
+            color++;
+            point = getFirstBlankPoint(matrix);
+            result++;
+        }
+        return result;
+    }
+
+    private Point getFirstBlankPoint(byte[][] matrix) {
+        for (int i = 0; i < matrix.length; i++)
+            for (int j = 0; j < matrix[i].length; j++) {
+                if (matrix[i][j] == 0) {
+                    return new Point(j, i);
+                }
+            }
+
+        return null;
+    }
+
+    private void colorMatrix(byte color, int x, int y, byte[][] matrix) {
+        if (matrix[y][x] == 0) {
+            matrix[y][x] = color;
+            if (x - 1 >= 0 && y - 1 >= 0) {
+                colorMatrix(color, x - 1, y - 1, matrix);
+            }
+            if (x - 1 >= 0 && y >= 0 && x - 1 < matrix[y].length) {
+                colorMatrix(color, x - 1, y, matrix);
+            }
+            if (x - 1 >= 0 && y + 1 < matrix.length) {
+                colorMatrix(color, x - 1, y + 1, matrix);
+            }
+            if (y - 1 >= 0) {
+                colorMatrix(color, x, y - 1, matrix);
+            }
+            if (y + 1 < matrix.length) {
+                colorMatrix(color, x, y + 1, matrix);
+            }
+            if (y - 1 >= 0 && x + 1 < matrix[y].length) {
+                colorMatrix(color, x + 1, y - 1, matrix);
+            }
+            if (x + 1 < matrix[y].length) {
+                colorMatrix(color, x + 1, y, matrix);
+            }
+            if (x + 1 < matrix[y].length && y + 1 < matrix.length) {
+                colorMatrix(color, x + 1, y + 1, matrix);
+            }
+        }
+    }
+
+    private byte[][] bitmapToMatrix(Bitmap bitmap) {
+        byte[][] matrix = new byte[bitmap.getHeight()][bitmap.getWidth()];
+        for (int i = 0; i < bitmap.getHeight(); i++) {
+            matrix[i] = new byte[bitmap.getWidth()];
+            for (int j = 0; j < bitmap.getWidth(); j++) {
+                if (bitmap.getPixel(j, i) != Color.WHITE) {
+                    matrix[i][j] = 1;
+                } else {
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+
+        return matrix;
     }
 }

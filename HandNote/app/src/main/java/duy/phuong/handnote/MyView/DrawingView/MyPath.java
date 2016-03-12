@@ -125,4 +125,16 @@ public class MyPath {
 
         return false;
     }
+
+    public boolean isIntersect(MyPath myPath) {
+        for (Point point : mListPoint) {
+            for (Point p : myPath.getListPoint()) {
+                if (Math.abs(point.x - p.x) <= 1 && Math.abs(point.y - p.y) <= 1) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }

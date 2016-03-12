@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 import duy.phuong.handnote.DTO.ClusterLabel;
 import duy.phuong.handnote.DTO.StandardImage;
@@ -32,25 +33,20 @@ public class Recognizer {
 
     public String recognize(Bitmap bitmap) {
         Input input = normalizeData(bitmap);
-        Output[] outputs = mMap.getOutputs();
+        Output[][] outputs = mMap.getOutputs();
 
         double min_distance = 10000000;
         int win_neuron = -1;
         for (int i = 0; i < outputs.length; i++) {
-            double dis = getDistance(input, outputs[i]);
-            if (dis < min_distance) {
-                min_distance = dis;
-                win_neuron = i;
+            for (int j = 0; j < outputs[i].length; j++) {
+                double dis = getDistance(input, outputs[i][j]);
+                if (dis < min_distance) {
+                    min_distance = dis;
+                    win_neuron = i * 13 + j;
+                }
             }
         }
         if (win_neuron >= 0) {
-            /*String string = "";
-            switch (mMapNames.get(win_neuron).toString()) {
-                case "MV":
-                    return string;
-                default:
-                    break;
-            }*/
             return mMapNames.get(win_neuron).toString();
         }
         return "";
@@ -77,7 +73,7 @@ public class Recognizer {
     protected double getDistance(Input input, Output output) {
         double result = 0;
         if (input != null && output != null) {
-            for (int i = 0; i < Input.VECTOR_DIMENSIONS; i += 4) {
+            for (int i = 0; i < Input.VECTOR_DIMENSIONS; i += 8) {
                 double d = input.mInputData[i] - output.mWeights[i];
                 result += Math.pow(d, 2);
 
@@ -88,6 +84,18 @@ public class Recognizer {
                 result += Math.pow(d, 2);
 
                 d = input.mInputData[i + 3] - output.mWeights[i + 3];
+                result += Math.pow(d, 2);
+
+                d = input.mInputData[i + 4] - output.mWeights[i + 4];
+                result += Math.pow(d, 2);
+
+                d = input.mInputData[i + 5] - output.mWeights[i + 5];
+                result += Math.pow(d, 2);
+
+                d = input.mInputData[i + 6] - output.mWeights[i + 6];
+                result += Math.pow(d, 2);
+
+                d = input.mInputData[i + 7] - output.mWeights[i + 7];
                 result += Math.pow(d, 2);
             }
         }
