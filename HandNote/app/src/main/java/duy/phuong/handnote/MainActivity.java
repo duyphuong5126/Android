@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import duy.phuong.handnote.Listener.BackPressListener;
 import duy.phuong.handnote.Listener.MainListener;
 import duy.phuong.handnote.RecognitionAPI.MachineLearning.Input;
 import duy.phuong.handnote.RecognitionAPI.MachineLearning.SOM;
+import duy.phuong.handnote.Support.LanguageUtils;
 import duy.phuong.handnote.Support.SupportUtils;
 
 public class MainActivity extends FragmentActivity implements MainListener, ImageButton.OnClickListener, BackPressListener {
@@ -40,6 +42,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     private FrameLayout mLayoutBottomTabs;
     private ImageButton mButtonNavigator, mButtonCreate, mButtonBack;
     private LinearLayout mButtonTraining;
+    private TextView mTvAppTitle;
 
     private BackPressListener mBackPressListener;
     private Stack<String> mStack;
@@ -64,6 +67,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         mButtonTraining.setOnClickListener(this);
         mButtonBack = (ImageButton) findViewById(R.id.buttonBack);
         mButtonBack.setOnClickListener(this);
+        mTvAppTitle = (TextView) findViewById(R.id.tvAppTitle);
 
         mStack = new Stack<>();
 
@@ -124,7 +128,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
             sum += clusterLabel.getTotal();
             String mapNames = "";
             for (Label label : clusterLabel.getListLabel()) {
-                mapNames += label.getLabel() + ":" + label.getCount() + ";";
+                mapNames += label.getLabel() + ":" + clusterLabel.getLabelPercentage(label) + ";";
             }
 
             Log.d("List names", mapNames);
@@ -240,6 +244,8 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                     break;
             }
 
+            mTvAppTitle.setText(LanguageUtils.getFragmentTitle(name, this));
+
             if (mStack.size() > 1) {
                 mButtonBack.setVisibility(View.VISIBLE);
                 mButtonNavigator.setVisibility(View.GONE);
@@ -320,11 +326,5 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         transaction.replace(R.id.layoutFragmentContainer, fragment, name);
         transaction.addToBackStack(null);
         transaction.commit();
-    }
-
-    private void clearBackStack() {
-        for (int i = 0; i < mFragmentManager.getBackStackEntryCount(); i++) {
-            mFragmentManager.popBackStack();
-        }
     }
 }

@@ -8,36 +8,51 @@ import java.util.ArrayList;
  * Created by Phuong on 10/03/2016.
  */
 public class ClusterLabel {
-    private static int CLUSTER_COUNT;
+    private int mClusterCount;
     private ArrayList<Label> mListLabel;
 
     public ClusterLabel() {
         mListLabel = new ArrayList<>();
+
+        computeClusterCount();
     }
 
     public ClusterLabel(ArrayList<Label> ListLabel) {
         mListLabel = new ArrayList<>();
         mListLabel.addAll(ListLabel);
+
+        computeClusterCount();
     }
 
-    public boolean updateLabel(String label) {
-        boolean result = false;
-        CLUSTER_COUNT = 0;
-        if (label != null && !"".equals(label)) {
-            for (Label label1 : mListLabel) {
-                if (label.equals(label1.getLabel())) {
-                    label1.setCount(label1.getCount() + 1);
-                    result = true;
-                }
+    private void computeClusterCount() {
+        mClusterCount = 0;
+        for (Label label1 : mListLabel) {
+            mClusterCount += label1.getCount();
+        }
+    }
 
-                CLUSTER_COUNT += label1.getCount();
+    public String getClusterLabel() {
+        double percent = 0.89d;
+        String l = "";
+        for (Label label : mListLabel) {
+            double p = getLabelPercentage(label);
+            if (p > percent) {
+                percent = p;
+                l = label.getLabel();
             }
         }
-        return result;
+
+        if (l.length() != 1) {
+            Log.d("Label", toString());
+            return toString();
+        }
+
+        Log.d("Label", l);
+        return l;
     }
 
     public boolean addNewLabel(Label label) {
-        if (label == null || label.getCount() == 0 || "".equals(label.getLabel())) {
+        if (label == null || label.getCount() == 0 || label.getLabel() == null || label.getLabel().length() <= 0) {
             return false;
         }
 
@@ -53,46 +68,30 @@ public class ClusterLabel {
             mListLabel.add(label);
         }
 
+        computeClusterCount();
+
         return true;
-    }
-
-    public double getLabelPercent(String label) {
-        for (Label label1 : mListLabel) {
-            if (label.equals(label1.getLabel())) {
-                return (((double) label1.getCount()) / CLUSTER_COUNT);
-            }
-        }
-
-        return 0;
-    }
-
-    public Label getLabel(String label) {
-        for (Label label1 : mListLabel) {
-            if (label.equals(label1.getLabel())) {
-                return label1;
-            }
-        }
-        return null;
     }
 
     public ArrayList<Label> getListLabel() {
         return mListLabel;
     }
 
+    public double getLabelPercentage(Label label) {
+        return label.getCount() / ((double) mClusterCount);
+    }
+
     public int getTotal() {
-        int sum = 0;
-        for (Label label : mListLabel) {
-            sum += label.getCount();
-        }
-        return sum;
+        computeClusterCount();
+        return mClusterCount;
     }
 
     @Override
     public String toString() {
-        String s = "";
+        StringBuilder builder = new StringBuilder();
         for (Label label : mListLabel) {
-            s += label.getLabel();
+            builder.append(label.getLabel());
         }
-        return s;
+        return builder.toString();
     }
 }

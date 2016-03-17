@@ -15,7 +15,7 @@ public class Output {
 
     public Output() {
         mWeights = new double[Input.VECTOR_DIMENSIONS];
-        for (int i = 0; i < mWeights.length; i += 8) {
+        for (int i = 0; i < mWeights.length; i += 16) {
             mWeights[i] = randomWeight();
             mWeights[i + 1] = randomWeight();
             mWeights[i + 2] = randomWeight();
@@ -24,6 +24,14 @@ public class Output {
             mWeights[i + 5] = randomWeight();
             mWeights[i + 6] = randomWeight();
             mWeights[i + 7] = randomWeight();
+            mWeights[i + 8] = randomWeight();
+            mWeights[i + 9] = randomWeight();
+            mWeights[i + 10] = randomWeight();
+            mWeights[i + 11] = randomWeight();
+            mWeights[i + 12] = randomWeight();
+            mWeights[i + 13] = randomWeight();
+            mWeights[i + 14] = randomWeight();
+            mWeights[i + 15] = randomWeight();
         }
 
         resetLabel();
@@ -32,7 +40,7 @@ public class Output {
     public Output(double[] weightVector) {
         if (weightVector.length == Input.VECTOR_DIMENSIONS) {
             mWeights = new double[Input.VECTOR_DIMENSIONS];
-            for (int i = 0; i < mWeights.length; i += 8) {
+            for (int i = 0; i < mWeights.length; i += 16) {
                 mWeights[i] = weightVector[i];
                 mWeights[i + 1] = weightVector[i + 1];
                 mWeights[i + 2] = weightVector[i + 2];
@@ -41,6 +49,14 @@ public class Output {
                 mWeights[i + 5] = weightVector[i + 5];
                 mWeights[i + 6] = weightVector[i + 6];
                 mWeights[i + 7] = weightVector[i + 7];
+                mWeights[i + 8] = weightVector[i + 8];
+                mWeights[i + 9] = weightVector[i + 9];
+                mWeights[i + 10] = weightVector[i + 10];
+                mWeights[i + 11] = weightVector[i + 11];
+                mWeights[i + 12] = weightVector[i + 12];
+                mWeights[i + 13] = weightVector[i + 13];
+                mWeights[i + 14] = weightVector[i + 14];
+                mWeights[i + 15] = weightVector[i + 15];
             }
         }
 
@@ -153,14 +169,14 @@ public class Output {
 
     @Override
     public String toString() {
-        String string = "";
+        StringBuilder builder = new StringBuilder();
         for (int j = 0; j < mWeights.length; j++) {
-            string += mWeights[j];
+            builder.append(mWeights[j]);
             if (j < mWeights.length - 1) {
-                string += ";";
+                builder.append(";");
             }
         }
 
-        return string;
+        return builder.toString();
     }
 }

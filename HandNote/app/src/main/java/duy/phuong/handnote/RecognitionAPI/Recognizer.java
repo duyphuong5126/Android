@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import duy.phuong.handnote.DTO.ClusterLabel;
+import duy.phuong.handnote.DTO.FloatingImage;
 import duy.phuong.handnote.DTO.StandardImage;
 import duy.phuong.handnote.RecognitionAPI.MachineLearning.Input;
 import duy.phuong.handnote.RecognitionAPI.MachineLearning.Output;
@@ -19,6 +20,7 @@ import duy.phuong.handnote.RecognitionAPI.MachineLearning.SOM;
 public class Recognizer {
     protected SOM mMap;
     private ArrayList<ClusterLabel> mMapNames;
+    private BitmapProcessor mProcessor;
 
     public Recognizer() {
         mMap = new SOM();
@@ -29,9 +31,11 @@ public class Recognizer {
         mMap = som;
         mMapNames = new ArrayList<>();
         mMapNames.addAll(MapNames);
+        mProcessor = new BitmapProcessor();
     }
 
-    public String recognize(Bitmap bitmap) {
+    public String recognize(FloatingImage floatingImage) {
+        Bitmap bitmap = BitmapProcessor.resizeBitmap(floatingImage.mBitmap, StandardImage.WIDTH, StandardImage.HEIGHT);
         Input input = normalizeData(bitmap);
         Output[][] outputs = mMap.getOutputs();
 
@@ -47,7 +51,12 @@ public class Recognizer {
             }
         }
         if (win_neuron >= 0) {
-            return mMapNames.get(win_neuron).toString();
+            String result = mMapNames.get(win_neuron).getClusterLabel();
+            if (result.length() == 1) {
+                return result;
+            } else {
+                return mProcessor.featureExtraction(floatingImage, result);
+            }
         }
         return "";
     }
@@ -73,7 +82,7 @@ public class Recognizer {
     protected double getDistance(Input input, Output output) {
         double result = 0;
         if (input != null && output != null) {
-            for (int i = 0; i < Input.VECTOR_DIMENSIONS; i += 8) {
+            for (int i = 0; i < Input.VECTOR_DIMENSIONS; i += 16) {
                 double d = input.mInputData[i] - output.mWeights[i];
                 result += Math.pow(d, 2);
 
@@ -97,25 +106,31 @@ public class Recognizer {
 
                 d = input.mInputData[i + 7] - output.mWeights[i + 7];
                 result += Math.pow(d, 2);
+
+                d = input.mInputData[i + 8] - output.mWeights[i + 8];
+                result += Math.pow(d, 2);
+
+                d = input.mInputData[i + 9] - output.mWeights[i + 9];
+                result += Math.pow(d, 2);
+
+                d = input.mInputData[i + 10] - output.mWeights[i + 10];
+                result += Math.pow(d, 2);
+
+                d = input.mInputData[i + 11] - output.mWeights[i + 11];
+                result += Math.pow(d, 2);
+
+                d = input.mInputData[i + 12] - output.mWeights[i + 12];
+                result += Math.pow(d, 2);
+
+                d = input.mInputData[i + 13] - output.mWeights[i + 13];
+                result += Math.pow(d, 2);
+
+                d = input.mInputData[i + 14] - output.mWeights[i + 14];
+                result += Math.pow(d, 2);
+
+                d = input.mInputData[i + 15] - output.mWeights[i + 15];
+                result += Math.pow(d, 2);
             }
-        }
-        return Math.sqrt(result);
-    }
-
-    protected double getDistance(Output output1, Output output2) {
-        double result = 0;
-        for (int i = 0; i < Input.VECTOR_DIMENSIONS; i += 4) {
-            double d = output1.mWeights[i] - output2.mWeights[i];
-            result += Math.pow(d, 2);
-
-            d = output1.mWeights[i + 1] - output2.mWeights[i + 1];
-            result += Math.pow(d, 2);
-
-            d = output1.mWeights[i + 2] - output2.mWeights[i + 2];
-            result += Math.pow(d, 2);
-
-            d = output1.mWeights[i + 3] - output2.mWeights[i + 3];
-            result += Math.pow(d, 2);
         }
         return Math.sqrt(result);
     }

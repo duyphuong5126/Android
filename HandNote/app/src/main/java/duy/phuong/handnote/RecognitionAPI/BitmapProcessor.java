@@ -11,13 +11,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import duy.phuong.handnote.DTO.FloatingImage;
 import duy.phuong.handnote.Listener.RecognitionCallback;
-import duy.phuong.handnote.MyView.DrawingView.MyPath;
-import duy.phuong.handnote.MyView.DrawingView.MyShape;
-import duy.phuong.handnote.Support.SupportUtils;
 
 /**
  * Created by Phuong on 26/11/2015.
+ */
+
+/**
+ * (Pre-)Processing bitmap and segmenting character areas. Features extraction after clustering
  */
 public class BitmapProcessor {
 
@@ -27,12 +29,32 @@ public class BitmapProcessor {
         mListRectangle = new ArrayList<>();
     }
 
-    public void onDetectCharacter(final Bitmap src, RecognitionCallback callback) {
-        this.mListRectangle.addAll(detectAreasOnBitmap(src, 0, 0));
+    public static Bitmap cropBitmap(Bitmap src, int x, int y, int w, int h) {
+        if (x >= src.getWidth() || x < 0 || y >= src.getHeight() || y < 0) {
+            return null;
+        }
+        Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        for (int i = x; i < x + w; i++) {
+            for (int j = y; j < y + h; j++) {
+                if (i >= 0 && j >= 0) {
+                    bitmap.setPixel(((i - x) >= 0) ? i - x : 0, ((j - y) >= 0) ? j - y : 0, src.getPixel(i, j));
+                }
+            }
+        }
+        return bitmap;
+    }
 
-        ArrayList<Bitmap> resultBitmaps = new ArrayList<>();
+    public void onDetectCharacter(final FloatingImage floatingImage, RecognitionCallback callback) {
+        this.mListRectangle.addAll(detectAreasOnBitmap(floatingImage.mBitmap, 0, 0));
+
+        ArrayList<FloatingImage> resultBitmaps = new ArrayList<>();
         for (Rect rect : mListRectangle) {
-            resultBitmaps.add(SupportUtils.cropBitmap(src, rect.left, rect.top, rect.width(), rect.height()));
+            FloatingImage floatingImage1 = new FloatingImage();
+            floatingImage1.mBitmap = cropBitmap(floatingImage.mBitmap, rect.left, rect.top, rect.width(), rect.height());
+            floatingImage1.mMyShape = floatingImage.mMyShape;
+            floatingImage1.mParentHeight = floatingImage.mParentHeight;
+            floatingImage1.mParentWidth = floatingImage.mParentWidth;
+            resultBitmaps.add(floatingImage1);
         }
 
         callback.onRecognizeSuccess(resultBitmaps);
@@ -346,149 +368,454 @@ public class BitmapProcessor {
         return count;
     }
 
-    public String featureExtraction(Bitmap bitmap, String[] list) {
-        String result = "";
-        for (String string : list) {
+    private Point getFirstBlackPixel(Bitmap bitmap) {
+        for (int i = 0; i < bitmap.getHeight(); i++)
+            for (int j = 0; j < bitmap.getWidth(); j++) {
+                if (bitmap.getPixel(j, i) != Color.WHITE) {
+                    return new Point(j, i);
+                }
+            }
+        return null;
+    }
+
+    private Point getLastBlackPixel(Bitmap bitmap) {
+        for (int i = bitmap.getHeight() - 1; i >= 0; i--)
+            for (int j = 0; j < bitmap.getWidth(); j++) {
+                if (bitmap.getPixel(j, i) != Color.WHITE) {
+                    return new Point(j, i);
+                }
+            }
+        return null;
+    }
+
+    private int countSegments(int y, Bitmap bitmap) {
+        int count = 0;
+        int dis = 0;
+        for (int i = 0; i < bitmap.getWidth(); i++) {
+            if (bitmap.getPixel(i, y) != Color.WHITE) {
+                dis++;
+            } else {
+                if (dis > 0) {
+                    dis = 0;
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    private int getBothSideEndRow(Bitmap bitmap) {
+        for (int i = bitmap.getHeight() - 1; i >= 0; i--) {
+            if (countSegments(i, bitmap) == 2) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private int getBothSideStartRow(Bitmap bitmap) {
+        for (int i = 0; i < bitmap.getHeight(); i++) {
+            if (countSegments(i, bitmap) == 2) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private int getThreeSideStartRow(Bitmap bitmap) {
+        for (int i = 0; i < bitmap.getHeight(); i++) {
+            if (countSegments(i, bitmap) == 3) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private int getBlankCounts(int y, Bitmap bitmap) {
+        int count = 0;
+        if (countSegments(y, bitmap) == 2) {
+            int pos = -1;
+            for (int i = 0; i < bitmap.getWidth(); i++) {
+                if (bitmap.getPixel(i, y) != Color.WHITE) {
+                    if (count > 0) {
+                        return count;
+                    }
+                    pos = i;
+                } else {
+                    if (pos >= 0) {
+                        count++;
+                    }
+                }
+            }
+        }
+        return count;
+    }
+
+    private Point getMiddleFirstBlackPoint(Bitmap bitmap, int row) {
+        int mid = bitmap.getWidth() / 2;
+        if (row < 0) {
+            return null;
+        }
+        if (bitmap.getPixel(mid, row) != Color.WHITE) {
+            return new Point(mid, row);
+        }
+        Point left = null;
+        for (int i = mid - 1; i >= 0 && left == null; i--) {
+            if (bitmap.getPixel(i, row) != Color.WHITE) {
+                left = new Point(i, row);
+            }
+        }
+
+        Point right = null;
+        for (int i = mid + 1; mid < bitmap.getWidth() && right == null; i++) {
+            if (bitmap.getPixel(i, row) != Color.WHITE) {
+                right = new Point(i, row);
+            }
+        }
+
+        if (left != null && right != null) {
+            return (mid - left.x < right.x - mid) ? left : right;
+        }
+
+        return null;
+    }
+
+    private int triangleFromBot(FloatingImage floatingImage) {
+        Point lastBlack = getLastBlackPixel(floatingImage.mBitmap);
+        if (lastBlack == null) {
+            return -1;
+        }
+
+        int bothStart = getBothSideStartRow(floatingImage.mBitmap);
+
+        if (bothStart >= 0) {
+            int width = getBlankCounts(bothStart, floatingImage.mBitmap);
+            int decrease = 0, increase = 0;
+            for (int i = bothStart; i <= lastBlack.y; i++) {
+                int w = getBlankCounts(i, floatingImage.mBitmap);
+
+                if (w < width) {
+                    decrease++;
+                }
+                if (w > width) {
+                    increase++;
+                }
+                width = w;
+            }
+
+            if ((((double) decrease / (decrease + increase)) >= 0.6d) && width <= 0) {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    private int triangleFromTop(FloatingImage floatingImage) {
+        Point firstBlack = getFirstBlackPixel(floatingImage.mBitmap);
+        if (firstBlack == null) {
+            return -1;
+        }
+
+        int bothEnd = getBothSideEndRow(floatingImage.mBitmap);
+
+        if (bothEnd >= 0) {
+            int width = getBlankCounts(bothEnd, floatingImage.mBitmap);
+            int decrease = 0, increase = 0;
+            for (int i = bothEnd - 1; i >= firstBlack.y; i--) {
+                int w = getBlankCounts(i, floatingImage.mBitmap);
+
+                if (w < width) {
+                    decrease++;
+                }
+                if (w > width) {
+                    increase++;
+                }
+                width = w;
+            }
+
+            if ((((double) decrease / (decrease + increase)) >= 0.6d) && width <= 0) {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    private int connectedComponentTopBot(FloatingImage floatingImage) {
+        int fragmentHeight = floatingImage.mBitmap.getHeight() / 3;
+        int startAbove = 0;
+        int startBelow = floatingImage.mBitmap.getHeight() - fragmentHeight;
+        Bitmap fragmentAbove = cropBitmap(floatingImage.mBitmap, 0, startAbove, floatingImage.mBitmap.getWidth(), fragmentHeight);
+        Bitmap fragmentBelow = cropBitmap(floatingImage.mBitmap, 0, startBelow, floatingImage.mBitmap.getWidth(), fragmentHeight);
+
+        if (detectAreasOnBitmap(fragmentAbove, 0, 0).size() == 2 && detectAreasOnBitmap(fragmentBelow, 0, 0).size() == 2) {
+            return 1;
+        }
+        return 0;
+    }
+
+    public String featureExtraction(FloatingImage floatingImage, String list) {
+        for (int i = 0; i < list.length(); i++) {
+            String string = list.substring(i, i + 1);
             switch (string) {
                 case "A":
-                    isA(bitmap);
+                    if (isA(floatingImage)) {
+                        return "A";
+                    }
+                    break;
+
+                case "H":
+                    if (isH(floatingImage)) {
+                        return "H";
+                    }
+                    break;
+
+                case "W":
+                    if (isW(floatingImage)) {
+                        return "W";
+                    }
+                    break;
+
+                case "F":
+                    if (isF(floatingImage)) {
+                        return "F";
+                    }
+                    break;
+
+                case "I":
+                    if (isI(floatingImage)) {
+                        return "I";
+                    }
+                    break;
+
+                case "T":
+                    if (isT(floatingImage)) {
+                        return "T";
+                    }
+                    break;
+
+                case "R":
+                    if (isR(floatingImage)) {
+                        return "R";
+                    }
+                    break;
+
+                case "P":
+                    if (isP(floatingImage)) {
+                        return "P";
+                    }
+                    break;
+
+                case "D":
+                    if (isD(floatingImage)) {
+                        return "D";
+                    }
+                    break;
+
+                case "S":
+                    if (isS(floatingImage)) {
+                        return "S";
+                    }
                     break;
 
                 default:
                     break;
             }
         }
-        return result;
+        return list;
     }
 
-    private boolean isA(Bitmap bitmap) {
-        boolean result = false;
-        ArrayList<MyPath> myPaths = getAreas(bitmap);
-        Log.d("Ares", "" + myPaths.size());
-        return result;
+    private boolean isA(FloatingImage floatingImage) {
+        return (triangleFromTop(floatingImage) == 1 && connectedComponentTopBot(floatingImage) != 1);
     }
 
-    private ArrayList<MyPath> getAreas(Bitmap bitmap) {
-        ArrayList<MyPath> myPaths = new ArrayList<>();
-        myPaths.add(new MyPath(new ArrayList<Point>()));
-        int index = 0;
+    private boolean isH(FloatingImage floatingImage) {
+        if (triangleFromTop(floatingImage) != 1) {
+            int fragmentHeight = floatingImage.mBitmap.getHeight() / 3;
+            int startAbove = 0;
+            int startBelow = floatingImage.mBitmap.getHeight() - fragmentHeight;
+            Bitmap fragmentAbove = cropBitmap(floatingImage.mBitmap, 0, startAbove, floatingImage.mBitmap.getWidth(), fragmentHeight);
+            Bitmap fragmentBelow = cropBitmap(floatingImage.mBitmap, 0, startBelow, floatingImage.mBitmap.getWidth(), fragmentHeight);
 
-        ArrayList<Point> points = new ArrayList<>();
-        points.addAll(getListBlankPoint(bitmap));
+            ArrayList<Rect> listAbove = detectAreasOnBitmap(fragmentAbove, 0, 0);
+            ArrayList<Rect> listBelow = detectAreasOnBitmap(fragmentBelow, 0, 0);
 
-        myPaths.get(index).getListPoint().add(points.remove(0));
-
-        while (!points.isEmpty()) {
-            ArrayList<Point> listPos = new ArrayList<>();
-            for (int i = 0; i < points.size(); i++) {
-                boolean flag = false;
-                for (int j = 0; j < myPaths.get(index).getListPoint().size() && !flag; j++) {
-                    if (isContiguous(myPaths.get(index).getListPoint().get(j), points.get(i))) {
-                        listPos.add(points.get(i));
-                        flag = true;
+            if (listAbove.size() == 2 && listAbove.size() == 2) {
+                boolean triangle = false;
+                for (int i = 0; i < listAbove.size() && !triangle; i++) {
+                    Rect rect = listAbove.get(i);
+                    FloatingImage floatingImage1 = new FloatingImage();
+                    floatingImage1.mBitmap = cropBitmap(floatingImage.mBitmap, rect.left, rect.top, rect.width(), rect.height());
+                    if (triangleFromTop(floatingImage1) == 1 && triangleFromBot(floatingImage1) == 1) {
+                        triangle = true;
                     }
                 }
-            }
-
-            if (listPos.size() > 0) {
-                for (Point point: listPos) {
-                    myPaths.get(index).getListPoint().add(point);
-                    points.remove(point);
-                }
-            } else {
-                myPaths.add(new MyPath(new ArrayList<Point>()));
-                index++;
-                if (!points.isEmpty()) {
-                    myPaths.get(index).getListPoint().add(points.remove(0));
-                }
-            }
-        }
-        return myPaths;
-    }
-
-    private boolean isContiguous(Point point1, Point point2) {
-        return ((Math.abs(point1.x - point2.x) <= 1) && (Math.abs(point1.y - point2.y) <= 1));
-    }
-
-    private ArrayList<Point> getListBlankPoint(Bitmap bitmap) {
-        ArrayList<Point> points = new ArrayList<>();
-        for (int i = 0; i < bitmap.getHeight(); i++)
-            for (int j = 0; j < bitmap.getWidth(); j++) {
-                if (bitmap.getPixel(j, i) == Color.WHITE) {
-                    points.add(new Point(j, i));
-                }
-            }
-
-        return points;
-    }
-
-    private int countClosedAreas(byte[][] matrix) {
-        int result = 0;
-        byte color = 2;
-        Point point = getFirstBlankPoint(matrix);
-        while (point != null) {
-            colorMatrix(color, point.x, point.y, matrix);
-            color++;
-            point = getFirstBlankPoint(matrix);
-            result++;
-        }
-        return result;
-    }
-
-    private Point getFirstBlankPoint(byte[][] matrix) {
-        for (int i = 0; i < matrix.length; i++)
-            for (int j = 0; j < matrix[i].length; j++) {
-                if (matrix[i][j] == 0) {
-                    return new Point(j, i);
-                }
-            }
-
-        return null;
-    }
-
-    private void colorMatrix(byte color, int x, int y, byte[][] matrix) {
-        if (matrix[y][x] == 0) {
-            matrix[y][x] = color;
-            if (x - 1 >= 0 && y - 1 >= 0) {
-                colorMatrix(color, x - 1, y - 1, matrix);
-            }
-            if (x - 1 >= 0 && y >= 0 && x - 1 < matrix[y].length) {
-                colorMatrix(color, x - 1, y, matrix);
-            }
-            if (x - 1 >= 0 && y + 1 < matrix.length) {
-                colorMatrix(color, x - 1, y + 1, matrix);
-            }
-            if (y - 1 >= 0) {
-                colorMatrix(color, x, y - 1, matrix);
-            }
-            if (y + 1 < matrix.length) {
-                colorMatrix(color, x, y + 1, matrix);
-            }
-            if (y - 1 >= 0 && x + 1 < matrix[y].length) {
-                colorMatrix(color, x + 1, y - 1, matrix);
-            }
-            if (x + 1 < matrix[y].length) {
-                colorMatrix(color, x + 1, y, matrix);
-            }
-            if (x + 1 < matrix[y].length && y + 1 < matrix.length) {
-                colorMatrix(color, x + 1, y + 1, matrix);
-            }
-        }
-    }
-
-    private byte[][] bitmapToMatrix(Bitmap bitmap) {
-        byte[][] matrix = new byte[bitmap.getHeight()][bitmap.getWidth()];
-        for (int i = 0; i < bitmap.getHeight(); i++) {
-            matrix[i] = new byte[bitmap.getWidth()];
-            for (int j = 0; j < bitmap.getWidth(); j++) {
-                if (bitmap.getPixel(j, i) != Color.WHITE) {
-                    matrix[i][j] = 1;
+                if (triangle) {
+                    return false;
                 } else {
-                    matrix[i][j] = 0;
+                    for (int i = 0; i < listBelow.size() && !triangle; i++) {
+                        Rect rect = listBelow.get(i);
+                        FloatingImage floatingImage1 = new FloatingImage();
+                        floatingImage1.mBitmap = cropBitmap(floatingImage.mBitmap, rect.left, rect.top, rect.width(), rect.height());
+                        if (triangleFromTop(floatingImage1) == 1 && triangleFromBot(floatingImage1) == 1) {
+                            triangle = true;
+                        }
+                    }
+
+                    return !triangle;
+                }
+            }
+
+            return false;
+        }
+        return false;
+    }
+
+    private boolean isV(FloatingImage floatingImage) {
+        return (connectedComponentTopBot(floatingImage) != 1 && triangleFromBot(floatingImage) == 1);
+    }
+
+    private boolean isW(FloatingImage floatingImage) {
+        int threeStart = getThreeSideStartRow(floatingImage.mBitmap);
+        Point mid = getMiddleFirstBlackPoint(floatingImage.mBitmap, threeStart);
+        if (mid != null) {
+            Bitmap left = cropBitmap(floatingImage.mBitmap, 0, threeStart, mid.x, floatingImage.mBitmap.getHeight() - threeStart);
+            Bitmap right = cropBitmap(floatingImage.mBitmap, mid.x + 1, threeStart, floatingImage.mBitmap.getWidth() - mid.x - 1, floatingImage.mBitmap.getHeight() - threeStart);
+            if (left != null && right != null) {
+                FloatingImage leftImage = new FloatingImage();
+                leftImage.mBitmap = left;
+                FloatingImage rightImage = new FloatingImage();
+                rightImage.mBitmap = right;
+
+                return (isV(leftImage) && isV(rightImage));
+            }
+        }
+        return false;
+    }
+
+    private boolean isF(FloatingImage floatingImage) {
+        int mid = floatingImage.mBitmap.getWidth() / 2;
+        Bitmap src = floatingImage.mBitmap;
+        Bitmap right = cropBitmap(src, mid, 0, src.getWidth() - mid, src.getHeight());
+        if (right != null) {
+            ArrayList<Rect> list = detectAreasOnBitmap(right, 0, 0);
+            if (list.size() == 2) {
+                boolean closeToBot = false;
+                for (Rect rect : list) {
+                    if (rect.bottom >= src.getHeight() * 0.7) {
+                        closeToBot = true;
+                    }
+                }
+                return !closeToBot;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    private boolean isR(FloatingImage floatingImage) {
+        int mid = 2 * (floatingImage.mBitmap.getWidth() / 3);
+        Bitmap src = floatingImage.mBitmap;
+        Bitmap right = cropBitmap(src, mid, 0, src.getWidth() - mid, src.getHeight());
+        if (right != null) {
+            ArrayList<Rect> list = detectAreasOnBitmap(right, 0, 0);
+            if (list.size() == 2) {
+                boolean closeToBot = false;
+                for (Rect rect : list) {
+                    if (rect.bottom >= src.getHeight() * 0.8) {
+                        closeToBot = true;
+                    }
+                }
+                return closeToBot;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    private boolean isT(FloatingImage floatingImage) {
+        int offsetY = (int) (floatingImage.mBitmap.getHeight() * 0.3);
+        Bitmap bitmap = floatingImage.mBitmap;
+        Bitmap upper = cropBitmap(bitmap, 0, 0, bitmap.getWidth(), offsetY);
+        Bitmap lower = cropBitmap(bitmap, 0, bitmap.getHeight() - offsetY, bitmap.getWidth(), offsetY);
+
+        ArrayList<Rect> upperList = detectAreasOnBitmap(upper, 0, 0);
+        ArrayList<Rect> lowerList = detectAreasOnBitmap(lower, 0, 0);
+
+        return upperList.size() == 1 && lowerList.size() == 1 &&
+                (((double) upperList.get(0).width() / bitmap.getWidth() > 0.9d) &&
+                        (lowerList.get(0).width() / (double) upperList.get(0).width() < 0.5d));
+    }
+
+    private boolean isI(FloatingImage floatingImage) {
+        int offsetY = (int) (floatingImage.mBitmap.getHeight() * 0.2);
+        Bitmap bitmap = floatingImage.mBitmap;
+        Bitmap upper = cropBitmap(bitmap, 0, 0, bitmap.getWidth(), offsetY);
+        Bitmap lower = cropBitmap(bitmap, 0, bitmap.getHeight() - offsetY, bitmap.getWidth(), offsetY);
+
+        ArrayList<Rect> upperList = detectAreasOnBitmap(upper, 0, 0);
+        ArrayList<Rect> lowerList = detectAreasOnBitmap(lower, 0, 0);
+
+        return upperList.size() == 1 && lowerList.size() == 1 &&
+                (((double) upperList.get(0).width() / bitmap.getWidth() > 0.9d) &&
+                        ((double) upperList.get(0).width() / bitmap.getWidth() > 0.9d));
+    }
+
+    private boolean isP(FloatingImage floatingImage) {
+        Bitmap bitmap = floatingImage.mBitmap;
+
+        int thinRows = 0; int fatRows = 0;
+        for (int i = 0; i < bitmap.getHeight(); i++) {
+            if (getBlankCounts(i, bitmap) > 0) {
+                fatRows++;
+            } else {
+                if (getBlankCounts(i, bitmap) == 0) {
+                    thinRows++;
                 }
             }
         }
 
-        return matrix;
+        return ((double) (thinRows + fatRows) / bitmap.getHeight() >= 0.8d) && ((double) fatRows / bitmap.getHeight() <= 0.7d)
+                &&((double) thinRows / bitmap.getHeight() >= 0.2d);
+    }
+
+    private boolean isD(FloatingImage floatingImage) {
+        Bitmap bitmap = floatingImage.mBitmap;
+
+        int thinRows = 0; int fatRows = 0;
+        for (int i = 0; i < bitmap.getHeight(); i++) {
+            if (getBlankCounts(i, bitmap) > 0) {
+                fatRows++;
+            } else {
+                if (getBlankCounts(i, bitmap) == 0) {
+                    thinRows++;
+                }
+            }
+        }
+
+        return ((double) (thinRows + fatRows) / bitmap.getHeight() >= 0.9d) && ((double) fatRows / bitmap.getHeight() >= 0.7d);
+    }
+
+    private boolean isS(FloatingImage floatingImage) {
+        int mid = floatingImage.mBitmap.getWidth() / 2;
+        Bitmap src = floatingImage.mBitmap;
+        Bitmap left = cropBitmap(floatingImage.mBitmap, 0, 0, mid, src.getHeight());
+        Bitmap right = cropBitmap(floatingImage.mBitmap, mid, 0, src.getWidth() - mid, src.getHeight());
+
+        if (left != null && right != null) {
+            ArrayList<Rect> leftList = detectAreasOnBitmap(left, 0, 0);
+            ArrayList<Rect> rightList = detectAreasOnBitmap(right, 0, 0);
+
+            if (leftList.size() == 2 && rightList.size() == 2) {
+                int leftAboveArea = leftList.get(0).width() * leftList.get(0).height();
+                int leftBelowArea = leftList.get(1).width() * leftList.get(1).height();
+                int rightAboveArea = rightList.get(0).width() * rightList.get(0).height();
+                int rightBelowArea = rightList.get(1).width() * rightList.get(1).height();
+
+                return (leftAboveArea >= leftBelowArea) && (rightBelowArea > rightAboveArea);
+            }
+        }
+        return false;
     }
 }

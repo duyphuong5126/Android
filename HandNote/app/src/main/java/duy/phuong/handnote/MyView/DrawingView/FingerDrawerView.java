@@ -11,12 +11,14 @@ import android.graphics.Point;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Stack;
 
+import duy.phuong.handnote.DTO.FloatingImage;
 import duy.phuong.handnote.Listener.RecognitionCallback;
 import duy.phuong.handnote.RecognitionAPI.BitmapProcessor;
 
@@ -115,18 +117,17 @@ public class FingerDrawerView extends View {
     }
 
     private ArrayList<MyPath> doDFS(ArrayList<MyPath> list, MyPath myPath) {
-        boolean flag = false;
         if (hasMoreEdges()) {
+            ArrayList<MyPath> listPaths = new ArrayList<>();
             for (MyPath path : mListPaths) {
                 if (!path.isChecked() && path.isIntersect(myPath, CurrentWidth, CurrentHeight, mPaint)) {
-                    list.add(path);
+                    listPaths.add(path);
                     path.setChecked(true);
-                    flag = true;
                 }
             }
-            if (flag) {
-                ArrayList<MyPath> listPaths = new ArrayList<>();
-                listPaths.addAll(list);
+
+            if (!listPaths.isEmpty()) {
+                list.addAll(listPaths);
                 for (MyPath path : listPaths) {
                     doDFS(list, path);
                 }
@@ -153,9 +154,10 @@ public class FingerDrawerView extends View {
             MyPath myPath = mListPaths.get(i);
             if (!myPath.isChecked()) {
                 ArrayList<MyPath> list = new ArrayList<>();
+                ArrayList<MyPath> paths = new ArrayList<>();
                 list.add(myPath);
                 myPath.setChecked(true);
-                list.addAll(doDFS(list, myPath));
+                list.addAll(doDFS(paths, myPath));
 
                 if (!list.isEmpty()) {
                     MyShape myShape = new MyShape(list);
@@ -168,12 +170,17 @@ public class FingerDrawerView extends View {
             mListPaths.get(i).setChecked(false);
         }
 
-        final ArrayList<Bitmap> bitmaps = new ArrayList<>();
+        final ArrayList<FloatingImage> bitmaps = new ArrayList<>();
 
         if (!listShapes.isEmpty()) {
             for (MyShape myShape : listShapes) {
-                final Bitmap bitmap = Bitmap.createBitmap(mCacheBitmap.getWidth(), mCacheBitmap.getHeight(), Bitmap.Config.ARGB_8888);
-                Canvas canvas = new Canvas(bitmap);
+                final FloatingImage floatingImage = new FloatingImage();
+                floatingImage.mBitmap = Bitmap.createBitmap(mCacheBitmap.getWidth(), mCacheBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                floatingImage.mMyShape = myShape;
+                floatingImage.mParentWidth = CurrentWidth;
+                floatingImage.mParentHeight = CurrentHeight;
+
+                Canvas canvas = new Canvas(floatingImage.mBitmap);
                 canvas.drawColor(Color.WHITE);
                 for (MyPath myPath : myShape.getListPaths()) {
                     Path path = new Path();
@@ -190,21 +197,16 @@ public class FingerDrawerView extends View {
                     canvas.drawPath(path, mPaint);
                 }
 
-                mBitmapProcessor.onDetectCharacter(bitmap, new RecognitionCallback() {
+                mBitmapProcessor.onDetectCharacter(floatingImage, new RecognitionCallback() {
                     @Override
-                    public void onRecognizeSuccess(ArrayList<Bitmap> listBitmaps) {
-                        /*for (Bitmap bmp : listBitmaps) {
-                            bitmaps.add(Bitmap.createScaledBitmap(bmp, 5, 7, false));
-                        }*/
+                    public void onRecognizeSuccess(ArrayList<FloatingImage> listBitmaps) {
                         bitmaps.addAll(listBitmaps);
                     }
                 });
             }
         }
         mListener.onRecognizeSuccess(bitmaps);
-
     }
-
 
     @Override
     protected void onDraw(Canvas canvas) {

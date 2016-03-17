@@ -9,9 +9,12 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import duy.phuong.handnote.DTO.FloatingImage;
+import duy.phuong.handnote.DTO.StandardImage;
 import duy.phuong.handnote.Listener.BackPressListener;
 import duy.phuong.handnote.Listener.RecognitionCallback;
 import duy.phuong.handnote.MyView.DrawingView.FingerDrawerView;
+import duy.phuong.handnote.MyView.DrawingView.MyPath;
 import duy.phuong.handnote.R;
 import duy.phuong.handnote.RecognitionAPI.BitmapProcessor;
 import duy.phuong.handnote.RecognitionAPI.Recognizer;
@@ -23,7 +26,6 @@ import duy.phuong.handnote.Support.SupportUtils;
 public class CreateNoteFragment extends BaseFragment implements BackPressListener, View.OnClickListener, RecognitionCallback {
     private FingerDrawerView mDrawer;
     private ImageButton mButtonSave, mButtonDelete, mButtonUndo, mButtonRedo, mButtonColor;
-    private BitmapProcessor mBitmapProcessor;
     private TextView mTvResult;
 
     private Recognizer mRecognizer;
@@ -48,8 +50,6 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
         mButtonRedo = (ImageButton) mFragmentView.findViewById(R.id.buttonRedo);
         mButtonRedo.setOnClickListener(this);
         mTvResult = (TextView) mFragmentView.findViewById(R.id.tvResult);
-
-        mBitmapProcessor = new BitmapProcessor();
 
         mRecognizer = new Recognizer(mListener.getGlobalSOM(), mListener.getMapNames());
     }
@@ -88,21 +88,12 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
     }
 
     @Override
-    public void onRecognizeSuccess(ArrayList<Bitmap> listBitmaps) {
+    public void onRecognizeSuccess(ArrayList<FloatingImage> listBitmaps) {
         String text = "";
         for (int i = 0; i < listBitmaps.size(); i++) {
-            String result = mRecognizer.recognize(BitmapProcessor.resizeBitmap(listBitmaps.get(i), 20, 28));
+            String result = mRecognizer.recognize(listBitmaps.get(i));
             Log.d("Result", "bitmap " + i + " :" + result);
-
-            String[] list = new String[result.length()];
-            for (int j = 0; j < result.length(); j++) {
-                list[j] = result.substring(j, j + 1);
-            }
-
-            if (list.length > 0) {
-                mBitmapProcessor.featureExtraction(listBitmaps.get(i), list);
-            }
-            text += result + " - ";
+            text += result;
         }
         mTvResult.setText(text);
     }

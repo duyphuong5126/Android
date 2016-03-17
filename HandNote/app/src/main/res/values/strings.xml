@@ -19,4 +19,15 @@
 
     <string name="cancel_en">Cancel</string>
     <string name="cancel_vi">Hủy</string>
+
+    <string name="app_title_en">Hand Note</string>
+
+    <string name="drawing_fragment_en">Hand Drawer</string>
+    <string name="drawing_fragment_vi">Vẽ Tay</string>
+
+    <string name="learning_fragment_en">Learning</string>
+    <string name="learning_fragment_vi">Huấn Luyện</string>
+
+    <string name="create_fragment_en">Create new</string>
+    <string name="create_fragment_vi">Tạo Mới</string>
 </resources>

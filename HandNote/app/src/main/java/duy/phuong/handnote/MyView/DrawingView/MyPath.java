@@ -10,6 +10,8 @@ import android.graphics.Point;
 import android.graphics.Rect;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Phuong on 27/01/2016.
@@ -18,6 +20,16 @@ public class MyPath {
     private ArrayList<Point> mListPoint;
     private Rect mRect;
     private boolean mChecked;
+
+    public static final String RIGHT = "RIGHT";
+    public static final String LEFT = "LEFT";
+    public static final String UP = "UP";
+    public static final String DOWN = "DOWN";
+    public static final String RIGHT_UP = "RIGHT_UP";
+    public static final String RIGHT_DOWN = "RIGHT_DOWN";
+    public static final String LEFT_UP = "LEFT_UP";
+    public static final String LEFT_DOWN = "LEFT_DOWN";
+    public static final String STABLE = "STABLE";
 
     public MyPath(ArrayList<Point> ListPoint) {
         this.mListPoint = ListPoint;
@@ -126,15 +138,35 @@ public class MyPath {
         return false;
     }
 
-    public boolean isIntersect(MyPath myPath) {
-        for (Point point : mListPoint) {
-            for (Point p : myPath.getListPoint()) {
-                if (Math.abs(point.x - p.x) <= 1 && Math.abs(point.y - p.y) <= 1) {
-                    return true;
+    public String[] getDirectedChildPaths() {
+        String[] strings = new String[mListPoint.size() - 1];
+        for (int i = 0; i < mListPoint.size() && i + 1 < mListPoint.size(); i++) {
+            strings[i] = checkDirection(mListPoint.get(i), mListPoint.get(i + 1));
+        }
+        return strings;
+    }
+
+    public String checkDirection(Point point1, Point point2) {
+        if (point1.x == point2.x) {
+            if (point1.y == point2.y) {
+                return STABLE;
+            } else {
+                return (point1.y > point2.y) ? UP : DOWN;
+            }
+        } else {
+            if (point1.x < point2.x) {
+                if (point1.y == point2.y) {
+                    return RIGHT;
+                } else {
+                    return (point1.y > point2.y) ? RIGHT_UP : RIGHT_DOWN;
+                }
+            } else {
+                if (point1.y == point2.y) {
+                    return LEFT;
+                } else {
+                    return (point1.y > point2.y) ? LEFT_UP : LEFT_DOWN;
                 }
             }
         }
-
-        return false;
     }
 }

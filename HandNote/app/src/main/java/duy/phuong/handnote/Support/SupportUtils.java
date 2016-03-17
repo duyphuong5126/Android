@@ -20,18 +20,6 @@ public abstract class SupportUtils {
     public static final String RootPath = Environment.getExternalStorageDirectory().getAbsolutePath();
     public static final String ApplicationDirectory = "/HandNote/";
 
-    public static Bitmap cropBitmap(Bitmap src, int x, int y, int w, int h) {
-        Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        for (int i = x; i < x + w; i++ ) {
-            for (int j = y; j < y + h; j++ ) {
-                if (i >= 0 && j >= 0) {
-                    bitmap.setPixel(((i - x) >= 0)?i - x:0, ((j - y) >= 0)?j - y:0, src.getPixel(i, j));
-                }
-            }
-        }
-        return bitmap;
-    }
-
     public static boolean saveImage(Bitmap bitmap, String folderName, String fileName, String fileType) {
         File dir = new File(RootPath + ApplicationDirectory + folderName);
         dir.mkdirs();

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -12,11 +13,14 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import duy.phuong.handnote.Listener.LearningListener;
 import duy.phuong.handnote.R;
 import duy.phuong.handnote.DTO.StandardImage;
 import duy.phuong.handnote.RecognitionAPI.BitmapProcessor;
@@ -30,8 +34,9 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
     private ListView mListImages;
     private ArrayList<String> mListResourcePaths;
     private ArrayAdapter<String> mListFilesAdapter;
+    private ScrollView mScrollProgress;
 
-    private LinearLayout mLayoutProcessing;
+    private LinearLayout mLayoutProgressing, mLayoutProgressInfo;
 
     private ImageButton mButtonResize, mButtonTrain;
 
@@ -46,13 +51,16 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mListImages = (ListView) mFragmentView.findViewById(R.id.listFiles);
-        mListFilesAdapter = new ArrayAdapter<>(mActivity, android.R.layout.simple_list_item_1, mListResourcePaths);
+        mListFilesAdapter = new ArrayAdapter<>(mActivity, R.layout.item_text, mListResourcePaths);
         mListImages.setAdapter(mListFilesAdapter);
         mButtonResize = (ImageButton) mFragmentView.findViewById(R.id.buttonResize);
         mButtonResize.setOnClickListener(this);
-        mLayoutProcessing = (LinearLayout) mFragmentView.findViewById(R.id.layoutProcessing);
+        mLayoutProgressing = (LinearLayout) mFragmentView.findViewById(R.id.layoutProcessing);
+        mLayoutProgressing.setOnClickListener(this);
+        mLayoutProgressInfo = (LinearLayout) mFragmentView.findViewById(R.id.layoutInfo);
         mButtonTrain = (ImageButton) mFragmentView.findViewById(R.id.buttonTrain);
         mButtonTrain.setOnClickListener(this);
+        mScrollProgress = (ScrollView) mFragmentView.findViewById(R.id.scrProgress);
     }
 
     @Override
@@ -143,15 +151,47 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                                     public void onClick(View v) {
                                         String data = editText.getText().toString();
                                         int number_of_iterations = (("".equals(data)) ? 0 : Integer.valueOf(data));
+                                        dialog.cancel();
 
                                         if (number_of_iterations <= 0) {
                                             Toast.makeText(mActivity, "Can't start the training", Toast.LENGTH_LONG).show();
                                         } else {
+                                            mLayoutProgressing.setVisibility(View.VISIBLE);
                                             Toast.makeText(mActivity, "Training begin", Toast.LENGTH_LONG).show();
-                                            dialog.dismiss();
+                                            final LayoutInflater inflater = mActivity.getLayoutInflater();
                                             PatternLearning patternLearning = new PatternLearning(standardImages, number_of_iterations);
-                                            patternLearning.learn();
-                                            Toast.makeText(mActivity, "Training done", Toast.LENGTH_LONG).show();
+                                            patternLearning.learn(new LearningListener() {
+                                                @Override
+                                                public void updateEpoch(Bundle bundle) {
+                                                    if (bundle != null) {
+                                                        View epochView = inflater.inflate(R.layout.item_epoch, null);
+                                                        TextView tvEpoch = (TextView) epochView.findViewById(R.id.tvEpoch);
+                                                        tvEpoch.setText("Epoch: " + bundle.getInt("Epoch"));
+                                                        mLayoutProgressInfo.addView(epochView);
+
+                                                        String info = bundle.getString("ListName");
+                                                        if (info != null && !"".equals(info)) {
+                                                            View infoView = inflater.inflate(R.layout.item_infor_text, null);
+                                                            TextView tvInfo = (TextView) infoView.findViewById(R.id.tvInfoText);
+                                                            tvInfo.setText(info);
+                                                            mLayoutProgressInfo.addView(infoView);
+                                                        }
+
+                                                        mScrollProgress.post(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                mScrollProgress.fullScroll(View.FOCUS_DOWN);
+                                                            }
+                                                        });
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void finish() {
+                                                    Toast.makeText(mActivity, "Training done", Toast.LENGTH_LONG).show();
+                                                    mLayoutProgressing.setVisibility(View.GONE);
+                                                }
+                                            });
                                         }
                                     }
                                 });
@@ -169,6 +209,9 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                     };
                     runnable.run();
                 }
+                break;
+
+            case R.id.layoutProcessing:
                 break;
 
             default:

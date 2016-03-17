@@ -5,9 +5,11 @@ import android.os.Bundle;
 
 import java.util.ArrayList;
 
+import duy.phuong.handnote.DTO.FloatingImage;
+
 /**
  * Created by Phuong on 26/11/2015.
  */
 public interface RecognitionCallback {
-    void onRecognizeSuccess(ArrayList<Bitmap> listBitmaps);
+    void onRecognizeSuccess(ArrayList<FloatingImage> listBitmaps);
 }

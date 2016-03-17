@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import duy.phuong.handnote.DTO.FloatingImage;
 import duy.phuong.handnote.Listener.BackPressListener;
 import duy.phuong.handnote.Listener.RecognitionCallback;
 import duy.phuong.handnote.MyView.DrawingView.FingerDrawerView;
@@ -64,10 +65,10 @@ public class DrawingFragment extends BaseFragment implements View.OnClickListene
         mDrawer = (FingerDrawerView) mFragmentView.findViewById(R.id.FingerDrawer);
         mDrawer.setListener(new RecognitionCallback() {
             @Override
-            public void onRecognizeSuccess(ArrayList<Bitmap> listBitmaps) {
+            public void onRecognizeSuccess(ArrayList<FloatingImage> listBitmaps) {
                 mListBitmap.clear();
-                for (Bitmap bitmap : listBitmaps) {
-                    mListBitmap.add(bitmap);
+                for (FloatingImage floatingImage : listBitmaps) {
+                    mListBitmap.add(floatingImage.mBitmap);
                     mBitmapAdapter.notifyDataSetChanged();
                 }
             }

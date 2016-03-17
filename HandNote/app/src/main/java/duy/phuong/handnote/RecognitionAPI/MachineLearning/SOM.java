@@ -70,7 +70,7 @@ public class SOM {
             return false;
         }
 
-        for (int i = 0; i < mOutputs[y][x].mWeights.length; i += 8) {
+        for (int i = 0; i < mOutputs[y][x].mWeights.length; i += 16) {
             mOutputs[y][x].mWeights[i] += (input.mInputData[i] - mOutputs[y][x].mWeights[i]) * learningRate * neighborInfluence;
             mOutputs[y][x].mWeights[i + 1] += (input.mInputData[i + 1] - mOutputs[y][x].mWeights[i + 1]) * learningRate * neighborInfluence;
             mOutputs[y][x].mWeights[i + 2] += (input.mInputData[i + 2] - mOutputs[y][x].mWeights[i + 2]) * learningRate * neighborInfluence;
@@ -79,6 +79,14 @@ public class SOM {
             mOutputs[y][x].mWeights[i + 5] += (input.mInputData[i + 5] - mOutputs[y][x].mWeights[i + 5]) * learningRate * neighborInfluence;
             mOutputs[y][x].mWeights[i + 6] += (input.mInputData[i + 6] - mOutputs[y][x].mWeights[i + 6]) * learningRate * neighborInfluence;
             mOutputs[y][x].mWeights[i + 7] += (input.mInputData[i + 7] - mOutputs[y][x].mWeights[i + 7]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 8] += (input.mInputData[i + 8] - mOutputs[y][x].mWeights[i + 8]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 9] += (input.mInputData[i + 9] - mOutputs[y][x].mWeights[i + 9]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 10] += (input.mInputData[i + 10] - mOutputs[y][x].mWeights[i + 10]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 11] += (input.mInputData[i + 11] - mOutputs[y][x].mWeights[i + 11]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 12] += (input.mInputData[i + 12] - mOutputs[y][x].mWeights[i + 12]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 13] += (input.mInputData[i + 13] - mOutputs[y][x].mWeights[i + 13]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 14] += (input.mInputData[i + 14] - mOutputs[y][x].mWeights[i + 14]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 15] += (input.mInputData[i + 15] - mOutputs[y][x].mWeights[i + 15]) * learningRate * neighborInfluence;
         }
         return true;
     }
@@ -88,30 +96,30 @@ public class SOM {
     }
 
     public String getMapNames() {
-        String string = "";
+        StringBuilder builder = new StringBuilder();
         for (Output[] outputs : mOutputs)
             for (Output output : outputs) {
-                string += output.getNameList() + "\r\n";
+                builder.append(output.getNameList()).append("\r\n");
             }
-        return string;
+        return builder.toString();
     }
 
     public String getLabels() {
-        String string = "";
+        StringBuilder builder = new StringBuilder();
         for (Output[] outputs : mOutputs)
             for (Output output : outputs) {
-                string += output.getLabelInfo() + "\r\n";
+                builder.append(output.getLabelInfo()).append("\r\n");
             }
-        return string;
+        return builder.toString();
     }
 
     @Override
     public String toString() {
-        String string = "";
+        StringBuilder builder = new StringBuilder();
         for (Output[] outputs : mOutputs)
             for (Output output : outputs) {
-                string += output.mCurrentLabel + ";" + output.toString() + "|";
+                builder.append(output.mCurrentLabel).append(";").append(output.toString()).append("|");
             }
-        return string;
+        return builder.toString();
     }
 }
