@@ -4,11 +4,15 @@ import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -41,6 +45,9 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
     private ImageButton mButtonResize, mButtonTrain;
 
     private int mCurrentImage;
+    private Dialog mDialog;
+
+    private boolean mShowErrorLogs;
 
     public LearningFragment() {
         mLayoutRes = R.layout.fragment_learning;
@@ -61,6 +68,15 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
         mButtonTrain = (ImageButton) mFragmentView.findViewById(R.id.buttonTrain);
         mButtonTrain.setOnClickListener(this);
         mScrollProgress = (ScrollView) mFragmentView.findViewById(R.id.scrProgress);
+        mDialog = new Dialog(mActivity);
+        mDialog.setContentView(R.layout.layout_prompt);
+        ((CheckBox) mDialog.findViewById(R.id.checkLearningMethod)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mShowErrorLogs = isChecked;
+            }
+        });
+        mDialog.setTitle("Training information");
     }
 
     @Override
@@ -98,7 +114,7 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
         switch (v.getId()) {
             case R.id.buttonResize:
                 if (SupportUtils.emptyDirectory(SupportUtils.RootPath + SupportUtils.ApplicationDirectory + "Train")) {
-                    Log.d("Error", "Directory not exist");
+                    Log.e("Error", "Directory not exist");
                 }
 
                 Toast.makeText(mActivity, "Resize images begin!", Toast.LENGTH_SHORT).show();
@@ -131,6 +147,46 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
             case R.id.buttonTrain:
                 final ArrayList<StandardImage> standardImages = new ArrayList<>();
                 mCurrentImage = mListResourcePaths.size();
+                Toast.makeText(mActivity, "Loading resources, please wait!", Toast.LENGTH_LONG).show();
+                final Handler handler = new Handler() {
+                    @Override
+                    public void handleMessage(Message msg) {
+                        super.handleMessage(msg);
+                        if (mCurrentImage <= 0) {
+                            mCurrentImage = 0;
+                            final EditText editText = (EditText) mDialog.findViewById(R.id.edtNumberOfIterations);
+                            Button buttonOK = (Button) mDialog.findViewById(R.id.buttonOK);
+                            buttonOK.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    String data = editText.getText().toString();
+                                    int number_of_iterations = (("".equals(data)) ? 0 : Integer.valueOf(data));
+                                    mDialog.cancel();
+
+                                    if (number_of_iterations <= 0) {
+                                        Toast.makeText(mActivity, "Can't start the training", Toast.LENGTH_LONG).show();
+                                    } else {
+                                        Toast.makeText(mActivity, "Training begin", Toast.LENGTH_LONG).show();
+                                        if (mShowErrorLogs) {
+                                            learningWithLog(standardImages, number_of_iterations);
+                                        } else {
+                                            learningWithNoLog(standardImages, number_of_iterations);
+                                        }
+                                    }
+                                }
+                            });
+                            Button buttonCancel = (Button) mDialog.findViewById(R.id.buttonCancel);
+                            buttonCancel.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    editText.setText("");
+                                    mDialog.dismiss();
+                                }
+                            });
+                            mDialog.show();
+                        }
+                    }
+                };
                 for (final String path : mListResourcePaths) {
                     Runnable runnable = new Runnable() {
                         @Override
@@ -138,73 +194,8 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                             String name = getNameFromPath(path);
                             String alphabet = name.substring(6, 7);
                             standardImages.add(new StandardImage(BitmapFactory.decodeFile(path), alphabet));
-
                             mCurrentImage--;
-                            if (mCurrentImage <= 0) {
-                                mCurrentImage = 0;
-                                final Dialog dialog = new Dialog(mActivity);
-                                dialog.setContentView(R.layout.layout_prompt);
-                                final EditText editText = (EditText) dialog.findViewById(R.id.edtNumberOfIterations);
-                                Button buttonOK = (Button) dialog.findViewById(R.id.buttonOK);
-                                buttonOK.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        String data = editText.getText().toString();
-                                        int number_of_iterations = (("".equals(data)) ? 0 : Integer.valueOf(data));
-                                        dialog.cancel();
-
-                                        if (number_of_iterations <= 0) {
-                                            Toast.makeText(mActivity, "Can't start the training", Toast.LENGTH_LONG).show();
-                                        } else {
-                                            mLayoutProgressing.setVisibility(View.VISIBLE);
-                                            Toast.makeText(mActivity, "Training begin", Toast.LENGTH_LONG).show();
-                                            final LayoutInflater inflater = mActivity.getLayoutInflater();
-                                            PatternLearning patternLearning = new PatternLearning(standardImages, number_of_iterations);
-                                            patternLearning.learn(new LearningListener() {
-                                                @Override
-                                                public void updateEpoch(Bundle bundle) {
-                                                    if (bundle != null) {
-                                                        View epochView = inflater.inflate(R.layout.item_epoch, null);
-                                                        TextView tvEpoch = (TextView) epochView.findViewById(R.id.tvEpoch);
-                                                        tvEpoch.setText("Epoch: " + bundle.getInt("Epoch"));
-                                                        mLayoutProgressInfo.addView(epochView);
-
-                                                        String info = bundle.getString("ListName");
-                                                        if (info != null && !"".equals(info)) {
-                                                            View infoView = inflater.inflate(R.layout.item_infor_text, null);
-                                                            TextView tvInfo = (TextView) infoView.findViewById(R.id.tvInfoText);
-                                                            tvInfo.setText(info);
-                                                            mLayoutProgressInfo.addView(infoView);
-                                                        }
-
-                                                        mScrollProgress.post(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                mScrollProgress.fullScroll(View.FOCUS_DOWN);
-                                                            }
-                                                        });
-                                                    }
-                                                }
-
-                                                @Override
-                                                public void finish() {
-                                                    Toast.makeText(mActivity, "Training done", Toast.LENGTH_LONG).show();
-                                                    mLayoutProgressing.setVisibility(View.GONE);
-                                                }
-                                            });
-                                        }
-                                    }
-                                });
-                                Button buttonCancel = (Button) dialog.findViewById(R.id.buttonCancel);
-                                buttonCancel.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        editText.setText("");
-                                        dialog.dismiss();
-                                    }
-                                });
-                                dialog.show();
-                            }
+                            handler.sendMessage(handler.obtainMessage());
                         }
                     };
                     runnable.run();
@@ -217,6 +208,49 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
             default:
                 break;
         }
+    }
+
+    private void learningWithNoLog(ArrayList<StandardImage> standardImages, int number_of_iterations) {
+        PatternLearning patternLearning = new PatternLearning(standardImages, number_of_iterations);
+        patternLearning.learn();
+    }
+
+    private void learningWithLog(ArrayList<StandardImage> standardImages, int number_of_iterations) {
+        mLayoutProgressing.setVisibility(View.VISIBLE);
+        final LayoutInflater inflater = mActivity.getLayoutInflater();
+        PatternLearning patternLearning = new PatternLearning(standardImages, number_of_iterations);
+        patternLearning.learn(new LearningListener() {
+            @Override
+            public void updateEpoch(Bundle bundle) {
+                if (bundle != null) {
+                    View epochView = inflater.inflate(R.layout.item_epoch, null);
+                    TextView tvEpoch = (TextView) epochView.findViewById(R.id.tvEpoch);
+                    tvEpoch.setText("Epoch: " + bundle.getInt("Epoch"));
+                    mLayoutProgressInfo.addView(epochView);
+
+                    String info = bundle.getString("ListName");
+                    if (info != null && !"".equals(info)) {
+                        View infoView = inflater.inflate(R.layout.item_infor_text, null);
+                        TextView tvInfo = (TextView) infoView.findViewById(R.id.tvInfoText);
+                        tvInfo.setText(info);
+                        mLayoutProgressInfo.addView(infoView);
+                    }
+
+                    mScrollProgress.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mScrollProgress.fullScroll(View.FOCUS_DOWN);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void finish() {
+                Toast.makeText(mActivity, "Training done", Toast.LENGTH_LONG).show();
+                mLayoutProgressing.setVisibility(View.GONE);
+            }
+        });
     }
 
     private String getNameFromPath(String path) {
