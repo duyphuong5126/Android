@@ -192,7 +192,8 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                         @Override
                         public void run() {
                             String name = getNameFromPath(path);
-                            String alphabet = name.substring(6, 7);
+                            String alphabet = name.substring(11, 13);
+                            alphabet = alphabet.replace("_", "");
                             standardImages.add(new StandardImage(BitmapFactory.decodeFile(path), alphabet));
                             mCurrentImage--;
                             handler.sendMessage(handler.obtainMessage());

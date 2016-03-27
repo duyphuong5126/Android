@@ -1,19 +1,24 @@
 package duy.phuong.handnote;
 
+import android.app.Dialog;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -79,14 +84,19 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
 
         this.showFragment(BaseFragment.MAIN_FRAGMENT);
 
-        initMapNames();
+        /*initMapNames();
         initSOM();
+        Log.d("Done", "done");*/
     }
 
-    private void initMapNames() {
+    /*private void initMapNames() {
         mGlobalMapNames = new ArrayList<>();
         try {
-            String data = SupportUtils.getStringResource(this, R.raw.map_names);
+            String data = SupportUtils.getStringData("Trained", "MapNames.txt");
+            if (data.length() == 0) {
+                data = SupportUtils.getStringResource(this, R.raw.map_names);
+                SupportUtils.writeFile(data, "Trained", "MapNames.txt");
+            }
             StringTokenizer tokenizer = new StringTokenizer(data, "\r\n");
             ArrayList<String> listTokens = new ArrayList<>();
             while (tokenizer.hasMoreTokens()) {
@@ -138,7 +148,11 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
 
     private void initSOM() {
         try {
-            String data = SupportUtils.getStringResource(this, R.raw.som);
+            String data = SupportUtils.getStringData("Trained", "SOM.txt");
+            if (data.length() == 0) {
+                data = SupportUtils.getStringResource(this, R.raw.som);
+                SupportUtils.writeFile(data, "Trained", "SOM.txt");
+            }
             StringTokenizer tokenizer = new StringTokenizer(data, "|");
             ArrayList<String> listTokens = new ArrayList<>();
             while (tokenizer.hasMoreTokens()) {
@@ -154,13 +168,9 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                     String stringWeight = listTokens.get(i);
                     StringTokenizer stringTokenizer = new StringTokenizer(stringWeight, ";");
                     if (stringTokenizer.countTokens() == Input.VECTOR_DIMENSIONS + 1) {
-                        int index = -1;
+                        int index = 0;
                         while (stringTokenizer.hasMoreTokens()) {
-                            if (index >= 0) {
-                                weightMatrix[i][index] = Double.valueOf(stringTokenizer.nextToken());
-                            } else {
-                                stringTokenizer.nextToken();
-                            }
+                            weightMatrix[i][index] = Double.valueOf(stringTokenizer.nextToken());
                             index++;
                         }
                     }
@@ -171,7 +181,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -290,8 +300,25 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                 showFragment(BaseFragment.CREATE_NOTE_FRAGMENT);
                 break;
             case R.id.buttonTraining:
-                showFragment(BaseFragment.DRAWING_FRAGMENT);
-                mMainNavigator.closeDrawer(mSideMenu);
+                final Dialog dialog = new Dialog(this);
+                dialog.setContentView(R.layout.layout_prompt_1);
+                dialog.setTitle("Enter password");
+                final EditText editText = (EditText) dialog.findViewById(R.id.edtPrompt);
+                Button button = (Button) dialog.findViewById(R.id.buttonConfirm);
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String password = editText.getText().toString();
+                        if ("5126".equals(password)) {
+                            showFragment(BaseFragment.DRAWING_FRAGMENT);
+                            mMainNavigator.closeDrawer(mSideMenu);
+                            dialog.dismiss();
+                        } else {
+                            Toast.makeText(MainActivity.this, "Wrong password", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                dialog.show();
                 break;
             case R.id.buttonBack:
                 onBackPressed();

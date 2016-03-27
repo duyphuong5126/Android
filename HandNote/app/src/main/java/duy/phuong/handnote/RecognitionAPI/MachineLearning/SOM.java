@@ -9,7 +9,8 @@ import android.util.Log;
 /*Self-Organizing Map*/
 public class SOM {
     private Output[][] mOutputs;
-    public static final int NUMBERS_OF_CLUSTER = 26;
+    public static final int NUMBERS_OF_CLUSTER = 55;
+    public static final int NUM_OF_ROW = 5;
 
     public SOM() {
         init();
@@ -20,7 +21,7 @@ public class SOM {
     }
 
     private void init() {
-        mOutputs = new Output[2][NUMBERS_OF_CLUSTER / 2];
+        mOutputs = new Output[NUM_OF_ROW][NUMBERS_OF_CLUSTER / NUM_OF_ROW];
         for (int i = 0; i < mOutputs.length; i++)
             for (int j = 0; j < mOutputs[i].length; j++) {
                 mOutputs[i][j] = new Output();
@@ -30,28 +31,19 @@ public class SOM {
 
     private void init(double[][] weightMatrix) {
         if (weightMatrix.length == NUMBERS_OF_CLUSTER && weightMatrix[0].length == Input.VECTOR_DIMENSIONS) {
-            mOutputs = new Output[2][NUMBERS_OF_CLUSTER / 2];
+            mOutputs = new Output[NUM_OF_ROW][NUMBERS_OF_CLUSTER / NUM_OF_ROW];
             for (int i = 0; i < mOutputs.length; i++)
                 for (int j = 0; j < mOutputs[i].length; j++) {
-                    mOutputs[i][j] = new Output(weightMatrix[i * 13 + j]);
+                    mOutputs[i][j] = new Output(weightMatrix[i * 11 + j]);
                 }
         }
     }
 
-    public void updateLabelForCluster(int x, int y, double distance, String label) {
-        //update label by min distance
-        if (mOutputs[y][x].mCurrentMinDistance > distance) {
-            mOutputs[y][x].mCurrentMinDistance = distance;
-            mOutputs[y][x].mCurrentLabel = label;
-        } else {
-            if (mOutputs[y][x].mCurrentMinDistance == distance && !mOutputs[y][x].mCurrentLabel.contains(label)) {
-                mOutputs[y][x].mCurrentLabel += label;
-            }
-        }
-
+    public void updateLabelForCluster(int x, int y, String label) {
         //update map name by counting patterns
         if (mOutputs[y][x].mMapNames.get(label) != null) {
             mOutputs[y][x].mMapNames.put(label, mOutputs[y][x].mMapNames.get(label) + 1);
+            mOutputs[y][x].mCount++;
         } else {
             Log.d("Error", "Null at label: " + label);
         }
@@ -104,21 +96,12 @@ public class SOM {
         return builder.toString();
     }
 
-    public String getLabels() {
-        StringBuilder builder = new StringBuilder();
-        for (Output[] outputs : mOutputs)
-            for (Output output : outputs) {
-                builder.append(output.getLabelInfo()).append("\r\n");
-            }
-        return builder.toString();
-    }
-
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         for (Output[] outputs : mOutputs)
             for (Output output : outputs) {
-                builder.append(output.mCurrentLabel).append(";").append(output.toString()).append("|");
+                builder.append(output.toString()).append("|");
             }
         return builder.toString();
     }

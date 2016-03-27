@@ -46,7 +46,7 @@ public class Recognizer {
                 double dis = getDistance(input, outputs[i][j]);
                 if (dis < min_distance) {
                     min_distance = dis;
-                    win_neuron = i * 13 + j;
+                    win_neuron = i * 11 + j;
                 }
             }
         }
@@ -83,53 +83,22 @@ public class Recognizer {
         double result = 0;
         if (input != null && output != null) {
             for (int i = 0; i < Input.VECTOR_DIMENSIONS; i += 16) {
-                double d = input.mInputData[i] - output.mWeights[i];
-                result += Math.pow(d, 2);
-
-                d = input.mInputData[i + 1] - output.mWeights[i + 1];
-                result += Math.pow(d, 2);
-
-                d = input.mInputData[i + 2] - output.mWeights[i + 2];
-                result += Math.pow(d, 2);
-
-                d = input.mInputData[i + 3] - output.mWeights[i + 3];
-                result += Math.pow(d, 2);
-
-                d = input.mInputData[i + 4] - output.mWeights[i + 4];
-                result += Math.pow(d, 2);
-
-                d = input.mInputData[i + 5] - output.mWeights[i + 5];
-                result += Math.pow(d, 2);
-
-                d = input.mInputData[i + 6] - output.mWeights[i + 6];
-                result += Math.pow(d, 2);
-
-                d = input.mInputData[i + 7] - output.mWeights[i + 7];
-                result += Math.pow(d, 2);
-
-                d = input.mInputData[i + 8] - output.mWeights[i + 8];
-                result += Math.pow(d, 2);
-
-                d = input.mInputData[i + 9] - output.mWeights[i + 9];
-                result += Math.pow(d, 2);
-
-                d = input.mInputData[i + 10] - output.mWeights[i + 10];
-                result += Math.pow(d, 2);
-
-                d = input.mInputData[i + 11] - output.mWeights[i + 11];
-                result += Math.pow(d, 2);
-
-                d = input.mInputData[i + 12] - output.mWeights[i + 12];
-                result += Math.pow(d, 2);
-
-                d = input.mInputData[i + 13] - output.mWeights[i + 13];
-                result += Math.pow(d, 2);
-
-                d = input.mInputData[i + 14] - output.mWeights[i + 14];
-                result += Math.pow(d, 2);
-
-                d = input.mInputData[i + 15] - output.mWeights[i + 15];
-                result += Math.pow(d, 2);
+                result += Math.pow(input.mInputData[i] - output.mWeights[i], 2);
+                result += Math.pow(input.mInputData[i + 1] - output.mWeights[i + 1], 2);
+                result += Math.pow(input.mInputData[i + 2] - output.mWeights[i + 2], 2);
+                result += Math.pow(input.mInputData[i + 3] - output.mWeights[i + 3], 2);
+                result += Math.pow(input.mInputData[i + 4] - output.mWeights[i + 4], 2);
+                result += Math.pow(input.mInputData[i + 5] - output.mWeights[i + 5], 2);
+                result += Math.pow(input.mInputData[i + 6] - output.mWeights[i + 6], 2);
+                result += Math.pow(input.mInputData[i + 7] - output.mWeights[i + 7], 2);
+                result += Math.pow(input.mInputData[i + 8] - output.mWeights[i + 8], 2);
+                result += Math.pow(input.mInputData[i + 9] - output.mWeights[i + 9], 2);
+                result += Math.pow(input.mInputData[i + 10] - output.mWeights[i + 10], 2);
+                result += Math.pow(input.mInputData[i + 11] - output.mWeights[i + 11], 2);
+                result += Math.pow(input.mInputData[i + 12] - output.mWeights[i + 12], 2);
+                result += Math.pow(input.mInputData[i + 13] - output.mWeights[i + 13], 2);
+                result += Math.pow(input.mInputData[i + 14] - output.mWeights[i + 14], 2);
+                result += Math.pow(input.mInputData[i + 15] - output.mWeights[i + 15], 2);
             }
         }
         return Math.sqrt(result);

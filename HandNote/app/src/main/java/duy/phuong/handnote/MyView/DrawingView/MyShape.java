@@ -44,20 +44,43 @@ public class MyShape {
 
     public int getHeight() {
         ArrayList<MyPath> list = mListPaths;
-        int minY = (list.isEmpty()) ? 0 : list.get(0).getListPoint().get(0).x;
+        int minY = (list.isEmpty()) ? 0 : list.get(0).getListPoint().get(0).y;
         int maxY = minY;
         for (MyPath myPath : mListPaths) {
             for (Point point : myPath.getListPoint()) {
-                if (minY > point.x) {
-                    minY = point.x;
+                if (minY > point.y) {
+                    minY = point.y;
                 }
 
-                if (maxY < point.x) {
-                    maxY = point.x;
+                if (maxY < point.y) {
+                    maxY = point.y;
                 }
             }
         }
 
         return Math.abs(maxY - minY);
+    }
+
+    public Rect getRect() {
+        int left = mListPaths.get(0).getListPoint().get(0).x; int right = left;
+        int top = mListPaths.get(0).getListPoint().get(0).y; int bot = top;
+        for (MyPath myPath : mListPaths)
+            for (Point point : myPath.getListPoint()) {
+                if (left > point.x) {
+                    left = point.x;
+                }
+
+                if (right < point.x) {
+                    right = point.x;
+                }
+                if (top > point.y) {
+                    top = point.y;
+                }
+
+                if (bot < point.y) {
+                    bot = point.y;
+                }
+            }
+        return new Rect(left, top, right, bot);
     }
 }

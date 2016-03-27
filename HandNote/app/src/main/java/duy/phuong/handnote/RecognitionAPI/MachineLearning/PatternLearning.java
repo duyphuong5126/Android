@@ -19,7 +19,7 @@ import duy.phuong.handnote.Support.SupportUtils;
 /*Kohonen Algorithm*/
 public class PatternLearning extends Recognizer {
     private static final double INITIAL_LEARNING_RATE = 0.5;//the initial learning rate
-    private static final double MAP_RADIUS = (SOM.NUMBERS_OF_CLUSTER / 4);
+    private static final double MAP_RADIUS = (SOM.NUMBERS_OF_CLUSTER / SOM.NUM_OF_ROW);
 
     private ArrayList<Input> mSamples;//training set
     private int mEpochs; //learning rate time const (T2)
@@ -54,7 +54,6 @@ public class PatternLearning extends Recognizer {
                 boolean converge = false;
                 for (int i = 0; i < mEpochs && !converge; i++) {
                     mMap.resetMapName();
-                    Log.d("Epoch", "" + i);
 
                     ArrayList<Input> inputs = new ArrayList<>();
                     inputs.addAll(mSamples);
@@ -69,15 +68,75 @@ public class PatternLearning extends Recognizer {
                         double min_distance = 1000000000;
                         int win_neuron_position_X = -1;
                         int win_neuron_position_Y = -1;
-                        for (int j = 0; j < mMap.getOutputs().length; j++)
-                            for (int k = 0; k < mMap.getOutputs()[j].length; k++) {
-                                double d = getDistance(input, mMap.getOutputs()[j][k]);
-                                if (min_distance > d) {
-                                    min_distance = d;
-                                    win_neuron_position_Y = j;
-                                    win_neuron_position_X = k;
-                                }
+                        for (int j = 0; j < mMap.getOutputs().length; j++) {
+                            double d = getDistance(input, mMap.getOutputs()[j][0]);
+                            if (min_distance > d) {
+                                min_distance = d;
+                                win_neuron_position_Y = j;
+                                win_neuron_position_X = 0;
                             }
+                            d = getDistance(input, mMap.getOutputs()[j][1]);
+                            if (min_distance > d) {
+                                min_distance = d;
+                                win_neuron_position_Y = j;
+                                win_neuron_position_X = 1;
+                            }
+                            d = getDistance(input, mMap.getOutputs()[j][2]);
+                            if (min_distance > d) {
+                                min_distance = d;
+                                win_neuron_position_Y = j;
+                                win_neuron_position_X = 2;
+                            }
+                            d = getDistance(input, mMap.getOutputs()[j][3]);
+                            if (min_distance > d) {
+                                min_distance = d;
+                                win_neuron_position_Y = j;
+                                win_neuron_position_X = 3;
+                            }
+                            d = getDistance(input, mMap.getOutputs()[j][4]);
+                            if (min_distance > d) {
+                                min_distance = d;
+                                win_neuron_position_Y = j;
+                                win_neuron_position_X = 4;
+                            }
+                            d = getDistance(input, mMap.getOutputs()[j][5]);
+                            if (min_distance > d) {
+                                min_distance = d;
+                                win_neuron_position_Y = j;
+                                win_neuron_position_X = 5;
+                            }
+                            d = getDistance(input, mMap.getOutputs()[j][6]);
+                            if (min_distance > d) {
+                                min_distance = d;
+                                win_neuron_position_Y = j;
+                                win_neuron_position_X = 6;
+                            }
+                            d = getDistance(input, mMap.getOutputs()[j][7]);
+                            if (min_distance > d) {
+                                min_distance = d;
+                                win_neuron_position_Y = j;
+                                win_neuron_position_X = 7;
+                            }
+                            d = getDistance(input, mMap.getOutputs()[j][8]);
+                            if (min_distance > d) {
+                                min_distance = d;
+                                win_neuron_position_Y = j;
+                                win_neuron_position_X = 8;
+                            }
+                            d = getDistance(input, mMap.getOutputs()[j][9]);
+                            if (min_distance > d) {
+                                min_distance = d;
+                                win_neuron_position_Y = j;
+                                win_neuron_position_X = 9;
+                            }
+                            d = getDistance(input, mMap.getOutputs()[j][10]);
+                            if (min_distance > d) {
+                                min_distance = d;
+                                win_neuron_position_Y = j;
+                                win_neuron_position_X = 10;
+                            }
+                        }
+
 
                         if (win_neuron_position_X < 0 || win_neuron_position_Y < 0) {
                             Log.d("Error", "An error occur");
@@ -117,7 +176,7 @@ public class PatternLearning extends Recognizer {
                         }
 
                         //5. update map of names
-                        mMap.updateLabelForCluster(win_neuron_position_X, win_neuron_position_Y, min_distance, input.mLabel);
+                        mMap.updateLabelForCluster(win_neuron_position_X, win_neuron_position_Y, input.mLabel);
                     }
 
                     //check converge condition
@@ -145,7 +204,6 @@ public class PatternLearning extends Recognizer {
                 super.onPostExecute(aVoid);
                 SupportUtils.writeFile(mMap.toString(), "Trained", "SOM.txt");
                 SupportUtils.writeFile(mMap.getMapNames(), "Trained", "MapNames.txt");
-                SupportUtils.writeFile(mMap.getLabels(), "Trained", "Labels.txt");
 
                 learningListener.finish();
             }
@@ -173,15 +231,74 @@ public class PatternLearning extends Recognizer {
                 double min_distance = 1000000000;
                 int win_neuron_position_X = -1;
                 int win_neuron_position_Y = -1;
-                for (int j = 0; j < mMap.getOutputs().length; j++)
-                    for (int k = 0; k < mMap.getOutputs()[j].length; k++) {
-                        double d = getDistance(input, mMap.getOutputs()[j][k]);
-                        if (min_distance > d) {
-                            min_distance = d;
-                            win_neuron_position_Y = j;
-                            win_neuron_position_X = k;
-                        }
+                for (int j = 0; j < mMap.getOutputs().length; j++) {
+                    double d = getDistance(input, mMap.getOutputs()[j][0]);
+                    if (min_distance > d) {
+                        min_distance = d;
+                        win_neuron_position_Y = j;
+                        win_neuron_position_X = 0;
                     }
+                    d = getDistance(input, mMap.getOutputs()[j][1]);
+                    if (min_distance > d) {
+                        min_distance = d;
+                        win_neuron_position_Y = j;
+                        win_neuron_position_X = 1;
+                    }
+                    d = getDistance(input, mMap.getOutputs()[j][2]);
+                    if (min_distance > d) {
+                        min_distance = d;
+                        win_neuron_position_Y = j;
+                        win_neuron_position_X = 2;
+                    }
+                    d = getDistance(input, mMap.getOutputs()[j][3]);
+                    if (min_distance > d) {
+                        min_distance = d;
+                        win_neuron_position_Y = j;
+                        win_neuron_position_X = 3;
+                    }
+                    d = getDistance(input, mMap.getOutputs()[j][4]);
+                    if (min_distance > d) {
+                        min_distance = d;
+                        win_neuron_position_Y = j;
+                        win_neuron_position_X = 4;
+                    }
+                    d = getDistance(input, mMap.getOutputs()[j][5]);
+                    if (min_distance > d) {
+                        min_distance = d;
+                        win_neuron_position_Y = j;
+                        win_neuron_position_X = 5;
+                    }
+                    d = getDistance(input, mMap.getOutputs()[j][6]);
+                    if (min_distance > d) {
+                        min_distance = d;
+                        win_neuron_position_Y = j;
+                        win_neuron_position_X = 6;
+                    }
+                    d = getDistance(input, mMap.getOutputs()[j][7]);
+                    if (min_distance > d) {
+                        min_distance = d;
+                        win_neuron_position_Y = j;
+                        win_neuron_position_X = 7;
+                    }
+                    d = getDistance(input, mMap.getOutputs()[j][8]);
+                    if (min_distance > d) {
+                        min_distance = d;
+                        win_neuron_position_Y = j;
+                        win_neuron_position_X = 8;
+                    }
+                    d = getDistance(input, mMap.getOutputs()[j][9]);
+                    if (min_distance > d) {
+                        min_distance = d;
+                        win_neuron_position_Y = j;
+                        win_neuron_position_X = 9;
+                    }
+                    d = getDistance(input, mMap.getOutputs()[j][10]);
+                    if (min_distance > d) {
+                        min_distance = d;
+                        win_neuron_position_Y = j;
+                        win_neuron_position_X = 10;
+                    }
+                }
 
                 if (win_neuron_position_X < 0 || win_neuron_position_Y < 0) {
                     Log.d("Error", "An error occur");
@@ -221,7 +338,7 @@ public class PatternLearning extends Recognizer {
                 }
 
                 //5. update map of names
-                mMap.updateLabelForCluster(win_neuron_position_X, win_neuron_position_Y, min_distance, input.mLabel);
+                mMap.updateLabelForCluster(win_neuron_position_X, win_neuron_position_Y, input.mLabel);
             }
 
             //check converge condition
@@ -233,21 +350,17 @@ public class PatternLearning extends Recognizer {
 
         SupportUtils.writeFile(mMap.toString(), "Trained", "SOM.txt");
         SupportUtils.writeFile(mMap.getMapNames(), "Trained", "MapNames.txt");
-        SupportUtils.writeFile(mMap.getLabels(), "Trained", "Labels.txt");
-
     }
 
     private String checkListNames() {
         String result = "";
         for (int i = 0; i < mMap.getOutputs().length && "".equals(result); i++) {
             for (int j = 0; j < mMap.getOutputs()[i].length && "".equals(result); j++) {
-                if (!(mMap.getOutputs()[i][j].getCount() >= 50)) {
+                if (!(mMap.getOutputs()[i][j].mCount >= 50)) {
                     result = mMap.getOutputs()[i][j].getNameList();
                     if (result.isEmpty()) {
-                        Log.d("Label", result);
+                        result = "Wrong at neuron[" + i + "][" + j + "], " + result;
                     }
-
-                    result = "Wrong at neuron[" + i + "][" + j + "], " + result;
                 }
             }
         }
@@ -258,8 +371,9 @@ public class PatternLearning extends Recognizer {
         String result = "";
         for (int i = 0; i < mMap.getOutputs().length && "".equals(result); i++) {
             for (int j = 0; j < mMap.getOutputs()[i].length && "".equals(result); j++) {
-                if (!(mMap.getOutputs()[i][j].getCount() >= 50)) {
-                    Log.d("Label", result);
+                if (!(mMap.getOutputs()[i][j].mCount >= 50)) {
+                    result = mMap.getOutputs()[i][j].getNameList();
+                    Log.d("Wrong", result);
                     return false;
                 }
             }

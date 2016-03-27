@@ -5,14 +5,12 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import duy.phuong.handnote.DTO.FloatingImage;
-import duy.phuong.handnote.Listener.RecognitionCallback;
 
 /**
  * Created by Phuong on 26/11/2015.
@@ -23,10 +21,26 @@ import duy.phuong.handnote.Listener.RecognitionCallback;
  */
 public class BitmapProcessor {
 
+    public interface RecognitionCallback {
+        void onRecognizeSuccess(ArrayList<FloatingImage> listBitmaps);
+    }
+
     private ArrayList<Rect> mListRectangle;
 
     public BitmapProcessor() {
         mListRectangle = new ArrayList<>();
+    }
+
+    public static Bitmap resizeBitmap(Bitmap bitmap, int newWidth, int newHeight) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        return Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, false);
     }
 
     public static Bitmap cropBitmap(Bitmap src, int x, int y, int w, int h) {
@@ -47,31 +61,50 @@ public class BitmapProcessor {
     public void onDetectCharacter(final FloatingImage floatingImage, RecognitionCallback callback) {
         this.mListRectangle.addAll(detectAreasOnBitmap(floatingImage.mBitmap, 0, 0));
 
-        ArrayList<FloatingImage> resultBitmaps = new ArrayList<>();
+        ArrayList<FloatingImage> detectedBitmaps = new ArrayList<>();
         for (Rect rect : mListRectangle) {
             FloatingImage floatingImage1 = new FloatingImage();
             floatingImage1.mBitmap = cropBitmap(floatingImage.mBitmap, rect.left, rect.top, rect.width(), rect.height());
             floatingImage1.mMyShape = floatingImage.mMyShape;
             floatingImage1.mParentHeight = floatingImage.mParentHeight;
             floatingImage1.mParentWidth = floatingImage.mParentWidth;
-            resultBitmaps.add(floatingImage1);
+            detectedBitmaps.add(floatingImage1);
         }
 
-        callback.onRecognizeSuccess(resultBitmaps);
+        /*ArrayList<FloatingImage> resultBitmaps = new ArrayList<>();
+        for (FloatingImage f : detectedBitmaps) {
+            resultBitmaps.addAll(getSegments(f));
+        }*/
+        callback.onRecognizeSuccess(/*resultBitmaps.isEmpty()?detectedBitmaps:resultBitmaps*/detectedBitmaps);
 
         this.mListRectangle.clear();
     }
 
-    public static Bitmap resizeBitmap(Bitmap bitmap, int newWidth, int newHeight) {
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
+    private ArrayList<FloatingImage> getSegments(FloatingImage floatingImage) {
+        ArrayList<FloatingImage> resultBitmaps = new ArrayList<>();
+        Bitmap src = floatingImage.mBitmap;
+        int height = src.getHeight();
 
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleWidth, scaleHeight);
-
-        return Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, false);
+        Rect rect = new Rect(); rect.top = 0; rect.bottom = src.getHeight() - 1; rect.left = 0;
+        boolean ready = false;
+        for (int i = 0; i < src.getWidth(); i++) {
+            if (getColumnHeight(src, i) >= 0.7 * height && countColumnSegments(i, src) == 1) {
+                rect.right = i;
+                if (ready) {
+                    FloatingImage fImage = new FloatingImage();
+                    fImage.mBitmap = cropBitmap(src, rect.left, rect.top, rect.width(), rect.height());
+                    resultBitmaps.add(fImage);
+                    rect.left = i;
+                    ready = false;
+                }
+            } else {
+                if (!ready) {
+                    ready = true;
+                }
+                rect.right = i;
+            }
+        }
+        return resultBitmaps;
     }
 
     private ArrayList<Rect> detectAreasOnBitmap(final Bitmap bitmap, int dx, int dy) {
@@ -167,18 +200,6 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean checkNotEmptyColumn(int c, int start, int end, final Bitmap bitmap) {
-        if (c >= bitmap.getWidth()) {
-            return false;
-        }
-        for (int i = start; i < end; i++) {
-            if (bitmap.getPixel(c, i) != Color.WHITE) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private boolean checkNotEmptyRow(int r, int start, int end, final Bitmap bitmap) {
         if (r >= bitmap.getHeight()) {
             return false;
@@ -191,183 +212,6 @@ public class BitmapProcessor {
         return false;
     }
 
-    public int checkVerticalEdges(Bitmap bitmap, int edgeWidth) {
-        ArrayList<Rect> listRect = new ArrayList<>();
-        Log.d("Width", "" + bitmap.getWidth());
-
-        for (int startHorizontal = 0; startHorizontal < bitmap.getWidth(); startHorizontal++) {
-            int endHorizontal = startHorizontal + edgeWidth - 1;
-            if (endHorizontal >= bitmap.getWidth()) {
-                return listRect.size();
-            } else {
-                int startVertical = checkStartVertical(bitmap, startHorizontal, endHorizontal);
-                int endVertical = checkEndVertical(bitmap, startHorizontal, endHorizontal);
-
-                if (startVertical < 0 || endVertical < 0) {
-                    return listRect.size();
-                } else {
-                    int height = endVertical - startVertical + 1;
-                    int verticalCount = 0;
-                    if (height > 0 && (((double) height) / bitmap.getHeight()) > 0.5) {
-                        for (int i = startHorizontal; i <= endHorizontal; i++) {
-                            if ((((double) countVertical(bitmap, i, startVertical, endVertical)) / height) >= 0.5) {
-                                verticalCount++;
-                            }
-                        }
-                    }
-
-                    if (verticalCount / edgeWidth > 0) {
-                        Rect rect = new Rect(startHorizontal, startVertical, endHorizontal, endVertical);
-                        boolean intersect = false;
-                        for (Rect rect1 : listRect) {
-                            if (rect.intersect(rect1)) {
-                                intersect = true;
-                            }
-                        }
-                        if (!intersect) {
-                            listRect.add(rect);
-                        }
-                    }
-                }
-            }
-        }
-
-        ArrayList<Integer> temps = new ArrayList<>();
-
-        for (int i = 0; i < listRect.size() - 1; i++)
-            for (int j = i + 1; j < listRect.size(); j++) {
-                if (listRect.get(i).intersect(listRect.get(j))) {
-                    temps.add(j);
-                }
-            }
-
-        for (int index : temps) {
-            listRect.remove(index);
-        }
-        return listRect.size();
-    }
-
-    public int checkHorizontalEdges(Bitmap bitmap, int edgeHeight) {
-        ArrayList<Rect> listRect = new ArrayList<>();
-
-        for (int startVertical = 0; startVertical < bitmap.getHeight(); startVertical++) {
-            int endVertical = startVertical + edgeHeight - 1;
-            if (endVertical >= bitmap.getHeight()) {
-                return listRect.size();
-            } else {
-                int startHorizontal = checkStartHorizontal(bitmap, startVertical, endVertical);
-                int endHorizontal = checkEndHorizontal(bitmap, startVertical, endVertical);
-
-                if (startHorizontal < 0 || endHorizontal < 0) {
-                    return listRect.size();
-                } else {
-                    int width = endHorizontal - startHorizontal + 1;
-                    int horizontalCount = 0;
-                    if (width > 0 && (((double) width) / bitmap.getWidth()) > 0.5) {
-                        for (int i = startVertical; i <= endVertical; i++) {
-                            if ((((double) countHorizontal(bitmap, i, startHorizontal, endHorizontal)) / width) >= 0.5) {
-                                horizontalCount++;
-                            }
-                        }
-                    }
-
-                    if (horizontalCount / edgeHeight > 0) {
-                        Rect rect = new Rect(startVertical, startHorizontal, endVertical, endHorizontal);
-                        boolean intersect = false;
-                        for (Rect rect1 : listRect) {
-                            if (rect.intersect(rect1)) {
-                                intersect = true;
-                            }
-                        }
-                        if (!intersect) {
-                            listRect.add(rect);
-                        }
-                    }
-                }
-            }
-        }
-
-        ArrayList<Integer> temps = new ArrayList<>();
-
-        for (int i = 0; i < listRect.size() - 1; i++)
-            for (int j = i + 1; j < listRect.size(); j++) {
-                if (listRect.get(i).intersect(listRect.get(j))) {
-                    temps.add(j);
-                }
-            }
-
-        for (int index : temps) {
-            listRect.remove(index);
-        }
-        return listRect.size();
-    }
-
-    private int checkStartVertical(Bitmap bitmap, int startHorizontal, int endHorizontal) {
-        for (int i = 0; i < bitmap.getHeight(); i++) {
-            if (checkNotEmptyRow(i, startHorizontal, endHorizontal + 1, bitmap)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    private int checkStartHorizontal(Bitmap bitmap, int startVertical, int endVertical) {
-        for (int i = 0; i < bitmap.getWidth(); i++) {
-            if (checkNotEmptyColumn(i, startVertical, endVertical + 1, bitmap)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    private int checkEndVertical(Bitmap bitmap, int startHorizontal, int endHorizontal) {
-        int row = -1;
-        for (int i = 0; i < bitmap.getHeight(); i++) {
-            if (checkNotEmptyRow(i, startHorizontal, endHorizontal + 1, bitmap)) {
-                row = i;
-            }
-        }
-        return row;
-    }
-
-    private int checkEndHorizontal(Bitmap bitmap, int startVertical, int endVertical) {
-        int column = -1;
-        for (int i = 0; i < bitmap.getWidth(); i++) {
-            if (checkNotEmptyColumn(i, startVertical, endVertical + 1, bitmap)) {
-                column = i;
-            }
-        }
-        return column;
-    }
-
-    private int countVertical(Bitmap bitmap, int column, int startVertical, int endVertical) {
-        int count = 0;
-        if (startVertical < 0 || endVertical < 0 || startVertical >= bitmap.getHeight() || endVertical >= bitmap.getHeight()) {
-            return count;
-        }
-        for (int i = startVertical; i <= endVertical; i++) {
-            if (bitmap.getPixel(column, i) != Color.WHITE) {
-                count++;
-            }
-        }
-
-        return count;
-    }
-
-    private int countHorizontal(Bitmap bitmap, int row, int startHorizontal, int endHorizontal) {
-        int count = 0;
-        if (startHorizontal < 0 || endHorizontal < 0 || startHorizontal >= bitmap.getWidth() || endHorizontal >= bitmap.getWidth()) {
-            return count;
-        }
-        for (int i = startHorizontal; i <= endHorizontal; i++) {
-            if (bitmap.getPixel(i, row) != Color.WHITE) {
-                count++;
-            }
-        }
-
-        return count;
-    }
-
     private int countBlack(Bitmap bitmap) {
         int count = 0;
         for (int i = 0; i < bitmap.getHeight(); i++)
@@ -375,6 +219,15 @@ public class BitmapProcessor {
                 count += (bitmap.getPixel(j, i) == Color.WHITE) ? 0 : 1;
             }
         return count;
+    }
+
+    private int getColumnHeight(Bitmap bitmap, int col) {
+        for (int row = 0; row < bitmap.getHeight(); row++) {
+            if (bitmap.getPixel(col, row) != Color.WHITE) {
+                return row;
+            }
+        }
+        return -1;
     }
 
     private Point getFirstBlackPixel(Bitmap bitmap) {
@@ -465,7 +318,6 @@ public class BitmapProcessor {
     private int getBlankCounts(int y, Bitmap bitmap) {
         int count = 0;
         int segments = countRowSegments(y, bitmap);
-        Log.d("Seg", "" + segments);
         if (segments == 2) {
             int pos = -1;
             for (int i = 0; i < bitmap.getWidth(); i++) {
@@ -543,7 +395,16 @@ public class BitmapProcessor {
         return 0;
     }
 
+    private boolean verticalClosed(Bitmap bitmap) {
+        boolean closedTop = getBlankCounts(0, bitmap) > 0;
+        boolean closedBot = getBlankCounts(bitmap.getHeight() - 1, bitmap) > 0;
+        return closedTop || closedBot;
+    }
+
     private int triangleFromTop(FloatingImage floatingImage) {
+        if (verticalClosed(floatingImage.mBitmap)) {
+            return -1;
+        }
         Point firstBlack = getFirstBlackPixel(floatingImage.mBitmap);
         if (firstBlack == null) {
             return -1;
@@ -599,11 +460,7 @@ public class BitmapProcessor {
                 case "B":
                     if (isB(floatingImage)) {
                         return "B";
-                    } /*else {
-                        if (isR(floatingImage)) {
-                            return "R";
-                        }
-                    }*/
+                    }
                     break;
 
                 case "C":
@@ -615,11 +472,7 @@ public class BitmapProcessor {
                 case "D":
                     if (isD(floatingImage)) {
                         return "D";
-                    } /*else {
-                        if (isR(floatingImage)) {
-                            return "R";
-                        }
-                    }*/
+                    }
                     break;
 
                 case "F":
@@ -637,10 +490,6 @@ public class BitmapProcessor {
                 case "H":
                     if (isH(floatingImage)) {
                         return "H";
-                    } else {
-                        if (isV(floatingImage)) {
-                            return "V";
-                        }
                     }
                     break;
 
@@ -677,16 +526,18 @@ public class BitmapProcessor {
                 case "R":
                     if (isR(floatingImage)) {
                         return "R";
-                    } /*else {
-                        if (isB(floatingImage)) {
-                            return "B";
-                        }
-                    }*/
+                    }
                     break;
 
                 case "S":
                     if (isS(floatingImage)) {
                         return "S";
+                    }
+                    break;
+
+                case "V":
+                    if (isV(floatingImage)) {
+                        return "V";
                     }
                     break;
 
@@ -699,6 +550,18 @@ public class BitmapProcessor {
                 case "W":
                     if (isW(floatingImage)) {
                         return "W";
+                    }
+                    break;
+
+                case "X":
+                    if (isX(floatingImage)) {
+                        return "X";
+                    }
+                    break;
+
+                case "Y":
+                    if (isY(floatingImage)) {
+                        return "Y";
                     }
                     break;
 
@@ -715,7 +578,7 @@ public class BitmapProcessor {
 
     private boolean isH(FloatingImage floatingImage) {
         if (triangleFromTop(floatingImage) != 1) {
-            int fragmentHeight = floatingImage.mBitmap.getHeight() / 3;
+            int fragmentHeight = floatingImage.mBitmap.getHeight() / 4;
             int startAbove = 0;
             int startBelow = floatingImage.mBitmap.getHeight() - fragmentHeight;
             Bitmap fragmentAbove = cropBitmap(floatingImage.mBitmap, 0, startAbove, floatingImage.mBitmap.getWidth(), fragmentHeight);
@@ -865,7 +728,6 @@ public class BitmapProcessor {
             } else {
                 if (getBlankCounts(i, bitmap) == 0) {
                     thinRows++;
-                    Log.d("Row", "" + i);
                 }
             }
         }
@@ -1088,4 +950,46 @@ public class BitmapProcessor {
         }
         return false;
     }
+
+    private boolean isX(FloatingImage floatingImage) {
+        if (!isV(floatingImage) && !isW(floatingImage) && !isA(floatingImage) && !isY(floatingImage)) {
+            Bitmap src = floatingImage.mBitmap;
+            int row = -1;
+            int start = src.getHeight() / 4;
+            int end = src.getHeight() - start;
+            for (int i = start; i <= end && row < 0; i++) {
+                if (countRowSegments(i, src) == 1) {
+                    row = i;
+                }
+            }
+
+            if (row > 0) {
+                FloatingImage top = new FloatingImage();
+                top.mBitmap = cropBitmap(src, 0, 0, src.getWidth(), row + 1);
+                FloatingImage bot = new FloatingImage();
+                bot.mBitmap = cropBitmap(src, 0, row + 2, src.getWidth(), src.getHeight() - row - 2);
+                return triangleFromBot(top) == 1 && triangleFromTop(bot) == 1;
+            }
+        }
+        return false;
+    }
+
+    private boolean isY(FloatingImage floatingImage) {
+        Bitmap src = floatingImage.mBitmap;
+        int row = -1;
+
+        for (int i = src.getHeight() - 1; i >= 0 && row < 0; i--) {
+            if (countRowSegments(i, src) == 2) {
+                row = i;
+            }
+        }
+
+        if (row > 0) {
+            FloatingImage top = new FloatingImage();
+            top.mBitmap = cropBitmap(src, 0, 0, src.getWidth(), row + 1);
+            return triangleFromBot(top) == 1;
+        }
+        return false;
+    }
+
 }

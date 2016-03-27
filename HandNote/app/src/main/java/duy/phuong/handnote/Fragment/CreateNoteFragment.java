@@ -1,6 +1,6 @@
 package duy.phuong.handnote.Fragment;
 
-import android.graphics.Bitmap;
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -10,20 +10,16 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import duy.phuong.handnote.DTO.FloatingImage;
-import duy.phuong.handnote.DTO.StandardImage;
 import duy.phuong.handnote.Listener.BackPressListener;
-import duy.phuong.handnote.Listener.RecognitionCallback;
 import duy.phuong.handnote.MyView.DrawingView.FingerDrawerView;
-import duy.phuong.handnote.MyView.DrawingView.MyPath;
 import duy.phuong.handnote.R;
 import duy.phuong.handnote.RecognitionAPI.BitmapProcessor;
 import duy.phuong.handnote.RecognitionAPI.Recognizer;
-import duy.phuong.handnote.Support.SupportUtils;
 
 /**
  * Created by Phuong on 06/03/2016.
  */
-public class CreateNoteFragment extends BaseFragment implements BackPressListener, View.OnClickListener, RecognitionCallback {
+public class CreateNoteFragment extends BaseFragment implements BackPressListener, View.OnClickListener, BitmapProcessor.RecognitionCallback {
     private FingerDrawerView mDrawer;
     private ImageButton mButtonSave, mButtonDelete, mButtonUndo, mButtonRedo, mButtonColor;
     private TextView mTvResult;
@@ -35,10 +31,13 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+    }
+
+    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mDrawer = (FingerDrawerView) mFragmentView.findViewById(R.id.FingerDrawer);
-        mDrawer.setListener(this);
         mButtonSave = (ImageButton) mFragmentView.findViewById(R.id.buttonSave);
         mButtonSave.setOnClickListener(this);
         mButtonColor = (ImageButton) mFragmentView.findViewById(R.id.buttonColor);
@@ -52,6 +51,14 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
         mTvResult = (TextView) mFragmentView.findViewById(R.id.tvResult);
 
         mRecognizer = new Recognizer(mListener.getGlobalSOM(), mListener.getMapNames());
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mDrawer = (FingerDrawerView) mFragmentView.findViewById(R.id.FingerDrawer);
+        mDrawer.setListener(this);
+        mDrawer.setDisplayListener(this);
     }
 
     @Override
@@ -102,4 +109,55 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
         mDrawer.emptyDrawer();
         mTvResult.setText("");
     }
+/*
+    private void updatePaintWidth() {
+        DisplayMetrics metrics = mListener.getScreenResolution();
+        int height = metrics.heightPixels;
+        int width = metrics.widthPixels;
+        if (height >= 480) {
+            if (height <= 800) {
+                FingerDrawerView.CurrentPaintSize = 5f;
+            } else {
+                if (height <= 854) {
+                    FingerDrawerView.CurrentPaintSize = 6f;
+                } else {
+                    if (height <= 960) {
+                        FingerDrawerView.CurrentPaintSize = 9f;
+                    } else {
+                        if (height <= 1024) {
+                            FingerDrawerView.CurrentPaintSize = 10f;
+                        } else {
+                            if (height <= 1280) {
+                                switch (width) {
+                                    case 800:
+                                        FingerDrawerView.CurrentPaintSize = 13f;
+                                        break;
+                                    case 768:
+                                        FingerDrawerView.CurrentPaintSize = 12f;
+                                        break;
+                                    default:
+                                        FingerDrawerView.CurrentPaintSize = 11f;
+                                        break;
+                                }
+                            } else {
+                                if (height <= 1400) {
+                                    FingerDrawerView.CurrentPaintSize = 15f;
+                                } else {
+                                    if (height <= 1824) {
+                                        FingerDrawerView.CurrentPaintSize = 17f;
+                                    } else {
+                                        if (height <= 1920) {
+                                            FingerDrawerView.CurrentPaintSize = (width <= 1200) ? 19f : 20f;
+                                        } else {
+                                            FingerDrawerView.CurrentPaintSize = 25f;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }*/
 }

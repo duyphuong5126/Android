@@ -12,17 +12,16 @@ import java.util.ArrayList;
 
 import duy.phuong.handnote.DTO.FloatingImage;
 import duy.phuong.handnote.Listener.BackPressListener;
-import duy.phuong.handnote.Listener.RecognitionCallback;
 import duy.phuong.handnote.MyView.DrawingView.FingerDrawerView;
 import duy.phuong.handnote.MyView.BitmapAdapter;
-import duy.phuong.handnote.MyView.DrawingView.MyPath;
 import duy.phuong.handnote.R;
+import duy.phuong.handnote.RecognitionAPI.BitmapProcessor;
 import duy.phuong.handnote.Support.SupportUtils;
 
 /**
  * Created by Phuong on 23/11/2015.
  */
-public class DrawingFragment extends BaseFragment implements View.OnClickListener, BackPressListener {
+public class DrawingFragment extends BaseFragment implements View.OnClickListener, BackPressListener{
     private GridView mListDetectedBitmap;
     private BitmapAdapter mBitmapAdapter;
     private ArrayList<Bitmap> mListBitmap;
@@ -63,7 +62,7 @@ public class DrawingFragment extends BaseFragment implements View.OnClickListene
         mListDetectedBitmap.setAdapter(mBitmapAdapter);
 
         mDrawer = (FingerDrawerView) mFragmentView.findViewById(R.id.FingerDrawer);
-        mDrawer.setListener(new RecognitionCallback() {
+        mDrawer.setListener(new BitmapProcessor.RecognitionCallback() {
             @Override
             public void onRecognizeSuccess(ArrayList<FloatingImage> listBitmaps) {
                 mListBitmap.clear();
@@ -73,6 +72,7 @@ public class DrawingFragment extends BaseFragment implements View.OnClickListene
                 }
             }
         });
+        mDrawer.setDisplayListener(this);
     }
 
     @Override

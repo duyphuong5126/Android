@@ -9,9 +9,8 @@ import java.util.Random;
  */
 public class Output {
     public double[] mWeights;
-    public double mCurrentMinDistance;
-    public String mCurrentLabel;
     public HashMap<String, Integer> mMapNames;
+    public int mCount = 0;
 
     public Output() {
         mWeights = new double[Input.VECTOR_DIMENSIONS];
@@ -63,17 +62,7 @@ public class Output {
         resetLabel();
     }
 
-    public int getCount() {
-        int result = 0;
-        for (Map.Entry<String, Integer> entry : mMapNames.entrySet()) {
-            result += entry.getValue();
-        }
-        return result;
-    }
-
     public void resetLabel() {
-        mCurrentMinDistance = 1000000000;
-        mCurrentLabel = "";
         resetMapName();
     }
 
@@ -83,32 +72,35 @@ public class Output {
         } else {
             mMapNames.clear();
         }
-        mMapNames.put("A", 0);
-        mMapNames.put("B", 0);
-        mMapNames.put("C", 0);
-        mMapNames.put("D", 0);
-        mMapNames.put("E", 0);
-        mMapNames.put("F", 0);
-        mMapNames.put("G", 0);
-        mMapNames.put("H", 0);
-        mMapNames.put("I", 0);
-        mMapNames.put("J", 0);
-        mMapNames.put("K", 0);
-        mMapNames.put("L", 0);
-        mMapNames.put("M", 0);
-        mMapNames.put("N", 0);
-        mMapNames.put("O", 0);
-        mMapNames.put("P", 0);
-        mMapNames.put("Q", 0);
-        mMapNames.put("R", 0);
-        mMapNames.put("S", 0);
-        mMapNames.put("T", 0);
-        mMapNames.put("W", 0);
-        mMapNames.put("U", 0);
-        mMapNames.put("V", 0);
-        mMapNames.put("X", 0);
-        mMapNames.put("Y", 0);
-        mMapNames.put("Z", 0);
+        mCount = 0;
+        mMapNames.put("A", 0);mMapNames.put("B", 0);
+        mMapNames.put("C", 0);mMapNames.put("D", 0);
+        mMapNames.put("E", 0);mMapNames.put("F", 0);
+        mMapNames.put("G", 0);mMapNames.put("H", 0);
+        mMapNames.put("I", 0);mMapNames.put("J", 0);
+        mMapNames.put("K", 0);mMapNames.put("L", 0);
+        mMapNames.put("M", 0);mMapNames.put("N", 0);
+        mMapNames.put("O", 0);mMapNames.put("P", 0);
+        mMapNames.put("Q", 0);mMapNames.put("R", 0);
+        mMapNames.put("S", 0);mMapNames.put("T", 0);
+        mMapNames.put("W", 0);mMapNames.put("U", 0);
+        mMapNames.put("V", 0);mMapNames.put("X", 0);
+        mMapNames.put("Y", 0);mMapNames.put("Z", 0);
+        mMapNames.put("a", 0);mMapNames.put("b", 0);
+        mMapNames.put("b1", 0);mMapNames.put("d", 0);
+        mMapNames.put("e", 0);mMapNames.put("f", 0);
+        mMapNames.put("g", 0);mMapNames.put("h", 0);
+        mMapNames.put("i", 0);mMapNames.put("j", 0);
+        mMapNames.put("k", 0);mMapNames.put("k1", 0);
+        mMapNames.put("l", 0);mMapNames.put("m", 0);
+        mMapNames.put("n", 0);mMapNames.put("q", 0);
+        mMapNames.put("r", 0);mMapNames.put("t", 0);
+        mMapNames.put("u", 0);mMapNames.put("y", 0);
+        mMapNames.put("1", 0);mMapNames.put("2", 0);
+        mMapNames.put("3", 0);mMapNames.put("4", 0);
+        mMapNames.put("5", 0);mMapNames.put("6", 0);
+        mMapNames.put("7", 0);mMapNames.put("8", 0);
+        mMapNames.put("9", 0);
     }
 
     private double randomWeight() {
@@ -123,9 +115,9 @@ public class Output {
         temp1 -= 50d;
         temp2 -= 50d;
 
-        //get number -0.1 -> 0.1
-        temp1 /= 500d;
-        temp2 /= 500d;
+        //get number -0.2 -> 0.2
+        temp1 /= 250d;
+        temp2 /= 250d;
 
         result += temp1 * temp2;
 
@@ -159,12 +151,7 @@ public class Output {
                 label += entry.getKey();
             }
         }
-
         return label;
-    }
-
-    public String getLabelInfo() {
-        return mCurrentLabel + ":" + mCurrentMinDistance;
     }
 
     @Override

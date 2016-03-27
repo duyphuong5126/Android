@@ -1,5 +1,7 @@
 package duy.phuong.handnote.Listener;
 
+import android.util.DisplayMetrics;
+
 import java.util.ArrayList;
 
 import duy.phuong.handnote.DTO.ClusterLabel;

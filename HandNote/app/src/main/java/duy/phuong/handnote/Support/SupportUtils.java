@@ -6,9 +6,11 @@ import android.graphics.Color;
 import android.os.Environment;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -126,5 +128,26 @@ public abstract class SupportUtils {
         byte[] data = new byte[stream.available()];
         stream.read(data);
         return new String(data);
+    }
+
+    public static String getStringData(String folder, String fileName) {
+        StringBuilder builder = new StringBuilder();
+        File file = new File(RootPath + ApplicationDirectory + folder + "/" + fileName);
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String s = "";
+            while ((s = reader.readLine()) != null) {
+                builder.append(s);
+                builder.append("\r\n");
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return "";
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+        return builder.toString();
     }
 }

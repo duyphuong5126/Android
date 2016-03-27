@@ -4,16 +4,18 @@ import android.app.Activity;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import duy.phuong.handnote.Listener.MainListener;
+import duy.phuong.handnote.MyView.DrawingView.FingerDrawerView;
 
 /**
  * Created by Phuong on 23/11/2015.
  */
-public abstract class BaseFragment extends Fragment {
+public abstract class BaseFragment extends Fragment implements FingerDrawerView.GetDisplayListener{
     public static final String DRAWING_FRAGMENT = "DrawingFragment";
     public static final String MAIN_FRAGMENT = "MainFragment";
     public static final String LEARNING_FRAGMENT = "LearningFragment";
@@ -36,4 +38,14 @@ public abstract class BaseFragment extends Fragment {
     }
 
     public abstract String fragmentIdentify();
+
+    @Override
+    public DisplayMetrics getScreenResolution() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        mActivity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        if (displayMetrics.heightPixels <= 480) {
+            mActivity.finish();
+        }
+        return displayMetrics;
+    }
 }
