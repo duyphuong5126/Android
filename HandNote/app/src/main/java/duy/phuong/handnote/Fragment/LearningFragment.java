@@ -40,14 +40,19 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
     private ArrayAdapter<String> mListFilesAdapter;
     private ScrollView mScrollProgress;
 
-    private LinearLayout mLayoutProgressing, mLayoutProgressInfo;
+    private LinearLayout mLayoutProgressing, mButtonProcess;
 
     private ImageButton mButtonResize, mButtonTrain;
+    private TextView mTvLogView;
 
     private int mCurrentImage;
     private Dialog mDialog;
 
     private boolean mShowErrorLogs;
+
+    private String mLog;
+
+    boolean isTraining;
 
     public LearningFragment() {
         mLayoutRes = R.layout.fragment_learning;
@@ -57,6 +62,7 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mTvLogView = (TextView) mFragmentView.findViewById(R.id.tvLogView);
         mListImages = (ListView) mFragmentView.findViewById(R.id.listFiles);
         mListFilesAdapter = new ArrayAdapter<>(mActivity, R.layout.item_text, mListResourcePaths);
         mListImages.setAdapter(mListFilesAdapter);
@@ -64,7 +70,8 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
         mButtonResize.setOnClickListener(this);
         mLayoutProgressing = (LinearLayout) mFragmentView.findViewById(R.id.layoutProcessing);
         mLayoutProgressing.setOnClickListener(this);
-        mLayoutProgressInfo = (LinearLayout) mFragmentView.findViewById(R.id.layoutInfo);
+        mButtonProcess = (LinearLayout) mFragmentView.findViewById(R.id.buttonProgress);
+        mButtonProcess.setOnClickListener(this);
         mButtonTrain = (ImageButton) mFragmentView.findViewById(R.id.buttonTrain);
         mButtonTrain.setOnClickListener(this);
         mScrollProgress = (ScrollView) mFragmentView.findViewById(R.id.scrProgress);
@@ -84,6 +91,8 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
         super.onActivityCreated(savedInstanceState);
         mListResourcePaths.addAll(SupportUtils.getListFilePaths("mnt/sdcard/Download"));
         mCurrentImage = 0;
+        mLog = "";
+        isTraining = false;
         switchMode();
     }
 
@@ -92,14 +101,22 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
         trainPaths.addAll(SupportUtils.getListFilePaths(SupportUtils.RootPath + SupportUtils.ApplicationDirectory + "Train"));
 
         if (!trainPaths.isEmpty()) {
-            mButtonResize.setVisibility(View.GONE);
-            mButtonTrain.setVisibility(View.VISIBLE);
+            if (isTraining) {
+                mButtonResize.setVisibility(View.GONE);
+                mButtonTrain.setVisibility(View.GONE);
+                mButtonProcess.setVisibility(View.VISIBLE);
+            } else {
+                mButtonResize.setVisibility(View.GONE);
+                mButtonTrain.setVisibility(View.VISIBLE);
+                mButtonProcess.setVisibility(View.GONE);
+            }
 
             mListResourcePaths.clear();
             mListResourcePaths.addAll(trainPaths);
         } else {
             mButtonResize.setVisibility(View.VISIBLE);
             mButtonTrain.setVisibility(View.GONE);
+            mButtonProcess.setVisibility(View.GONE);
         }
         mListFilesAdapter.notifyDataSetChanged();
     }
@@ -145,9 +162,9 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                 break;
 
             case R.id.buttonTrain:
+                Toast.makeText(mActivity, "Loading resources, please wait!", Toast.LENGTH_LONG).show();
                 final ArrayList<StandardImage> standardImages = new ArrayList<>();
                 mCurrentImage = mListResourcePaths.size();
-                Toast.makeText(mActivity, "Loading resources, please wait!", Toast.LENGTH_LONG).show();
                 final Handler handler = new Handler() {
                     @Override
                     public void handleMessage(Message msg) {
@@ -169,9 +186,12 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                                         Toast.makeText(mActivity, "Training begin", Toast.LENGTH_LONG).show();
                                         if (mShowErrorLogs) {
                                             learningWithLog(standardImages, number_of_iterations);
+                                            isTraining = true;
+                                            switchMode();
                                         } else {
                                             learningWithNoLog(standardImages, number_of_iterations);
                                         }
+
                                     }
                                 }
                             });
@@ -204,6 +224,11 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                 break;
 
             case R.id.layoutProcessing:
+                mLayoutProgressing.setVisibility(View.GONE);
+                break;
+
+            case R.id.buttonProgress:
+                mLayoutProgressing.setVisibility(View.VISIBLE);
                 break;
 
             default:
@@ -218,24 +243,20 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
 
     private void learningWithLog(ArrayList<StandardImage> standardImages, int number_of_iterations) {
         mLayoutProgressing.setVisibility(View.VISIBLE);
-        final LayoutInflater inflater = mActivity.getLayoutInflater();
+        mLog = "";
         PatternLearning patternLearning = new PatternLearning(standardImages, number_of_iterations);
         patternLearning.learn(new LearningListener() {
             @Override
             public void updateEpoch(Bundle bundle) {
                 if (bundle != null) {
-                    View epochView = inflater.inflate(R.layout.item_epoch, null);
-                    TextView tvEpoch = (TextView) epochView.findViewById(R.id.tvEpoch);
-                    tvEpoch.setText("Epoch: " + bundle.getInt("Epoch"));
-                    mLayoutProgressInfo.addView(epochView);
+                    mLog += "Epoch: " + bundle.getInt("Epoch") + "\n";
 
                     String info = bundle.getString("ListName");
                     if (info != null && !"".equals(info)) {
-                        View infoView = inflater.inflate(R.layout.item_infor_text, null);
-                        TextView tvInfo = (TextView) infoView.findViewById(R.id.tvInfoText);
-                        tvInfo.setText(info);
-                        mLayoutProgressInfo.addView(infoView);
+                        mLog += info + "\n\n";
                     }
+
+                    mTvLogView.setText(mLog);
 
                     mScrollProgress.post(new Runnable() {
                         @Override

@@ -45,6 +45,10 @@ public class FingerDrawerView extends View {
     private static int CurrentWidth = 0;
     private static int CurrentHeight = 0;
 
+    public interface GetDisplayListener {
+        DisplayMetrics getScreenResolution();
+    }
+
     private BitmapProcessor.RecognitionCallback mListener;
     private GetDisplayListener mDisplayListener;
 
@@ -348,9 +352,5 @@ public class FingerDrawerView extends View {
                 }
             }
         }
-    }
-
-    public interface GetDisplayListener {
-        DisplayMetrics getScreenResolution();
     }
 }

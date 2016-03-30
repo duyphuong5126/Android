@@ -43,6 +43,20 @@
                     android:visibility="gone"
                     android:background="@drawable/circle_heavy_red"
                     android:src="@mipmap/ic_android_white_36dp" />
+
+                <LinearLayout
+                    android:id="@+id/buttonProgress"
+                    android:layout_width="60dip"
+                    android:layout_height="60dip"
+                    android:visibility="gone"
+                    android:gravity="center">
+
+                    <ProgressBar
+                        android:layout_width="40dip"
+                        android:layout_height="40dip"
+                        android:background="@drawable/circle_heavy_red"
+                        android:src="@mipmap/ic_android_white_36dp" />
+                </LinearLayout>
             </FrameLayout>
         </LinearLayout>
 
@@ -65,9 +79,16 @@
                     android:id="@+id/layoutInfo"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="top">
+                    android:orientation="vertical">
 
+                    <TextView
+                        android:id="@+id/tvLogView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingLeft="5dip"
+                        android:textColor="#fff"
+                        android:textSize="15sp"
+                        android:gravity="top"/>
 
                 </LinearLayout>
             </ScrollView>

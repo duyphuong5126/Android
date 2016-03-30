@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import duy.phuong.handnote.DTO.Label;
+
 /**
  * Created by Phuong on 01/03/2016.
  */

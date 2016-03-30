@@ -2,6 +2,7 @@ package duy.phuong.handnote.RecognitionAPI;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -12,7 +13,9 @@ import duy.phuong.handnote.DTO.FloatingImage;
 import duy.phuong.handnote.DTO.StandardImage;
 import duy.phuong.handnote.RecognitionAPI.MachineLearning.Input;
 import duy.phuong.handnote.RecognitionAPI.MachineLearning.Output;
+import duy.phuong.handnote.RecognitionAPI.MachineLearning.PatternLearning;
 import duy.phuong.handnote.RecognitionAPI.MachineLearning.SOM;
+import duy.phuong.handnote.Support.SupportUtils;
 
 /**
  * Created by Phuong on 08/03/2016.
@@ -34,31 +37,48 @@ public class Recognizer {
         mProcessor = new BitmapProcessor();
     }
 
-    public String recognize(FloatingImage floatingImage) {
+    public Bundle recognize(FloatingImage floatingImage) {
         Bitmap bitmap = BitmapProcessor.resizeBitmap(floatingImage.mBitmap, StandardImage.WIDTH, StandardImage.HEIGHT);
         Input input = normalizeData(bitmap);
         Output[][] outputs = mMap.getOutputs();
 
         double min_distance = 10000000;
         int win_neuron = -1;
+        int win_neuron_X = -1; int win_neuron_Y = -1;
         for (int i = 0; i < outputs.length; i++) {
             for (int j = 0; j < outputs[i].length; j++) {
                 double dis = getDistance(input, outputs[i][j]);
                 if (dis < min_distance) {
                     min_distance = dis;
                     win_neuron = i * 11 + j;
+                    win_neuron_X = j; win_neuron_Y = i;
                 }
             }
         }
         if (win_neuron >= 0) {
             String result = mMapNames.get(win_neuron).getClusterLabel();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("input", input);
             if (result.length() == 1) {
-                return result;
+                bundle.putString("result", result);
             } else {
-                return mProcessor.featureExtraction(floatingImage, result);
+                bundle.putString("result", mProcessor.featureExtraction(floatingImage, result));
             }
+            if (win_neuron_X >= 0 && win_neuron_Y >= 0) {
+                bundle.putInt("cordX", win_neuron_X);
+                bundle.putInt("cordY", win_neuron_Y);
+            }
+            return bundle;
         }
-        return "";
+        return null;
+    }
+
+    public void overrideData() {
+        SupportUtils.writeFile(mMap.toString(), "Trained", "SOM.txt");
+    }
+
+    public void updateSOM(Input input, int x, int y) {
+        mMap.updateWeightVector(x, y, input, PatternLearning.INITIAL_LEARNING_RATE, 1);
     }
 
     protected Input normalizeData(Bitmap bitmap) {

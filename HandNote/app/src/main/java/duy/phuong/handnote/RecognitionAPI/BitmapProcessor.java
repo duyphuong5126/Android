@@ -74,34 +74,257 @@ public class BitmapProcessor {
         /*ArrayList<FloatingImage> resultBitmaps = new ArrayList<>();
         for (FloatingImage f : detectedBitmaps) {
             resultBitmaps.addAll(getSegments(f));
+            highLight(f.mBitmap,0, f.mBitmap.getWidth() - 1, (int) (f.mBitmap.getHeight() * 0.8d), f.mBitmap.getHeight() - 1);
+            resultBitmaps.add(f);
+        }*/
+
+        /*ArrayList<FloatingImage> resultBitmaps = new ArrayList<>();
+        for (FloatingImage f : detectedBitmaps) {
+            resultBitmaps.addAll(bottomUpSegmenting(f));
         }*/
         callback.onRecognizeSuccess(/*resultBitmaps.isEmpty()?detectedBitmaps:resultBitmaps*/detectedBitmaps);
 
         this.mListRectangle.clear();
     }
 
+    public static Bitmap copyImage(Bitmap src) {
+        Bitmap bitmap = Bitmap.createBitmap(src.getWidth(), src.getHeight(), Bitmap.Config.ARGB_8888);
+        for (int i = 0; i < src.getHeight(); i++) {
+            for (int j = 0; j < src.getWidth(); j++) {
+                bitmap.setPixel(j, i, src.getPixel(j, i));
+            }
+        }
+        return bitmap;
+    }
+
+    private ArrayList<FloatingImage> topDownSegmenting(FloatingImage floatingImage) {
+        ArrayList<FloatingImage> list = new ArrayList<>();
+        Bitmap src = copyImage(floatingImage.mBitmap);
+        Point point = null;
+        for (int row = 0; row < src.getHeight() && point == null; row++) {
+            if (countRowSegments(row, src) == 2) {
+                point = getInitialTopDownPoint(row, src);
+            }
+        }
+
+        if (point != null) {
+            boolean moved = false;
+            boolean end = false;
+            while (!end) {
+                int col = point.x;
+                int row = point.y;
+                src.setPixel(point.x, point.y, Color.RED);
+
+                if (row + 1 < src.getHeight()) {
+                    if (src.getPixel(col, row + 1) == Color.WHITE) {
+                        point = new Point(col, row + 1);
+                        moved = true;
+                    }
+                }
+
+                if (col + 1 < src.getWidth()) {
+                    if (src.getPixel(col + 1, row) == Color.WHITE && !moved) {
+                        point = new Point(col + 1, row);
+                        moved = true;
+                    }
+                }
+
+                if (col + 1 < src.getWidth() && row + 1 < src.getHeight() && !moved) {
+                    if (src.getPixel(col + 1, row + 1) == Color.WHITE) {
+                        point = new Point(col + 1, row + 1);
+                        moved = true;
+                    }
+                }
+
+                if (col - 1 >= 0 && row + 1 < src.getHeight()) {
+                    if (src.getPixel(col - 1, row + 1) == Color.WHITE && !moved) {
+                        point = new Point(col - 1, row + 1);
+                        moved = true;
+                    }
+                }
+
+                if (col - 1 >= 0) {
+                    if (src.getPixel(col - 1, row) == Color.WHITE && !moved) {
+                        point = new Point(col - 1, row);
+                        moved = true;
+                    }
+                }
+
+                if (moved) {
+                    moved = false;
+                } else {
+                    end = true;
+                }
+            }
+        }
+
+        if (point != null) {
+            if (point.x > 0 && point.y > 0) {
+                FloatingImage f1 = new FloatingImage();
+                f1.mBitmap = cropBitmap(floatingImage.mBitmap, 0, 0, point.x, floatingImage.mBitmap.getHeight());
+                list.add(f1);
+            }
+            FloatingImage f2 = new FloatingImage(); f2.mBitmap = cropBitmap(floatingImage.mBitmap, point.x + 1,
+                    0, floatingImage.mBitmap.getWidth() - point.x - 1, floatingImage.mBitmap.getHeight());
+            list.add(f2);
+            FloatingImage f3 = new FloatingImage(); f3.mBitmap = src; list.add(f3);
+        }
+        return list;
+    }
+
+    private ArrayList<FloatingImage> bottomUpSegmenting(FloatingImage floatingImage) {
+        ArrayList<FloatingImage> list = new ArrayList<>();
+        Bitmap src = copyImage(floatingImage.mBitmap);
+        Point point = null;
+        for (int row = 0; row < src.getHeight(); row++) {
+            if (countRowSegments(row, src) == 2) {
+                if (getInitialTopDownPoint(row, src) != null) {
+                    point = getInitialBottomUpPoint(row, src);
+                }
+            }
+        }
+
+        if (point != null) {
+            boolean moved = false;
+            boolean end = false;
+            while (!end) {
+                int col = point.x;
+                int row = point.y;
+                src.setPixel(point.x, point.y, Color.RED);
+
+                if (row - 1 >= 0) {
+                    if (src.getPixel(col, row - 1) == Color.WHITE) {
+                        point = new Point(col, row - 1);
+                        moved = true;
+                    }
+                }
+
+                if (col + 1 < src.getWidth()) {
+                    if (src.getPixel(col + 1, row) == Color.WHITE && !moved) {
+                        point = new Point(col + 1, row);
+                        moved = true;
+                    }
+                }
+
+                if (col + 1 < src.getWidth() && row - 1 >= 0 && !moved) {
+                    if (src.getPixel(col + 1, row - 1) == Color.WHITE) {
+                        point = new Point(col + 1, row - 1);
+                        moved = true;
+                    }
+                }
+
+                if (col - 1 >= 0 && row - 1 >= 0) {
+                    if (src.getPixel(col - 1, row - 1) == Color.WHITE && !moved) {
+                        point = new Point(col - 1, row - 1);
+                        moved = true;
+                    }
+                }
+
+                if (col - 1 >= 0) {
+                    if (src.getPixel(col - 1, row) == Color.WHITE && !moved) {
+                        point = new Point(col - 1, row);
+                        moved = true;
+                    }
+                }
+
+                if (moved) {
+                    moved = false;
+                } else {
+                    end = true;
+                }
+            }
+        }
+
+        if (point != null) {
+            if (point.x > 0 && point.y > 0) {
+                FloatingImage f1 = new FloatingImage();
+                f1.mBitmap = cropBitmap(floatingImage.mBitmap, 0, 0, point.x, floatingImage.mBitmap.getHeight());
+                list.add(f1);
+            }
+            FloatingImage f2 = new FloatingImage(); f2.mBitmap = cropBitmap(floatingImage.mBitmap, point.x + 1,
+                    0, floatingImage.mBitmap.getWidth() - point.x - 1, floatingImage.mBitmap.getHeight());
+            list.add(f2);
+            FloatingImage f3 = new FloatingImage(); f3.mBitmap = src; list.add(f3);
+        }
+        return list;
+    }
+
+    private Point getInitialTopDownPoint(int row, Bitmap src) {
+        boolean flag = false;
+        for (int i = 0; i < src.getWidth(); i++) {
+            if (src.getPixel(i, row) == Color.WHITE) {
+                if (flag) {
+                    return new Point(i, row);
+                }
+            } else {
+                flag = true;
+            }
+        }
+        return null;
+    }
+
+    private Point getInitialBottomUpPoint(int row, Bitmap src) {
+        boolean flag = false;
+        for (int i = src.getWidth() - 1; i >= 0; i--) {
+            if (src.getPixel(i, row) == Color.WHITE) {
+                if (flag) {
+                    return new Point(i, row);
+                }
+            } else {
+                flag = true;
+            }
+        }
+        return null;
+    }
+
+    private void highLight(Bitmap src, int startX, int endX, int startY, int endY) {
+        for (int i = startY; i <= endY; i++)
+            for (int j = startX; j <= endX; j++) {
+                if (src.getPixel(j, i) == Color.WHITE) {
+                    src.setPixel(j, i, Color.RED);
+                }
+            }
+    }
+
     private ArrayList<FloatingImage> getSegments(FloatingImage floatingImage) {
         ArrayList<FloatingImage> resultBitmaps = new ArrayList<>();
         Bitmap src = floatingImage.mBitmap;
-        int height = src.getHeight();
-
-        Rect rect = new Rect(); rect.top = 0; rect.bottom = src.getHeight() - 1; rect.left = 0;
-        boolean ready = false;
-        for (int i = 0; i < src.getWidth(); i++) {
-            if (getColumnHeight(src, i) >= 0.7 * height && countColumnSegments(i, src) == 1) {
-                rect.right = i;
-                if (ready) {
-                    FloatingImage fImage = new FloatingImage();
-                    fImage.mBitmap = cropBitmap(src, rect.left, rect.top, rect.width(), rect.height());
-                    resultBitmaps.add(fImage);
-                    rect.left = i;
-                    ready = false;
+        int height = src.getHeight(); double threshold = height * 0.8d;
+        ArrayList<Rect> listRect = new ArrayList<>();
+        boolean flag = true;
+        for (int i = 0; i < src.getWidth() - 1; i++) {
+            if (getColumnHeight(src, i) < threshold) {
+                int index = listRect.size() - 1;
+                if (flag) {
+                    listRect.add(new Rect(i, 0, i + 1, src.getHeight() - 1));
+                    flag = false;
+                } else {
+                    listRect.get(index).right = listRect.get(index).right + 1;
                 }
             } else {
-                if (!ready) {
-                    ready = true;
+                flag = true;
+            }
+        }
+
+        for (int i = 0; i < listRect.size() - 1; i++) {
+            if (listRect.get(i) != null) {
+                boolean stop = false;
+                for (int j = i + 1; j < listRect.size() && !stop; j++) {
+                    if (listRect.get(j).left - listRect.get(i).right <= 0.05d * src.getWidth()) {
+                        listRect.get(i).right = listRect.get(j).right;
+                        listRect.set(j, null);
+                    } else {
+                        stop = true;
+                    }
                 }
-                rect.right = i;
+            }
+        }
+
+        for (Rect rect : listRect) {
+            if (rect != null) {
+                FloatingImage fImage = new FloatingImage();
+                fImage.mBitmap = cropBitmap(src, rect.left, rect.top, rect.width(), rect.height());
+                resultBitmaps.add(fImage);
             }
         }
         return resultBitmaps;

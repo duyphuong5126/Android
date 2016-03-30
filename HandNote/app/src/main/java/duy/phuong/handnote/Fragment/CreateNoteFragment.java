@@ -1,19 +1,24 @@
 package duy.phuong.handnote.Fragment;
 
 import android.app.Activity;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import duy.phuong.handnote.DTO.FloatingImage;
 import duy.phuong.handnote.Listener.BackPressListener;
 import duy.phuong.handnote.MyView.DrawingView.FingerDrawerView;
 import duy.phuong.handnote.R;
 import duy.phuong.handnote.RecognitionAPI.BitmapProcessor;
+import duy.phuong.handnote.RecognitionAPI.MachineLearning.Input;
 import duy.phuong.handnote.RecognitionAPI.Recognizer;
 
 /**
@@ -25,6 +30,8 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
     private TextView mTvResult;
 
     private Recognizer mRecognizer;
+
+    private HashMap<Input, Point> mCurrentRecognized;
 
     public CreateNoteFragment() {
         mLayoutRes = R.layout.fragment_create_note;
@@ -59,6 +66,7 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
         mDrawer = (FingerDrawerView) mFragmentView.findViewById(R.id.FingerDrawer);
         mDrawer.setListener(this);
         mDrawer.setDisplayListener(this);
+        mCurrentRecognized = new HashMap<>();
     }
 
     @Override
@@ -79,6 +87,18 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonSave:
+                if (!mCurrentRecognized.isEmpty()) {
+                    for (Map.Entry<Input, Point> entry : mCurrentRecognized.entrySet()) {
+                        Point point = entry.getValue();
+                        mRecognizer.updateSOM(entry.getKey(), point.x, point.y);
+                    }
+                    mRecognizer.overrideData();
+                    mListener.initSOM();
+                    mRecognizer = new Recognizer(mListener.getGlobalSOM(), mListener.getMapNames());
+                    Toast.makeText(mActivity, "Update successfully", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(mActivity, "Nothing to update", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.buttonDelete:
                 deleteData();
@@ -97,8 +117,17 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
     @Override
     public void onRecognizeSuccess(ArrayList<FloatingImage> listBitmaps) {
         String text = "";
+        if (mCurrentRecognized == null) {
+            mCurrentRecognized = new HashMap<>();
+        } else {
+            mCurrentRecognized.clear();
+        }
         for (int i = 0; i < listBitmaps.size(); i++) {
-            String result = mRecognizer.recognize(listBitmaps.get(i));
+            Bundle bundle = mRecognizer.recognize(listBitmaps.get(i));
+            int x = bundle.getInt("cordX"); int y = bundle.getInt("cordY");
+            Input input = (Input) bundle.getSerializable("input");
+            String result = bundle.getString("result");
+            mCurrentRecognized.put(input, new Point(x, y));
             Log.d("Result", "bitmap " + i + " :" + result);
             text += result;
         }

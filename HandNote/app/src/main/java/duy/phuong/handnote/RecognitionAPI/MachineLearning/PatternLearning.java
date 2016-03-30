@@ -18,7 +18,7 @@ import duy.phuong.handnote.Support.SupportUtils;
 
 /*Kohonen Algorithm*/
 public class PatternLearning extends Recognizer {
-    private static final double INITIAL_LEARNING_RATE = 0.5;//the initial learning rate
+    public static final double INITIAL_LEARNING_RATE = 0.5;//the initial learning rate
     private static final double MAP_RADIUS = (SOM.NUMBERS_OF_CLUSTER / SOM.NUM_OF_ROW);
 
     private ArrayList<Input> mSamples;//training set
@@ -52,9 +52,9 @@ public class PatternLearning extends Recognizer {
             @Override
             protected Void doInBackground(Void... params) {
                 boolean converge = false;
-                for (int i = 0; i < mEpochs && !converge; i++) {
+                    for (int i = 0; i < mEpochs && !converge; i++) {
                     mMap.resetMapName();
-
+                    Log.d("Epoch", "" + i);
                     ArrayList<Input> inputs = new ArrayList<>();
                     inputs.addAll(mSamples);
 
@@ -368,12 +368,9 @@ public class PatternLearning extends Recognizer {
     }
 
     private boolean checkConverge() {
-        String result = "";
-        for (int i = 0; i < mMap.getOutputs().length && "".equals(result); i++) {
-            for (int j = 0; j < mMap.getOutputs()[i].length && "".equals(result); j++) {
+        for (int i = 0; i < mMap.getOutputs().length; i++) {
+            for (int j = 0; j < mMap.getOutputs()[i].length; j++) {
                 if (!(mMap.getOutputs()[i][j].mCount >= 50)) {
-                    result = mMap.getOutputs()[i][j].getNameList();
-                    Log.d("Wrong", result);
                     return false;
                 }
             }

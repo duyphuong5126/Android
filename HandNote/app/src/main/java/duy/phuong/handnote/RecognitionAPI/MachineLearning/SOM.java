@@ -41,12 +41,12 @@ public class SOM {
 
     public void updateLabelForCluster(int x, int y, String label) {
         //update map name by counting patterns
-        if (mOutputs[y][x].mMapNames.get(label) != null) {
-            mOutputs[y][x].mMapNames.put(label, mOutputs[y][x].mMapNames.get(label) + 1);
-            mOutputs[y][x].mCount++;
-        } else {
+        /*if (mOutputs[y][x].mMapNames.get(label) == null) {
             Log.d("Error", "Null at label: " + label);
-        }
+            return;
+        }*/
+        mOutputs[y][x].mMapNames.put(label, mOutputs[y][x].mMapNames.get(label) + 1);
+        mOutputs[y][x].mCount++;
     }
 
     public void resetMapName() {
@@ -57,10 +57,10 @@ public class SOM {
     }
 
     public boolean updateWeightVector(int x, int y, Input input, double learningRate, double neighborInfluence) {
-        if (y < 0 || y >= mOutputs.length || learningRate < 0 || input.mInputData.length != mOutputs[y][x].mWeights.length) {
+        /*if (y < 0 || y >= mOutputs.length || learningRate < 0 || input.mInputData.length != mOutputs[y][x].mWeights.length) {
             Log.e("Error", "Input data error!");
             return false;
-        }
+        }*/
 
         for (int i = 0; i < mOutputs[y][x].mWeights.length; i += 16) {
             mOutputs[y][x].mWeights[i] += (input.mInputData[i] - mOutputs[y][x].mWeights[i]) * learningRate * neighborInfluence;

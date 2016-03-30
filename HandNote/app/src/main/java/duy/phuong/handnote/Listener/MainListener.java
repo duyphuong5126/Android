@@ -16,4 +16,5 @@ public interface MainListener {
     void toggleMainBottomTabs(boolean show);
     SOM getGlobalSOM();
     ArrayList<ClusterLabel> getMapNames();
+    void initSOM();
 }

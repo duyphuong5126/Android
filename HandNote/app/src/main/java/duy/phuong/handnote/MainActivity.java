@@ -84,12 +84,12 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
 
         this.showFragment(BaseFragment.MAIN_FRAGMENT);
 
-        /*initMapNames();
+        initMapNames();
         initSOM();
-        Log.d("Done", "done");*/
+        Log.d("Done", "done");
     }
 
-    /*private void initMapNames() {
+    private void initMapNames() {
         mGlobalMapNames = new ArrayList<>();
         try {
             String data = SupportUtils.getStringData("Trained", "MapNames.txt");
@@ -120,9 +120,12 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
 
                     if (!strings.isEmpty()) {
                         for (String string : strings) {
-                            int count = Integer.valueOf(string.substring(2));
-                            if (count > 0) {
-                                clusterLabel.addNewLabel(new Label(string.substring(0, 1), count));
+                            String[] s = string.split(":");
+                            if (s.length == 2) {
+                                int count = Integer.valueOf(s[1]);
+                                if (count > 0) {
+                                    clusterLabel.addNewLabel(new Label(s[0], count));
+                                }
                             }
                         }
                     }
@@ -146,7 +149,8 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         Log.d("Sum: ", "" + sum);
     }
 
-    private void initSOM() {
+    @Override
+    public void initSOM() {
         try {
             String data = SupportUtils.getStringData("Trained", "SOM.txt");
             if (data.length() == 0) {
@@ -167,7 +171,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                 for (int i = 0; i < listTokens.size(); i++) {
                     String stringWeight = listTokens.get(i);
                     StringTokenizer stringTokenizer = new StringTokenizer(stringWeight, ";");
-                    if (stringTokenizer.countTokens() == Input.VECTOR_DIMENSIONS + 1) {
+                    if (stringTokenizer.countTokens() == Input.VECTOR_DIMENSIONS) {
                         int index = 0;
                         while (stringTokenizer.hasMoreTokens()) {
                             weightMatrix[i][index] = Double.valueOf(stringTokenizer.nextToken());
@@ -181,7 +185,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }*/
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
