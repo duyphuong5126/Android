@@ -20,6 +20,20 @@ public class SOM {
         init(weightMatrix);
     }
 
+    public SOM(SOM som) {
+        init(som);
+    }
+
+    private void init(SOM som) {
+        mOutputs = new Output[NUM_OF_ROW][NUMBERS_OF_CLUSTER / NUM_OF_ROW];
+        if (som.mOutputs.length == mOutputs.length && som.mOutputs[0].length == mOutputs[0].length) {
+            for (int i = 0; i < mOutputs.length; i++)
+                for (int j = 0; j < mOutputs[i].length; j++) {
+                    mOutputs[i][j] = new Output(som.mOutputs[i][j].mWeights);
+                }
+        }
+    }
+
     private void init() {
         mOutputs = new Output[NUM_OF_ROW][NUMBERS_OF_CLUSTER / NUM_OF_ROW];
         for (int i = 0; i < mOutputs.length; i++)
@@ -41,10 +55,6 @@ public class SOM {
 
     public void updateLabelForCluster(int x, int y, String label) {
         //update map name by counting patterns
-        /*if (mOutputs[y][x].mMapNames.get(label) == null) {
-            Log.d("Error", "Null at label: " + label);
-            return;
-        }*/
         mOutputs[y][x].mMapNames.put(label, mOutputs[y][x].mMapNames.get(label) + 1);
         mOutputs[y][x].mCount++;
     }
@@ -57,11 +67,6 @@ public class SOM {
     }
 
     public boolean updateWeightVector(int x, int y, Input input, double learningRate, double neighborInfluence) {
-        /*if (y < 0 || y >= mOutputs.length || learningRate < 0 || input.mInputData.length != mOutputs[y][x].mWeights.length) {
-            Log.e("Error", "Input data error!");
-            return false;
-        }*/
-
         for (int i = 0; i < mOutputs[y][x].mWeights.length; i += 16) {
             mOutputs[y][x].mWeights[i] += (input.mInputData[i] - mOutputs[y][x].mWeights[i]) * learningRate * neighborInfluence;
             mOutputs[y][x].mWeights[i + 1] += (input.mInputData[i + 1] - mOutputs[y][x].mWeights[i + 1]) * learningRate * neighborInfluence;

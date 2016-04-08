@@ -2,6 +2,8 @@ package duy.phuong.handnote.DTO;
 
 import android.graphics.Bitmap;
 
+import java.util.ArrayList;
+
 import duy.phuong.handnote.MyView.DrawingView.MyShape;
 
 /**
@@ -12,4 +14,5 @@ public class FloatingImage {
     public Bitmap mBitmap;
     public int mParentWidth;
     public int mParentHeight;
+    public ArrayList<Bitmap> mListContours;
 }

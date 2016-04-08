@@ -56,14 +56,9 @@ public class Recognizer {
             }
         }
         if (win_neuron >= 0) {
-            String result = mMapNames.get(win_neuron).getClusterLabel();
             Bundle bundle = new Bundle();
             bundle.putSerializable("input", input);
-            if (result.length() == 1) {
-                bundle.putString("result", result);
-            } else {
-                bundle.putString("result", mProcessor.featureExtraction(floatingImage, result));
-            }
+            bundle.putString("result", mProcessor.featureExtraction(floatingImage, mMapNames.get(win_neuron).getListLabel()));
             if (win_neuron_X >= 0 && win_neuron_Y >= 0) {
                 bundle.putInt("cordX", win_neuron_X);
                 bundle.putInt("cordY", win_neuron_Y);

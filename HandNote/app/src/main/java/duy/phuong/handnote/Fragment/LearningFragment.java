@@ -178,20 +178,19 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                                 public void onClick(View v) {
                                     String data = editText.getText().toString();
                                     int number_of_iterations = (("".equals(data)) ? 0 : Integer.valueOf(data));
-                                    mDialog.cancel();
 
                                     if (number_of_iterations <= 0) {
                                         Toast.makeText(mActivity, "Can't start the training", Toast.LENGTH_LONG).show();
                                     } else {
+                                        mDialog.dismiss();
                                         Toast.makeText(mActivity, "Training begin", Toast.LENGTH_LONG).show();
+                                        isTraining = true;
+                                        switchMode();
                                         if (mShowErrorLogs) {
                                             learningWithLog(standardImages, number_of_iterations);
-                                            isTraining = true;
-                                            switchMode();
                                         } else {
                                             learningWithNoLog(standardImages, number_of_iterations);
                                         }
-
                                     }
                                 }
                             });
@@ -237,14 +236,25 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
     }
 
     private void learningWithNoLog(ArrayList<StandardImage> standardImages, int number_of_iterations) {
-        PatternLearning patternLearning = new PatternLearning(standardImages, number_of_iterations);
+        PatternLearning patternLearning;
+        if (mListener.getGlobalSOM() != null) {
+            patternLearning = new PatternLearning(standardImages, number_of_iterations, mListener.getGlobalSOM());
+        } else {
+            patternLearning = new PatternLearning(standardImages, number_of_iterations);
+        }
         patternLearning.learn();
+        isTraining = false;
     }
 
     private void learningWithLog(ArrayList<StandardImage> standardImages, int number_of_iterations) {
         mLayoutProgressing.setVisibility(View.VISIBLE);
         mLog = "";
-        PatternLearning patternLearning = new PatternLearning(standardImages, number_of_iterations);
+        PatternLearning patternLearning;
+        if (mListener.getGlobalSOM() != null) {
+            patternLearning = new PatternLearning(standardImages, number_of_iterations, mListener.getGlobalSOM());
+        } else {
+            patternLearning = new PatternLearning(standardImages, number_of_iterations);
+        }
         patternLearning.learn(new LearningListener() {
             @Override
             public void updateEpoch(Bundle bundle) {
@@ -271,6 +281,8 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
             public void finish() {
                 Toast.makeText(mActivity, "Training done", Toast.LENGTH_LONG).show();
                 mLayoutProgressing.setVisibility(View.GONE);
+                isTraining = false;
+                switchMode();
             }
         });
     }

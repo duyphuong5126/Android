@@ -15,6 +15,7 @@ import java.util.Map;
 
 import duy.phuong.handnote.DTO.FloatingImage;
 import duy.phuong.handnote.Listener.BackPressListener;
+import duy.phuong.handnote.MainActivity;
 import duy.phuong.handnote.MyView.DrawingView.FingerDrawerView;
 import duy.phuong.handnote.R;
 import duy.phuong.handnote.RecognitionAPI.BitmapProcessor;
@@ -40,6 +41,9 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        if (activity.getClass() == MainActivity.class) {
+            mListener = (MainActivity) activity;
+        }
     }
 
     @Override
@@ -56,8 +60,6 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
         mButtonRedo = (ImageButton) mFragmentView.findViewById(R.id.buttonRedo);
         mButtonRedo.setOnClickListener(this);
         mTvResult = (TextView) mFragmentView.findViewById(R.id.tvResult);
-
-        mRecognizer = new Recognizer(mListener.getGlobalSOM(), mListener.getMapNames());
     }
 
     @Override
@@ -67,6 +69,7 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
         mDrawer.setListener(this);
         mDrawer.setDisplayListener(this);
         mCurrentRecognized = new HashMap<>();
+        mRecognizer = new Recognizer(mListener.getGlobalSOM(), mListener.getMapNames());
     }
 
     @Override
@@ -138,55 +141,4 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
         mDrawer.emptyDrawer();
         mTvResult.setText("");
     }
-/*
-    private void updatePaintWidth() {
-        DisplayMetrics metrics = mListener.getScreenResolution();
-        int height = metrics.heightPixels;
-        int width = metrics.widthPixels;
-        if (height >= 480) {
-            if (height <= 800) {
-                FingerDrawerView.CurrentPaintSize = 5f;
-            } else {
-                if (height <= 854) {
-                    FingerDrawerView.CurrentPaintSize = 6f;
-                } else {
-                    if (height <= 960) {
-                        FingerDrawerView.CurrentPaintSize = 9f;
-                    } else {
-                        if (height <= 1024) {
-                            FingerDrawerView.CurrentPaintSize = 10f;
-                        } else {
-                            if (height <= 1280) {
-                                switch (width) {
-                                    case 800:
-                                        FingerDrawerView.CurrentPaintSize = 13f;
-                                        break;
-                                    case 768:
-                                        FingerDrawerView.CurrentPaintSize = 12f;
-                                        break;
-                                    default:
-                                        FingerDrawerView.CurrentPaintSize = 11f;
-                                        break;
-                                }
-                            } else {
-                                if (height <= 1400) {
-                                    FingerDrawerView.CurrentPaintSize = 15f;
-                                } else {
-                                    if (height <= 1824) {
-                                        FingerDrawerView.CurrentPaintSize = 17f;
-                                    } else {
-                                        if (height <= 1920) {
-                                            FingerDrawerView.CurrentPaintSize = (width <= 1200) ? 19f : 20f;
-                                        } else {
-                                            FingerDrawerView.CurrentPaintSize = 25f;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }*/
 }

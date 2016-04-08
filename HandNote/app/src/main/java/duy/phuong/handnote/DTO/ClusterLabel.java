@@ -32,7 +32,7 @@ public class ClusterLabel {
     }
 
     public String getClusterLabel() {
-        double percent = 0.89d;
+        double percent = 1.0d;
         String l = "";
         for (Label label : mListLabel) {
             double p = getLabelPercentage(label);
@@ -74,6 +74,7 @@ public class ClusterLabel {
     }
 
     public ArrayList<Label> getListLabel() {
+        getClusterLabel();
         return mListLabel;
     }
 

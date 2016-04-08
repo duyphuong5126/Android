@@ -43,9 +43,6 @@ public abstract class BaseFragment extends Fragment implements FingerDrawerView.
     public DisplayMetrics getScreenResolution() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         mActivity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        if (displayMetrics.heightPixels <= 480) {
-            mActivity.finish();
-        }
         return displayMetrics;
     }
 }

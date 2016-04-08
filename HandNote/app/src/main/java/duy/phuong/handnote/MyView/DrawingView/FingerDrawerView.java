@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -76,8 +77,13 @@ public class FingerDrawerView extends View {
         updatePaintWidth();
         CurrentWidth = w;
         CurrentHeight = h;
-        mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        mCacheBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        try {
+            mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+            mCacheBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        } catch (OutOfMemoryError error) {
+            Log.d("Out of memory", "bitmap size exceeds VM budget");
+            Log.d("Size", "w: " + w + ", h: " + h);
+        }
 
         mCanvas = new Canvas(mBitmap);
         mCacheCanvas = new Canvas(mCacheBitmap);

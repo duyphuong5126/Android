@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -56,6 +55,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     private ArrayList<ClusterLabel> mGlobalMapNames;
 
     private String mCurrentUser = "Admin";
+    private String mFragmentName = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,11 +82,29 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
 
         mFragmentManager = getSupportFragmentManager();
 
-        this.showFragment(BaseFragment.MAIN_FRAGMENT);
-
         initMapNames();
         initSOM();
-        Log.d("Done", "done");
+        if (savedInstanceState != null) {
+            mFragmentName = savedInstanceState.getString("Fragment");
+            ArrayList<String> list = savedInstanceState.getStringArrayList("Stack");
+            if (list != null) {
+                for (int i = list.size() - 1; i >= 0; i--) {
+                    mStack.push(list.get(i));
+                }
+            }
+        }
+        if (mFragmentName == null || mFragmentName.length() == 0) {
+            mFragmentName = BaseFragment.MAIN_FRAGMENT;
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkScreen();
+        if (mFragmentManager.getBackStackEntryCount() <= 0) {
+            this.showFragment(mFragmentName);
+        }
     }
 
     private void initMapNames() {
@@ -94,15 +112,17 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         try {
             String data = SupportUtils.getStringData("Trained", "MapNames.txt");
             if (data.length() == 0) {
-                data = SupportUtils.getStringResource(this, R.raw.map_names);
+                data = SupportUtils.getStringResource(this, R.raw.map_names_ver_1);
                 SupportUtils.writeFile(data, "Trained", "MapNames.txt");
             }
             StringTokenizer tokenizer = new StringTokenizer(data, "\r\n");
             ArrayList<String> listTokens = new ArrayList<>();
             while (tokenizer.hasMoreTokens()) {
                 String token = tokenizer.nextToken();
-                if (token != null && !"".equals(token)) {
-                    listTokens.add(token);
+                if (token != null) {
+                    if (token.length() != 0) {
+                        listTokens.add(token);
+                    }
                 }
             }
 
@@ -154,7 +174,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         try {
             String data = SupportUtils.getStringData("Trained", "SOM.txt");
             if (data.length() == 0) {
-                data = SupportUtils.getStringResource(this, R.raw.som);
+                data = SupportUtils.getStringResource(this, R.raw.som_ver_1);
                 SupportUtils.writeFile(data, "Trained", "SOM.txt");
             }
             StringTokenizer tokenizer = new StringTokenizer(data, "|");
@@ -210,6 +230,17 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString("Fragment", mFragmentName);
+        ArrayList<String> list = new ArrayList<>();
+        while (!mStack.isEmpty()) {
+            list.add(mStack.pop());
+        }
+        outState.putStringArrayList("Stack", list);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     public void showFragment(String name) {
         BaseFragment baseFragment = null;
         switch (name) {
@@ -239,34 +270,36 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
             baseFragment.setListener(this);
             mStack.push(name);
             addFragment(baseFragment, baseFragment.fragmentIdentify());
+            mFragmentName = name;
         }
 
         checkScreen();
     }
 
     private void checkScreen() {
+        String name = "";
         if (!mStack.isEmpty()) {
-            String name = mStack.peek();
-            switch (name) {
-                case BaseFragment.DRAWING_FRAGMENT:
-                case BaseFragment.LEARNING_FRAGMENT:
-                case BaseFragment.CREATE_NOTE_FRAGMENT:
-                    this.toggleMainBottomTabs(false);
-                    break;
-                default:
-                    this.toggleMainBottomTabs(true);
-                    break;
-            }
+            name = mStack.peek();
+        }
+        switch (name) {
+            case BaseFragment.DRAWING_FRAGMENT:
+            case BaseFragment.LEARNING_FRAGMENT:
+            case BaseFragment.CREATE_NOTE_FRAGMENT:
+                this.toggleMainBottomTabs(false);
+                break;
+            default:
+                this.toggleMainBottomTabs(true);
+                break;
+        }
 
-            mTvAppTitle.setText(LanguageUtils.getFragmentTitle(name, this));
+        mTvAppTitle.setText(LanguageUtils.getFragmentTitle(name, this));
 
-            if (mStack.size() > 1) {
-                mButtonBack.setVisibility(View.VISIBLE);
-                mButtonNavigator.setVisibility(View.GONE);
-            } else {
-                mButtonBack.setVisibility(View.GONE);
-                mButtonNavigator.setVisibility(View.VISIBLE);
-            }
+        if (mStack.size() > 1) {
+            mButtonBack.setVisibility(View.VISIBLE);
+            mButtonNavigator.setVisibility(View.GONE);
+        } else {
+            mButtonBack.setVisibility(View.GONE);
+            mButtonNavigator.setVisibility(View.VISIBLE);
         }
     }
 
@@ -357,5 +390,14 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         transaction.replace(R.id.layoutFragmentContainer, fragment, name);
         transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mGlobalMapNames.clear();
+        mGlobalMapNames = null;
+        mGlobalSOM = null;
+        onSaveInstanceState(new Bundle());
+        super.onDestroy();
     }
 }
