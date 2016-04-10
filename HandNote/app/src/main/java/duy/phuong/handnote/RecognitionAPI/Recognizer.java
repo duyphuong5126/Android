@@ -6,10 +6,10 @@ import android.os.Bundle;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.StringTokenizer;
+import java.util.HashMap;
 
 import duy.phuong.handnote.DTO.ClusterLabel;
-import duy.phuong.handnote.DTO.FloatingImage;
+import duy.phuong.handnote.DTO.Character;
 import duy.phuong.handnote.DTO.StandardImage;
 import duy.phuong.handnote.RecognitionAPI.MachineLearning.Input;
 import duy.phuong.handnote.RecognitionAPI.MachineLearning.Output;
@@ -25,6 +25,16 @@ public class Recognizer {
     private ArrayList<ClusterLabel> mMapNames;
     private BitmapProcessor mProcessor;
 
+    private class Neuron {
+        public int position;
+        public double distance;
+
+        public Neuron(int position, double distance) {
+            this.position = position;
+            this.distance = distance;
+        }
+    }
+
     public Recognizer() {
         mMap = new SOM();
         mMapNames = new ArrayList<>();
@@ -37,35 +47,83 @@ public class Recognizer {
         mProcessor = new BitmapProcessor();
     }
 
-    public Bundle recognize(FloatingImage floatingImage) {
-        Bitmap bitmap = BitmapProcessor.resizeBitmap(floatingImage.mBitmap, StandardImage.WIDTH, StandardImage.HEIGHT);
+    public Bundle recognize(Character character) {
+        Bitmap bitmap = BitmapProcessor.resizeBitmap(character.mBitmap, StandardImage.WIDTH, StandardImage.HEIGHT);
         Input input = normalizeData(bitmap);
         Output[][] outputs = mMap.getOutputs();
+        mProcessor.resetMap();
 
-        double min_distance = 10000000;
-        int win_neuron = -1;
-        int win_neuron_X = -1; int win_neuron_Y = -1;
+        Neuron[] distance = new Neuron[SOM.NUMBERS_OF_CLUSTER];
+
         for (int i = 0; i < outputs.length; i++) {
             for (int j = 0; j < outputs[i].length; j++) {
                 double dis = getDistance(input, outputs[i][j]);
-                if (dis < min_distance) {
-                    min_distance = dis;
-                    win_neuron = i * 11 + j;
-                    win_neuron_X = j; win_neuron_Y = i;
-                }
+                int pos = i * 11 + j;
+                distance[pos]= new Neuron(pos, dis);
             }
         }
-        if (win_neuron >= 0) {
+
+        boolean end = false;
+        while (!end) {
+            boolean swapped = false;
+            for (int i = 1; i < distance.length; i++) {
+                if (distance[i].distance < distance[i - 1].distance) {
+                    distance[i].position += distance[i - 1].position;
+                    distance[i - 1].position = distance[i].position - distance[i - 1].position;
+                    distance[i].position -= distance[i - 1].position;
+
+                    double temp = distance[i].distance;
+                    distance[i].distance = distance[i - 1].distance;
+                    distance[i - 1].distance = temp;
+                    swapped = true;
+                }
+            }
+
+            if (!swapped) {
+                end = true;
+            }
+        }
+
+        int win_neuron = distance[0].position;
+        int win_neuron_X = win_neuron % 11; int win_neuron_Y = win_neuron / 11;
+        Bundle result = mProcessor.featureExtraction(character, mMapNames.get(win_neuron).getListLabel());
+        if (result.getBoolean("Result")) {
             Bundle bundle = new Bundle();
             bundle.putSerializable("input", input);
-            bundle.putString("result", mProcessor.featureExtraction(floatingImage, mMapNames.get(win_neuron).getListLabel()));
+            bundle.putString("result", result.getString("Char"));
             if (win_neuron_X >= 0 && win_neuron_Y >= 0) {
                 bundle.putInt("cordX", win_neuron_X);
                 bundle.putInt("cordY", win_neuron_Y);
             }
             return bundle;
+        } else {
+            for (int i = 0; i < distance.length; i++) {
+                int neuron = distance[i].position;
+                win_neuron_X = neuron % 11; win_neuron_Y = neuron / 11;
+                Bundle r = mProcessor.featureExtraction(character, mMapNames.get(neuron).getListLabel());
+                if (r.getBoolean("Result")) {
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("input", input);
+                    bundle.putString("result", r.getString("Char"));
+                    if (win_neuron_X >= 0 && win_neuron_Y >= 0) {
+                        bundle.putInt("cordX", win_neuron_X);
+                        bundle.putInt("cordY", win_neuron_Y);
+                    }
+                    return bundle;
+                }
+            }
         }
-        return null;
+
+        win_neuron = distance[0].position;
+        win_neuron_X = win_neuron % 11; win_neuron_Y = win_neuron / 11;
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("input", input);
+        bundle.putString("result", result.getString("Char"));
+        if (win_neuron_X >= 0 && win_neuron_Y >= 0) {
+            bundle.putInt("cordX", win_neuron_X);
+            bundle.putInt("cordY", win_neuron_Y);
+        }
+        return bundle;
     }
 
     public void overrideData() {

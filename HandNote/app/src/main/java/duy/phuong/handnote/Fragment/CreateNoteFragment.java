@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import duy.phuong.handnote.DTO.FloatingImage;
+import duy.phuong.handnote.DTO.Character;
+import duy.phuong.handnote.DTO.Line;
+import duy.phuong.handnote.DTO.Word;
 import duy.phuong.handnote.Listener.BackPressListener;
 import duy.phuong.handnote.MainActivity;
 import duy.phuong.handnote.MyView.DrawingView.FingerDrawerView;
@@ -118,23 +120,27 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
     }
 
     @Override
-    public void onRecognizeSuccess(ArrayList<FloatingImage> listBitmaps) {
-        String text = "";
+    public void onRecognizeSuccess(ArrayList<Character> listBitmaps) {
         if (mCurrentRecognized == null) {
             mCurrentRecognized = new HashMap<>();
         } else {
             mCurrentRecognized.clear();
         }
-        for (int i = 0; i < listBitmaps.size(); i++) {
-            Bundle bundle = mRecognizer.recognize(listBitmaps.get(i));
-            int x = bundle.getInt("cordX"); int y = bundle.getInt("cordY");
-            Input input = (Input) bundle.getSerializable("input");
-            String result = bundle.getString("result");
-            mCurrentRecognized.put(input, new Point(x, y));
-            Log.d("Result", "bitmap " + i + " :" + result);
-            text += result;
+
+        if (listBitmaps != null && listBitmaps.size() > 0) {
+            String text = "";
+            for (int i = 0; i < listBitmaps.size(); i++) {
+                Bundle bundle = mRecognizer.recognize(listBitmaps.get(i));
+                int x = bundle.getInt("cordX");
+                int y = bundle.getInt("cordY");
+                Input input = (Input) bundle.getSerializable("input");
+                String result = bundle.getString("result");
+                mCurrentRecognized.put(input, new Point(x, y));
+                Log.d("Result", "bitmap " + i + " :" + result);
+                text += result;
+            }
+            mTvResult.setText(text);
         }
-        mTvResult.setText(text);
     }
 
     private void deleteData() {

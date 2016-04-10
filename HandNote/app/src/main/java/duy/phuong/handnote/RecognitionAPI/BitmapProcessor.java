@@ -5,14 +5,15 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.os.Bundle;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import duy.phuong.handnote.DTO.FloatingImage;
-import duy.phuong.handnote.DTO.Label;
+import duy.phuong.handnote.DTO.*;
+import duy.phuong.handnote.DTO.Character;
 import duy.phuong.handnote.MyView.DrawingView.FingerDrawerView;
 import duy.phuong.handnote.MyView.DrawingView.MyPath;
 
@@ -26,13 +27,48 @@ import duy.phuong.handnote.MyView.DrawingView.MyPath;
 public class BitmapProcessor {
 
     public interface RecognitionCallback {
-        void onRecognizeSuccess(ArrayList<FloatingImage> listBitmaps);
+        void onRecognizeSuccess(ArrayList<Character> listBitmaps);
     }
+
+    public HashMap<String, Boolean> mMapFeatures;
 
     private ArrayList<Rect> mListRectangle;
 
     public BitmapProcessor() {
         mListRectangle = new ArrayList<>();
+        mMapFeatures = new HashMap<>();
+        resetMap();
+    }
+
+    public void resetMap() {
+        mMapFeatures.put("A", false);mMapFeatures.put("B", false);
+        mMapFeatures.put("C", false);mMapFeatures.put("D", false);
+        mMapFeatures.put("E", false);mMapFeatures.put("F", false);
+        mMapFeatures.put("G", false);mMapFeatures.put("H", false);
+        mMapFeatures.put("I", false);mMapFeatures.put("J", false);
+        mMapFeatures.put("K", false);mMapFeatures.put("L", false);
+        mMapFeatures.put("M", false);mMapFeatures.put("N", false);
+        mMapFeatures.put("O", false);mMapFeatures.put("P", false);
+        mMapFeatures.put("Q", false);mMapFeatures.put("R", false);
+        mMapFeatures.put("S", false);mMapFeatures.put("T", false);
+        mMapFeatures.put("W", false);mMapFeatures.put("U", false);
+        mMapFeatures.put("V", false);mMapFeatures.put("X", false);
+        mMapFeatures.put("Y", false);mMapFeatures.put("Z", false);
+        mMapFeatures.put("a", false);mMapFeatures.put("b", false);
+        mMapFeatures.put("b1", false);mMapFeatures.put("d", false);
+        mMapFeatures.put("e", false);mMapFeatures.put("f", false);
+        mMapFeatures.put("g", false);mMapFeatures.put("h", false);
+        mMapFeatures.put("i", false);mMapFeatures.put("j", false);
+        mMapFeatures.put("k", false);mMapFeatures.put("k1", false);
+        mMapFeatures.put("l", false);mMapFeatures.put("m", false);
+        mMapFeatures.put("n", false);mMapFeatures.put("q", false);
+        mMapFeatures.put("r", false);mMapFeatures.put("t", false);
+        mMapFeatures.put("u", false);mMapFeatures.put("y", false);
+        mMapFeatures.put("1", false);mMapFeatures.put("2", false);
+        mMapFeatures.put("3", false);mMapFeatures.put("4", false);
+        mMapFeatures.put("5", false);mMapFeatures.put("6", false);
+        mMapFeatures.put("7", false);mMapFeatures.put("8", false);
+        mMapFeatures.put("9", false);
     }
 
     public static Bitmap resizeBitmap(Bitmap bitmap, int newWidth, int newHeight) {
@@ -71,30 +107,31 @@ public class BitmapProcessor {
         return null;
     }
 
-    public void onDetectCharacter(final FloatingImage floatingImage, RecognitionCallback callback) {
-        this.mListRectangle.addAll(detectAreasOnBitmap(floatingImage.mBitmap, 0, 0));
+    public void onDetectCharacter(final Character character, RecognitionCallback callback) {
+        this.mListRectangle.addAll(detectAreasOnBitmap(character.mBitmap, 0, 0));
 
-        ArrayList<FloatingImage> detectedBitmaps = new ArrayList<>();
+        ArrayList<Character> detectedBitmaps = new ArrayList<>();
         for (Rect rect : mListRectangle) {
-            FloatingImage floatingImage1 = new FloatingImage();
-            floatingImage1.mBitmap = cropBitmap(floatingImage.mBitmap, rect.left, rect.top, rect.width(), rect.height());
-            floatingImage1.mMyShape = floatingImage.mMyShape;
-            floatingImage1.mParentHeight = floatingImage.mParentHeight;
-            floatingImage1.mParentWidth = floatingImage.mParentWidth;
-            detectedBitmaps.add(floatingImage1);
+            Character character1 = new Character();
+            character1.mBitmap = cropBitmap(character.mBitmap, rect.left, rect.top, rect.width(), rect.height());
+            character1.mMyShape = character.mMyShape;
+            character1.mParentHeight = character.mParentHeight;
+            character1.mParentWidth = character.mParentWidth;
+            character1.mRect = rect;
+            detectedBitmaps.add(character1);
         }
 
-        /*ArrayList<FloatingImage> resultBitmaps = new ArrayList<>();
-        for (FloatingImage f : detectedBitmaps) {
+        /*ArrayList<Character> resultBitmaps = new ArrayList<>();
+        for (Character f : detectedBitmaps) {
             resultBitmaps.addAll(getSegments(f));
             highLight(f.mBitmap,0, f.mBitmap.getWidth() - 1, (int) (f.mBitmap.getHeight() * 0.8d), f.mBitmap.getHeight() - 1);
             resultBitmaps.add(f);
         }*/
 
-        /*ArrayList<FloatingImage> resultBitmaps = new ArrayList<>();
-        for (FloatingImage f : detectedBitmaps) {
+        /*ArrayList<Character> resultBitmaps = new ArrayList<>();
+        for (Character f : detectedBitmaps) {
             for (Bitmap bitmap : findContour(f.mBitmap)) {
-                FloatingImage fContour = new FloatingImage();
+                Character fContour = new Character();
                 fContour.mBitmap = bitmap;
                 resultBitmaps.add(fContour);
             }
@@ -114,9 +151,9 @@ public class BitmapProcessor {
         return bitmap;
     }
 
-    private ArrayList<FloatingImage> topDownSegmenting(FloatingImage floatingImage) {
-        ArrayList<FloatingImage> list = new ArrayList<>();
-        Bitmap src = copyImage(floatingImage.mBitmap);
+    private ArrayList<Character> topDownSegmenting(Character character) {
+        ArrayList<Character> list = new ArrayList<>();
+        Bitmap src = copyImage(character.mBitmap);
         Point point = null;
         for (int row = 0; row < src.getHeight() && point == null; row++) {
             if (countRowSegments(row, src) == 2) {
@@ -177,25 +214,25 @@ public class BitmapProcessor {
 
         if (point != null) {
             if (point.x > 0 && point.y > 0) {
-                FloatingImage f1 = new FloatingImage();
-                f1.mBitmap = cropBitmap(floatingImage.mBitmap, 0, 0, point.x, floatingImage.mBitmap.getHeight());
+                Character f1 = new Character();
+                f1.mBitmap = cropBitmap(character.mBitmap, 0, 0, point.x, character.mBitmap.getHeight());
                 list.add(f1);
             }
-            FloatingImage f2 = new FloatingImage();
-            f2.mBitmap = cropBitmap(floatingImage.mBitmap, point.x + 1,
-                    0, floatingImage.mBitmap.getWidth() - point.x - 1, floatingImage.mBitmap.getHeight());
+            Character f2 = new Character();
+            f2.mBitmap = cropBitmap(character.mBitmap, point.x + 1,
+                    0, character.mBitmap.getWidth() - point.x - 1, character.mBitmap.getHeight());
             list.add(f2);
-            FloatingImage f3 = new FloatingImage();
+            Character f3 = new Character();
             f3.mBitmap = src;
             list.add(f3);
         }
         return list;
     }
 
-    private ArrayList<FloatingImage> bottomUpSegmenting(FloatingImage floatingImage) {
-        ArrayList<FloatingImage> list = new ArrayList<>();
-        Bitmap original = floatingImage.mBitmap;
-        Bitmap src = copyImage(floatingImage.mBitmap);
+    private ArrayList<Character> bottomUpSegmenting(Character character) {
+        ArrayList<Character> list = new ArrayList<>();
+        Bitmap original = character.mBitmap;
+        Bitmap src = copyImage(character.mBitmap);
         Point point = null;
         for (int row = 0; row < src.getHeight(); row++) {
             if (countRowSegments(row, src) == 2) {
@@ -269,9 +306,9 @@ public class BitmapProcessor {
 
         if (point != null) {
             if (point.x > 0 && point.y > 0) {
-                FloatingImage f1 = new FloatingImage();
-                Bitmap bmp = /*cropBitmap(floatingImage.mBitmap, 0, 0, point.x, floatingImage.mBitmap.getHeight())*/
-                        Bitmap.createBitmap(floatingImage.mBitmap.getWidth(), floatingImage.mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                Character f1 = new Character();
+                Bitmap bmp = /*cropBitmap(character.mBitmap, 0, 0, point.x, character.mBitmap.getHeight())*/
+                        Bitmap.createBitmap(character.mBitmap.getWidth(), character.mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
                 for (Point p : points) {
                     for (int i = 0; i <= p.x; i++) {
                         bmp.setPixel(i, p.y, original.getPixel(i, p.y));
@@ -284,15 +321,15 @@ public class BitmapProcessor {
                 list1.addAll(detectAreasOnBitmap(bmp, 0, 0));
                 if (!list1.isEmpty()) {
                     for (Rect rect : list1) {
-                        f1.mBitmap = cropBitmap(floatingImage.mBitmap, rect.left, rect.top, rect.width(), rect.height());
+                        f1.mBitmap = cropBitmap(character.mBitmap, rect.left, rect.top, rect.width(), rect.height());
                     }
                 }
                 list.add(f1);
             }
-            FloatingImage f2 = new FloatingImage(); /*f2.mBitmap = cropBitmap(floatingImage.mBitmap, point.x + 1,
-                    0, floatingImage.mBitmap.getWidth() - point.x - 1, floatingImage.mBitmap.getHeight());*/
+            Character f2 = new Character(); /*f2.mBitmap = cropBitmap(character.mBitmap, point.x + 1,
+                    0, character.mBitmap.getWidth() - point.x - 1, character.mBitmap.getHeight());*/
             Bitmap bmp =
-                    Bitmap.createBitmap(floatingImage.mBitmap.getWidth(), floatingImage.mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                    Bitmap.createBitmap(character.mBitmap.getWidth(), character.mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
             for (Point p : points) {
                 for (int i = 0; i <= p.x; i++) {
                     bmp.setPixel(i, p.y, Color.WHITE);
@@ -305,11 +342,11 @@ public class BitmapProcessor {
             list1.addAll(detectAreasOnBitmap(bmp, 0, 0));
             if (!list1.isEmpty()) {
                 for (Rect rect : list1) {
-                    f2.mBitmap = cropBitmap(floatingImage.mBitmap, rect.left, rect.top, rect.width(), rect.height());
+                    f2.mBitmap = cropBitmap(character.mBitmap, rect.left, rect.top, rect.width(), rect.height());
                 }
             }
             list.add(f2);
-            FloatingImage f3 = new FloatingImage();
+            Character f3 = new Character();
             f3.mBitmap = src;
             list.add(f3);
         }
@@ -353,9 +390,9 @@ public class BitmapProcessor {
             }
     }
 
-    private ArrayList<FloatingImage> getSegments(FloatingImage floatingImage) {
-        ArrayList<FloatingImage> resultBitmaps = new ArrayList<>();
-        Bitmap src = floatingImage.mBitmap;
+    private ArrayList<Character> getSegments(Character character) {
+        ArrayList<Character> resultBitmaps = new ArrayList<>();
+        Bitmap src = character.mBitmap;
         int height = src.getHeight();
         double threshold = height * 0.8d;
         ArrayList<Rect> listRect = new ArrayList<>();
@@ -390,7 +427,7 @@ public class BitmapProcessor {
 
         for (Rect rect : listRect) {
             if (rect != null) {
-                FloatingImage fImage = new FloatingImage();
+                Character fImage = new Character();
                 fImage.mBitmap = cropBitmap(src, rect.left, rect.top, rect.width(), rect.height());
                 resultBitmaps.add(fImage);
             }
@@ -637,19 +674,19 @@ public class BitmapProcessor {
         return count;
     }
 
-    private int triangleFromBot(FloatingImage floatingImage) {
-        Point lastBlack = getLastBlackPixel(floatingImage.mBitmap);
+    private int triangleFromBot(Character character) {
+        Point lastBlack = getLastBlackPixel(character.mBitmap);
         if (lastBlack == null) {
             return -1;
         }
 
-        int bothStart = getBothSideStartRow(floatingImage.mBitmap);
+        int bothStart = getBothSideStartRow(character.mBitmap);
 
         if (bothStart >= 0) {
-            int width = getBlankCounts(bothStart, floatingImage.mBitmap);
+            int width = getBlankCounts(bothStart, character.mBitmap);
             int decrease = 0, increase = 0;
             for (int i = bothStart; i <= lastBlack.y; i++) {
-                int w = getBlankCounts(i, floatingImage.mBitmap);
+                int w = getBlankCounts(i, character.mBitmap);
 
                 if (w < width) {
                     decrease++;
@@ -680,22 +717,22 @@ public class BitmapProcessor {
         return closedTop || closedBot;
     }
 
-    private int triangleFromTop(FloatingImage floatingImage) {
-        if (!verticalClosed(floatingImage.mBitmap)) {
+    private int triangleFromTop(Character character) {
+        if (!verticalClosed(character.mBitmap)) {
             return -1;
         }
-        Point firstBlack = getFirstBlackPixel(floatingImage.mBitmap);
+        Point firstBlack = getFirstBlackPixel(character.mBitmap);
         if (firstBlack == null) {
             return -1;
         }
 
-        int bothEnd = getBothSideEndRow(floatingImage.mBitmap);
+        int bothEnd = getBothSideEndRow(character.mBitmap);
 
         if (bothEnd >= 0) {
-            int width = getBlankCounts(bothEnd, floatingImage.mBitmap);
+            int width = getBlankCounts(bothEnd, character.mBitmap);
             int decrease = 0, increase = 0;
             for (int i = bothEnd - 1; i >= firstBlack.y; i--) {
-                int w = getBlankCounts(i, floatingImage.mBitmap);
+                int w = getBlankCounts(i, character.mBitmap);
 
                 if (w < width) {
                     decrease++;
@@ -715,21 +752,24 @@ public class BitmapProcessor {
         return 0;
     }
 
-    private int connectedComponentTop(FloatingImage floatingImage) {
-        int fragmentHeight = floatingImage.mBitmap.getHeight() / 3;
+    private int connectedComponentTop(Character character) {
+        int fragmentHeight = character.mBitmap.getHeight() / 3;
         int startAbove = 0;
-        Bitmap fragmentAbove = cropBitmap(floatingImage.mBitmap, 0, startAbove, floatingImage.mBitmap.getWidth(), fragmentHeight);
+        Bitmap fragmentAbove = cropBitmap(character.mBitmap, 0, startAbove, character.mBitmap.getWidth(), fragmentHeight);
         if (fragmentAbove != null) {
             return detectAreasOnBitmap(fragmentAbove, 0, 0).size();
         }
         return 0;
     }
 
-    private int connectedComponentBot(FloatingImage floatingImage) {
-        int fragmentHeight = floatingImage.mBitmap.getHeight() / 3;
-        int startBelow = floatingImage.mBitmap.getHeight() - fragmentHeight - 1;
-        Bitmap fragmentBelow = cropBitmap(floatingImage.mBitmap, 0, startBelow, floatingImage.mBitmap.getWidth(), fragmentHeight);
-        return detectAreasOnBitmap(fragmentBelow, 0, 0).size();
+    private int connectedComponentBot(Character character) {
+        int fragmentHeight = character.mBitmap.getHeight() / 3;
+        int startBelow = character.mBitmap.getHeight() - fragmentHeight - 1;
+        Bitmap fragmentBelow = cropBitmap(character.mBitmap, 0, startBelow, character.mBitmap.getWidth(), fragmentHeight);
+        if (fragmentBelow != null) {
+            return detectAreasOnBitmap(fragmentBelow, 0, 0).size();
+        }
+        return 0;
     }
 
     private Point getFirstBackFromBot(Bitmap src, int col) {
@@ -975,382 +1015,718 @@ public class BitmapProcessor {
         return list;
     }
 
-    public String featureExtraction(FloatingImage floatingImage, ArrayList<Label> list) {
-        floatingImage.mListContours = findContour(floatingImage.mBitmap);
+    public Bundle featureExtraction(Character character, ArrayList<Label> list) {
+        character.mListContours = findContour(character.mBitmap);
+        character.mListRectContour = new ArrayList<>();
+        ArrayList<Bitmap> contours = character.mListContours;
+        if (contours.size() == 2) {
+            ArrayList<Rect> r1 = detectAreasOnBitmap(contours.get(0), 0, 0);
+            ArrayList<Rect> r2 = detectAreasOnBitmap(contours.get(1), 0, 0);
+
+            if (r1 != null && r2 != null) {
+                if (r1.size() == 1 && r2.size() == 1) {
+                    Rect rSmall = (r1.get(0).width() > r2.get(0).width()) ? r2.get(0) : r1.get(0);
+                    Rect rBig = (r1.get(0).width() <= r2.get(0).width()) ? r2.get(0) : r1.get(0);
+                    character.mListRectContour.add(rSmall);
+                    character.mListRectContour.add(rBig);
+                }
+            }
+        } else {
+            if (contours.size() == 3) {
+                ArrayList<Rect> r1 = detectAreasOnBitmap(contours.get(0), 0, 0);
+                ArrayList<Rect> r2 = detectAreasOnBitmap(contours.get(1), 0, 0);
+                ArrayList<Rect> r3 = detectAreasOnBitmap(contours.get(2), 0, 0);
+                if (r1 != null && r2 != null && r3 != null) {
+                    if (r1.size() == 1 && r2.size() == 1 && r3.size() == 1) {
+                        Rect rMin = null;
+                        Rect r = null;
+                        Rect rBig = null;
+                        if (r1.get(0).width() > r2.get(0).width() && r2.get(0).width() > r3.get(0).width()) {
+                            r = r2.get(0);
+                            rMin = r3.get(0);
+                            rBig = r1.get(0);
+                        }
+                        if (r1.get(0).width() > r3.get(0).width() && r3.get(0).width() > r2.get(0).width()) {
+                            r = r3.get(0);
+                            rMin = r2.get(0);
+                            rBig = r1.get(0);
+                        }
+                        if (r2.get(0).width() > r1.get(0).width() && r1.get(0).width() > r3.get(0).width()) {
+                            r = r1.get(0);
+                            rMin = r3.get(0);
+                            rBig = r2.get(0);
+                        }
+                        if (r2.get(0).width() > r3.get(0).width() && r3.get(0).width() > r1.get(0).width()) {
+                            r = r3.get(0);
+                            rMin = r1.get(0);
+                            rBig = r2.get(0);
+                        }
+                        if (r3.get(0).width() > r1.get(0).width() && r1.get(0).width() > r2.get(0).width()) {
+                            r = r1.get(0);
+                            rMin = r2.get(0);
+                            rBig = r3.get(0);
+                        }
+                        if (r3.get(0).width() > r2.get(0).width() && r2.get(0).width() > r1.get(0).width()) {
+                            r = r2.get(0);
+                            rMin = r1.get(0);
+                            rBig = r3.get(0);
+                        }
+
+                        if (rMin != null && rBig != null && r != null) {
+                            character.mListRectContour.add(rMin);
+                            character.mListRectContour.add(r);
+                            character.mListRectContour.add(rBig);
+                        }
+                    }
+                }
+            }
+        }
         for (int i = 0; i < list.size(); i++) {
             String string = list.get(i).getLabel();
+            Bundle bundle = new Bundle();
+            bundle.putString("Char", string);
             switch (string) {
                 case "A":
-                    if (isA(floatingImage)) {
-                        return "A";
+                    if (!mMapFeatures.get("A")) {
+                        mMapFeatures.put("A", true);
+                    }
+                    if (isA(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
                 case "a":
-                    if (isa(floatingImage)) {
-                        return "a";
+                    if (!mMapFeatures.get("a")) {
+                        mMapFeatures.put("a", true);
+                    }
+                    if (isa(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "B":
-                    if (isB(floatingImage)) {
-                        return "B";
+                    if (!mMapFeatures.get("B")) {
+                        mMapFeatures.put("B", true);
+                    }
+                    if (isB(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "b":
-                    if (isb(floatingImage)) {
-                        return "b";
-                    } else {
-                        if (isb1(floatingImage)) {
+                    if (!mMapFeatures.get("b")) {
+                        mMapFeatures.put("b", true);
+                    }
+                    if (isb(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
+                    } /*else {
+                        if (isb1(character)) {
                             return "b1";
                         }
-                    }
+                    }*/
                     break;
 
                 case "b1":
-                    if (isb1(floatingImage)) {
-                        return "b1";
-                    } else {
-                        if (isk1(floatingImage)) {
+                    if (!mMapFeatures.get("b1")) {
+                        mMapFeatures.put("b1", true);
+                    }
+                    if (isb1(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
+                    } /*else {
+                        if (isk1(character)) {
                             return "k1";
                         }
-                    }
+                    }*/
                     break;
 
                 case "C":
-                    if (isC(floatingImage)) {
-                        return "C";
+                    if (!mMapFeatures.get("C")) {
+                        mMapFeatures.put("C", true);
+                    }
+                    if (isC(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "D":
-                    if (isD(floatingImage)) {
-                        return "D";
+                    if (!mMapFeatures.get("D")) {
+                        mMapFeatures.put("D", true);
+                    }
+                    if (isD(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "d":
-                    if (isd(floatingImage)) {
-                        return "d";
-                    } else {
-                        if (isU(floatingImage)) {
+                    if (!mMapFeatures.get("d")) {
+                        mMapFeatures.put("d", true);
+                    }
+                    if (isd(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
+                    } /*else {
+                        if (isA(character)) {
+                            return "A";
+                        }
+                        if (isa(character)) {
+                            return "a";
+                        }
+                        if (isU(character)) {
                             return "U";
                         }
-                        if (isb1(floatingImage)) {
+                        if (isb1(character)) {
                             return "b1";
                         }
-                    }
+                    }*/
                     break;
 
                 case "E":
-                    if (isE(floatingImage)) {
-                        return "E";
+                    if (!mMapFeatures.get("E")) {
+                        mMapFeatures.put("E", true);
+                    }
+                    if (isE(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "e":
-                    if (ise(floatingImage)) {
-                        return "e";
-                    } else {
-                        if (isC(floatingImage)) {
+                    if (!mMapFeatures.get("e")) {
+                        mMapFeatures.put("e", true);
+                    }
+                    if (ise(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
+                    } /*else {
+                        if (isC(character)) {
                             return "C";
                         }
-                    }
+                    }*/
                     break;
 
                 case "F":
-                    if (isF(floatingImage)) {
-                        return "F";
+                    if (!mMapFeatures.get("F")) {
+                        mMapFeatures.put("F", true);
+                    }
+                    if (isF(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "f":
-                    if (isf(floatingImage)) {
-                        return "f";
-                    } else {
-                        if (isb1(floatingImage)) {
+                    if (!mMapFeatures.get("f")) {
+                        mMapFeatures.put("f", true);
+                    }
+                    if (isf(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
+                    } /*else {
+                        if (isb1(character)) {
                             return "b1";
                         }
-                    }
+                    }*/
                     break;
 
                 case "G":
-                    if (isG(floatingImage)) {
-                        return "G";
+                    if (!mMapFeatures.get("G")) {
+                        mMapFeatures.put("G", true);
+                    }
+                    if (isG(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "g":
-                    if (isg(floatingImage)) {
-                        return "g";
+                    if (!mMapFeatures.get("g")) {
+                        mMapFeatures.put("g", true);
+                    }
+                    if (isg(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "H":
-                    if (isH(floatingImage)) {
-                        return "H";
+                    if (!mMapFeatures.get("H")) {
+                        mMapFeatures.put("H", true);
                     }
+                    if (isH(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
+                    } /*else {
+                        if (isA(character)) {
+                            return "A";
+                        }
+                    }*/
                     break;
 
                 case "h":
-                    if (ish(floatingImage)) {
-                        return "h";
+                    if (!mMapFeatures.get("h")) {
+                        mMapFeatures.put("h", true);
                     }
+                    if (ish(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
+                    } /*else {
+                        if (isA(character)) {
+                            return "A";
+                        }
+                    }*/
                     break;
 
                 case "I":
-                    if (isI(floatingImage)) {
-                        return "I";
+                    if (!mMapFeatures.get("I")) {
+                        mMapFeatures.put("I", true);
+                    }
+                    if (isI(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "i":
-                    if (isi(floatingImage)) {
-                        return "i";
+                    if (!mMapFeatures.get("i")) {
+                        mMapFeatures.put("i", true);
+                    }
+                    if (isi(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "J":
-                    if (isJ(floatingImage)) {
-                        return "J";
+                    if (!mMapFeatures.get("J")) {
+                        mMapFeatures.put("J", true);
+                    }
+                    if (isJ(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "j":
-                    if (isj(floatingImage)) {
-                        return "j";
-                    } else {
-                        if (isU(floatingImage)) {
+                    if (!mMapFeatures.get("j")) {
+                        mMapFeatures.put("j", true);
+                    }
+                    if (isj(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
+                    } /*else {
+                        if (isU(character)) {
                             return "U";
                         }
-                    }
+                    }*/
                     break;
 
                 case "K":
-                    if (isK(floatingImage)) {
-                        return "K";
-                    } else {
-                        if (isk(floatingImage)) {
+                    if (!mMapFeatures.get("K")) {
+                        mMapFeatures.put("K", true);
+                    }
+                    if (isK(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
+                    } /*else {
+                        if (isk(character)) {
                             return "k";
                         } else {
-                            if (isk1(floatingImage)) {
+                            if (isk1(character)) {
                                 return "k1";
                             }
                         }
-                    }
+                    }*/
                     break;
 
                 case "k":
-                    if (isk(floatingImage)) {
-                        return "k";
+                    if (!mMapFeatures.get("k")) {
+                        mMapFeatures.put("k", true);
+                    }
+                    if (isk(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "k1":
-                    if (isk1(floatingImage)) {
-                        return "k1";
+                    if (!mMapFeatures.get("k1")) {
+                        mMapFeatures.put("k1", true);
+                    }
+                    if (isk1(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "L":
-                    if (isL(floatingImage)) {
-                        return "L";
+                    if (!mMapFeatures.get("L")) {
+                        mMapFeatures.put("L", true);
+                    }
+                    if (isL(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "l":
-                    if (isl(floatingImage)) {
-                        return "l";
+                    if (!mMapFeatures.get("l")) {
+                        mMapFeatures.put("l", true);
+                    }
+                    if (isl(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "M":
-                    if (isM(floatingImage)) {
-                        return "M";
+                    if (!mMapFeatures.get("M")) {
+                        mMapFeatures.put("M", true);
+                    }
+                    if (isM(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "m":
-                    if (ism(floatingImage)) {
-                        return "m";
+                    if (!mMapFeatures.get("m")) {
+                        mMapFeatures.put("m", true);
+                    }
+                    if (ism(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "N":
-                    if (isN(floatingImage)) {
-                        return "N";
+                    if (!mMapFeatures.get("N")) {
+                        mMapFeatures.put("N", true);
+                    }
+                    if (isN(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "n":
-                    if (isn(floatingImage)) {
-                        return "n";
+                    if (!mMapFeatures.get("n")) {
+                        mMapFeatures.put("n", true);
                     }
+                    if (isn(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
+                    } /*else {
+                        if (ism(character)) {
+                            return "m";
+                        }
+                    }*/
                     break;
 
                 case "O":
-                    if (isO(floatingImage)) {
-                        return "O";
+                    if (!mMapFeatures.get("O")) {
+                        mMapFeatures.put("O", true);
+                    }
+                    if (isO(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     } else {
-                        if (is0(floatingImage)) {
-                            return "0";
+                        if (is0(character)) {
+                            bundle.putString("Char", "0");
+                            bundle.putBoolean("Result", true);
+                            return bundle;
                         }
+                        /*if (isC(character)) {
+                            return "C";
+                        }*/
                     }
                     break;
 
                 case "P":
-                    if (isP(floatingImage)) {
-                        return "P";
+                    if (!mMapFeatures.get("P")) {
+                        mMapFeatures.put("P", true);
                     }
+                    if (isP(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
+                    } /*else {
+                        if (isB(character)) {
+                            return "B";
+                        }
+                    }*/
                     break;
 
                 case "Q":
-                    if (isQ(floatingImage)) {
-                        return "Q";
+                    if (!mMapFeatures.get("Q")) {
+                        mMapFeatures.put("Q", true);
+                    }
+                    if (isQ(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "q":
-                    if (isq(floatingImage)) {
-                        return "q";
+                    if (!mMapFeatures.get("q")) {
+                        mMapFeatures.put("q", true);
+                    }
+                    if (isq(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "R":
-                    if (isR(floatingImage)) {
-                        return "R";
+                    if (!mMapFeatures.get("R")) {
+                        mMapFeatures.put("R", true);
+                    }
+                    if (isR(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "r":
-                    if (isr(floatingImage)) {
-                        return "r";
+                    if (!mMapFeatures.get("r")) {
+                        mMapFeatures.put("r", true);
+                    }
+                    if (isr(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "S":
-                    if (isS(floatingImage)) {
-                        return "S";
+                    if (!mMapFeatures.get("S")) {
+                        mMapFeatures.put("S", true);
+                    }
+                    if (isS(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "U":
-                    if (isU(floatingImage)) {
-                        return "U";
+                    if (!mMapFeatures.get("U")) {
+                        mMapFeatures.put("U", true);
+                    }
+                    if (isU(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "u":
-                    if (isu(floatingImage)) {
-                        return "u";
-                    } else if (isa(floatingImage)) {
-                        return "a";
+                    if (!mMapFeatures.get("u")) {
+                        mMapFeatures.put("u", true);
                     }
+                    if (isu(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
+                    } /*else if (isa(character)) {
+                        return "a";
+                    }*/
                     break;
 
                 case "V":
-                    if (isV(floatingImage)) {
-                        return "V";
+                    if (!mMapFeatures.get("V")) {
+                        mMapFeatures.put("V", true);
                     }
+                    if (isV(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
+                    } /*else {
+                        if (isH(character)) {
+                            return "H";
+                        }
+                    }*/
                     break;
 
                 case "T":
-                    if (isT(floatingImage)) {
-                        return "T";
+                    if (!mMapFeatures.get("T")) {
+                        mMapFeatures.put("T", true);
+                    }
+                    if (isT(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "t":
-                    if (ist(floatingImage)) {
-                        return "t";
+                    if (!mMapFeatures.get("t")) {
+                        mMapFeatures.put("t", true);
                     }
+                    if (ist(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
+                    } /*else {
+                        if (isZ(character)) {
+                            return "Z";
+                        }
+                    }*/
                     break;
 
                 case "W":
-                    if (isW(floatingImage)) {
-                        return "W";
+                    if (!mMapFeatures.get("W")) {
+                        mMapFeatures.put("W", true);
+                    }
+                    if (isW(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "X":
-                    if (isX(floatingImage)) {
-                        return "X";
+                    if (!mMapFeatures.get("X")) {
+                        mMapFeatures.put("X", true);
+                    }
+                    if (isX(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "Y":
-                    if (isY(floatingImage)) {
-                        return "Y";
+                    if (!mMapFeatures.get("Y")) {
+                        mMapFeatures.put("Y", true);
+                    }
+                    if (isY(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "y":
-                    if (isy(floatingImage)) {
-                        return "y";
-                    } else {
-                        if (isb1(floatingImage)) {
+                    if (!mMapFeatures.get("y")) {
+                        mMapFeatures.put("y", true);
+                    }
+                    if (isy(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
+                    } /*else {
+                        if (isb1(character)) {
                             return "b1";
                         }
-                    }
+                    }*/
                     break;
 
                 case "Z":
-                    if (isZ(floatingImage)) {
-                        return "Z";
+                    if (!mMapFeatures.get("Z")) {
+                        mMapFeatures.put("Z", true);
+                    }
+                    if (isZ(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "1":
-                    if (is1(floatingImage)) {
-                        return "1";
+                    if (!mMapFeatures.get("1")) {
+                        mMapFeatures.put("1", true);
                     }
+                    if (is1(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
+                    } /*else {
+                        if (isA(character)) {
+                            return "A";
+                        }
+                    }*/
                     break;
 
                 case "2":
-                    if (is2(floatingImage)) {
-                        return "2";
+                    if (!mMapFeatures.get("2")) {
+                        mMapFeatures.put("2", true);
                     }
+                    if (is2(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
+                    } /*else {
+                        if (isa(character)) {
+                            return "a";
+                        }
+                        if (isd(character)) {
+                            return "d";
+                        }
+                    }*/
                     break;
 
                 case "3":
-                    if (is3(floatingImage)) {
-                        return "3";
+                    if (!mMapFeatures.get("3")) {
+                        mMapFeatures.put("3", true);
+                    }
+                    if (is3(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "4":
-                    if (is4(floatingImage)) {
-                        return "4";
+                    if (!mMapFeatures.get("4")) {
+                        mMapFeatures.put("4", true);
+                    }
+                    if (is4(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "5":
-                    if (is5(floatingImage)) {
-                        return "5";
+                    if (!mMapFeatures.get("5")) {
+                        mMapFeatures.put("5", true);
+                    }
+                    if (is5(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "6":
-                    if (is6(floatingImage)) {
-                        return "6";
+                    if (!mMapFeatures.get("6")) {
+                        mMapFeatures.put("6", true);
+                    }
+                    if (is6(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "7":
-                    if (is7(floatingImage)) {
-                        return "7";
+                    if (!mMapFeatures.get("7")) {
+                        mMapFeatures.put("7", true);
+                    }
+                    if (is7(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
                 case "8":
-                    if (is8(floatingImage)) {
-                        return "8";
+                    if (!mMapFeatures.get("8")) {
+                        mMapFeatures.put("8", true);
                     }
+                    if (is8(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
+                    } /*else {
+                        if (is3(character)) {
+                            return "3";
+                        }
+                    }*/
                     break;
 
                 case "9":
-                    if (is9(floatingImage)) {
-                        return "9";
+                    if (!mMapFeatures.get("9")) {
+                        mMapFeatures.put("9", true);
+                    }
+                    if (is9(character)) {
+                        bundle.putBoolean("Result", true);
+                        return bundle;
                     }
                     break;
 
@@ -1362,48 +1738,57 @@ public class BitmapProcessor {
         for (Label label : list) {
             s += label.getLabel();
         }
-        return s;
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("Result", false);
+        bundle.putString("Char", s);
+        return bundle;
     }
 
-    private boolean isA(FloatingImage floatingImage) {
-        ArrayList<Bitmap> listRect = floatingImage.mListContours;
-        if (listRect != null) {
-            return (listRect.size() == 2) && !isW(floatingImage) && triangleFromTop(floatingImage) == 1
-                    && connectedComponentTop(floatingImage) == 1 && connectedComponentBot(floatingImage) == 2;
+    private boolean isA(Character character) {
+        if (isW(character)) {
+            return false;
         }
-        return false;
-    }
-
-    private boolean isa(FloatingImage floatingImage) {
-        ArrayList<Bitmap> bitmaps = floatingImage.mListContours;
-        Bitmap src = floatingImage.mBitmap;
-        if (bitmaps.size() == 2) {
-            ArrayList<Rect> rect1 = detectAreasOnBitmap(bitmaps.get(0), 0, 0);
-            ArrayList<Rect> rect2 = detectAreasOnBitmap(bitmaps.get(1), 0, 0);
-
-            if (rect1 != null && rect2 != null) {
-                if (rect1.size() == 1 && rect2.size() == 1) {
-                    Rect rSmall = (rect1.get(0).width() < rect2.get(0).width()) ? rect1.get(0) : rect2.get(0);
-                    Rect rBig = (rect1.get(0).width() >= rect2.get(0).width()) ? rect1.get(0) : rect2.get(0);
-                    if (rSmall != null && rBig != null) {
-                        Bitmap right = cropBitmap(src, rSmall.right, 0, src.getWidth() - rSmall.right, src.getHeight());
-                        FloatingImage f = new FloatingImage();
-                        f.mBitmap = right;
-                        f.mListContours = findContour(right);
-                        boolean isi = isi(f), isL = isL(f);
-                        return isi || isL;
+        ArrayList<Rect> listRect = character.mListRectContour;
+        Bitmap src = character.mBitmap;
+        if (listRect != null) {
+            if (listRect.size() == 2 && connectedComponentTop(character) == 1) {
+                Rect rSmall = listRect.get(0);
+                boolean two = false;
+                for (int i = src.getHeight() - 1; i >= rSmall.bottom && !two; i--) {
+                    if (countRowSegments(i, src) == 2) {
+                        two = true;
                     }
                 }
+
+                return two || connectedComponentBot(character) == 2;
             }
         }
         return false;
     }
 
-    private boolean isB(FloatingImage floatingImage) {
-        Bitmap bitmap = floatingImage.mBitmap;
-        ArrayList<Bitmap> list = floatingImage.mListContours;
+    private boolean isa(Character character) {
+        ArrayList<Rect> list = character.mListRectContour;
+        Bitmap src = character.mBitmap;
         if (list.size() == 2) {
-            int countFourSegmentsCol = 0, countThreeSegmentsCol = 0;
+            Rect rSmall = list.get(0);
+            Rect rBig = list.get(1);
+            if (rSmall != null && rBig != null) {
+                Bitmap right = cropBitmap(src, rSmall.right, 0, src.getWidth() - rSmall.right, src.getHeight());
+                Character f = new Character();
+                f.mBitmap = right;
+                f.mListContours = findContour(right);
+                boolean isi = isi(f), isL = isL(f);
+                return isi || isL;
+            }
+        }
+        return false;
+    }
+
+    private boolean isB(Character character) {
+        Bitmap bitmap = character.mBitmap;
+        ArrayList<Rect> list = character.mListRectContour;
+        if (list.size() == 2) {
+            int countThreeSegmentsCol = 0;
             int count = 0;
             boolean flag = false;
             for (int i = 0; i < bitmap.getHeight(); i++) {
@@ -1421,14 +1806,11 @@ public class BitmapProcessor {
                 return false;
             }
             for (int i = 0; i < bitmap.getWidth(); i++) {
-                if (countColumnSegments(i, bitmap) == 4) {
-                    countFourSegmentsCol++;
-                }
                 if (countColumnSegments(i, bitmap) == 3) {
                     countThreeSegmentsCol++;
                 }
             }
-            return countFourSegmentsCol > 0 && countThreeSegmentsCol > 0;
+            return countThreeSegmentsCol > 0;
         } else {
             if (list.size() == 3) {
                 int countFourSegmentsCol = 0;
@@ -1462,8 +1844,8 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isb(FloatingImage floatingImage) {
-        ArrayList<Bitmap> contourImage = floatingImage.mListContours;
+    private boolean isb(Character character) {
+        ArrayList<Bitmap> contourImage = character.mListContours;
         if (contourImage.size() == 2) {
             ArrayList<Rect> r1 = detectAreasOnBitmap(contourImage.get(0), 0, 0);
             ArrayList<Rect> r2 = detectAreasOnBitmap(contourImage.get(1), 0, 0);
@@ -1485,28 +1867,71 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isb1(FloatingImage floatingImage) {
-        Bitmap src = floatingImage.mBitmap;
-        ArrayList<Bitmap> list = floatingImage.mListContours;
+    private boolean isb1(Character character) {
+        Bitmap src = character.mBitmap;
+        ArrayList<Rect> list = character.mListRectContour;
         if (list != null) {
             if (list.size() == 2) {
-                ArrayList<Rect> r1 = detectAreasOnBitmap(list.get(0), 0, 0);
-                ArrayList<Rect> r2 = detectAreasOnBitmap(list.get(1), 0, 0);
-                if (r1.size() == 1 && r2.size() == 1) {
-                    Rect rect = (r1.get(0).width() > r2.get(0).width()) ? r2.get(0) : r1.get(0);
-                    if (rect != null) {
+                Rect rect = list.get(0);
+                if (rect != null) {
+                    if (rect.bottom <= src.getHeight() * 0.7d && rect.width() <= rect.height()) {
+                        int offsetY = rect.bottom;
+                        int offsetX = -1;
+                        for (int i = 0; i < src.getWidth() && offsetX < 0; i++) {
+                            if (getColumnHeightFromTop(src, i) <= rect.bottom) {
+                                offsetX = i;
+                            }
+                        }
+
+                        if (offsetY >= 0 && offsetX >= 0) {
+                            Bitmap interested = cropBitmap(src, offsetX, offsetY, src.getWidth() - offsetX, src.getHeight() - offsetY);
+                            if (interested != null) {
+                                int count = 0;
+                                for (int i = interested.getHeight() - 1; i >= 0 && count < 5; i--) {
+                                    if (countRowSegments(i, interested) == 2) {
+                                        count++;
+                                        offsetY = i;
+                                    }
+                                }
+
+                                Bitmap interestedBot =
+                                        cropBitmap(interested, 0, 0, interested.getWidth(), offsetY);
+                                ArrayList<Rect> listRect = detectAreasOnBitmap(interestedBot, 0, 0);
+                                if (listRect.size() == 2) {
+                                    int firstTwo = -1;
+                                    for (int i = 0; i < interested.getHeight() && firstTwo < 0; i++) {
+                                        if (countRowSegments(i, interested) == 2) {
+                                            firstTwo = i;
+                                        }
+                                    }
+
+                                    if (firstTwo >= 0) {
+                                        return firstTwo <= 0.5d * interested.getHeight();
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (list.size() == 3) {
+                    Rect rSmall = list.get(0);
+                    Rect rect = list.get(1);
+                    if (rect != null && rSmall != null) {
+
                         if (rect.bottom <= src.getHeight() * 0.7d && rect.width() <= rect.height()) {
                             int offsetY = rect.bottom;
                             int offsetX = -1;
                             for (int i = 0; i < src.getWidth() && offsetX < 0; i++) {
-                                if (getColumnHeightFromTop(src, i) <= rect.bottom) {
+                                if (getColumnHeightFromTop(src, i) < rect.bottom) {
                                     offsetX = i;
                                 }
                             }
 
-                            if (offsetY >= 0 && offsetX >= 0) {
+                            if (offsetY >= 0) {
                                 Bitmap interested = cropBitmap(src, offsetX, offsetY, src.getWidth() - offsetX, src.getHeight() - offsetY);
-                                if (interested != null) {/*
+                                if (interested != null) {
                                     int count = 0;
                                     for (int i = interested.getHeight() - 1; i >= 0 && count < 5; i--) {
                                         if (countRowSegments(i, interested) == 2) {
@@ -1524,90 +1949,9 @@ public class BitmapProcessor {
                                         int small = (listRect.get(0).width() <= listRect.get(1).width()) ?
                                                 listRect.get(0).width() : listRect.get(1).width();
 
-                                        return ((double) big) / small >= 1.3d;
-                                    }*/
-
-                                    FloatingImage f = new FloatingImage();
-                                    f.mBitmap = interested;
-                                    f.mListContours = findContour(interested);
-                                    return !isi(f) && !isL(f);
-
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                if (list.size() == 3) {
-                    ArrayList<Rect> r1 = detectAreasOnBitmap(list.get(0), 0, 0);
-                    ArrayList<Rect> r2 = detectAreasOnBitmap(list.get(1), 0, 0);
-                    ArrayList<Rect> r3 = detectAreasOnBitmap(list.get(2), 0, 0);
-
-                    if (r1.size() == 1 && r2.size() == 1 && r3.size() == 1) {
-                        if (r1.get(0).width() != r2.get(0).width() && r1.get(0).width() != r3.get(0).width() && r3.get(0).width() != r2.get(0).width()) {
-                            Rect rect = null;
-                            Rect rSmall = null;
-                            if (r1.get(0).width() > r2.get(0).width() && r2.get(0).width() > r3.get(0).width()) {
-                                rect = r2.get(0);
-                                rSmall = r3.get(0);
-                            }
-                            if (r1.get(0).width() > r3.get(0).width() && r3.get(0).width() > r2.get(0).width()) {
-                                rect = r3.get(0);
-                                rSmall = r2.get(0);
-                            }
-                            if (r2.get(0).width() > r1.get(0).width() && r1.get(0).width() > r3.get(0).width()) {
-                                rect = r1.get(0);
-                                rSmall = r3.get(0);
-                            }
-                            if (r2.get(0).width() > r3.get(0).width() && r3.get(0).width() > r1.get(0).width()) {
-                                rect = r3.get(0);
-                                rSmall = r1.get(0);
-                            }
-                            if (r3.get(0).width() > r1.get(0).width() && r1.get(0).width() > r2.get(0).width()) {
-                                rect = r1.get(0);
-                                rSmall = r2.get(0);
-                            }
-                            if (r3.get(0).width() > r2.get(0).width() && r2.get(0).width() > r1.get(0).width()) {
-                                rect = r2.get(0);
-                                rSmall = r1.get(0);
-                            }
-
-                            if (rect != null && rSmall != null) {
-
-                                if (rect.bottom <= src.getHeight() * 0.7d && rect.width() <= rect.height()) {
-                                    int offsetY = rect.bottom;
-                                    int offsetX = -1;
-                                    for (int i = 0; i < src.getWidth() && offsetX < 0; i++) {
-                                        if (getColumnHeightFromTop(src, i) < rect.bottom) {
-                                            offsetX = i;
-                                        }
+                                        return ((double) big) / small >= 1.3d && rSmall.left >= src.getWidth() * 0.3d;
                                     }
 
-                                    if (offsetY >= 0) {
-                                        Bitmap interested = cropBitmap(src, offsetX, offsetY, src.getWidth() - offsetX, src.getHeight() - offsetY);
-                                        if (interested != null) {
-                                            int count = 0;
-                                            for (int i = interested.getHeight() - 1; i >= 0 && count < 5; i--) {
-                                                if (countRowSegments(i, interested) == 2) {
-                                                    count++;
-                                                    offsetY = i;
-                                                }
-                                            }
-
-                                            Bitmap interestedBot =
-                                                    cropBitmap(interested, 0, 0, interested.getWidth(), offsetY);
-                                            ArrayList<Rect> listRect = detectAreasOnBitmap(interestedBot, 0, 0);
-                                            if (listRect.size() == 2) {
-                                                int big = (listRect.get(0).width() > listRect.get(1).width()) ?
-                                                        listRect.get(0).width() : listRect.get(1).width();
-                                                int small = (listRect.get(0).width() <= listRect.get(1).width()) ?
-                                                        listRect.get(0).width() : listRect.get(1).width();
-
-                                                return ((double) big) / small >= 1.3d && rSmall.left >= src.getWidth() * 0.3d;
-                                            }
-
-                                        }
-                                    }
                                 }
                             }
                         }
@@ -1618,8 +1962,8 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isC(FloatingImage floatingImage) {
-        Bitmap src = floatingImage.mBitmap;
+    private boolean isC(Character character) {
+        Bitmap src = character.mBitmap;
         int split = (int) (src.getWidth() * 0.2d);
         Bitmap right = cropBitmap(src, split, 0, src.getWidth() - split, src.getHeight());
         if (right != null) {
@@ -1648,91 +1992,46 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isD(FloatingImage floatingImage) {
-        if (isB(floatingImage)) {
+    private boolean isD(Character character) {
+        if (isB(character)) {
             return false;
         }
-        Bitmap bitmap = floatingImage.mBitmap;/*
-        int thinRows = 0;
-        int fatRows = 0;
-        for (int i = 0; i < bitmap.getHeight(); i++) {
-            if (getBlankCounts(i, bitmap) > 0) {
-                fatRows++;
-            } else {
-                if (getBlankCounts(i, bitmap) == 0) {
-                    thinRows++;
-                }
-            }
-        }
-
-        if (((double) thinRows / bitmap.getHeight() <= 0.15d) && ((double) fatRows / bitmap.getHeight() >= 0.85d)) {
-            int split = (int) (bitmap.getWidth() * 0.7d);
-            Bitmap bmp = cropBitmap(bitmap, split, 0, bitmap.getWidth() - split, bitmap.getHeight());
-            if (detectAreasOnBitmap(bmp, 0, 0).size() == 1) {
-                split = (int) (bitmap.getWidth() * 0.2);
-                if (bmp != null) {
-                    bmp = cropBitmap(bitmap, 0, 0, split, bitmap.getHeight());
-                    int start = -1, end = -1;
-                    for (int i = 0; i < bmp.getHeight(); i++) {
-                        if (checkNotEmptyRow(i, 0, bmp.getWidth(), bmp)) {
-                            if (start < 0) {
-                                start = i;
-                            }
-
-                            end = i;
-                        }
-                    }
-
-                    return (start >= 0 && end > start) && (((double) end - start) / bmp.getHeight() >= 0.9d);
-                }
-            }
-        }*/
-        Bitmap src = floatingImage.mBitmap;
-        ArrayList<Bitmap> list = floatingImage.mListContours;
+        Bitmap src = character.mBitmap;
+        ArrayList<Rect> list = character.mListRectContour;
         if (list.size() == 2) {
-            ArrayList<Rect> r1 = detectAreasOnBitmap(list.get(0), 0, 0);
-            ArrayList<Rect> r2 = detectAreasOnBitmap(list.get(1), 0, 0);
+            Rect rSmall = list.get(0);
 
-            if (r1 != null && r2 != null) {
-                if (r1.size() == 1 && r2.size() == 1) {
-                    Rect rSmall = (r1.get(0).width() > r2.get(0).width()) ? r2.get(0) : r1.get(0);
-                    Rect rBig = (r1.get(0).width() <= r2.get(0).width()) ? r2.get(0) : r1.get(0);
+            int countOne = 0, countTwo = 0, countThree = 0, firstOne = -1, lastOne = -1;
+            boolean end = false;
+            for (int i = 0; i < src.getWidth(); i++) {
+                if (countColumnSegments(i, src) == 1) {
+                    countOne++;
+                }
+                if (countColumnSegments(i, src) == 2) {
+                    countTwo++;
+                }
+                if (countColumnSegments(i, src) == 3) {
+                    countThree++;
+                }
+            }
 
-                    int countOne = 0, countTwo = 0, firstOne = -1, lastOne = -1;
-                    boolean end = false;
-                    int count = 0;
-                    for (int i = 0; i < src.getWidth(); i++) {
-                        if (countColumnSegments(i, src) == 1) {
-                            countOne++;
+            if (countOne + countTwo >= src.getWidth() * 0.95d && countThree == 0) {
+                for (int i = 0; i < src.getHeight(); i++) {
+                    if (countRowSegments(i, src) == 1) {
+                        if (firstOne < 0) {
+                            firstOne = i;
                         }
-                        if (countColumnSegments(i, src) == 2) {
-                            countTwo++;
+                        if (end) {
+                            lastOne = i;
+                        }
+                    } else {
+                        if (firstOne >= 0) {
+                            end = true;
                         }
                     }
-
-                    Log.d("Total", "" + (countOne + countTwo));
-                    Log.d("Width", "" + src.getWidth());
-                    if (countOne + countTwo >= src.getWidth() * 0.95d) {
-                        for (int i = 0; i < src.getHeight(); i++) {
-                            if (countRowSegments(i, src) == 1) {
-                                if (firstOne < 0) {
-                                    firstOne = i;
-                                }
-                                if (end) {
-                                    lastOne = i;
-                                }
-                            } else {
-                                if (firstOne >= 0) {
-                                    end = true;
-                                }
-                            }
-                        }
-                        Log.d("One", "first: " + firstOne + ", last: " + lastOne);
-                        Log.d("Rect", "top: " + rSmall.top + ", bot: " + rSmall.bottom);
-                        if (firstOne >= 0 && lastOne >= 0) {
-                            return firstOne <= rSmall.top && lastOne >= rSmall.bottom;
-                        }
-                    }
+                }
+                if (firstOne >= 0 && lastOne >= 0) {
+                    return firstOne <= rSmall.top && lastOne >= rSmall.bottom;
                 }
             }
         }
@@ -1740,82 +2039,55 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isd(FloatingImage floatingImage) {
-        /*ArrayList<Bitmap> contourImage = floatingImage.mListContours;
-        if (contourImage.size() == 2) {
-            ArrayList<Rect> r1 = detectAreasOnBitmap(contourImage.get(0), 0, 0);
-            ArrayList<Rect> r2 = detectAreasOnBitmap(contourImage.get(1), 0, 0);
-            if (r1.size() == 1 && r2.size() == 1) {
-                Rect area1 = r1.get(0), area2 = r2.get(0);
-                Point p1 = getFirstPixel(contourImage.get(0), Color.RED);
-                Point p2 = getFirstPixel(contourImage.get(1), Color.RED);
-                if (p1 != null && p2 != null) {
-                    if (p1.y > p2.y) {
-                        return p2.x > contourImage.get(1).getWidth() / 2 &&
-                                Math.abs(area1.bottom - contourImage.get(0).getHeight()) <= 2 * FingerDrawerView.CurrentPaintSize;
-                    } else {
-                        if (p2.y > p1.y) {
-                            return p1.x > contourImage.get(0).getWidth() / 2 &&
-                                    Math.abs(area2.bottom - contourImage.get(1).getHeight()) <= 2 * FingerDrawerView.CurrentPaintSize;
-                        }
-                    }
-                }
-            }
-        }*/
-        Bitmap src = floatingImage.mBitmap;
-        ArrayList<Bitmap> list = floatingImage.mListContours;
+    private boolean isd(Character character) {
+        Bitmap src = character.mBitmap;
+        ArrayList<Rect> list = character.mListRectContour;
         if (list != null) {
             if (list.size() == 2) {
-                ArrayList<Rect> r1 = detectAreasOnBitmap(list.get(0), 0, 0);
-                ArrayList<Rect> r2 = detectAreasOnBitmap(list.get(1), 0, 0);
-                if (r1 != null && r2 != null) {
-                    if (r1.size() == 1 && r2.size() == 1) {
-                        Rect rSmall = (r1.get(0).width() < r2.get(0).width()) ? r1.get(0) : r2.get(0);
-                        Rect rBig = (r1.get(0).width() >= r2.get(0).width()) ? r1.get(0) : r2.get(0);
+                Rect rSmall = list.get(0);
+                Rect rBig = list.get(1);
 
-                        if (Math.abs(rSmall.top - rBig.top) > Math.abs(rSmall.bottom - rBig.bottom)
-                                && Math.abs(rSmall.right - rBig.right) > Math.abs(rSmall.left - rBig.left)) {
-                            int offsetY = Math.abs(rSmall.top - rBig.top) / 2;
-                            int offsetX = Math.abs(rSmall.left - rSmall.right) / 2;
+                if (Math.abs(rSmall.top - rBig.top) > Math.abs(rSmall.bottom - rBig.bottom)
+                        && Math.abs(rSmall.right - rBig.right) > Math.abs(rSmall.left - rBig.left)) {
+                    int offsetY = Math.abs(rSmall.top - rBig.top) / 2;
+                    int offsetX = Math.abs(rSmall.left - rSmall.right) / 2;
 
-                            Point point = new Point(offsetX, offsetY);
-                            boolean moved = false, end = false;
-                            while (!end) {
-                                int x = point.x, y = point.y;
-                                if (x + 1 < src.getWidth()) {
-                                    if (src.getPixel(x + 1, y) == Color.WHITE) {
-                                        point = new Point(x + 1, y);
-                                        moved = true;
-                                    }
-                                }
-                                if (x + 1 < src.getWidth() && y + 1 < src.getHeight() && !moved) {
-                                    if (src.getPixel(x + 1, y + 1) == Color.WHITE) {
-                                        point = new Point(x + 1, y + 1);
-                                        moved = true;
-                                    }
-                                }
-                                if (y + 1 < src.getHeight() && !moved) {
-                                    if (src.getPixel(x, y + 1) == Color.WHITE) {
-                                        point = new Point(x, y + 1);
-                                        moved = true;
-                                    }
-                                }
-
-                                if (moved) {
-                                    moved = false;
-                                } else {
-                                    end = true;
-                                }
-                            }
-
-                            Bitmap interested = cropBitmap(src, point.x, 0, src.getWidth() - point.x, src.getHeight());
-                            if (interested != null) {
-                                FloatingImage f = new FloatingImage();
-                                f.mBitmap = interested;
-                                f.mListContours = findContour(interested);
-                                return isi(f) || isL(f);
+                    Point point = new Point(offsetX, offsetY);
+                    boolean moved = false, end = false;
+                    while (!end) {
+                        int x = point.x, y = point.y;
+                        if (x + 1 < src.getWidth()) {
+                            if (src.getPixel(x + 1, y) == Color.WHITE) {
+                                point = new Point(x + 1, y);
+                                moved = true;
                             }
                         }
+                        if (x + 1 < src.getWidth() && y + 1 < src.getHeight() && !moved) {
+                            if (src.getPixel(x + 1, y + 1) == Color.WHITE) {
+                                point = new Point(x + 1, y + 1);
+                                moved = true;
+                            }
+                        }
+                        if (y + 1 < src.getHeight() && !moved) {
+                            if (src.getPixel(x, y + 1) == Color.WHITE) {
+                                point = new Point(x, y + 1);
+                                moved = true;
+                            }
+                        }
+
+                        if (moved) {
+                            moved = false;
+                        } else {
+                            end = true;
+                        }
+                    }
+
+                    Bitmap interested = cropBitmap(src, point.x, 0, src.getWidth() - point.x, src.getHeight());
+                    if (interested != null) {
+                        Character f = new Character();
+                        f.mBitmap = interested;
+                        f.mListContours = findContour(interested);
+                        return isi(f) || isL(f);
                     }
                 }
             }
@@ -1823,10 +2095,10 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isE(FloatingImage floatingImage) {
-        if (floatingImage.mListContours.size() == 1) {
-            int split = (int) (floatingImage.mBitmap.getWidth() * 0.3d);
-            Bitmap src = floatingImage.mBitmap;
+    private boolean isE(Character character) {
+        if (character.mListContours.size() == 1) {
+            int split = (int) (character.mBitmap.getWidth() * 0.3d);
+            Bitmap src = character.mBitmap;
             Bitmap right = cropBitmap(src, split, 0, src.getWidth() - split, src.getHeight());
             ArrayList<Rect> rect = detectAreasOnBitmap(right, 0, 0);
             if (rect != null) {
@@ -1842,39 +2114,32 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean ise(FloatingImage floatingImage) {
-        ArrayList<Bitmap> list = floatingImage.mListContours;
-        Bitmap src = floatingImage.mBitmap;
+    private boolean ise(Character character) {
+        ArrayList<Rect> list = character.mListRectContour;
+        Bitmap src = character.mBitmap;
         if (list.size() == 2) {
-            ArrayList<Rect> r1 = detectAreasOnBitmap(list.get(0), 0, 0);
-            ArrayList<Rect> r2 = detectAreasOnBitmap(list.get(1), 0, 0);
+            Rect rSmall = list.get(0);
+            Rect rBig = list.get(1);
 
-            if (r1 != null && r2 != null) {
-                if (r1.size() == 1 && r2.size() == 1) {
-                    Rect rSmall = (r1.get(0).width() > r2.get(0).width()) ? r2.get(0) : r1.get(0);
-                    Rect rBig = (r1.get(0).width() <= r2.get(0).width()) ? r2.get(0) : r1.get(0);
-
-                    int offsetTop = Math.abs(rSmall.top - rBig.top);
-                    int offsetBot = Math.abs(rSmall.bottom - rBig.bottom);
-                    if (offsetBot >= offsetTop) {
-                        int countThree = 0;
-                        for (int i = 0; i < src.getWidth(); i++) {
-                            if (countColumnSegments(i, src) == 3) {
-                                countThree++;
-                            }
-                        }
-                        return countThree > 0 && rSmall.width() >= rSmall.height();
+            int offsetTop = Math.abs(rSmall.top - rBig.top);
+            int offsetBot = Math.abs(rSmall.bottom - rBig.bottom);
+            if (offsetBot >= offsetTop) {
+                int countThree = 0;
+                for (int i = 0; i < src.getWidth(); i++) {
+                    if (countColumnSegments(i, src) == 3) {
+                        countThree++;
                     }
                 }
+                return countThree > 0 && rSmall.width() >= rSmall.height();
             }
         }
 
         return false;
     }
 
-    private boolean isF(FloatingImage floatingImage) {
-        int mid = floatingImage.mBitmap.getWidth() / 2;
-        Bitmap src = floatingImage.mBitmap;
+    private boolean isF(Character character) {
+        int mid = character.mBitmap.getWidth() / 2;
+        Bitmap src = character.mBitmap;
         Bitmap right = cropBitmap(src, mid, 0, src.getWidth() - mid, src.getHeight());
         if (right != null) {
             ArrayList<Rect> list = detectAreasOnBitmap(right, 0, 0);
@@ -1893,58 +2158,52 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isf(FloatingImage floatingImage) {
-        Bitmap src = floatingImage.mBitmap;
+    private boolean isf(Character character) {
+        Bitmap src = character.mBitmap;
         Bitmap top = cropBitmap(src, 0, 0, src.getWidth(), (int) (src.getHeight() * 0.2d));
         if (detectAreasOnBitmap(top, 0, 0).size() >= 2) {
             return false;
         }
-        ArrayList<Bitmap> list = floatingImage.mListContours;
+        ArrayList<Rect> list = character.mListRectContour;
         if (list != null) {
             if (list.size() == 2) {
-                ArrayList<Rect> r1 = detectAreasOnBitmap(list.get(0), 0, 0);
-                ArrayList<Rect> r2 = detectAreasOnBitmap(list.get(1), 0, 0);
-                if (r1 != null && r2 != null) {
-                    if (r1.size() == 1 && r2.size() == 1) {
-                        Rect rect = (r1.get(0).width() < r2.get(0).width()) ? r1.get(0) : r2.get(0);
-                        if (rect != null) {
-                            boolean closeToBot = Math.abs(rect.bottom - (src.getHeight() - 1)) <= 2.5 * FingerDrawerView.CurrentPaintSize;
-                            int count = 0;
-                            int increase = 0;
-                            boolean stop = false;
-                            for (int i = 0; i < src.getHeight() && !stop; i++) {
-                                int blank = getBlankCounts(i, src);
-                                if (blank > 0) {
-                                    if (blank >= count) {
-                                        increase++;
-                                        count = blank;
-                                    } else {
-                                        stop = true;
-                                    }
-                                } else {
-                                    if (count > 0) {
-                                        stop = true;
-                                    }
-                                }
+                Rect rect = list.get(0);
+                if (rect != null) {
+                    boolean closeToBot = Math.abs(rect.bottom - (src.getHeight() - 1)) <= 2.5 * FingerDrawerView.CurrentPaintSize;
+                    int count = 0;
+                    int increase = 0;
+                    boolean stop = false;
+                    for (int i = 0; i < src.getHeight() && !stop; i++) {
+                        int blank = getBlankCounts(i, src);
+                        if (blank > 0) {
+                            if (blank >= count) {
+                                increase++;
+                                count = blank;
+                            } else {
+                                stop = true;
                             }
-
-                            return increase > 0 && closeToBot;
+                        } else {
+                            if (count > 0) {
+                                stop = true;
+                            }
                         }
                     }
+
+                    return increase > 0 && closeToBot;
                 }
             }
         }
         return false;
     }
 
-    private boolean isG(FloatingImage floatingImage) {
-        if (isS(floatingImage)) {
+    private boolean isG(Character character) {
+        if (isS(character)) {
             return false;
         }
-        if (floatingImage.mListContours.size() >= 2) {
+        if (character.mListContours.size() >= 2) {
             return false;
         }
-        Bitmap src = floatingImage.mBitmap;
+        Bitmap src = character.mBitmap;
         int split = (int) (src.getWidth() * 0.4d);
         Bitmap right = cropBitmap(src, split, 0, src.getWidth() - split, src.getHeight());
         if (right != null) {
@@ -1969,64 +2228,30 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isg(FloatingImage floatingImage) {
-        Bitmap src = floatingImage.mBitmap;
-        ArrayList<Bitmap> list = floatingImage.mListContours;
+    private boolean isg(Character character) {
+        Bitmap src = character.mBitmap;
+        ArrayList<Rect> list = character.mListRectContour;
         if (list != null) {
             if (list.size() == 3) {
-                ArrayList<Rect> r1 = detectAreasOnBitmap(list.get(0), 0, 0);
-                ArrayList<Rect> r2 = detectAreasOnBitmap(list.get(1), 0, 0);
-                ArrayList<Rect> r3 = detectAreasOnBitmap(list.get(2), 0, 0);
-
-                if (r1 != null && r2 != null && r3 != null) {
-                    if (r1.size() == 1 && r2.size() == 1 && r3.size() == 1) {
-                        Rect rMin = null;
-                        Rect r = null;
-                        if (r1.get(0).width() > r2.get(0).width() && r2.get(0).width() > r3.get(0).width()) {
-                            r = r2.get(0);
-                            rMin = r3.get(0);
-                        }
-                        if (r1.get(0).width() > r3.get(0).width() && r3.get(0).width() > r2.get(0).width()) {
-                            r = r3.get(0);
-                            rMin = r2.get(0);
-                        }
-                        if (r2.get(0).width() > r1.get(0).width() && r1.get(0).width() > r3.get(0).width()) {
-                            r = r1.get(0);
-                            rMin = r3.get(0);
-                        }
-                        if (r2.get(0).width() > r3.get(0).width() && r3.get(0).width() > r1.get(0).width()) {
-                            r = r3.get(0);
-                            rMin = r1.get(0);
-                        }
-                        if (r3.get(0).width() > r1.get(0).width() && r1.get(0).width() > r2.get(0).width()) {
-                            r = r1.get(0);
-                            rMin = r2.get(0);
-                        }
-                        if (r3.get(0).width() > r2.get(0).width() && r2.get(0).width() > r1.get(0).width()) {
-                            r = r2.get(0);
-                            rMin = r1.get(0);
-                        }
-
-                        if (r != null && rMin != null) {
-                            boolean closeToBot = Math.abs(rMin.bottom - (src.getHeight() - 1)) <= 2.5 * FingerDrawerView.CurrentPaintSize;
-                            boolean tall = rMin.width() <= rMin.height();
-                            boolean fat = r.width() >= r.height();
-                            return closeToBot && tall && fat;
-                        }
-                    }
+                Rect rMin = list.get(0), r = list.get(1);
+                if (r != null && rMin != null) {
+                    boolean closeToBot = Math.abs(rMin.bottom - (src.getHeight() - 1)) <= 2.5 * FingerDrawerView.CurrentPaintSize;
+                    boolean tall = rMin.width() <= rMin.height();
+                    boolean fat = r.width() >= r.height();
+                    return closeToBot && tall && fat;
                 }
             }
         }
         return false;
     }
 
-    private boolean isH(FloatingImage floatingImage) {
-        Bitmap src = floatingImage.mBitmap;
+    private boolean isH(Character character) {
+        Bitmap src = character.mBitmap;
         Bitmap mid = cropBitmap(src, 0, (int) (src.getHeight() * 0.2d), src.getWidth(), (int) (src.getHeight() * 0.6d));
         if (detectAreasOnBitmap(mid, 0, 0).size() != 1) {
             return false;
         }
-        if (triangleFromTop(floatingImage) != 1) {
+        if (triangleFromTop(character) != 1) {
             int fragmentHeight = src.getHeight() / 4;
             int startAbove = 0;
             int startBelow = src.getHeight() - fragmentHeight;
@@ -2040,9 +2265,9 @@ public class BitmapProcessor {
                 boolean triangle = false;
                 for (int i = 0; i < listAbove.size() && !triangle; i++) {
                     Rect rect = listAbove.get(i);
-                    FloatingImage floatingImage1 = new FloatingImage();
-                    floatingImage1.mBitmap = cropBitmap(src, rect.left, rect.top, rect.width(), rect.height());
-                    if (triangleFromTop(floatingImage1) == 1 && triangleFromBot(floatingImage1) == 1) {
+                    Character character1 = new Character();
+                    character1.mBitmap = cropBitmap(src, rect.left, rect.top, rect.width(), rect.height());
+                    if (triangleFromTop(character1) == 1 && triangleFromBot(character1) == 1) {
                         triangle = true;
                     }
                 }
@@ -2051,9 +2276,9 @@ public class BitmapProcessor {
                 } else {
                     for (int i = 0; i < listBelow.size() && !triangle; i++) {
                         Rect rect = listBelow.get(i);
-                        FloatingImage floatingImage1 = new FloatingImage();
-                        floatingImage1.mBitmap = cropBitmap(src, rect.left, rect.top, rect.width(), rect.height());
-                        if (triangleFromTop(floatingImage1) == 1 && triangleFromBot(floatingImage1) == 1) {
+                        Character character1 = new Character();
+                        character1.mBitmap = cropBitmap(src, rect.left, rect.top, rect.width(), rect.height());
+                        if (triangleFromTop(character1) == 1 && triangleFromBot(character1) == 1) {
                             triangle = true;
                         }
                     }
@@ -2067,29 +2292,26 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean ish(FloatingImage floatingImage) {
-        Bitmap src = floatingImage.mBitmap;
-        ArrayList<Bitmap> list = floatingImage.mListContours;
+    private boolean ish(Character character) {
+        Bitmap src = character.mBitmap;
+        ArrayList<Rect> list = character.mListRectContour;
         if (list != null) {
             if (list.size() == 2) {
-                ArrayList<Rect> r1 = detectAreasOnBitmap(list.get(0), 0, 0);
-                ArrayList<Rect> r2 = detectAreasOnBitmap(list.get(1), 0, 0);
-                if (r1.size() == 1 && r2.size() == 1) {
-                    Rect rect = (r1.get(0).width() > r2.get(0).width()) ? r2.get(0) : r1.get(0);
-                    if (rect != null) {
-                        if (rect.bottom <= src.getHeight() * 0.7d && rect.width() <= rect.height()) {
-                            int offsetY = rect.bottom;
-                            int offsetX = -1;
-                            for (int i = 0; i < src.getWidth() && offsetX < 0; i++) {
-                                if (getColumnHeightFromTop(src, i) < rect.bottom) {
-                                    offsetX = i;
-                                }
+                Rect rect = list.get(0);
+                if (rect != null) {
+                    if (rect.bottom <= src.getHeight() * 0.7d && rect.width() <= rect.height()) {
+                        int offsetY = rect.bottom;
+                        int offsetX = -1;
+                        for (int i = 0; i < src.getWidth() && offsetX < 0; i++) {
+                            if (getColumnHeightFromTop(src, i) < rect.bottom) {
+                                offsetX = i;
                             }
+                        }
 
-                            if (offsetY >= 0) {
-                                Bitmap interested = cropBitmap(src, offsetX, offsetY, src.getWidth() - offsetX, src.getHeight() - offsetY);
-                                if (interested != null) {
-                                    int count = 0;
+                        if (offsetY >= 0) {
+                            Bitmap interested = cropBitmap(src, offsetX, offsetY, src.getWidth() - offsetX, src.getHeight() - offsetY);
+                            if (interested != null) {
+                                    /*int count = 0;
                                     for (int i = interested.getHeight() - 1; i >= 0 && count < 5; i--) {
                                         if (countRowSegments(i, interested) == 2) {
                                             count++;
@@ -2101,34 +2323,51 @@ public class BitmapProcessor {
                                             cropBitmap(interested, 0, offsetY, interested.getWidth(), interested.getHeight() - offsetY);
                                     if (interestedBot != null) {
                                         return detectAreasOnBitmap(interestedBot, 0, 0).size() == 2;
+                                    }*/
+                                offsetY = -1;
+                                for (int i = 0; i < interested.getHeight() && offsetY < 0; i++) {
+                                    if (countRowSegments(i, interested) == 2) {
+                                        offsetY = i;
                                     }
-
                                 }
+                                Bitmap interestedBot =
+                                        cropBitmap(interested, 0, offsetY, interested.getWidth(), interested.getHeight() - offsetY);
+                                if (interestedBot != null) {
+                                    Character c = new Character(); c.mBitmap = interestedBot; c.mListContours = findContour(interestedBot);
+                                    return isN(c) || isn(c);
+                                }
+
                             }
                         }
                     }
-
                 }
             }
         }
         return false;
     }
 
-    private boolean isI(FloatingImage floatingImage) {
-        Bitmap src = rotateBitmap(floatingImage.mBitmap, 90);
-        FloatingImage f = new FloatingImage();
-        f.mBitmap = src;
+    private boolean isI(Character character) {
+        Bitmap src = character.mBitmap;
+        int countThree = 0;
+        for (int i = 0; i < src.getWidth(); i++) {
+            if (countColumnSegments(i, src) == 3) {
+                countThree++;
+            }
+        }
+        if (countThree > src.getWidth() * 0.3d) {
+            return false;
+        }
+        Bitmap rotated = rotateBitmap(character.mBitmap, 90);
+        Character f = new Character();
+        f.mBitmap = rotated;
         return isH(f);
     }
 
-    private boolean isi(FloatingImage floatingImage) {
-        Bitmap src = floatingImage.mBitmap;
-        ArrayList<Bitmap> list = floatingImage.mListContours;
+    private boolean isi(Character character) {
+        Bitmap src = character.mBitmap;
+        ArrayList<Bitmap> list = character.mListContours;
         if (list != null) {
             if (list.size() == 1) {
-                int split = (int) (src.getWidth() * 0.5d);
-                Bitmap right = cropBitmap(src, split, 0, src.getWidth() - split, src.getHeight());
-                ArrayList<Rect> rect = detectAreasOnBitmap(right, 0, 0);
                 int countOne = 0, countTwo = 0;
                 int firstTwo = -1;
                 for (int i = 0; i < src.getHeight(); i++) {
@@ -2142,14 +2381,17 @@ public class BitmapProcessor {
                         countOne++;
                     }
                 }
-                return countOne >= 0.95d * src.getHeight() || firstTwo >= src.getHeight() * 0.3d;
+                return countOne >= 0.95d * src.getHeight() || firstTwo >= src.getHeight() * 0.5d;
             }
         }
         return false;
     }
 
-    private boolean isJ(FloatingImage floatingImage) {
-        Bitmap bitmap = floatingImage.mBitmap;
+    private boolean isJ(Character character) {
+        if (character.mListContours.size() == 2) {
+            return false;
+        }
+        Bitmap bitmap = character.mBitmap;
         int offsetY = (int) (bitmap.getHeight() * 0.2d);
         Bitmap upper = cropBitmap(bitmap, 0, 0, bitmap.getWidth(), offsetY);
         ArrayList<Rect> upperList = detectAreasOnBitmap(upper, 0, 0);
@@ -2177,9 +2419,9 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isj(FloatingImage floatingImage) {
-        Bitmap src = floatingImage.mBitmap;
-        ArrayList<Bitmap> list = floatingImage.mListContours;
+    private boolean isj(Character character) {
+        Bitmap src = character.mBitmap;
+        ArrayList<Bitmap> list = character.mListContours;
         if (list != null) {
             if (list.size() == 1) {
                 int split = (int) (src.getWidth() * 0.5d);
@@ -2202,9 +2444,9 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isK(FloatingImage floatingImage) {
-        Bitmap src = floatingImage.mBitmap;
-        ArrayList<Bitmap> list = floatingImage.mListContours;
+    private boolean isK(Character character) {
+        Bitmap src = character.mBitmap;
+        ArrayList<Bitmap> list = character.mListContours;
         if (list != null) {
             if (list.size() == 1) {
                 int x = -1;
@@ -2234,9 +2476,9 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isk(FloatingImage floatingImage) {
-        Bitmap src = floatingImage.mBitmap;
-        ArrayList<Bitmap> list = floatingImage.mListContours;
+    private boolean isk(Character character) {
+        Bitmap src = character.mBitmap;
+        ArrayList<Bitmap> list = character.mListContours;
         if (list != null) {
             if (list.size() == 1) {
                 int x = -1;
@@ -2266,81 +2508,41 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isk1(FloatingImage floatingImage) {
-        Bitmap src = floatingImage.mBitmap;
-        ArrayList<Bitmap> list = floatingImage.mListContours;
+    private boolean isk1(Character character) {
+        Bitmap src = character.mBitmap;
+        ArrayList<Rect> list = character.mListRectContour;
         if (list != null) {
             if (list.size() < 3) {
                 return false;
             } else {
                 if (list.size() == 3) {
-                    ArrayList<Rect> r1 = detectAreasOnBitmap(list.get(0), 0, 0);
-                    ArrayList<Rect> r2 = detectAreasOnBitmap(list.get(1), 0, 0);
-                    ArrayList<Rect> r3 = detectAreasOnBitmap(list.get(2), 0, 0);
+                    Rect rBig = list.get(2);
+                    Rect rTop = (Math.abs(rBig.top - list.get(0).top) < Math.abs(rBig.top - list.get(1).top)?list.get(0):list.get(1));
+                    Rect rMid = (Math.abs(rBig.top - list.get(0).top) >= Math.abs(rBig.top - list.get(1).top)?list.get(0):list.get(1));;
 
-                    if (r1.size() == 1 && r2.size() == 1 && r3.size() == 1) {
-                        if (r1.get(0).width() != r2.get(0).width() && r1.get(0).width() != r3.get(0).width() && r3.get(0).width() != r2.get(0).width()) {
-                            Rect rBig = null;
-                            Rect rTop = null;
-                            Rect rMid = null;
-                            if (r1.get(0).width() > r2.get(0).width() && r1.get(0).width() > r3.get(0).width()) {
-                                Log.d("Rect", "1");
-                                rBig = r1.get(0);
-                                if (Math.abs(r1.get(0).top - r2.get(0).top) < Math.abs(r1.get(0).top - r3.get(0).top)) {
-                                    rTop = r2.get(0);
-                                    rMid = r3.get(0);
-                                } else {
-                                    rTop = r3.get(0);
-                                    rMid = r2.get(0);
-                                }
+                    if (rTop != null && rMid != null) {
+                        int offsetY = rMid.bottom;
+                        int offsetX = -1;
+                        for (int i = 0; i < src.getWidth() && offsetX < 0; i++) {
+                            if (getColumnHeightFromTop(src, i) < rMid.bottom) {
+                                offsetX = i;
                             }
-                            if (r2.get(0).width() > r1.get(0).width() && r2.get(0).width() > r3.get(0).width()) {
-                                Log.d("Rect", "2");
-                                rBig = r2.get(0);
-                                if (Math.abs(r2.get(0).top - r1.get(0).top) < Math.abs(r2.get(0).top - r3.get(0).top)) {
-                                    rTop = r1.get(0);
-                                    rMid = r3.get(0);
-                                } else {
-                                    rTop = r3.get(0);
-                                    rMid = r1.get(0);
-                                }
-                            }
-                            if (r3.get(0).width() > r1.get(0).width() && r3.get(0).width() > r2.get(0).width()) {
-                                Log.d("Rect", "3");
-                                rBig = r3.get(0);
-                                if (Math.abs(r3.get(0).top - r1.get(0).top) < Math.abs(r3.get(0).top - r2.get(0).top)) {
-                                    rTop = r1.get(0);
-                                    rMid = r2.get(0);
-                                } else {
-                                    rTop = r2.get(0);
-                                    rMid = r1.get(0);
-                                }
-                            }
+                        }
 
-                            if (rTop != null && rMid != null && rBig != null) {
-                                int offsetY = rMid.bottom;
-                                Log.d("Bottom", offsetY + "");
-                                Log.d("Height", src.getHeight() + "");
-                                int offsetX = -1;
-                                for (int i = 0; i < src.getWidth() && offsetX < 0; i++) {
-                                    if (getColumnHeightFromTop(src, i) < rMid.bottom) {
-                                        offsetX = i;
-                                    }
-                                }
-
-                                if (offsetY >= 0) {
-                                    Bitmap interested = cropBitmap(src, offsetX, offsetY, src.getWidth() - offsetX, src.getHeight() - offsetY);
-                                    if (interested != null) {
-                                        int two = 0;
+                        if (offsetY >= 0) {
+                            Bitmap interested = cropBitmap(src, offsetX, offsetY, src.getWidth() - offsetX, src.getHeight() - offsetY);
+                            if (interested != null) {
+                                        /*int two = 0;
                                         for (int i = 0; i < interested.getHeight(); i++) {
                                             if (countRowSegments(i, src) == 2) {
                                                 two++;
                                             }
                                         }
 
-                                        return two > 0;
-                                    }
-                                }
+                                        return two > 0;*/
+                                Character f = new Character();
+                                f.mBitmap = interested;
+                                return isV_Inverse(f);
                             }
                         }
                     }
@@ -2350,9 +2552,9 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isL(FloatingImage floatingImage) {
-        Bitmap src = floatingImage.mBitmap;
-        ArrayList<Bitmap> list = floatingImage.mListContours;
+    private boolean isL(Character character) {
+        Bitmap src = character.mBitmap;
+        ArrayList<Bitmap> list = character.mListContours;
         if (list != null) {
             if (list.size() == 1) {
                 int split = (int) (src.getWidth() * 0.7d);
@@ -2375,54 +2577,44 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isl(FloatingImage floatingImage) {
-        Bitmap src = floatingImage.mBitmap;
-        ArrayList<Bitmap> list = floatingImage.mListContours;
+    private boolean isl(Character character) {
+        Bitmap src = character.mBitmap;
+        ArrayList<Rect> list = character.mListRectContour;
         if (list != null) {
             if (list.size() == 2) {
-                ArrayList<Rect> r1 = detectAreasOnBitmap(list.get(0), 0, 0);
-                ArrayList<Rect> r2 = detectAreasOnBitmap(list.get(1), 0, 0);
-                if (r1.size() == 1 && r2.size() == 1) {
-                    Rect rect = (r1.get(0).width() > r2.get(0).width()) ? r2.get(0) : r1.get(0);
-                    if (rect != null) {
-                        if (rect.bottom <= src.getHeight() * 0.7d && rect.width() <= rect.height()) {
-                            int offsetY = rect.bottom;
-                            int offsetX = -1;
-                            for (int i = 0; i < src.getWidth() && offsetX < 0; i++) {
-                                if (getColumnHeightFromTop(src, i) < rect.bottom) {
-                                    offsetX = i;
-                                }
-                            }
-
-                            Bitmap interested = cropBitmap(src, offsetX, offsetY, src.getWidth() - offsetX, src.getHeight() - offsetY);
-                            if (interested != null) {
-                                /*int two = 0, one = 0;
-                                for (int i = 0; i < interested.getHeight(); i++) {
-                                    if (countRowSegments(i, interested) == 2) {
-                                        two++;
-                                    }
-                                    if (countRowSegments(i, interested) == 1) {
-                                        one++;
-                                    }
-                                }
-                                return ((double) one / interested.getHeight()) >= 0.8d && ((double) two / interested.getHeight()) <= 0.1d;*/
-
-                                FloatingImage f = new FloatingImage();
-                                f.mBitmap = interested;
-                                f.mListContours = findContour(interested);
-                                return isi(f) || isL(f);
+                Rect rect = list.get(0);
+                if (rect != null) {
+                    if (rect.bottom <= src.getHeight() * 0.7d && rect.width() <= rect.height()) {
+                        int offsetY = rect.bottom;
+                        int offsetX = -1;
+                        for (int i = 0; i < src.getWidth() && offsetX < 0; i++) {
+                            if (getColumnHeightFromTop(src, i) < rect.bottom) {
+                                offsetX = i;
                             }
                         }
-                    }
 
+                        Bitmap interested = cropBitmap(src, offsetX, offsetY, src.getWidth() - offsetX, src.getHeight() - offsetY);
+                        if (interested != null) {
+                            int two = 0, one = 0;
+                            for (int i = 0; i < interested.getHeight(); i++) {
+                                if (countRowSegments(i, interested) == 2) {
+                                    two++;
+                                }
+                                if (countRowSegments(i, interested) == 1) {
+                                    one++;
+                                }
+                            }
+                            return ((double) one / interested.getHeight()) >= 0.8d && ((double) two / interested.getHeight()) <= 0.3d;
+                        }
+                    }
                 }
             }
         }
         return false;
     }
 
-    private boolean isM(FloatingImage floatingImage) {
-        Bitmap src = floatingImage.mBitmap;
+    private boolean isM(Character character) {
+        Bitmap src = character.mBitmap;
         int left = (int) (src.getWidth() * 0.15d);
         Point blackLeft = getFirstBackFromBot(src, left);
         if (blackLeft != null) {
@@ -2458,7 +2650,7 @@ public class BitmapProcessor {
             if (Math.abs(blackLeft.x - blackRight.x) > 0 && src.getHeight() > 0) {
                 Bitmap center = cropBitmap(src, blackLeft.x, 0, blackRight.x - blackLeft.x, src.getHeight());
                 if (center != null) {
-                    FloatingImage f = new FloatingImage();
+                    Character f = new Character();
                     f.mBitmap = center;
                     return isV(f);
                 }
@@ -2467,11 +2659,11 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean ism(FloatingImage floatingImage) {
-        if (floatingImage.mListContours.size() >= 2) {
+    private boolean ism(Character character) {
+        if (character.mListContours.size() >= 2) {
             return false;
         }
-        Bitmap src = floatingImage.mBitmap;
+        Bitmap src = character.mBitmap;
         int right = (int) (src.getWidth() * 0.8d);
         int height = getColumnHeightFromBot(src, right);
         boolean decrease = false;
@@ -2488,48 +2680,52 @@ public class BitmapProcessor {
         if (right - 5 >= 0) {
             Bitmap r = cropBitmap(src, right - 5, 0, src.getWidth() - right + 5, src.getHeight());
             if (left != null && r != null) {
-                FloatingImage fLeft = new FloatingImage();
+                Character fLeft = new Character();
                 fLeft.mBitmap = left;
-                FloatingImage fRight = new FloatingImage();
+                fLeft.mListContours = findContour(left);
+                Character fRight = new Character();
                 fRight.mBitmap = r;
-                return isN(fLeft) && isN(fRight);
+                fRight.mListContours = findContour(r);
+                if (isN(fLeft)) {
+                    return true;
+                }
+                if (isN(fRight)) {
+                    return true;
+                }
+                if (isn(fLeft)) {
+                    return true;
+                }
+                if (isn(fRight)) {
+                    return true;
+                }
             }
         }
         return false;
     }
 
-    private boolean isN(FloatingImage floatingImage) {
-        Bitmap src = floatingImage.mBitmap;
-        int mid = src.getHeight() / 2;
-        Point point = null;
-        for (int i = (int) (src.getWidth() * 0.7d); i >= 0 && point == null; i--) {
-            int height = getColumnHeightFromTop(src, i);
-            int segments = countColumnSegments(i, src);
-            if (height > mid && segments == 1) {
-                point = new Point(i, height);
-            }
-        }
+    private boolean isN(Character character) {
+        Bitmap src = character.mBitmap;
+        int mid = src.getWidth() / 2;
+        int startTop = getColumnHeightFromTop(src, mid);
+        int startBot = getColumnHeightFromBot(src, mid);
 
-        if (point != null) {
-            Log.d("Point", "not null");
-            Bitmap leftAbove = cropBitmap(src, 0, 0, point.x, point.y);
-            Bitmap rightBelow = cropBitmap(src, point.x + 1, point.y + 1, src.getWidth() - point.x - 1, src.getHeight() - point.y - 1);
-            if (leftAbove != null && rightBelow != null) {
-                FloatingImage fLeftAbove = new FloatingImage();
-                fLeftAbove.mBitmap = leftAbove;
-                FloatingImage fRightBelow = new FloatingImage();
-                fRightBelow.mBitmap = rightBelow;
-                return isV_Inverse(fLeftAbove) && isV(fRightBelow);
-            }
+        Bitmap right = cropBitmap(src, mid, startTop, src.getWidth() - mid, src.getHeight() - startTop);
+        Bitmap left = cropBitmap(src, 0, 0, mid, startBot);
+        if (right != null && left != null) {
+            Character fLeft = new Character();
+            fLeft.mBitmap = left;
+            Character fRight = new Character();
+            fRight.mBitmap = right;
+            return isV_Inverse(fLeft) && isV(fRight);
         }
         return false;
     }
 
-    private boolean isn(FloatingImage floatingImage) {
-        if (floatingImage.mListContours.size() >= 2) {
+    private boolean isn(Character character) {
+        if (character.mListContours.size() >= 2) {
             return false;
         }
-        Bitmap src = floatingImage.mBitmap;
+        Bitmap src = character.mBitmap;
         int one = 0;
         for (int i = 0; i < src.getHeight(); i++) {
             if (countRowSegments(i, src) == 1) {
@@ -2538,70 +2734,61 @@ public class BitmapProcessor {
         }
         int split = (int) (src.getHeight() * 0.7d);
         Bitmap bot = cropBitmap(src, 0, split, src.getWidth(), src.getHeight() - split);
-        return detectAreasOnBitmap(bot, 0, 0).size() == 2 && ((double) one) / src.getHeight() <= 0.15d;
+        double ratio = ((double) one) / src.getHeight();
+        int count = detectAreasOnBitmap(bot, 0, 0).size();
+        return count == 2 && ratio <= 0.4d;
     }
 
-    private boolean isO(FloatingImage floatingImage) {
-        ArrayList<Bitmap> list = floatingImage.mListContours;
+    private boolean isO(Character character) {
+        if (is0(character)) {
+            return false;
+        }
+        ArrayList<Rect> list = character.mListRectContour;
         if (list.size() == 2) {
-            ArrayList<Rect> r1 = detectAreasOnBitmap(list.get(0), 0, 0);
-            ArrayList<Rect> r2 = detectAreasOnBitmap(list.get(1), 0, 0);
+            Rect rSmall = list.get(0);
+            Rect rBig = list.get(1);
 
-            if (r1 != null && r2 != null) {
-                if (r1.size() == 1 && r2.size() == 1) {
-                    Rect rSmall = (r1.get(0).width() > r2.get(0).width()) ? r2.get(0) : r1.get(0);
-                    Rect rBig = (r1.get(0).width() <= r2.get(0).width()) ? r2.get(0) : r1.get(0);
+            int offsetTop = Math.abs(rBig.top - rSmall.top);
+            int offsetBot = Math.abs(rBig.bottom - rSmall.bottom);
+            int offsetLeft = Math.abs(rBig.left - rSmall.left);
+            int offsetRight = Math.abs(rBig.right - rSmall.right);
+            boolean circleHorizontal = rBig.width() > rBig.height() * 0.85d;
 
-                    int offsetTop = Math.abs(rBig.top - rSmall.top);
-                    int offsetBot = Math.abs(rBig.bottom - rSmall.bottom);
-                    int offsetLeft = Math.abs(rBig.left - rSmall.left);
-                    int offsetRight = Math.abs(rBig.right - rSmall.right);
-                    boolean circleHorizontal = rBig.width() >= rBig.height();
-
-                    return (offsetBot == offsetTop) && (offsetBot == offsetRight) && (offsetBot == offsetLeft) && circleHorizontal;
-                }
-            }
+            return (Math.abs(offsetBot - offsetTop) <= 3) && (Math.abs(offsetBot - offsetRight) <= 3) &&
+                    (Math.abs(offsetBot - offsetLeft) <= 3) && circleHorizontal;
         }
         return false;
     }
 
-    private boolean isP(FloatingImage floatingImage) {
-        Bitmap bitmap = floatingImage.mBitmap;
-        ArrayList<Bitmap> list = floatingImage.mListContours;
+    private boolean isP(Character character) {
+        Bitmap bitmap = character.mBitmap;
+        ArrayList<Rect> list = character.mListRectContour;
         if (list != null) {
             if (list.size() == 2) {
-                ArrayList<Rect> r1 = detectAreasOnBitmap(list.get(0), 0, 0);
-                ArrayList<Rect> r2 = detectAreasOnBitmap(list.get(1), 0, 0);
-                if (r1 != null && r2 != null) {
-                    if (r1.size() == 1 && r2.size() == 1) {
-                        Rect rSmall = (r1.get(0).width() < r2.get(0).width()) ? r1.get(0) : r2.get(0);
-                        Rect rBig = (r1.get(0).width() >= r2.get(0).width()) ? r1.get(0) : r2.get(0);
-
-                        if (rSmall.bottom <= bitmap.getHeight() * 0.7d) {
-                            int one = 0, two = 0;
-                            int maxHorizontal = -1;
-                            for (int i = (int) (rSmall.bottom + 2 * FingerDrawerView.CurrentPaintSize); i < bitmap.getHeight(); i++) {
-                                if (countRowSegments(i, bitmap) == 1) {
-                                    one++;
-                                    int pos = -1;
-                                    for (int j = bitmap.getWidth() - 1; j >= 0 && pos < 0; j--) {
-                                        if (bitmap.getPixel(j, i) != Color.WHITE) {
-                                            pos = j;
-                                        }
-                                    }
-
-                                    if (pos > maxHorizontal) {
-                                        maxHorizontal = pos;
-                                    }
-                                }
-                                if (countRowSegments(i, bitmap) == 2) {
-                                    two++;
+                Rect rSmall = list.get(0);
+                if (rSmall.bottom <= bitmap.getHeight() * 0.7d) {
+                    int one = 0, two = 0;
+                    int maxHorizontal = -1;
+                    for (int i = (int) (rSmall.bottom + 2 * FingerDrawerView.CurrentPaintSize); i < bitmap.getHeight(); i++) {
+                        if (countRowSegments(i, bitmap) == 1) {
+                            one++;
+                            int pos = -1;
+                            for (int j = bitmap.getWidth() - 1; j >= 0 && pos < 0; j--) {
+                                if (bitmap.getPixel(j, i) != Color.WHITE) {
+                                    pos = j;
                                 }
                             }
 
-                            return two < 0.1d * one && maxHorizontal >= 0 && maxHorizontal < bitmap.getWidth() * 0.5d;
+                            if (pos > maxHorizontal) {
+                                maxHorizontal = pos;
+                            }
+                        }
+                        if (countRowSegments(i, bitmap) == 2) {
+                            two++;
                         }
                     }
+
+                    return two < 0.1d * one && maxHorizontal >= 0 && maxHorizontal < bitmap.getWidth() * 0.5d;
                 }
             }
         }
@@ -2622,8 +2809,8 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isQ(FloatingImage floatingImage) {
-        Bitmap src = floatingImage.mBitmap;
+    private boolean isQ(Character character) {
+        Bitmap src = character.mBitmap;
         /*int start = -1;
         int end = -1;
         for (int i = src.getHeight() / 2; i < src.getHeight(); i++) {
@@ -2636,25 +2823,17 @@ public class BitmapProcessor {
         }
 
         return (start >= 0 && end > start) && (start >= src.getHeight() / 2);*/
-        ArrayList<Bitmap> bitmaps = floatingImage.mListContours;
+        ArrayList<Rect> bitmaps = character.mListRectContour;
         if (bitmaps.size() == 2) {
-            ArrayList<Rect> rect1 = detectAreasOnBitmap(bitmaps.get(0), 0, 0);
-            ArrayList<Rect> rect2 = detectAreasOnBitmap(bitmaps.get(1), 0, 0);
-
-            if (rect1 != null && rect2 != null) {
-                Log.d("Size", "1: " + rect1.size() + ", 2: " + rect2.size());
-                if (rect1.size() == 1 && rect2.size() == 1) {
-                    Rect rSmall = (rect1.get(0).width() < rect2.get(0).width()) ? rect1.get(0) : rect2.get(0);
-                    Rect rBig = (rect1.get(0).width() >= rect2.get(0).width()) ? rect1.get(0) : rect2.get(0);
-                    if (rSmall != null && rBig != null) {
-                        Bitmap interested = cropBitmap(src, rSmall.left, rSmall.top, rSmall.width(), rSmall.height());
-                        if (interested != null) {
-                            for (int i = interested.getHeight() - 1; i >= 0; i--) {
-                                for (int j = interested.getWidth() - 1; j >= 0; j--) {
-                                    if (countRowSegments(i, interested) == 3 && countColumnSegments(j, interested) == 3) {
-                                        return true;
-                                    }
-                                }
+            Rect rSmall = bitmaps.get(0);
+            Rect rBig = bitmaps.get(1);
+            if (rSmall != null && rBig != null) {
+                Bitmap interested = cropBitmap(src, rSmall.left, rSmall.top, rSmall.width(), rSmall.height());
+                if (interested != null) {
+                    for (int i = interested.getHeight() - 1; i >= 0; i--) {
+                        for (int j = interested.getWidth() - 1; j >= 0; j--) {
+                            if (countRowSegments(i, interested) == 3 && countColumnSegments(j, interested) == 3) {
+                                return true;
                             }
                         }
                     }
@@ -2664,53 +2843,47 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isq(FloatingImage floatingImage) {
-        Bitmap bitmap = floatingImage.mBitmap;
-        ArrayList<Bitmap> list = floatingImage.mListContours;
+    private boolean isq(Character character) {
+        Bitmap bitmap = character.mBitmap;
+        ArrayList<Rect> list = character.mListRectContour;
         if (list != null) {
             if (list.size() == 2) {
-                ArrayList<Rect> r1 = detectAreasOnBitmap(list.get(0), 0, 0);
-                ArrayList<Rect> r2 = detectAreasOnBitmap(list.get(1), 0, 0);
-                if (r1 != null && r2 != null) {
-                    if (r1.size() == 1 && r2.size() == 1) {
-                        Rect rSmall = (r1.get(0).width() < r2.get(0).width()) ? r1.get(0) : r2.get(0);
+                Rect rSmall = list.get(0);
 
-                        if (rSmall.bottom <= bitmap.getHeight() * 0.7d) {
-                            int one = 0, two = 0;
-                            int maxHorizontal = -1;
-                            for (int i = (int) (rSmall.bottom + 2 * FingerDrawerView.CurrentPaintSize); i < bitmap.getHeight(); i++) {
-                                if (countRowSegments(i, bitmap) == 1) {
-                                    one++;
-                                    int pos = -1;
-                                    for (int j = bitmap.getWidth() - 1; j >= 0 && pos < 0; j--) {
-                                        if (bitmap.getPixel(j, i) != Color.WHITE) {
-                                            pos = j;
-                                        }
-                                    }
-
-                                    if (pos > maxHorizontal) {
-                                        maxHorizontal = pos;
-                                    }
-                                }
-                                if (countRowSegments(i, bitmap) == 2) {
-                                    two++;
+                if (rSmall.bottom <= bitmap.getHeight() * 0.7d) {
+                    int one = 0, two = 0;
+                    int maxHorizontal = -1;
+                    for (int i = (int) (rSmall.bottom + 2 * FingerDrawerView.CurrentPaintSize); i < bitmap.getHeight(); i++) {
+                        if (countRowSegments(i, bitmap) == 1) {
+                            one++;
+                            int pos = -1;
+                            for (int j = bitmap.getWidth() - 1; j >= 0 && pos < 0; j--) {
+                                if (bitmap.getPixel(j, i) != Color.WHITE) {
+                                    pos = j;
                                 }
                             }
 
-                            return two < 0.1d * one && maxHorizontal >= 0 && maxHorizontal > bitmap.getWidth() * 0.5d;
+                            if (pos > maxHorizontal) {
+                                maxHorizontal = pos;
+                            }
+                        }
+                        if (countRowSegments(i, bitmap) == 2) {
+                            two++;
                         }
                     }
+
+                    return two < 0.1d * one && maxHorizontal >= 0 && maxHorizontal > bitmap.getWidth() * 0.5d;
                 }
             }
         }
         return false;
     }
 
-    private boolean isR(FloatingImage floatingImage) {
-        if (isB(floatingImage) || isS(floatingImage)) {
+    private boolean isR(Character character) {
+        if (isB(character) || isS(character)) {
             return false;
         }
-        Bitmap src = floatingImage.mBitmap;
+        Bitmap src = character.mBitmap;
         int mid = src.getWidth() / 2;
         Bitmap right = cropBitmap(src, mid, 0, src.getWidth() - mid, src.getHeight());
         if (right != null) {
@@ -2734,34 +2907,27 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isr(FloatingImage floatingImage) {
-        Bitmap src = floatingImage.mBitmap;
-        ArrayList<Bitmap> list = floatingImage.mListContours;
+    private boolean isr(Character character) {
+        Bitmap src = character.mBitmap;
+        ArrayList<Rect> list = character.mListRectContour;
         if (list != null) {
             if (list.size() == 2) {
-                ArrayList<Rect> r1 = detectAreasOnBitmap(list.get(0), 0, 0);
-                ArrayList<Rect> r2 = detectAreasOnBitmap(list.get(0), 0, 0);
-
-                if (r1 != null && r2 != null) {
-                    if (r1.size() == 1 && r2.size() == 1) {
-                        Rect rect = (r1.get(0).width() < r2.get(0).width()) ? r1.get(0) : r2.get(0);
-                        Rect rBounder = (r1.get(0).width() >= r2.get(0).width()) ? r1.get(0) : r2.get(0);
-                        boolean closeToTopLeft = Math.abs(rBounder.top - rect.top) == Math.abs(rBounder.left - rect.left);
-                        int split = (int) (src.getHeight() * 0.7d);
-                        Bitmap bitmap = cropBitmap(src, 0, split, src.getWidth(), src.getHeight() - split);
-                        return closeToTopLeft && detectAreasOnBitmap(bitmap, 0, 0).size() == 2;
-                    }
-                }
+                Rect rect = list.get(0);
+                Rect rBounder = list.get(1);
+                boolean closeToTopLeft = Math.abs(rBounder.top - rect.top) == Math.abs(rBounder.left - rect.left);
+                int split = (int) (src.getHeight() * 0.7d);
+                Bitmap bitmap = cropBitmap(src, 0, split, src.getWidth(), src.getHeight() - split);
+                return closeToTopLeft && detectAreasOnBitmap(bitmap, 0, 0).size() == 2;
             }
         }
         return false;
     }
 
-    private boolean isS(FloatingImage floatingImage) {
-        int mid = floatingImage.mBitmap.getWidth() / 2;
-        Bitmap src = floatingImage.mBitmap;
-        Bitmap left = cropBitmap(floatingImage.mBitmap, 0, 0, mid, src.getHeight());
-        Bitmap right = cropBitmap(floatingImage.mBitmap, mid, 0, src.getWidth() - mid, src.getHeight());
+    private boolean isS(Character character) {
+        int mid = character.mBitmap.getWidth() / 2;
+        Bitmap src = character.mBitmap;
+        Bitmap left = cropBitmap(character.mBitmap, 0, 0, mid, src.getHeight());
+        Bitmap right = cropBitmap(character.mBitmap, mid, 0, src.getWidth() - mid, src.getHeight());
 
         if (left != null && right != null) {
             ArrayList<Rect> leftList = detectAreasOnBitmap(left, 0, 0);
@@ -2779,11 +2945,11 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isT(FloatingImage floatingImage) {
-        if (floatingImage.mListContours.size() >= 2 || isZ(floatingImage)) {
+    private boolean isT(Character character) {
+        if (character.mListContours.size() >= 2 || isZ(character)) {
             return false;
         }
-        Bitmap src = floatingImage.mBitmap;
+        Bitmap src = character.mBitmap;
         int width = src.getWidth();
         int first = -1;
         int countFat = 0, countThin = 0;
@@ -2835,11 +3001,11 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean ist(FloatingImage floatingImage) {
-        if (floatingImage.mListContours.size() >= 2) {
+    private boolean ist(Character character) {
+        if (character.mListContours.size() >= 2 || isZ(character)) {
             return false;
         }
-        Bitmap src = floatingImage.mBitmap;
+        Bitmap src = character.mBitmap;
         int width = src.getWidth();
         int first = -1;
         int countFat = 0, countThin = 0;
@@ -2877,51 +3043,44 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isU(FloatingImage floatingImage) {
+    private boolean isU(Character character) {
         int countThree = 0;
-        for (int i = 0; i < floatingImage.mBitmap.getHeight(); i++) {
-            if (countRowSegments(i, floatingImage.mBitmap) == 3) {
+        for (int i = 0; i < character.mBitmap.getHeight(); i++) {
+            if (countRowSegments(i, character.mBitmap) == 3) {
                 countThree++;
             }
         }
         if (countThree == 0) {
-            return (floatingImage.mListContours.size() == 1) && connectedComponentBot(floatingImage) == 1 &&
-                    connectedComponentTop(floatingImage) == 2;
+            return (character.mListContours.size() == 1) && connectedComponentBot(character) == 1 &&
+                    connectedComponentTop(character) == 2;
         }
         return false;
     }
 
-    private boolean isu(FloatingImage floatingImage) {
-        return (findContour(floatingImage.mBitmap).size() == 1);
+    private boolean isu(Character character) {
+        return (findContour(character.mBitmap).size() == 1);
     }
 
-    private boolean isV_Inverse(FloatingImage floatingImage) {
-        int connectedTop = connectedComponentTop(floatingImage);
-        int connectedBot = connectedComponentBot(floatingImage);
-        int triangleTop = triangleFromTop(floatingImage);
+    private boolean isV_Inverse(Character character) {
+        int connectedTop = connectedComponentTop(character);
+        int connectedBot = connectedComponentBot(character);
+        int triangleTop = triangleFromTop(character);
         return (connectedTop == 1 && connectedBot == 2 && triangleTop == 1);
     }
 
-    private boolean isV(FloatingImage floatingImage) {
-        int connectedTop = connectedComponentTop(floatingImage);
-        int connectedBot = connectedComponentBot(floatingImage);
-        int triangleBot = triangleFromBot(floatingImage);
-        Bitmap src = floatingImage.mBitmap;
-        int countOne = 0;
-        for (int i = 0; i < src.getHeight(); i++) {
-            if (countRowSegments(i, src) == 1) {
-                countOne++;
-            }
-        }
-        return (connectedTop == 2 && connectedBot == 1 && triangleBot == 1 && countOne <= 0.3d * src.getHeight());
+    private boolean isV(Character character) {
+        int connectedTop = connectedComponentTop(character);
+        int connectedBot = connectedComponentBot(character);
+        int triangleBot = triangleFromBot(character);
+        return (connectedTop == 2 && connectedBot == 1 && triangleBot == 1);
     }
 
-    private boolean isW(FloatingImage floatingImage) {
-        if (floatingImage.mListContours.size() >= 2) {
+    private boolean isW(Character character) {
+        if (character.mListContours.size() >= 2) {
             return false;
         }
 
-        Bitmap src = floatingImage.mBitmap;
+        Bitmap src = character.mBitmap;
         int left = (int) (src.getWidth() * 0.15d);
         Point blackLeft = getFirstBackFromTop(src, left);
         if (blackLeft != null) {
@@ -2956,7 +3115,7 @@ public class BitmapProcessor {
         if (blackLeft != null && blackRight != null) {
             Bitmap center = cropBitmap(src, blackLeft.x, 0, blackRight.x - blackLeft.x, src.getHeight());
             if (center != null) {
-                FloatingImage f = new FloatingImage();
+                Character f = new Character();
                 f.mBitmap = center;
                 return isV_Inverse(f);
             }
@@ -2964,9 +3123,9 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isX(FloatingImage floatingImage) {
-        if (!isV(floatingImage) && !isW(floatingImage) && !isA(floatingImage) && !isY(floatingImage)) {
-            Bitmap src = floatingImage.mBitmap;
+    private boolean isX(Character character) {
+        if (!isV(character) && !isW(character) && !isA(character) && !isY(character)) {
+            Bitmap src = character.mBitmap;
             int row = -1;
             int start = src.getHeight() / 4;
             int end = src.getHeight() - start;
@@ -2977,9 +3136,9 @@ public class BitmapProcessor {
             }
 
             if (row > 0) {
-                FloatingImage top = new FloatingImage();
+                Character top = new Character();
                 top.mBitmap = cropBitmap(src, 0, 0, src.getWidth(), row + 1);
-                FloatingImage bot = new FloatingImage();
+                Character bot = new Character();
                 bot.mBitmap = cropBitmap(src, 0, row + 2, src.getWidth(), src.getHeight() - row - 2);
                 return triangleFromBot(top) == 1 && triangleFromTop(bot) == 1;
             }
@@ -2987,8 +3146,8 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isY(FloatingImage floatingImage) {
-        Bitmap src = floatingImage.mBitmap;
+    private boolean isY(Character character) {
+        Bitmap src = character.mBitmap;
         int row = -1;
 
         for (int i = src.getHeight() - 1; i >= 0 && row < 0; i--) {
@@ -2999,7 +3158,7 @@ public class BitmapProcessor {
 
         if (row > 0) {
             if (row + 5 < src.getHeight()) {
-                FloatingImage top = new FloatingImage();
+                Character top = new Character();
                 top.mBitmap = cropBitmap(src, 0, 0, src.getWidth(), row + 5);
                 return isV(top);
             }
@@ -3007,83 +3166,75 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean isy(FloatingImage floatingImage) {
-        Bitmap src = floatingImage.mBitmap;
+    private boolean isy(Character character) {
+        Bitmap src = character.mBitmap;
         Bitmap top = cropBitmap(src, 0, 0, src.getWidth(), (int) (src.getHeight() * 0.2d));
         if (detectAreasOnBitmap(top, 0, 0).size() < 2) {
             return false;
         }
-        ArrayList<Bitmap> list = floatingImage.mListContours;
+        ArrayList<Rect> list = character.mListRectContour;
         if (list != null) {
             if (list.size() == 2) {
-                ArrayList<Rect> r1 = detectAreasOnBitmap(list.get(0), 0, 0);
-                ArrayList<Rect> r2 = detectAreasOnBitmap(list.get(1), 0, 0);
-                if (r1 != null && r2 != null) {
-                    if (r1.size() == 1 && r2.size() == 1) {
-                        Rect rect = (r1.get(0).width() < r2.get(0).width()) ? r1.get(0) : r2.get(0);
-                        if (rect != null) {
-                            boolean closeToBot = Math.abs(rect.bottom - (src.getHeight() - 1)) <= 2.5 * FingerDrawerView.CurrentPaintSize;
-                            int count = 0;
-                            int increase = 0;
-                            boolean stop = false;
-                            for (int i = 0; i < src.getHeight() && !stop; i++) {
-                                int blank = getBlankCounts(i, src);
-                                if (blank > 0) {
-                                    if (blank >= count) {
-                                        increase++;
-                                        count = blank;
-                                    } else {
-                                        stop = true;
-                                    }
-                                } else {
-                                    if (count > 0) {
-                                        stop = true;
-                                    }
-                                }
+                Rect rect = list.get(0);
+                if (rect != null) {
+                    boolean closeToBot = Math.abs(rect.bottom - (src.getHeight() - 1)) <= 2.5 * FingerDrawerView.CurrentPaintSize;
+                    int count = 0;
+                    int increase = 0;
+                    boolean stop = false;
+                    for (int i = 0; i < src.getHeight() && !stop; i++) {
+                        int blank = getBlankCounts(i, src);
+                        if (blank > 0) {
+                            if (blank >= count) {
+                                increase++;
+                                count = blank;
+                            } else {
+                                stop = true;
                             }
-
-                            return increase > 0 && closeToBot;
+                        } else {
+                            if (count > 0) {
+                                stop = true;
+                            }
                         }
                     }
+
+                    return increase > 0 && closeToBot;
                 }
             }
         }
         return false;
     }
 
-    private boolean isZ(FloatingImage floatingImage) {
-        Bitmap src = rotateBitmap(floatingImage.mBitmap, 90);
-        FloatingImage f = new FloatingImage();
+    private boolean isZ(Character character) {
+        Bitmap src = rotateBitmap(character.mBitmap, 90);
+        Character f = new Character();
         f.mBitmap = src;
         return isN(f);
     }
 
-    private boolean is0(FloatingImage floatingImage) {
-        ArrayList<Bitmap> list = floatingImage.mListContours;
+    private boolean is0(Character character) {
+        ArrayList<Rect> list = character.mListRectContour;
         if (list.size() == 2) {
-            ArrayList<Rect> r1 = detectAreasOnBitmap(list.get(0), 0, 0);
-            ArrayList<Rect> r2 = detectAreasOnBitmap(list.get(1), 0, 0);
+            Rect rSmall = list.get(0);
+            Rect rBig = list.get(1);
 
-            if (r1 != null && r2 != null) {
-                if (r1.size() == 1 && r2.size() == 1) {
-                    Rect rSmall = (r1.get(0).width() > r2.get(0).width()) ? r2.get(0) : r1.get(0);
-                    Rect rBig = (r1.get(0).width() <= r2.get(0).width()) ? r2.get(0) : r1.get(0);
+            int offsetTop = Math.abs(rBig.top - rSmall.top);
+            int offsetBot = Math.abs(rBig.bottom - rSmall.bottom);
+            int offsetLeft = Math.abs(rBig.left - rSmall.left);
+            int offsetRight = Math.abs(rBig.right - rSmall.right);
+            Log.d("top", offsetTop + "");
+            Log.d("bot", offsetBot + "");
+            Log.d("left", offsetLeft + "");
+            Log.d("right", offsetRight + "");
+            boolean circleVertical = rBig.width() <= rBig.height() * 0.85d;
 
-                    int offsetTop = Math.abs(rBig.top - rSmall.top);
-                    int offsetBot = Math.abs(rBig.bottom - rSmall.bottom);
-                    int offsetLeft = Math.abs(rBig.left - rSmall.left);
-                    int offsetRight = Math.abs(rBig.right - rSmall.right);
-                    boolean circleVertical = rBig.width() <= rBig.height();
-
-                    return (offsetBot == offsetTop) && (offsetBot == offsetRight) && (offsetBot == offsetLeft) && circleVertical;
-                }
-            }
+            return (Math.abs(offsetBot - offsetTop) <= 3) && (Math.abs(offsetBot - offsetRight) <= 3) &&
+                    (Math.abs(offsetBot - offsetLeft) <= 3) && circleVertical;
         }
         return false;
     }
 
-    private boolean is1(FloatingImage floatingImage) {
-        Bitmap src = floatingImage.mBitmap;
+    private boolean is1(Character character) {
+        Bitmap src = character.mBitmap;
         int pos = -1;
         boolean stop = false;
         for (int i = 0; i < src.getHeight() && !stop; i++) {
@@ -3101,7 +3252,7 @@ public class BitmapProcessor {
             Bitmap interested = cropBitmap(src, 0, 0, src.getWidth(), pos);
             boolean isV_inverse = false;
             if (interested != null) {
-                FloatingImage f = new FloatingImage();
+                Character f = new Character();
                 f.mBitmap = interested;
                 isV_inverse = isV_Inverse(f);
             }
@@ -3133,39 +3284,32 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean is2(FloatingImage floatingImage) {
-        ArrayList<Bitmap> list = floatingImage.mListContours;
-        Bitmap src = floatingImage.mBitmap;
+    private boolean is2(Character character) {
+        ArrayList<Rect> list = character.mListRectContour;
+        Bitmap src = character.mBitmap;
         if (list.size() == 2) {
-            ArrayList<Rect> r1 = detectAreasOnBitmap(list.get(0), 0, 0);
-            ArrayList<Rect> r2 = detectAreasOnBitmap(list.get(1), 0, 0);
+            Rect rSmall = list.get(0);
+            Rect rBig = list.get(1);
 
-            if (r1 != null && r2 != null) {
-                if (r1.size() == 1 && r2.size() == 1) {
-                    Rect rSmall = (r1.get(0).width() > r2.get(0).width()) ? r2.get(0) : r1.get(0);
-                    Rect rBig = (r1.get(0).width() <= r2.get(0).width()) ? r2.get(0) : r1.get(0);
+            int offsetTop = Math.abs(rSmall.top - rBig.top);
+            int offsetBot = Math.abs(rSmall.bottom - rBig.bottom);
+            int offsetLeft = Math.abs(rSmall.left - rBig.left);
+            int offsetRight = Math.abs(rSmall.right - rBig.right);
+            boolean closeToBotLeft = offsetTop > offsetBot && offsetLeft < offsetRight;
+            int split = rSmall.right;
+            Bitmap left = cropBitmap(src, 0, 0, split, src.getHeight());
+            boolean segmentsTwo = detectAreasOnBitmap(left, 0, 0).size() == 2;
 
-                    int offsetTop = Math.abs(rSmall.top - rBig.top);
-                    int offsetBot = Math.abs(rSmall.bottom - rBig.bottom);
-                    int offsetLeft = Math.abs(rSmall.left - rBig.left);
-                    int offsetRight = Math.abs(rSmall.right - rBig.right);
-                    boolean closeToBotLeft = offsetTop > offsetBot && offsetLeft < offsetRight;
-                    int split = rSmall.right;
-                    Bitmap left = cropBitmap(src, 0, 0, split, src.getHeight());
-                    boolean segmentsTwo = detectAreasOnBitmap(left, 0, 0).size() == 2;
-
-                    int countThree = 0;
-                    if (left != null) {
-                        for (int i = 0; i < left.getWidth(); i++) {
-                            if (countColumnSegments(i, left) == 3) {
-                                countThree++;
-                            }
-                        }
+            int countThree = 0;
+            if (left != null) {
+                for (int i = 0; i < left.getWidth(); i++) {
+                    if (countColumnSegments(i, left) == 3) {
+                        countThree++;
                     }
-
-                    return closeToBotLeft && segmentsTwo && countThree >= src.getWidth() * 0.1d;
                 }
             }
+
+            return closeToBotLeft && segmentsTwo && countThree >= src.getWidth() * 0.1d;
         } else {
             if (list.size() == 1) {
                 boolean stop = false;
@@ -3201,12 +3345,12 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean is3(FloatingImage floatingImage) {
-        if (floatingImage.mListContours.size() > 1) {
+    private boolean is3(Character character) {
+        if (character.mListContours.size() > 1) {
             return false;
         }
-        Bitmap src = floatingImage.mBitmap;
-        int split = (int) (src.getWidth() * 0.3d);
+        Bitmap src = character.mBitmap;
+        int split = (int) (src.getWidth() * 0.6d);
         Bitmap left = cropBitmap(src, 0, 0, split, src.getHeight());
         ArrayList<Rect> rect = detectAreasOnBitmap(left, 0, 0);
         if (rect != null) {
@@ -3275,11 +3419,11 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean is4(FloatingImage floatingImage) {
-        if (floatingImage.mListContours.size() > 1) {
+    private boolean is4(Character character) {
+        if (character.mListContours.size() > 1) {
             return false;
         }
-        Bitmap src = floatingImage.mBitmap;
+        Bitmap src = character.mBitmap;
         Bitmap top = cropBitmap(src, 0, 0, src.getWidth(), (int) (src.getHeight() * 0.3d));
         boolean openTop = false;
         if (top != null) {
@@ -3317,7 +3461,7 @@ public class BitmapProcessor {
 
         Bitmap interested = cropBitmap(src, point.x, 0, src.getWidth() - point.x, point.y);
         if (interested != null) {
-            FloatingImage f = new FloatingImage();
+            Character f = new Character();
             f.mBitmap = interested;
             f.mListContours = findContour(interested);
             return isL(f) && openTop;
@@ -3325,11 +3469,11 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean is5(FloatingImage floatingImage) {
-        if (floatingImage.mListContours.size() > 1) {
+    private boolean is5(Character character) {
+        if (character.mListContours.size() > 1) {
             return false;
         }
-        Bitmap src = floatingImage.mBitmap;
+        Bitmap src = character.mBitmap;
         int countFatRow = 0;
         for (int i = 0; i < src.getHeight(); i++) {
             if (countRowSegments(i, src) == 1) {
@@ -3401,7 +3545,7 @@ public class BitmapProcessor {
                 if (interested != null) {
                     Bitmap rotated = rotateBitmap(interested, -90);
                     if (rotated != null) {
-                        FloatingImage f = new FloatingImage();
+                        Character f = new Character();
                         f.mBitmap = rotated;
                         f.mListContours = findContour(rotated);
                         return isL(f) && countFatRow > 0;
@@ -3413,34 +3557,27 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean is6(FloatingImage floatingImage) {
-        ArrayList<Bitmap> list = floatingImage.mListContours;
-        Bitmap src = floatingImage.mBitmap;
+    private boolean is6(Character character) {
+        ArrayList<Rect> list = character.mListRectContour;
+        Bitmap src = character.mBitmap;
         if (list.size() == 2) {
-            ArrayList<Rect> r1 = detectAreasOnBitmap(list.get(0), 0, 0);
-            ArrayList<Rect> r2 = detectAreasOnBitmap(list.get(1), 0, 0);
+            Rect rSmall = list.get(0);
+            Rect rBig = list.get(1);
 
-            if (r1 != null && r2 != null) {
-                if (r1.size() == 1 && r2.size() == 1) {
-                    Rect rSmall = (r1.get(0).width() > r2.get(0).width()) ? r2.get(0) : r1.get(0);
-                    Rect rBig = (r1.get(0).width() <= r2.get(0).width()) ? r2.get(0) : r1.get(0);
-
-                    int offsetTop = Math.abs(rSmall.top - rBig.top);
-                    int offsetBot = Math.abs(rSmall.bottom - rBig.bottom);
-                    if (offsetBot <= offsetTop && rSmall.width() >= src.getWidth() * 0.5d) {
-                        int countThree = 0;
-                        for (int i = 0; i < src.getWidth(); i++) {
-                            if (countColumnSegments(i, src) == 3) {
-                                countThree++;
-                            }
-                        }
-                        if (countThree >= 0.5d * src.getWidth()) {
-                            int split = src.getWidth() / 2;
-                            Bitmap right = cropBitmap(src, split, 0, src.getWidth() - split, src.getHeight());
-                            if (right != null) {
-                                return detectAreasOnBitmap(right, 0, 0).size() == 2;
-                            }
-                        }
+            int offsetTop = Math.abs(rSmall.top - rBig.top);
+            int offsetBot = Math.abs(rSmall.bottom - rBig.bottom);
+            if (offsetBot <= offsetTop && rSmall.width() >= src.getWidth() * 0.5d) {
+                int countThree = 0;
+                for (int i = 0; i < src.getWidth(); i++) {
+                    if (countColumnSegments(i, src) == 3) {
+                        countThree++;
+                    }
+                }
+                if (countThree >= 0.5d * src.getWidth()) {
+                    int split = src.getWidth() / 2;
+                    Bitmap right = cropBitmap(src, split, 0, src.getWidth() - split, src.getHeight());
+                    if (right != null) {
+                        return detectAreasOnBitmap(right, 0, 0).size() == 2;
                     }
                 }
             }
@@ -3449,12 +3586,14 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean is7(FloatingImage floatingImage) {
-
-        if (floatingImage.mListContours.size() >= 2 || isZ(floatingImage)) {
+    private boolean is7(Character character) {
+        if (isZ(character)) {
             return false;
         }
-        Bitmap src = floatingImage.mBitmap;
+        if (character.mListContours.size() >= 2 || isZ(character)) {
+            return false;
+        }
+        Bitmap src = character.mBitmap;
         int width = src.getWidth();
         int first = -1;
         int countFat = 0, countThin = 0;
@@ -3504,11 +3643,11 @@ public class BitmapProcessor {
         return false;
     }
 
-    private boolean is8(FloatingImage floatingImage) {
-        if (floatingImage.mListContours.size() != 3) {
+    private boolean is8(Character character) {
+        if (character.mListRectContour.size() != 3) {
             return false;
         }
-        Bitmap src = floatingImage.mBitmap;
+        Bitmap src = character.mBitmap;
         int count = 0;
         boolean flag = false;
         for (int i = 0; i < src.getHeight(); i++) {
@@ -3540,11 +3679,26 @@ public class BitmapProcessor {
         return countThree > 0 && countFour > 0 && (countFour + countThree) >= 0.5d * src.getWidth();
     }
 
-    private boolean is9(FloatingImage floatingImage) {
-        Bitmap rotated = rotateBitmap(floatingImage.mBitmap, 180);
-        FloatingImage f = new FloatingImage();
+    private boolean is9(Character character) {
+        Bitmap rotated = rotateBitmap(character.mBitmap, 180);
+        Character f = new Character();
         f.mBitmap = rotated;
         f.mListContours = findContour(rotated);
+        f.mListRectContour = new ArrayList<>();
+        ArrayList<Bitmap> contours = f.mListContours;
+        if (contours.size() == 2) {
+            ArrayList<Rect> r1 = detectAreasOnBitmap(contours.get(0), 0, 0);
+            ArrayList<Rect> r2 = detectAreasOnBitmap(contours.get(1), 0, 0);
+
+            if (r1 != null && r2 != null) {
+                if (r1.size() == 1 && r2.size() == 1) {
+                    Rect rSmall = (r1.get(0).width() > r2.get(0).width()) ? r2.get(0) : r1.get(0);
+                    Rect rBig = (r1.get(0).width() <= r2.get(0).width()) ? r2.get(0) : r1.get(0);
+                    f.mListRectContour.add(rSmall);
+                    f.mListRectContour.add(rBig);
+                }
+            }
+        }
         return is6(f);
     }
 }

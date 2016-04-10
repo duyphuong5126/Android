@@ -8,7 +8,6 @@ import android.graphics.CornerPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
-import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
@@ -18,11 +17,9 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Stack;
 
-import duy.phuong.handnote.DTO.FloatingImage;
+import duy.phuong.handnote.DTO.Character;
 import duy.phuong.handnote.RecognitionAPI.BitmapProcessor;
 
 /**
@@ -248,17 +245,17 @@ public class FingerDrawerView extends View {
             mListPaths.get(i).setChecked(false);
         }
 
-        final ArrayList<FloatingImage> bitmaps = new ArrayList<>();
+        final ArrayList<Character> bitmaps = new ArrayList<>();
 
         if (!listShapes.isEmpty()) {
             for (MyShape myShape : listShapes) {
-                final FloatingImage floatingImage = new FloatingImage();
-                floatingImage.mBitmap = Bitmap.createBitmap(mCacheBitmap.getWidth(), mCacheBitmap.getHeight(), Bitmap.Config.ARGB_8888);
-                floatingImage.mMyShape = myShape;
-                floatingImage.mParentWidth = CurrentWidth;
-                floatingImage.mParentHeight = CurrentHeight;
+                final duy.phuong.handnote.DTO.Character character = new Character();
+                character.mBitmap = Bitmap.createBitmap(mCacheBitmap.getWidth(), mCacheBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                character.mMyShape = myShape;
+                character.mParentWidth = CurrentWidth;
+                character.mParentHeight = CurrentHeight;
 
-                Canvas canvas = new Canvas(floatingImage.mBitmap);
+                Canvas canvas = new Canvas(character.mBitmap);
                 canvas.drawColor(Color.WHITE);
                 for (MyPath myPath : myShape.getListPaths()) {
                     Path path = new Path();
@@ -275,9 +272,9 @@ public class FingerDrawerView extends View {
                     canvas.drawPath(path, mPaint);
                 }
 
-                mBitmapProcessor.onDetectCharacter(floatingImage, new BitmapProcessor.RecognitionCallback() {
+                mBitmapProcessor.onDetectCharacter(character, new BitmapProcessor.RecognitionCallback() {
                     @Override
-                    public void onRecognizeSuccess(ArrayList<FloatingImage> listBitmaps) {
+                    public void onRecognizeSuccess(ArrayList<Character> listBitmaps) {
                         bitmaps.addAll(listBitmaps);
                     }
                 });
