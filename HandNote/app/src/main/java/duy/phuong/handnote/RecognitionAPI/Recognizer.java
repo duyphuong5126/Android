@@ -84,38 +84,26 @@ public class Recognizer {
             }
         }
 
-        int win_neuron = distance[0].position;
-        int win_neuron_X = win_neuron % 11; int win_neuron_Y = win_neuron / 11;
-        Bundle result = mProcessor.featureExtraction(character, mMapNames.get(win_neuron).getListLabel());
-        if (result.getBoolean("Result")) {
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("input", input);
-            bundle.putString("result", result.getString("Char"));
-            if (win_neuron_X >= 0 && win_neuron_Y >= 0) {
-                bundle.putInt("cordX", win_neuron_X);
-                bundle.putInt("cordY", win_neuron_Y);
-            }
-            return bundle;
-        } else {
-            for (int i = 0; i < distance.length; i++) {
-                int neuron = distance[i].position;
-                win_neuron_X = neuron % 11; win_neuron_Y = neuron / 11;
-                Bundle r = mProcessor.featureExtraction(character, mMapNames.get(neuron).getListLabel());
-                if (r.getBoolean("Result")) {
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable("input", input);
-                    bundle.putString("result", r.getString("Char"));
-                    if (win_neuron_X >= 0 && win_neuron_Y >= 0) {
-                        bundle.putInt("cordX", win_neuron_X);
-                        bundle.putInt("cordY", win_neuron_Y);
-                    }
-                    return bundle;
+        int win_neuron_X = -1, win_neuron_Y = -1;
+        for (int i = 0; i < distance.length; i++) {
+            int neuron = distance[i].position;
+            win_neuron_X = neuron % 11; win_neuron_Y = neuron / 11;
+            Bundle r = mProcessor.featureExtraction(character, mMapNames.get(neuron).getListLabel());
+            if (r.getBoolean("Result")) {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("input", input);
+                bundle.putString("result", r.getString("Char"));
+                if (win_neuron_X >= 0 && win_neuron_Y >= 0) {
+                    bundle.putInt("cordX", win_neuron_X);
+                    bundle.putInt("cordY", win_neuron_Y);
                 }
+                return bundle;
             }
         }
 
-        win_neuron = distance[0].position;
+        int win_neuron = distance[0].position;
         win_neuron_X = win_neuron % 11; win_neuron_Y = win_neuron / 11;
+        Bundle result = mProcessor.featureExtraction(character, mMapNames.get(win_neuron).getListLabel());
         Bundle bundle = new Bundle();
         bundle.putSerializable("input", input);
         bundle.putString("result", result.getString("Char"));
