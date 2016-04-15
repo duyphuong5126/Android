@@ -10,6 +10,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -120,26 +122,84 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
     }
 
     @Override
-    public void onRecognizeSuccess(ArrayList<Character> listBitmaps) {
+    public void onRecognizeSuccess(ArrayList<Character> listCharacters) {
         if (mCurrentRecognized == null) {
             mCurrentRecognized = new HashMap<>();
         } else {
             mCurrentRecognized.clear();
         }
 
-        if (listBitmaps != null && listBitmaps.size() > 0) {
-            String text = "";
-            for (int i = 0; i < listBitmaps.size(); i++) {
-                Bundle bundle = mRecognizer.recognize(listBitmaps.get(i));
-                int x = bundle.getInt("cordX");
-                int y = bundle.getInt("cordY");
-                Input input = (Input) bundle.getSerializable("input");
-                String result = bundle.getString("result");
-                mCurrentRecognized.put(input, new Point(x, y));
-                Log.d("Result", "bitmap " + i + " :" + result);
-                text += result;
+        ArrayList<Line> lines = mDrawer.getLines();
+
+        if (!lines.isEmpty()) {
+            for (Line line : lines) {
+                line.mCharacters = new ArrayList<>();
+                for (Character character : listCharacters) {
+                    if (!character.isSorted) {
+                        if (character.mRect.top >= line.mTop && character.mRect.top <= line.mBottom) {
+                            line.mCharacters.add(character);
+                            character.isSorted = true;
+                        }
+                    }
+                }
             }
-            mTvResult.setText(text);
+
+            String paragraph = "";
+            for (Line line : lines) {
+                if (!line.mCharacters.isEmpty()) {
+                    boolean end = false;
+                    while (!end) {
+                        boolean swapped = false;
+                        for (int i = 1; i < line.mCharacters.size(); i++) {
+                            Character c1 = line.mCharacters.get(i), cp = line.mCharacters.get(i - 1);
+                            if (c1.mRect.left < cp.mRect.left) {
+                                Collections.swap(line.mCharacters, i, i - 1);
+                                swapped = true;
+                            }
+                        }
+
+                        if (!swapped) {
+                            end = true;
+                        }
+                    }
+                    String text = "";
+                    int h = Math.abs(line.mBottom - line.mTop);
+                    for (int i = 0; i < line.mCharacters.size(); i++) {
+                        Character c = line.mCharacters.get(i);
+                        Bundle bundle = mRecognizer.recognize(c);
+                        int x = bundle.getInt("cordX");
+                        int y = bundle.getInt("cordY");
+                        Input input = (Input) bundle.getSerializable("input");
+                        String result = bundle.getString("result");
+                        mCurrentRecognized.put(input, new Point(x, y));
+                        Log.d("Result", "bitmap " + i + " :" + result);
+                        String character = "";
+                        switch (result) {
+                            case "C":
+                            case "O":
+                            case "P":
+                            case "S":
+                            case "V":
+                            case "W":
+                            case "X":
+                            case "Z":
+                                if (c.mRect.height() <= 0.65d * h) {
+                                    character = result.toLowerCase();
+                                } else {
+                                    character = result;
+                                }
+                                break;
+
+                            default:
+                                character = result;
+                                break;
+                        }
+                        text += character;
+                    }
+                    paragraph += text + " ";
+                }
+            }
+            mTvResult.setText(paragraph);
         }
     }
 

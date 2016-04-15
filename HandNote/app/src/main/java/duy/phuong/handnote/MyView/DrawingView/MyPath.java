@@ -21,16 +21,6 @@ public class MyPath {
     private Rect mRect;
     private boolean mChecked;
 
-    public static final String RIGHT = "RIGHT";
-    public static final String LEFT = "LEFT";
-    public static final String UP = "UP";
-    public static final String DOWN = "DOWN";
-    public static final String RIGHT_UP = "RIGHT_UP";
-    public static final String RIGHT_DOWN = "RIGHT_DOWN";
-    public static final String LEFT_UP = "LEFT_UP";
-    public static final String LEFT_DOWN = "LEFT_DOWN";
-    public static final String STABLE = "STABLE";
-
     public MyPath(ArrayList<Point> ListPoint) {
         this.mListPoint = ListPoint;
         mChecked = false;
@@ -46,10 +36,6 @@ public class MyPath {
 
     public ArrayList<Point> getListPoint() {
         return mListPoint;
-    }
-
-    public void setListPoint(ArrayList<Point> ListPoint) {
-        this.mListPoint = ListPoint;
     }
 
     public Rect getRect() {
@@ -136,37 +122,5 @@ public class MyPath {
         }
 
         return false;
-    }
-
-    public String[] getDirectedChildPaths() {
-        String[] strings = new String[mListPoint.size() - 1];
-        for (int i = 0; i < mListPoint.size() && i + 1 < mListPoint.size(); i++) {
-            strings[i] = checkDirection(mListPoint.get(i), mListPoint.get(i + 1));
-        }
-        return strings;
-    }
-
-    public String checkDirection(Point point1, Point point2) {
-        if (point1.x == point2.x) {
-            if (point1.y == point2.y) {
-                return STABLE;
-            } else {
-                return (point1.y > point2.y) ? UP : DOWN;
-            }
-        } else {
-            if (point1.x < point2.x) {
-                if (point1.y == point2.y) {
-                    return RIGHT;
-                } else {
-                    return (point1.y > point2.y) ? RIGHT_UP : RIGHT_DOWN;
-                }
-            } else {
-                if (point1.y == point2.y) {
-                    return LEFT;
-                } else {
-                    return (point1.y > point2.y) ? LEFT_UP : LEFT_DOWN;
-                }
-            }
-        }
     }
 }

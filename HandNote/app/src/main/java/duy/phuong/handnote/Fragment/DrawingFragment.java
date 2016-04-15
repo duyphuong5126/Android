@@ -64,9 +64,9 @@ public class DrawingFragment extends BaseFragment implements View.OnClickListene
         mDrawer = (FingerDrawerView) mFragmentView.findViewById(R.id.FingerDrawer);
         mDrawer.setListener(new BitmapProcessor.RecognitionCallback() {
             @Override
-            public void onRecognizeSuccess(ArrayList<Character> listBitmaps) {
+            public void onRecognizeSuccess(ArrayList<Character> listCharacters) {
                 mListBitmap.clear();
-                for (duy.phuong.handnote.DTO.Character character : listBitmaps) {
+                for (duy.phuong.handnote.DTO.Character character : listCharacters) {
                     mListBitmap.add(character.mBitmap);
                     mBitmapAdapter.notifyDataSetChanged();
                 }

@@ -134,7 +134,6 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                     Log.e("Error", "Directory not exist");
                 }
 
-                Toast.makeText(mActivity, "Resize images begin!", Toast.LENGTH_SHORT).show();
                 mCurrentImage = mListResourcePaths.size();
                 for (final String path : mListResourcePaths) {
                     Runnable runnable = new Runnable() {
@@ -146,8 +145,15 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                             while (tokenizer.hasMoreTokens()) {
                                 name = tokenizer.nextToken();
                             }
+                            String[] split  = name.split("_");
+                            if (split.length >= 2) {
+                                name = name.split("_")[1];
+                            }
                             if (!SupportUtils.saveImage(bitmap, "Train", name, ".png")) {
                                 Toast.makeText(mActivity, "Save images error", Toast.LENGTH_SHORT).show();
+                            }
+                            if (mCurrentImage == mListResourcePaths.size()) {
+                                Toast.makeText(mActivity, "Resize images begin!", Toast.LENGTH_SHORT).show();
                             }
                             mCurrentImage--;
                             if (mCurrentImage <= 0) {
@@ -211,9 +217,12 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                         @Override
                         public void run() {
                             String name = getNameFromPath(path);
-                            String alphabet = name.substring(11, 13);
-                            alphabet = alphabet.replace("_", "");
-                            standardImages.add(new StandardImage(BitmapFactory.decodeFile(path), alphabet));
+                            String[] split  = name.split("_");
+                            if (split.length >= 2) {
+                                name = name.split("_")[1];
+                            }
+                            Log.d("Name", name);
+                            standardImages.add(new StandardImage(BitmapFactory.decodeFile(path), name));
                             mCurrentImage--;
                             handler.sendMessage(handler.obtainMessage());
                         }

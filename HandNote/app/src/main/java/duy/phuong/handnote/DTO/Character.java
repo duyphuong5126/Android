@@ -18,4 +18,5 @@ public class Character {
     public ArrayList<Bitmap> mListContours;
     public Rect mRect;
     public ArrayList<Rect> mListRectContour;
+    public boolean isSorted;
 }

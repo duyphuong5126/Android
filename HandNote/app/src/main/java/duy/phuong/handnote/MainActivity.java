@@ -112,7 +112,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         try {
             String data = SupportUtils.getStringData("Trained", "MapNames.txt");
             if (data.length() == 0) {
-                data = SupportUtils.getStringResource(this, R.raw.map_names_ver_1);
+                data = SupportUtils.getStringResource(this, R.raw.map_names);
                 SupportUtils.writeFile(data, "Trained", "MapNames.txt");
             }
             StringTokenizer tokenizer = new StringTokenizer(data, "\r\n");
@@ -174,7 +174,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         try {
             String data = SupportUtils.getStringData("Trained", "SOM.txt");
             if (data.length() == 0) {
-                data = SupportUtils.getStringResource(this, R.raw.som_ver_1);
+                data = SupportUtils.getStringResource(this, R.raw.som);
                 SupportUtils.writeFile(data, "Trained", "SOM.txt");
             }
             StringTokenizer tokenizer = new StringTokenizer(data, "|");
@@ -393,11 +393,16 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onStop() {
         mGlobalMapNames.clear();
         mGlobalMapNames = null;
         mGlobalSOM = null;
         onSaveInstanceState(new Bundle());
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
         super.onDestroy();
     }
 }

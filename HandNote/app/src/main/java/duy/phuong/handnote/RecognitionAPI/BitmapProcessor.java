@@ -27,7 +27,7 @@ import duy.phuong.handnote.MyView.DrawingView.MyPath;
 public class BitmapProcessor {
 
     public interface RecognitionCallback {
-        void onRecognizeSuccess(ArrayList<Character> listBitmaps);
+        void onRecognizeSuccess(ArrayList<Character> listCharacters);
     }
 
     public HashMap<String, Boolean> mMapFeatures;
@@ -464,82 +464,83 @@ public class BitmapProcessor {
 
     private ArrayList<Rect> detectAreasOnBitmap(final Bitmap bitmap, int dx, int dy) {
         ArrayList<Rect> listDetectedArea = new ArrayList<>();
-        HashMap<Integer, Integer> listColumns = new HashMap<>();
-        int startCol = -1;
-        int endCol = -1;
+        if (bitmap != null) {
+            HashMap<Integer, Integer> listColumns = new HashMap<>();
+            int startCol = -1;
+            int endCol = -1;
 
-        //horizontal fragment
-        for (int c = 0; c < bitmap.getWidth(); c++) {
-            //find the start column
-            if (checkNotEmptyColumn(c, bitmap)) {
+            //horizontal fragment
+            for (int c = 0; c < bitmap.getWidth(); c++) {
+                //find the start column
+                if (checkNotEmptyColumn(c, bitmap)) {
                 /*startCol = (c > 0) ? c - 1 : c;*/
-                startCol = c;
-            }
+                    startCol = c;
+                }
 
-            boolean hasEndCol = false;
-            if (startCol >= 0) {
-                int c1 = startCol + 1;
-                while (!hasEndCol) {
-                    //find the end column
-                    if (!checkNotEmptyColumn(c1, bitmap)) {
-                        //endCol = (c1 >= bitmap.getWidth()) ? c1 : c1 + 1;
-                        endCol = c1;
+                boolean hasEndCol = false;
+                if (startCol >= 0) {
+                    int c1 = startCol + 1;
+                    while (!hasEndCol) {
+                        //find the end column
+                        if (!checkNotEmptyColumn(c1, bitmap)) {
+                            //endCol = (c1 >= bitmap.getWidth()) ? c1 : c1 + 1;
+                            endCol = c1;
+                        }
+
+                        if (endCol > startCol) {
+                            //save startCol (key) and endCol (value)
+                            listColumns.put(startCol, endCol);
+                            //save current anchor
+                            c = endCol;
+
+                            startCol = endCol = -1;
+                            hasEndCol = true;
+                        }
+                        c1++;
                     }
-
-                    if (endCol > startCol) {
-                        //save startCol (key) and endCol (value)
-                        listColumns.put(startCol, endCol);
-                        //save current anchor
-                        c = endCol;
-
-                        startCol = endCol = -1;
-                        hasEndCol = true;
-                    }
-                    c1++;
                 }
             }
-        }
 
-        //vertical fragment
-        for (Map.Entry<Integer, Integer> entry : listColumns.entrySet()) {
-            startCol = endCol = -1;
-            if (entry.getKey() >= 0 && entry.getValue() >= 0) {
-                startCol = entry.getKey();
-                endCol = entry.getValue();
-                int startRow = -1;
-                int endRow = -1;
-                for (int r = 0; r < bitmap.getHeight(); r++) {
-                    //find the start row
-                    if (checkNotEmptyRow(r, startCol, endCol, bitmap)) {
+            //vertical fragment
+            for (Map.Entry<Integer, Integer> entry : listColumns.entrySet()) {
+                startCol = endCol = -1;
+                if (entry.getKey() >= 0 && entry.getValue() >= 0) {
+                    startCol = entry.getKey();
+                    endCol = entry.getValue();
+                    int startRow = -1;
+                    int endRow = -1;
+                    for (int r = 0; r < bitmap.getHeight(); r++) {
+                        //find the start row
+                        if (checkNotEmptyRow(r, startCol, endCol, bitmap)) {
                         /*startRow = (r > 0) ? r - 1 : r;*/
-                        startRow = r;
-                    }
+                            startRow = r;
+                        }
 
-                    boolean hasEndRow = false;
-                    if (startRow >= 0) {
-                        int r1 = startRow + 1;
-                        while (!hasEndRow) {
-                            //find the endRow
-                            if (!checkNotEmptyRow(r1, startCol, endCol, bitmap)) {
+                        boolean hasEndRow = false;
+                        if (startRow >= 0) {
+                            int r1 = startRow + 1;
+                            while (!hasEndRow) {
+                                //find the endRow
+                                if (!checkNotEmptyRow(r1, startCol, endCol, bitmap)) {
                                 /*endRow = (r1 >= bitmap.getHeight()) ? r1 : r1 + 1;*/
-                                endRow = r1;
-                            }
+                                    endRow = r1;
+                                }
 
-                            if (endRow > startRow) {
-                                //save rectangle
-                                listDetectedArea.add(new Rect(startCol + dx, startRow + dy, endCol + dx, endRow + dy));
+                                if (endRow > startRow) {
+                                    //save rectangle
+                                    listDetectedArea.add(new Rect(startCol + dx, startRow + dy, endCol + dx, endRow + dy));
 
-                                r = endRow;
-                                startRow = endRow = -1;
-                                hasEndRow = true;
+                                    r = endRow;
+                                    startRow = endRow = -1;
+                                    hasEndRow = true;
+                                }
+                                r1++;
                             }
-                            r1++;
                         }
                     }
                 }
             }
         }
-
         return listDetectedArea;
     }
 
@@ -673,24 +674,6 @@ public class BitmapProcessor {
 
     private int getBothSideEndRow(Bitmap bitmap) {
         for (int i = bitmap.getHeight() - 1; i >= 0; i--) {
-            if (countRowSegments(i, bitmap) == 2) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    private int getBothSideStartCol(Bitmap bitmap) {
-        for (int i = 0; i < bitmap.getWidth(); i++) {
-            if (countRowSegments(i, bitmap) == 2) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    private int getBothSideEndCol(Bitmap bitmap) {
-        for (int i = bitmap.getWidth() - 1; i >= 0; i--) {
             if (countRowSegments(i, bitmap) == 2) {
                 return i;
             }
@@ -1081,7 +1064,7 @@ public class BitmapProcessor {
                         Rect rMin = null;
                         Rect r = null;
                         Rect rBig = null;
-                        if (r1.get(0).width() > r2.get(0).width() && r2.get(0).width() > r3.get(0).width()) {
+                        if (r1.get(0).width() > r2.get(0).width() && r2.get(0).width() >= r3.get(0).width()) {
                             r = r2.get(0);
                             rMin = r3.get(0);
                             rBig = r1.get(0);
@@ -1091,7 +1074,7 @@ public class BitmapProcessor {
                             rMin = r2.get(0);
                             rBig = r1.get(0);
                         }
-                        if (r2.get(0).width() > r1.get(0).width() && r1.get(0).width() > r3.get(0).width()) {
+                        if (r2.get(0).width() > r1.get(0).width() && r1.get(0).width() >= r3.get(0).width()) {
                             r = r1.get(0);
                             rMin = r3.get(0);
                             rBig = r2.get(0);
@@ -1101,7 +1084,7 @@ public class BitmapProcessor {
                             rMin = r1.get(0);
                             rBig = r2.get(0);
                         }
-                        if (r3.get(0).width() > r1.get(0).width() && r1.get(0).width() > r2.get(0).width()) {
+                        if (r3.get(0).width() > r1.get(0).width() && r1.get(0).width() >= r2.get(0).width()) {
                             r = r1.get(0);
                             rMin = r2.get(0);
                             rBig = r3.get(0);
@@ -2219,6 +2202,9 @@ public class BitmapProcessor {
     }
 
     private boolean isf(Character character) {
+        if (isd(character)) {
+            return false;
+        }
         Bitmap src = character.mBitmap;
         Bitmap top = cropBitmap(src, 0, 0, src.getWidth(), (int) (src.getHeight() * 0.2d));
         if (detectAreasOnBitmap(top, 0, 0).size() >= 2) {
@@ -2227,29 +2213,35 @@ public class BitmapProcessor {
         ArrayList<Rect> list = character.mListRectContour;
         if (list != null) {
             if (list.size() == 2) {
-                Rect rect = list.get(0);
-                if (rect != null) {
-                    boolean closeToBot = Math.abs(rect.bottom - (src.getHeight() - 1)) <= 2.5 * FingerDrawerView.CurrentPaintSize;
-                    int count = 0;
-                    int increase = 0;
-                    boolean stop = false;
-                    for (int i = 0; i < src.getHeight() && !stop; i++) {
-                        int blank = getHorizontalBlankCounts(i, src);
-                        if (blank > 0) {
-                            if (blank >= count) {
-                                increase++;
-                                count = blank;
-                            } else {
-                                stop = true;
-                            }
+                Rect rect = list.get(0), rBig = list.get(1);
+                if (rect != null && rBig != null) {
+                    boolean closeToBot = Math.abs(rect.bottom - rBig.bottom) <= Math.abs(rect.top - rBig.top);
+                    int row = -1;
+                    boolean end = false;
+                    for (int i =0; i <= rect.top && !end; i++) {
+                        if (countRowSegments(i, src) == 2) {
+                            row = i;
                         } else {
-                            if (count > 0) {
-                                stop = true;
+                            if (countRowSegments(i, src) == 1) {
+                                if (row > 0) {
+                                    end = true;
+                                }
                             }
                         }
                     }
-
-                    return increase > 0 && closeToBot;
+                    if (row >= 0) {
+                        Bitmap cropped = cropBitmap(src, 0, 0, src.getWidth(), row);
+                        ArrayList<Rect> r = detectAreasOnBitmap(cropped, 0, 0);
+                        if (r.size() == 1) {
+                            Character c = new Character(); c.mBitmap = cropped;
+                            return closeToBot && isV_Inverse(c);
+                        } else {
+                            Rect rect1 = (r.get(0).width() <= r.get(1).width())?r.get(1):r.get(0);
+                            Bitmap interested = cropBitmap(cropped, rect1.left, rect1.top, rect1.width(), rect1.height());
+                            Character c = new Character(); c.mBitmap = interested;
+                            return closeToBot && isV_Inverse(c);
+                        }
+                    }
                 }
             }
         }
@@ -2289,17 +2281,17 @@ public class BitmapProcessor {
     }
 
     private boolean isg(Character character) {
-        Bitmap src = character.mBitmap;
         ArrayList<Rect> list = character.mListRectContour;
         if (list != null) {
             if (list.size() == 3) {
-                Rect rMin = list.get(0), r = list.get(1);
-                if (r != null && rMin != null) {
-                    boolean closeToBot = Math.abs(rMin.bottom - (src.getHeight() - 1)) <= 2.5 * FingerDrawerView.CurrentPaintSize;
-                    boolean tall = rMin.width() <= rMin.height();
-                    boolean fat = r.width() >= r.height();
-                    return closeToBot && tall && fat;
-                }
+                /*Rect rTop = (list.get(0).top <= list.get(1).top) ? list.get(0) : list.get(1);
+                Rect rBot = (list.get(0).top > list.get(1).top) ? list.get(0) : list.get(1);
+                if (rTop != null && rBot != null) {
+                    boolean fat = rTop.width() >= rTop.height();
+                    boolean tall = rBot.width() <= rBot.height();
+                    return tall && fat;
+                }*/
+                return true;
             }
         }
         return false;

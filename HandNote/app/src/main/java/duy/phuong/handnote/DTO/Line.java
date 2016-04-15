@@ -7,5 +7,6 @@ import java.util.ArrayList;
  */
 public class Line {
     public ArrayList<Word> mWords;
+    public ArrayList<Character> mCharacters;
     public int mTop, mBottom;
 }
