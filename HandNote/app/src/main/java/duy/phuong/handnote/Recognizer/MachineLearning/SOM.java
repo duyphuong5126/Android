@@ -1,6 +1,4 @@
-package duy.phuong.handnote.RecognitionAPI.MachineLearning;
-
-import android.util.Log;
+package duy.phuong.handnote.Recognizer.MachineLearning;
 
 /**
  * Created by Phuong on 01/03/2016.
@@ -10,7 +8,8 @@ import android.util.Log;
 public class SOM {
     private Output[][] mOutputs;
     public static final int NUMBERS_OF_CLUSTER = 55;
-    public static final int NUM_OF_ROW = 5;
+    public static final int NUM_OF_ROWS = 5;
+    public static final int NUM_OF_COLUMNS = NUMBERS_OF_CLUSTER / NUM_OF_ROWS;
 
     public SOM() {
         init();
@@ -25,7 +24,7 @@ public class SOM {
     }
 
     private void init(SOM som) {
-        mOutputs = new Output[NUM_OF_ROW][NUMBERS_OF_CLUSTER / NUM_OF_ROW];
+        mOutputs = new Output[NUM_OF_ROWS][NUMBERS_OF_CLUSTER / NUM_OF_ROWS];
         if (som.mOutputs.length == mOutputs.length && som.mOutputs[0].length == mOutputs[0].length) {
             for (int i = 0; i < mOutputs.length; i++)
                 for (int j = 0; j < mOutputs[i].length; j++) {
@@ -35,7 +34,7 @@ public class SOM {
     }
 
     private void init() {
-        mOutputs = new Output[NUM_OF_ROW][NUMBERS_OF_CLUSTER / NUM_OF_ROW];
+        mOutputs = new Output[NUM_OF_ROWS][NUMBERS_OF_CLUSTER / NUM_OF_ROWS];
         for (int i = 0; i < mOutputs.length; i++)
             for (int j = 0; j < mOutputs[i].length; j++) {
                 mOutputs[i][j] = new Output();
@@ -45,7 +44,7 @@ public class SOM {
 
     private void init(double[][] weightMatrix) {
         if (weightMatrix.length == NUMBERS_OF_CLUSTER && weightMatrix[0].length == Input.VECTOR_DIMENSIONS) {
-            mOutputs = new Output[NUM_OF_ROW][NUMBERS_OF_CLUSTER / NUM_OF_ROW];
+            mOutputs = new Output[NUM_OF_ROWS][NUMBERS_OF_CLUSTER / NUM_OF_ROWS];
             for (int i = 0; i < mOutputs.length; i++)
                 for (int j = 0; j < mOutputs[i].length; j++) {
                     mOutputs[i][j] = new Output(weightMatrix[i * 11 + j]);

@@ -3,6 +3,8 @@ package duy.phuong.handnote.Fragment;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
@@ -15,7 +17,7 @@ import duy.phuong.handnote.Listener.BackPressListener;
 import duy.phuong.handnote.MyView.DrawingView.FingerDrawerView;
 import duy.phuong.handnote.MyView.BitmapAdapter;
 import duy.phuong.handnote.R;
-import duy.phuong.handnote.RecognitionAPI.BitmapProcessor;
+import duy.phuong.handnote.Recognizer.BitmapProcessor;
 import duy.phuong.handnote.Support.SupportUtils;
 
 /**
@@ -27,6 +29,7 @@ public class DrawingFragment extends BaseFragment implements View.OnClickListene
     private ArrayList<Bitmap> mListBitmap;
     private ImageButton mButtonSave, mButtonEmpty, mButtonForward, mButtonEraser, mButtonUndo, mButtonRedo;
     private EditText mEdtName;
+    private CheckBox mCheckSplit;
 
     private FingerDrawerView mDrawer;
 
@@ -51,6 +54,13 @@ public class DrawingFragment extends BaseFragment implements View.OnClickListene
         mButtonEraser = (ImageButton) mFragmentView.findViewById(R.id.buttonEraser);
         mButtonEraser.setOnClickListener(this);
         mEdtName = (EditText) mFragmentView.findViewById(R.id.edtName);
+        mCheckSplit = (CheckBox) mFragmentView.findViewById(R.id.ckcSplit);
+        mCheckSplit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mDrawer.setSplit(isChecked);
+            }
+        });
     }
 
     @Override
@@ -66,7 +76,7 @@ public class DrawingFragment extends BaseFragment implements View.OnClickListene
             @Override
             public void onRecognizeSuccess(ArrayList<Character> listCharacters) {
                 mListBitmap.clear();
-                for (duy.phuong.handnote.DTO.Character character : listCharacters) {
+                for (Character character : listCharacters) {
                     mListBitmap.add(character.mBitmap);
                     mBitmapAdapter.notifyDataSetChanged();
                 }

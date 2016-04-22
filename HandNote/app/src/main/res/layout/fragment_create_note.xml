@@ -29,10 +29,24 @@
 
                 <ImageButton
                     android:id="@+id/buttonSave"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/press_effect"
+                    android:layout_width="0dip"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="#0000"
                     android:src="@mipmap/ic_check_black_24dp" />
+
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_weight="2">
+
+                    <CheckBox
+                        android:id="@+id/ckcSplit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:button="@drawable/check_box" />
+                </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>

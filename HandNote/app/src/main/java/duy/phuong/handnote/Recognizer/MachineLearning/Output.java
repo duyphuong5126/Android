@@ -1,10 +1,8 @@
-package duy.phuong.handnote.RecognitionAPI.MachineLearning;
+package duy.phuong.handnote.Recognizer.MachineLearning;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-
-import duy.phuong.handnote.DTO.Label;
 
 /**
  * Created by Phuong on 01/03/2016.

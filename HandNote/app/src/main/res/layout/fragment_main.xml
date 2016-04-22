@@ -1,16 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:background="#fff">
+    android:background="#fff"
+    android:gravity="center">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Main Screen"
-        android:textSize="50sp"
-        android:textColor="#000"/>
+        android:id="@+id/mainTextView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Empty list note"
+        android:textColor="#c03"
+        android:textSize="30sp"
+        android:gravity="center"
+        android:visibility="gone" />
 
-</LinearLayout>
+    <ScrollView
+        android:id="@+id/mainScroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ListView
+                android:id="@+id/listNotes"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dip"
+                android:layout_marginTop="5dip"
+                android:layout_marginRight="5dip"/>
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>

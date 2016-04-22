@@ -1,11 +1,10 @@
 package duy.phuong.handnote.Listener;
 
-import android.util.DisplayMetrics;
-
 import java.util.ArrayList;
 
 import duy.phuong.handnote.DTO.ClusterLabel;
-import duy.phuong.handnote.RecognitionAPI.MachineLearning.SOM;
+import duy.phuong.handnote.DTO.Note;
+import duy.phuong.handnote.Recognizer.MachineLearning.SOM;
 
 /**
  * Created by Phuong on 23/11/2015.
@@ -16,5 +15,6 @@ public interface MainListener {
     void toggleMainBottomTabs(boolean show);
     SOM getGlobalSOM();
     ArrayList<ClusterLabel> getMapNames();
+    Note getCurrentNote();
     void initSOM();
 }

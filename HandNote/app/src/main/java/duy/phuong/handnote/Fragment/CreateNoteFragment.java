@@ -5,26 +5,28 @@ import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import duy.phuong.handnote.DAO.LocalStorage;
 import duy.phuong.handnote.DTO.Character;
 import duy.phuong.handnote.DTO.Line;
-import duy.phuong.handnote.DTO.Word;
 import duy.phuong.handnote.Listener.BackPressListener;
 import duy.phuong.handnote.MainActivity;
 import duy.phuong.handnote.MyView.DrawingView.FingerDrawerView;
 import duy.phuong.handnote.R;
-import duy.phuong.handnote.RecognitionAPI.BitmapProcessor;
-import duy.phuong.handnote.RecognitionAPI.MachineLearning.Input;
-import duy.phuong.handnote.RecognitionAPI.Recognizer;
+import duy.phuong.handnote.Recognizer.BitmapProcessor;
+import duy.phuong.handnote.Recognizer.MachineLearning.Input;
+import duy.phuong.handnote.Recognizer.Recognizer;
+import duy.phuong.handnote.Support.SupportUtils;
 
 /**
  * Created by Phuong on 06/03/2016.
@@ -33,10 +35,13 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
     private FingerDrawerView mDrawer;
     private ImageButton mButtonSave, mButtonDelete, mButtonUndo, mButtonRedo, mButtonColor;
     private TextView mTvResult;
+    private CheckBox mCheckSplit;
 
     private Recognizer mRecognizer;
 
     private HashMap<Input, Point> mCurrentRecognized;
+
+    private LocalStorage mLocalStorage;
 
     public CreateNoteFragment() {
         mLayoutRes = R.layout.fragment_create_note;
@@ -64,6 +69,15 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
         mButtonRedo = (ImageButton) mFragmentView.findViewById(R.id.buttonRedo);
         mButtonRedo.setOnClickListener(this);
         mTvResult = (TextView) mFragmentView.findViewById(R.id.tvResult);
+        mCheckSplit = (CheckBox) mFragmentView.findViewById(R.id.ckcSplit);
+        mCheckSplit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mDrawer.setSplit(isChecked);
+            }
+        });
+
+        mLocalStorage = new LocalStorage(mActivity);
     }
 
     @Override
@@ -102,6 +116,12 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
                     mRecognizer.overrideData();
                     mListener.initSOM();
                     mRecognizer = new Recognizer(mListener.getGlobalSOM(), mListener.getMapNames());
+
+                    String imagePath = SupportUtils.saveImageWithPath(mDrawer.getContent(), "Image", "image", ".png");
+                    String contentPath = SupportUtils.writeFileWithPath(mTvResult.getText().toString(), "Note", "content " + System.nanoTime() +
+                            ".txt");
+                    mLocalStorage.insertNote(imagePath, contentPath);
+
                     Toast.makeText(mActivity, "Update successfully", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(mActivity, "Nothing to update", Toast.LENGTH_SHORT).show();
@@ -136,7 +156,7 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
                 line.mCharacters = new ArrayList<>();
                 for (Character character : listCharacters) {
                     if (!character.isSorted) {
-                        if (character.mRect.top >= line.mTop && character.mRect.top <= line.mBottom) {
+                        if (character.mRect.bottom * 0.8d <= line.mBottom) {
                             line.mCharacters.add(character);
                             character.isSorted = true;
                         }
@@ -188,6 +208,11 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
                                 } else {
                                     character = result;
                                 }
+                                break;
+
+                            case "b1":
+                            case "k1":
+                                character = result.substring(0, 1);
                                 break;
 
                             default:

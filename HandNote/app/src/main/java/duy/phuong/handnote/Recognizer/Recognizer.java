@@ -1,4 +1,4 @@
-package duy.phuong.handnote.RecognitionAPI;
+package duy.phuong.handnote.Recognizer;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -6,15 +6,14 @@ import android.os.Bundle;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import duy.phuong.handnote.DTO.ClusterLabel;
 import duy.phuong.handnote.DTO.Character;
 import duy.phuong.handnote.DTO.StandardImage;
-import duy.phuong.handnote.RecognitionAPI.MachineLearning.Input;
-import duy.phuong.handnote.RecognitionAPI.MachineLearning.Output;
-import duy.phuong.handnote.RecognitionAPI.MachineLearning.PatternLearning;
-import duy.phuong.handnote.RecognitionAPI.MachineLearning.SOM;
+import duy.phuong.handnote.Recognizer.MachineLearning.Input;
+import duy.phuong.handnote.Recognizer.MachineLearning.Output;
+import duy.phuong.handnote.Recognizer.MachineLearning.PatternLearning;
+import duy.phuong.handnote.Recognizer.MachineLearning.SOM;
 import duy.phuong.handnote.Support.SupportUtils;
 
 /**
@@ -58,7 +57,7 @@ public class Recognizer {
         for (int i = 0; i < outputs.length; i++) {
             for (int j = 0; j < outputs[i].length; j++) {
                 double dis = getDistance(input, outputs[i][j]);
-                int pos = i * 11 + j;
+                int pos = i * SOM.NUM_OF_COLUMNS + j;
                 distance[pos]= new Neuron(pos, dis);
             }
         }
@@ -87,7 +86,7 @@ public class Recognizer {
         int win_neuron_X = -1, win_neuron_Y = -1;
         for (int i = 0; i < distance.length; i++) {
             int neuron = distance[i].position;
-            win_neuron_X = neuron % 11; win_neuron_Y = neuron / 11;
+            win_neuron_X = neuron % SOM.NUM_OF_COLUMNS; win_neuron_Y = neuron / SOM.NUM_OF_COLUMNS;
             Bundle r = mProcessor.featureExtraction(character, mMapNames.get(neuron).getListLabel());
             if (r.getBoolean("Result")) {
                 Bundle bundle = new Bundle();

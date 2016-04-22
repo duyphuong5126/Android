@@ -22,6 +22,37 @@ public abstract class SupportUtils {
     public static final String RootPath = Environment.getExternalStorageDirectory().getAbsolutePath();
     public static final String ApplicationDirectory = "/HandNote/";
 
+    public static String saveImageWithPath(Bitmap bitmap, String folderName, String fileName, String fileType) {
+        File dir = new File(RootPath + ApplicationDirectory + folderName);
+        dir.mkdirs();
+
+        File file = new File(dir, folderName + "_" + fileName + "_" + System.currentTimeMillis() + fileType);
+        if (file.exists()) {
+            file.delete();
+        }
+
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
+            fileOutputStream.flush();
+            fileOutputStream.close();
+            return file.getAbsolutePath();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return "";
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
     public static boolean saveImage(Bitmap bitmap, String folderName, String fileName, String fileType) {
         File dir = new File(RootPath + ApplicationDirectory + folderName);
         dir.mkdirs();
@@ -123,6 +154,27 @@ public abstract class SupportUtils {
         return true;
     }
 
+    public static String writeFileWithPath(String data, String folder, String name) {
+        File fileDir = new File(RootPath + ApplicationDirectory + folder);
+        fileDir.mkdirs();
+
+        File output = new File(fileDir, name);
+        if (output.exists()) {
+            output.delete();
+        }
+
+        try {
+            output.createNewFile();
+            FileOutputStream fileOutputStream = new FileOutputStream(output);
+            fileOutputStream.write(data.getBytes());
+            fileOutputStream.close();
+            return output.getAbsolutePath();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
     public static String getStringResource(Context context, int rawId) throws IOException {
         InputStream stream = context.getResources().openRawResource(rawId);
         byte[] data = new byte[stream.available()];
@@ -149,5 +201,33 @@ public abstract class SupportUtils {
             return "";
         }
         return builder.toString();
+    }
+    public static String getStringData(String path) {
+        StringBuilder builder = new StringBuilder();
+        File file = new File(path);
+        BufferedReader reader;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String s = "";
+            while ((s = reader.readLine()) != null) {
+                builder.append(s);
+                builder.append("\r\n");
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return "";
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+        return builder.toString();
+    }
+
+    public static boolean deleteFile(String path) {
+        File file = new File(path);
+        if (file.exists()) {
+            return file.delete();
+        }
+        return false;
     }
 }

@@ -1,4 +1,4 @@
-package duy.phuong.handnote.RecognitionAPI.MachineLearning;
+package duy.phuong.handnote.Recognizer.MachineLearning;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,7 +9,7 @@ import java.util.Random;
 
 import duy.phuong.handnote.DTO.StandardImage;
 import duy.phuong.handnote.Listener.LearningListener;
-import duy.phuong.handnote.RecognitionAPI.Recognizer;
+import duy.phuong.handnote.Recognizer.Recognizer;
 import duy.phuong.handnote.Support.SupportUtils;
 
 /**
@@ -19,7 +19,7 @@ import duy.phuong.handnote.Support.SupportUtils;
 /*Kohonen Algorithm*/
 public class PatternLearning extends Recognizer {
     public static final double INITIAL_LEARNING_RATE = 0.5;//the initial learning rate
-    private static final double MAP_RADIUS = (SOM.NUMBERS_OF_CLUSTER / SOM.NUM_OF_ROW);
+    private static final double MAP_RADIUS = (SOM.NUMBERS_OF_CLUSTER / SOM.NUM_OF_ROWS);
 
     private ArrayList<Input> mSamples;//training set
     private int mEpochs; //learning rate time const (T2)
@@ -225,10 +225,7 @@ public class PatternLearning extends Recognizer {
         AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                boolean converge = false;
-                for (int i = 0; i < mEpochs && !converge; i++) {
-                    mMap.resetMapName();
-
+                for (int i = 0; i < mEpochs; i++) {
                     ArrayList<Input> inputs = new ArrayList<>();
                     inputs.addAll(mSamples);
 
@@ -343,17 +340,91 @@ public class PatternLearning extends Recognizer {
                             }
                         }
 
-                        //5. update map of names
-                        mMap.updateLabelForCluster(win_neuron_position_X, win_neuron_position_Y, input.mLabel);
+                        /*//5. update map of names
+                        mMap.updateLabelForCluster(win_neuron_position_X, win_neuron_position_Y, input.mLabel);*/
                     }
 
-                    //check converge condition
-                    converge = checkConverge();
+                    /*//check converge condition
+                    converge = checkConverge();*/
 
                     updateLearningRate(i);
                     updateNeighborRadius(i);
+                }
 
-                    inputs = null;
+                mMap.resetMapName();
+                for (Input input : mSamples) {
+                    double min_distance = Double.MAX_VALUE;
+                    int win_neuron_position_X = -1;
+                    int win_neuron_position_Y = -1;
+                    for (int j = 0; j < mMap.getOutputs().length; j++) {
+                        double d = getDistance(input, mMap.getOutputs()[j][0]);
+                        if (min_distance > d) {
+                            min_distance = d;
+                            win_neuron_position_Y = j;
+                            win_neuron_position_X = 0;
+                        }
+                        d = getDistance(input, mMap.getOutputs()[j][1]);
+                        if (min_distance > d) {
+                            min_distance = d;
+                            win_neuron_position_Y = j;
+                            win_neuron_position_X = 1;
+                        }
+                        d = getDistance(input, mMap.getOutputs()[j][2]);
+                        if (min_distance > d) {
+                            min_distance = d;
+                            win_neuron_position_Y = j;
+                            win_neuron_position_X = 2;
+                        }
+                        d = getDistance(input, mMap.getOutputs()[j][3]);
+                        if (min_distance > d) {
+                            min_distance = d;
+                            win_neuron_position_Y = j;
+                            win_neuron_position_X = 3;
+                        }
+                        d = getDistance(input, mMap.getOutputs()[j][4]);
+                        if (min_distance > d) {
+                            min_distance = d;
+                            win_neuron_position_Y = j;
+                            win_neuron_position_X = 4;
+                        }
+                        d = getDistance(input, mMap.getOutputs()[j][5]);
+                        if (min_distance > d) {
+                            min_distance = d;
+                            win_neuron_position_Y = j;
+                            win_neuron_position_X = 5;
+                        }
+                        d = getDistance(input, mMap.getOutputs()[j][6]);
+                        if (min_distance > d) {
+                            min_distance = d;
+                            win_neuron_position_Y = j;
+                            win_neuron_position_X = 6;
+                        }
+                        d = getDistance(input, mMap.getOutputs()[j][7]);
+                        if (min_distance > d) {
+                            min_distance = d;
+                            win_neuron_position_Y = j;
+                            win_neuron_position_X = 7;
+                        }
+                        d = getDistance(input, mMap.getOutputs()[j][8]);
+                        if (min_distance > d) {
+                            min_distance = d;
+                            win_neuron_position_Y = j;
+                            win_neuron_position_X = 8;
+                        }
+                        d = getDistance(input, mMap.getOutputs()[j][9]);
+                        if (min_distance > d) {
+                            min_distance = d;
+                            win_neuron_position_Y = j;
+                            win_neuron_position_X = 9;
+                        }
+                        d = getDistance(input, mMap.getOutputs()[j][10]);
+                        if (min_distance > d) {
+                            min_distance = d;
+                            win_neuron_position_Y = j;
+                            win_neuron_position_X = 10;
+                        }
+                    }
+                    mMap.updateLabelForCluster(win_neuron_position_X, win_neuron_position_Y, input.mLabel);
                 }
 
                 return null;

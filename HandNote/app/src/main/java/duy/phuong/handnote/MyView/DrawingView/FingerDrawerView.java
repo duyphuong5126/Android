@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.CornerPathEffect;
-import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
@@ -22,7 +21,7 @@ import java.util.Stack;
 
 import duy.phuong.handnote.DTO.Character;
 import duy.phuong.handnote.DTO.Line;
-import duy.phuong.handnote.RecognitionAPI.BitmapProcessor;
+import duy.phuong.handnote.Recognizer.BitmapProcessor;
 
 /**
  * Created by Phuong on 23/11/2015.
@@ -104,7 +103,7 @@ public class FingerDrawerView extends View {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                if (isReadyForRecognize && mStartRecognizeTime > 0 && System.currentTimeMillis() - mStartRecognizeTime > 3000) {
+                if (isReadyForRecognize && mStartRecognizeTime > 0 && System.currentTimeMillis() - mStartRecognizeTime > 2000) {
                     handler.sendMessage(handler.obtainMessage());
                 }
                 handler.postDelayed(this, 10);
@@ -125,8 +124,16 @@ public class FingerDrawerView extends View {
         }
     }
 
+    public Bitmap getContent() {
+        return mBitmap;
+    }
+
     public ArrayList<Line> getLines() {
         return mLines;
+    }
+
+    public void setSplit(boolean split) {
+        mBitmapProcessor.setSplit(split);
     }
 
     @Override

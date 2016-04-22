@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -27,8 +26,8 @@ import java.util.StringTokenizer;
 import duy.phuong.handnote.Listener.LearningListener;
 import duy.phuong.handnote.R;
 import duy.phuong.handnote.DTO.StandardImage;
-import duy.phuong.handnote.RecognitionAPI.BitmapProcessor;
-import duy.phuong.handnote.RecognitionAPI.MachineLearning.PatternLearning;
+import duy.phuong.handnote.Recognizer.BitmapProcessor;
+import duy.phuong.handnote.Recognizer.MachineLearning.PatternLearning;
 import duy.phuong.handnote.Support.SupportUtils;
 
 /**
@@ -221,7 +220,6 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                             if (split.length >= 2) {
                                 name = name.split("_")[1];
                             }
-                            Log.d("Name", name);
                             standardImages.add(new StandardImage(BitmapFactory.decodeFile(path), name));
                             mCurrentImage--;
                             handler.sendMessage(handler.obtainMessage());
@@ -253,6 +251,8 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
         }
         patternLearning.learn();
         isTraining = false;
+        Toast.makeText(mActivity, "Training done", Toast.LENGTH_LONG).show();
+        switchMode();
     }
 
     private void learningWithLog(ArrayList<StandardImage> standardImages, int number_of_iterations) {

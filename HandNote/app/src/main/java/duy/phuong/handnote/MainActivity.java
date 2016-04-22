@@ -21,24 +21,27 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
 import duy.phuong.handnote.DTO.ClusterLabel;
 import duy.phuong.handnote.DTO.Label;
+import duy.phuong.handnote.DTO.Note;
 import duy.phuong.handnote.Fragment.BaseFragment;
 import duy.phuong.handnote.Fragment.CreateNoteFragment;
 import duy.phuong.handnote.Fragment.DrawingFragment;
 import duy.phuong.handnote.Fragment.LearningFragment;
 import duy.phuong.handnote.Fragment.MainFragment;
+import duy.phuong.handnote.Fragment.ViewNoteFragment;
 import duy.phuong.handnote.Listener.BackPressListener;
 import duy.phuong.handnote.Listener.MainListener;
-import duy.phuong.handnote.RecognitionAPI.MachineLearning.Input;
-import duy.phuong.handnote.RecognitionAPI.MachineLearning.SOM;
+import duy.phuong.handnote.Recognizer.MachineLearning.Input;
+import duy.phuong.handnote.Recognizer.MachineLearning.SOM;
 import duy.phuong.handnote.Support.LanguageUtils;
 import duy.phuong.handnote.Support.SupportUtils;
 
-public class MainActivity extends FragmentActivity implements MainListener, ImageButton.OnClickListener, BackPressListener {
+public class MainActivity extends FragmentActivity implements MainListener, ImageButton.OnClickListener, BackPressListener, MainFragment.ShowNoteListener {
 
     private FragmentManager mFragmentManager;
     private DrawerLayout mMainNavigator;
@@ -56,6 +59,8 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
 
     private String mCurrentUser = "Admin";
     private String mFragmentName = "";
+
+    private Note mCurrentNote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +97,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                     mStack.push(list.get(i));
                 }
             }
+            mCurrentNote = (Note) savedInstanceState.getSerializable("Note");
         }
         if (mFragmentName == null || mFragmentName.length() == 0) {
             mFragmentName = BaseFragment.MAIN_FRAGMENT;
@@ -104,6 +110,23 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         checkScreen();
         if (mFragmentManager.getBackStackEntryCount() <= 0) {
             this.showFragment(mFragmentName);
+        } else {
+            List<Fragment> list = mFragmentManager.getFragments();
+            for (Fragment fragment : list) {
+                BaseFragment baseFragment = (BaseFragment) fragment;
+                if (baseFragment != null) {
+                    baseFragment.setListener(this);
+                    if (baseFragment.fragmentIdentify().equals(BaseFragment.MAIN_FRAGMENT)) {
+                        MainFragment mainFragment = (MainFragment) baseFragment;
+                        mainFragment.setShowNoteListener(this);
+                    }
+
+                    if (baseFragment.fragmentIdentify().equals(BaseFragment.VIEW_NOTE_FRAGMENT)) {
+                        ViewNoteFragment viewNoteFragment = (ViewNoteFragment) baseFragment;
+                        viewNoteFragment.setNote(mCurrentNote);
+                    }
+                }
+            }
         }
     }
 
@@ -233,6 +256,19 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     public void onSaveInstanceState(Bundle outState) {
         outState.putString("Fragment", mFragmentName);
         ArrayList<String> list = new ArrayList<>();
+        List<Fragment> listFragments = mFragmentManager.getFragments();
+        for (Fragment fragment : listFragments) {
+            BaseFragment baseFragment = (BaseFragment) fragment;
+            if (baseFragment != null) {
+                if (baseFragment.fragmentIdentify().equals(BaseFragment.VIEW_NOTE_FRAGMENT)) {
+                    ViewNoteFragment viewNoteFragment = (ViewNoteFragment) baseFragment;
+                    Note note = viewNoteFragment.getNote();
+                    if (note != null) {
+                        outState.putSerializable("Note", note);
+                    }
+                }
+            }
+        }
         while (!mStack.isEmpty()) {
             list.add(mStack.pop());
         }
@@ -245,7 +281,9 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         BaseFragment baseFragment = null;
         switch (name) {
             case BaseFragment.MAIN_FRAGMENT:
-                baseFragment = new MainFragment();
+                MainFragment mainFragment = new MainFragment();
+                mainFragment.setShowNoteListener(this);
+                baseFragment = mainFragment;
                 break;
 
             case BaseFragment.DRAWING_FRAGMENT:
@@ -260,6 +298,12 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
             case BaseFragment.CREATE_NOTE_FRAGMENT:
                 baseFragment = new CreateNoteFragment();
                 mBackPressListener = (CreateNoteFragment) baseFragment;
+                break;
+
+            case BaseFragment.VIEW_NOTE_FRAGMENT:
+                ViewNoteFragment viewNoteFragment = new ViewNoteFragment();
+                mBackPressListener = viewNoteFragment;
+                baseFragment = viewNoteFragment;
                 break;
 
             default:
@@ -285,6 +329,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
             case BaseFragment.DRAWING_FRAGMENT:
             case BaseFragment.LEARNING_FRAGMENT:
             case BaseFragment.CREATE_NOTE_FRAGMENT:
+            case BaseFragment.VIEW_NOTE_FRAGMENT:
                 this.toggleMainBottomTabs(false);
                 break;
             default:
@@ -325,6 +370,11 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     @Override
     public ArrayList<ClusterLabel> getMapNames() {
         return mGlobalMapNames;
+    }
+
+    @Override
+    public Note getCurrentNote() {
+        return mCurrentNote;
     }
 
     @Override
@@ -404,5 +454,11 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void showNote(Note note) {
+        mCurrentNote = note;
+        showFragment(BaseFragment.VIEW_NOTE_FRAGMENT);
     }
 }
