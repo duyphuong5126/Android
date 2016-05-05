@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="fill_parent"
         android:layout_height="0dip"
         android:layout_weight="5"
@@ -12,12 +12,25 @@
 
         <GridView
             android:id="@+id/listDetectedBitmap"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:gravity="center_horizontal"
             android:numColumns="5"
             android:stretchMode="columnWidth" />
-    </LinearLayout>
+
+        <HorizontalScrollView
+            android:id="@+id/scrollImageAnalysis"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/layoutImageAnalysis"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"/>
+        </HorizontalScrollView>
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -119,11 +132,11 @@
                 android:layout_weight="1">
 
                 <ImageButton
-                    android:id="@+id/buttonEraser"
+                    android:id="@+id/buttonMore"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/press_effect"
-                    android:src="@mipmap/ic_eraser_black_24dp" />
+                    android:src="@mipmap/ic_arrow_drop_down_black_24dp" />
             </LinearLayout>
 
             <LinearLayout

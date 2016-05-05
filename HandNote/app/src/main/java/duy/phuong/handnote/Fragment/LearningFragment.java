@@ -1,8 +1,11 @@
 package duy.phuong.handnote.Fragment;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -41,7 +44,7 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
 
     private LinearLayout mLayoutProgressing, mButtonProcess;
 
-    private ImageButton mButtonResize, mButtonTrain;
+    private ImageButton mButtonLoad, mButtonResize, mButtonTrain;
     private TextView mTvLogView;
 
     private int mCurrentImage;
@@ -52,6 +55,8 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
     private String mLog;
 
     boolean isTraining;
+
+    private static final int IMAGE_PICK = 1;
 
     public LearningFragment() {
         mLayoutRes = R.layout.fragment_learning;
@@ -73,6 +78,8 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
         mButtonProcess.setOnClickListener(this);
         mButtonTrain = (ImageButton) mFragmentView.findViewById(R.id.buttonTrain);
         mButtonTrain.setOnClickListener(this);
+        mButtonLoad = (ImageButton) mFragmentView.findViewById(R.id.buttonLoad);
+        mButtonLoad.setOnClickListener(this);
         mScrollProgress = (ScrollView) mFragmentView.findViewById(R.id.scrProgress);
         mDialog = new Dialog(mActivity);
         mDialog.setContentView(R.layout.layout_prompt);
@@ -88,7 +95,7 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mListResourcePaths.addAll(SupportUtils.getListFilePaths("mnt/sdcard/Download"));
+        //mListResourcePaths.addAll(SupportUtils.getListFilePaths("mnt/sdcard/Download"));
         mCurrentImage = 0;
         mLog = "";
         isTraining = false;
@@ -101,23 +108,52 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
 
         if (!trainPaths.isEmpty()) {
             if (isTraining) {
-                mButtonResize.setVisibility(View.GONE);
                 mButtonTrain.setVisibility(View.GONE);
                 mButtonProcess.setVisibility(View.VISIBLE);
             } else {
-                mButtonResize.setVisibility(View.GONE);
                 mButtonTrain.setVisibility(View.VISIBLE);
                 mButtonProcess.setVisibility(View.GONE);
             }
+            mButtonResize.setVisibility(View.GONE);
+            mButtonLoad.setVisibility(View.GONE);
 
             mListResourcePaths.clear();
             mListResourcePaths.addAll(trainPaths);
         } else {
-            mButtonResize.setVisibility(View.VISIBLE);
+            if (mListResourcePaths.isEmpty()) {
+                mButtonResize.setVisibility(View.GONE);
+                mButtonLoad.setVisibility(View.VISIBLE);
+            } else {
+                mButtonResize.setVisibility(View.VISIBLE);
+                mButtonLoad.setVisibility(View.GONE);
+            }
             mButtonTrain.setVisibility(View.GONE);
             mButtonProcess.setVisibility(View.GONE);
         }
         mListFilesAdapter.notifyDataSetChanged();
+    }
+
+    private void intentPick(String type, int requestCode) {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType(type);
+        startActivityForResult(Intent.createChooser(intent, "Pick a folder"), requestCode);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            Uri uri = data.getData();
+            String path = SupportUtils.getPath(uri, mActivity);
+            switch (requestCode) {
+                case IMAGE_PICK:
+                    mListResourcePaths.addAll(SupportUtils.getListFilePaths(path));
+                    switchMode();
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     @Override
@@ -128,6 +164,9 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.buttonLoad:
+                intentPick("image/*", IMAGE_PICK);
+                break;
             case R.id.buttonResize:
                 if (SupportUtils.emptyDirectory(SupportUtils.RootPath + SupportUtils.ApplicationDirectory + "Train")) {
                     Log.e("Error", "Directory not exist");

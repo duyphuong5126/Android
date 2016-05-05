@@ -122,24 +122,46 @@
         android:layout_height="0dip"
         android:layout_weight="10" />
 
-    <ScrollView
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dip"
+        android:background="#fff"
         android:layout_weight="2">
 
-        <LinearLayout
+        <ScrollView
+            android:id="@+id/viewResult"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/tvResult"
+            android:layout_height="match_parent">
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:inputType="textMultiLine"
-                android:textColor="#c03"
-                android:textSize="25sp" />
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tvResult"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:inputType="textMultiLine"
+                    android:textColor="#c03"
+                    android:textSize="25sp" />
+            </LinearLayout>
+        </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/viewProgress"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:gravity="center">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="50dip"
+                android:layout_height="50dip" />
         </LinearLayout>
-    </ScrollView>
+
+    </FrameLayout>
 
 </LinearLayout>

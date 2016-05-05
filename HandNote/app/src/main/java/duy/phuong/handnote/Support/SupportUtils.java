@@ -1,9 +1,12 @@
 package duy.phuong.handnote.Support;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -14,6 +17,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Created by Phuong on 28/11/2015.
@@ -229,5 +233,30 @@ public abstract class SupportUtils {
             return file.delete();
         }
         return false;
+    }
+
+    public static String getPath(Uri uri, Context context) {
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null) {
+            int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            if (cursor.moveToFirst()) {
+                return getFolderPath(cursor.getString(index));
+            }
+            cursor.close();
+        }
+        return uri.getPath();
+    }
+
+    private static String getFolderPath(String path) {
+        String[] strings = path.split("/");
+        String folder = "";
+        for (int i = 0; i < strings.length - 1; i++) {
+            folder += strings[i];
+            if (i < strings.length - 2) {
+                folder += "/";
+            }
+        }
+        return folder;
     }
 }

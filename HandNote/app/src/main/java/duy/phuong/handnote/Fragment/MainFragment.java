@@ -59,12 +59,6 @@ public class MainFragment extends BaseFragment implements NotesAdapter.AdapterLi
         mAdapter.setListener(this);
         mListNotes.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
-        mListNotes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mShowNoteListener.showNote(mNotes.get(position));
-            }
-        });
         setListViewHeight(mListNotes);
         checkEmptyList();
     }

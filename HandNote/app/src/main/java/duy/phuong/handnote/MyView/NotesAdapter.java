@@ -56,10 +56,16 @@ public class NotesAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        Note note = mNotes.get(position);
+        final Note note = mNotes.get(position);
         convertView = mActivity.getLayoutInflater().inflate(mLayout, null);
         ((ImageView) convertView.findViewById(R.id.imageView)).setImageBitmap(note.mImage);
         ((TextView) convertView.findViewById(R.id.textView)).setText(note.mContent);
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.showNote(note);
+            }
+        });
         ((ImageButton) convertView.findViewById(R.id.buttonDelete)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

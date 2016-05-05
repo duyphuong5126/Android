@@ -19,4 +19,12 @@ public class Character {
     public Rect mRect;
     public ArrayList<Rect> mListRectContour;
     public boolean isSorted;
+    public boolean isSettled;
+    public String mAlphabet;
+
+    public Character() {
+        isSorted = false;
+        isSettled = false;
+        mAlphabet = null;
+    }
 }

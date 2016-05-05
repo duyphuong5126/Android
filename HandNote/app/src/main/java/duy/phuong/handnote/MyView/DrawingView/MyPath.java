@@ -20,10 +20,12 @@ public class MyPath {
     private ArrayList<Point> mListPoint;
     private Rect mRect;
     private boolean mChecked;
+    private boolean mSettled;
 
     public MyPath(ArrayList<Point> ListPoint) {
         this.mListPoint = ListPoint;
         mChecked = false;
+        mSettled = false;
     }
 
     public boolean isChecked() {
@@ -32,6 +34,14 @@ public class MyPath {
 
     public void setChecked(boolean Checked) {
         this.mChecked = Checked;
+    }
+
+    public boolean isSettled() {
+        return mSettled;
+    }
+
+    public void setSettled(boolean Settled) {
+        this.mSettled = Settled;
     }
 
     public ArrayList<Point> getListPoint() {
@@ -67,31 +77,144 @@ public class MyPath {
         mRect = new Rect(left, top, right, bot);
     }
 
+    private void initPath(Path path, ArrayList<Point> points) {
+        boolean first = true;
+        if (points != null && !points.isEmpty()) {
+            if (points.size() % 2 == 0) {
+                if (points.size() % 4 == 0) {
+                    for (int i = 0; i < points.size(); i += 4) {
+                        Point point = points.get(i);
+                        if (first) {
+                            first = false;
+                            path.moveTo(point.x, point.y);
+                        } else {
+                            path.lineTo(point.x, point.y);
+                        }
+                        point = points.get(i + 1);
+                        path.lineTo(point.x, point.y);
+                        point = points.get(i + 2);
+                        path.lineTo(point.x, point.y);
+                        point = points.get(i + 3);
+                        path.lineTo(point.x, point.y);
+                    }
+                    return;
+                }
+
+                if (points.size() % 6 == 0) {
+                    for (int i = 0; i < points.size(); i += 6) {
+                        Point point = points.get(i);
+                        if (first) {
+                            first = false;
+                            path.moveTo(point.x, point.y);
+                        } else {
+                            path.lineTo(point.x, point.y);
+                        }
+                        point = points.get(i + 1);
+                        path.lineTo(point.x, point.y);
+                        point = points.get(i + 2);
+                        path.lineTo(point.x, point.y);
+                        point = points.get(i + 3);
+                        path.lineTo(point.x, point.y);
+                        point = points.get(i + 4);
+                        path.lineTo(point.x, point.y);
+                        point = points.get(i + 5);
+                        path.lineTo(point.x, point.y);
+                    }
+                    return;
+                }
+                for (int i = 0; i < points.size(); i += 2) {
+                    Point point = points.get(i);
+                    if (first) {
+                        first = false;
+                        path.moveTo(point.x, point.y);
+                    } else {
+                        path.lineTo(point.x, point.y);
+                    }
+                    point = points.get(i + 1);
+                    path.lineTo(point.x, point.y);
+                }
+            } else {
+                if (points.size() % 3 == 0) {
+                    for (int i = 0; i < points.size(); i += 3) {
+                        Point point = points.get(i);
+                        if (first) {
+                            first = false;
+                            path.moveTo(point.x, point.y);
+                        } else {
+                            path.lineTo(point.x, point.y);
+                        }
+                        point = points.get(i + 1);
+                        path.lineTo(point.x, point.y);
+                        point = points.get(i + 2);
+                        path.lineTo(point.x, point.y);
+                    }
+                    return;
+                }
+
+                if (points.size() % 5 == 0) {
+                    for (int i = 0; i < points.size(); i += 5) {
+                        Point point = points.get(i);
+                        if (first) {
+                            first = false;
+                            path.moveTo(point.x, point.y);
+                        } else {
+                            path.lineTo(point.x, point.y);
+                        }
+                        point = points.get(i + 1);
+                        path.lineTo(point.x, point.y);
+                        point = points.get(i + 2);
+                        path.lineTo(point.x, point.y);
+                        point = points.get(i + 3);
+                        path.lineTo(point.x, point.y);
+                        point = points.get(i + 4);
+                        path.lineTo(point.x, point.y);
+                    }
+                    return;
+                }
+
+                if (points.size() % 7 == 0) {
+                    for (int i = 0; i < points.size(); i += 7) {
+                        Point point = points.get(i);
+                        if (first) {
+                            first = false;
+                            path.moveTo(point.x, point.y);
+                        } else {
+                            path.lineTo(point.x, point.y);
+                        }
+                        point = points.get(i + 1);
+                        path.lineTo(point.x, point.y);
+                        point = points.get(i + 2);
+                        path.lineTo(point.x, point.y);
+                        point = points.get(i + 3);
+                        path.lineTo(point.x, point.y);
+                        point = points.get(i + 4);
+                        path.lineTo(point.x, point.y);
+                        point = points.get(i + 5);
+                        path.lineTo(point.x, point.y);
+                        point = points.get(i + 6);
+                        path.lineTo(point.x, point.y);
+                    }
+                    return;
+                }
+                for (int i = 0; i < points.size(); i++) {
+                    Point point = points.get(i);
+                    if (first) {
+                        first = false;
+                        path.moveTo(point.x, point.y);
+                    } else {
+                        path.lineTo(point.x, point.y);
+                    }
+                }
+            }
+        }
+    }
+
     public boolean isIntersect(MyPath myPath, int width, int height, Paint tempPaint) {
         if (myPath != null) {
             Path path1 = new Path();
+            initPath(path1, mListPoint);
             Path path2 = new Path();
-            boolean first = true;
-
-            for (Point point : myPath.getListPoint()) {
-                if (first) {
-                    first = false;
-                    path1.moveTo(point.x, point.y);
-                } else {
-                    path1.lineTo(point.x, point.y);
-                }
-            }
-
-            first = true;
-
-            for (Point point : mListPoint) {
-                if (first) {
-                    first = false;
-                    path2.moveTo(point.x, point.y);
-                } else {
-                    path2.lineTo(point.x, point.y);
-                }
-            }
+            initPath(path2, myPath.getListPoint());
 
             Bitmap bmp1 = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             Canvas c1 = new Canvas(bmp1);

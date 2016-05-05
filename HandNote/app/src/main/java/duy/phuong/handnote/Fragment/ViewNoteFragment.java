@@ -1,5 +1,7 @@
 package duy.phuong.handnote.Fragment;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,7 +25,8 @@ public class ViewNoteFragment extends BaseFragment implements BackPressListener{
         this.mNote = Note;
         if (mNote != null) {
             if (mNoteImage != null) {
-                mNoteImage.setImageBitmap(mNote.mImage);
+                Bitmap bitmap = BitmapFactory.decodeFile(mNote.mBitmapPath);
+                mNoteImage.setImageBitmap(bitmap);
             }
             if (mNoteContent != null) {
                 mNoteContent.setText(mNote.mContent);
@@ -49,7 +52,8 @@ public class ViewNoteFragment extends BaseFragment implements BackPressListener{
             mNote = mListener.getCurrentNote();
         }
         if (mNote != null) {
-            mNoteImage.setImageBitmap(mNote.mImage);
+            Bitmap bitmap = BitmapFactory.decodeFile(mNote.mBitmapPath);
+            mNoteImage.setImageBitmap(bitmap);
             mNoteContent.setText(mNote.mContent);
         }
     }

@@ -9,4 +9,9 @@ public class Line {
     public ArrayList<Word> mWords;
     public ArrayList<Character> mCharacters;
     public int mTop, mBottom;
+    public int mMinTop, mMaxBottom;
+
+    public Line() {
+        mMinTop = mMaxBottom = 0;
+    }
 }

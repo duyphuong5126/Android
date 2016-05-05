@@ -30,10 +30,18 @@
                 android:layout_marginRight="20dip">
 
                 <ImageButton
+                    android:id="@+id/buttonLoad"
+                    android:layout_width="60dip"
+                    android:layout_height="60dip"
+                    android:background="@drawable/circle_heavy_red"
+                    android:src="@mipmap/ic_add_to_photos_white_36dp" />
+
+                <ImageButton
                     android:id="@+id/buttonResize"
                     android:layout_width="60dip"
                     android:layout_height="60dip"
                     android:background="@drawable/circle_heavy_red"
+                    android:visibility="gone"
                     android:src="@mipmap/ic_photo_size_select_large_white_36dp" />
 
                 <ImageButton

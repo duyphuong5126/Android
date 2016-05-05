@@ -7,7 +7,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -60,7 +64,13 @@ public class LocalStorage extends SQLiteOpenHelper {
             do {
                 Note note = new Note();
                 note.mBitmapPath = cursor.getString(cursor.getColumnIndex(Note_Image));
-                note.mImage = BitmapFactory.decodeFile(note.mBitmapPath);
+
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inDither = false;
+                options.inPurgeable = true;
+                options.inInputShareable = true;
+                Bitmap src = BitmapFactory.decodeFile(note.mBitmapPath, options);
+                note.mImage = ThumbnailUtils.extractThumbnail(src, 60, 60);
                 note.mContentPath = cursor.getString(cursor.getColumnIndex(Note_Content));
                 note.mContent = SupportUtils.getStringData(note.mContentPath);
                 notes.add(note);

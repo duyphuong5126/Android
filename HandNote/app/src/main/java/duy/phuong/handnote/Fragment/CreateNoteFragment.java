@@ -1,13 +1,19 @@
 package duy.phuong.handnote.Fragment;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Point;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +42,8 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
     private ImageButton mButtonSave, mButtonDelete, mButtonUndo, mButtonRedo, mButtonColor;
     private TextView mTvResult;
     private CheckBox mCheckSplit;
+    private LinearLayout mLayoutProgress;
+    private ScrollView mViewResult;
 
     private Recognizer mRecognizer;
 
@@ -73,9 +81,11 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
         mCheckSplit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mDrawer.setSplit(isChecked);
+                mDrawer.setSplit();
             }
         });
+        mLayoutProgress = (LinearLayout) mFragmentView.findViewById(R.id.viewProgress);
+        mViewResult = (ScrollView) mFragmentView.findViewById(R.id.viewResult);
 
         mLocalStorage = new LocalStorage(mActivity);
     }
@@ -86,6 +96,7 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
         mDrawer = (FingerDrawerView) mFragmentView.findViewById(R.id.FingerDrawer);
         mDrawer.setListener(this);
         mDrawer.setDisplayListener(this);
+        mDrawer.setDefault();
         mCurrentRecognized = new HashMap<>();
         mRecognizer = new Recognizer(mListener.getGlobalSOM(), mListener.getMapNames());
     }
@@ -142,90 +153,116 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
     }
 
     @Override
-    public void onRecognizeSuccess(ArrayList<Character> listCharacters) {
+    public void onRecognizeSuccess(final ArrayList<Character> listCharacters) {
         if (mCurrentRecognized == null) {
             mCurrentRecognized = new HashMap<>();
         } else {
             mCurrentRecognized.clear();
         }
 
-        ArrayList<Line> lines = mDrawer.getLines();
+        for (Character character : listCharacters) {
+            character.isSorted = false;
+        }
 
-        if (!lines.isEmpty()) {
-            for (Line line : lines) {
-                line.mCharacters = new ArrayList<>();
-                for (Character character : listCharacters) {
-                    if (!character.isSorted) {
-                        if (character.mRect.bottom * 0.8d <= line.mBottom) {
-                            line.mCharacters.add(character);
-                            character.isSorted = true;
-                        }
-                    }
-                }
+        final ArrayList<Line> lines = mDrawer.getLines();
+        final String[] paragraph = {""};
+        Log.d("List char", "" + listCharacters.size());
+
+        AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                mLayoutProgress.setVisibility(View.VISIBLE);
             }
 
-            String paragraph = "";
-            for (Line line : lines) {
-                if (!line.mCharacters.isEmpty()) {
-                    boolean end = false;
-                    while (!end) {
-                        boolean swapped = false;
-                        for (int i = 1; i < line.mCharacters.size(); i++) {
-                            Character c1 = line.mCharacters.get(i), cp = line.mCharacters.get(i - 1);
-                            if (c1.mRect.left < cp.mRect.left) {
-                                Collections.swap(line.mCharacters, i, i - 1);
-                                swapped = true;
+            @Override
+            protected Void doInBackground(Void... params) {
+                if (!lines.isEmpty()) {
+                    for (Line line : lines) {
+                        line.mCharacters = new ArrayList<>();
+                        for (Character character : listCharacters) {
+                            if (!character.isSorted) {
+                                if (character.mRect.bottom * 0.8d <= line.mBottom) {
+                                    line.mCharacters.add(character);
+                                    character.isSorted = true;
+                                    if (line.mMinTop > character.mRect.top) {
+                                        line.mMinTop = character.mRect.top;
+                                    }
+                                    if (line.mMaxBottom < character.mRect.bottom) {
+                                        line.mMaxBottom = character.mRect.bottom;
+                                    }
+                                }
                             }
                         }
-
-                        if (!swapped) {
-                            end = true;
-                        }
                     }
-                    String text = "";
-                    int h = Math.abs(line.mBottom - line.mTop);
-                    for (int i = 0; i < line.mCharacters.size(); i++) {
-                        Character c = line.mCharacters.get(i);
-                        Bundle bundle = mRecognizer.recognize(c);
-                        int x = bundle.getInt("cordX");
-                        int y = bundle.getInt("cordY");
-                        Input input = (Input) bundle.getSerializable("input");
-                        String result = bundle.getString("result");
-                        mCurrentRecognized.put(input, new Point(x, y));
-                        Log.d("Result", "bitmap " + i + " :" + result);
-                        String character = "";
-                        switch (result) {
-                            case "C":
-                            case "O":
-                            case "P":
-                            case "S":
-                            case "V":
-                            case "W":
-                            case "X":
-                            case "Z":
-                                if (c.mRect.height() <= 0.65d * h) {
-                                    character = result.toLowerCase();
-                                } else {
-                                    character = result;
+
+                    String p = "";
+                    for (Line line : lines) {
+                        if (!line.mCharacters.isEmpty()) {
+                            boolean end = false;
+                            while (!end) {
+                                boolean swapped = false;
+                                for (int i = 1; i < line.mCharacters.size(); i++) {
+                                    Character c1 = line.mCharacters.get(i), cp = line.mCharacters.get(i - 1);
+                                    if (c1.mRect.left < cp.mRect.left) {
+                                        Collections.swap(line.mCharacters, i, i - 1);
+                                        swapped = true;
+                                    }
                                 }
-                                break;
 
-                            case "b1":
-                            case "k1":
-                                character = result.substring(0, 1);
-                                break;
+                                if (!swapped) {
+                                    end = true;
+                                }
+                            }
+                            String text = "";
+                            int h = Math.abs(line.mMaxBottom - line.mMinTop);
+                            for (int i = 0; i < line.mCharacters.size(); i++) {
+                                Character c = line.mCharacters.get(i);
+                                if (c.mAlphabet == null) {
+                                    Bundle bundle = mRecognizer.recognize(c);
+                                    int x = bundle.getInt("cordX");
+                                    int y = bundle.getInt("cordY");
+                                    Input input = (Input) bundle.getSerializable("input");
+                                    String result = bundle.getString("result");
+                                    mCurrentRecognized.put(input, new Point(x, y));
+                                    Log.d("Result", "bitmap " + i + " :" + result);
+                                    switch (result) {
+                                        case "C":case "O":case "P":case "S":case "V":case "W":case "X":case "Z":
+                                            if (c.mRect.height() <= 0.7d * h) {
+                                                c.mAlphabet = result.toLowerCase();
+                                            } else {
+                                                c.mAlphabet = result;
+                                            }
+                                            break;
 
-                            default:
-                                character = result;
-                                break;
+                                        case "b1":
+                                        case "k1":
+                                            c.mAlphabet = result.substring(0, 1);
+                                            break;
+
+                                        default:
+                                            c.mAlphabet = result;
+                                            break;
+                                    }
+                                }
+                                text += c.mAlphabet;
+                            }
+                            p += text + " ";
                         }
-                        text += character;
                     }
-                    paragraph += text + " ";
+                    paragraph[0] = p;
                 }
+                return null;
             }
-            mTvResult.setText(paragraph);
-        }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                mTvResult.setText(paragraph[0]);
+                mLayoutProgress.setVisibility(View.GONE);
+            }
+        };
+        asyncTask.execute();
     }
 
     private void deleteData() {

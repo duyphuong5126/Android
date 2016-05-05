@@ -107,7 +107,6 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     @Override
     protected void onStart() {
         super.onStart();
-        checkScreen();
         if (mFragmentManager.getBackStackEntryCount() <= 0) {
             this.showFragment(mFragmentName);
         } else {
@@ -127,7 +126,19 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                     }
                 }
             }
+
+            if (mStack.isEmpty()) {
+                if (!list.isEmpty()) {
+                    for (int i = 0; i < list.size(); i++) {
+                        BaseFragment baseFragment = (BaseFragment) list.get(i);
+                        if (baseFragment != null) {
+                            mStack.push(baseFragment.fragmentIdentify());
+                        }
+                    }
+                }
+            }
         }
+        checkScreen();
     }
 
     private void initMapNames() {
@@ -320,10 +331,16 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         checkScreen();
     }
 
+
+
     private void checkScreen() {
         String name = "";
         if (!mStack.isEmpty()) {
             name = mStack.peek();
+        } else {
+            if (mFragmentName != null) {
+                name = mFragmentName;
+            }
         }
         switch (name) {
             case BaseFragment.DRAWING_FRAGMENT:
@@ -444,9 +461,6 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
 
     @Override
     protected void onStop() {
-        mGlobalMapNames.clear();
-        mGlobalMapNames = null;
-        mGlobalSOM = null;
         onSaveInstanceState(new Bundle());
         super.onStop();
     }

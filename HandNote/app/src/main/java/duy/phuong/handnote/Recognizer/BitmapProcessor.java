@@ -1,6 +1,7 @@
 package duy.phuong.handnote.Recognizer;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -18,6 +19,8 @@ import duy.phuong.handnote.DTO.*;
 import duy.phuong.handnote.DTO.Character;
 import duy.phuong.handnote.MyView.DrawingView.FingerDrawerView;
 import duy.phuong.handnote.MyView.DrawingView.MyPath;
+import duy.phuong.handnote.R;
+import duy.phuong.handnote.Support.SupportUtils;
 
 /**
  * Created by Phuong on 26/11/2015.
@@ -34,19 +37,61 @@ public class BitmapProcessor {
 
     public HashMap<String, Boolean> mMapFeatures;
 
-    public void setSplit(boolean Split) {
-        this.mSplit = Split;
+    public void setSplit() {
+        mMode = SPLIT;
     }
 
-    private boolean mSplit;
+    public void setFindContours() {
+        mMode = CONTOUR;
+    }
+
+    public void setFindVerticalProjectionProfile() {
+        mMode = VERTICAL_PP;
+    }
+
+    public void setFindHorizontalProjectionProfile() {
+        mMode = HORIZONTAL_PP;
+    }
+
+    public void setProfile() {
+        mMode = PROFILE;
+    }
+
+    public void setDefault() {
+        mMode = DEFAULT;
+    }
+
+    public void setTopDown() {
+        mMode = SPLIT_TOP_DOWN;
+    }
+
+    public void setBottomUp() {
+        mMode = SPLIT_BOTTOM_UP;
+    }
+
+    public static final int DEFAULT = R.id.itemDefault;
+    public static final int SPLIT = 1;
+    public static final int VERTICAL_PP = R.id.itemVerticalProjectionProfile;
+    public static final int HORIZONTAL_PP = R.id.itemHorizontalProjectionProfile;
+    public static final int PROFILE = R.id.itemProfile;
+    public static final int CONTOUR = R.id.itemContour;
+    public static final int SPLIT_TOP_DOWN = R.id.itemTopDown;
+    public static final int SPLIT_BOTTOM_UP = R.id.itemBottomUp;
+
+    private int mMode;
+
+    public int getMode() {
+        return mMode;
+    }
 
     private ArrayList<Rect> mListRectangle;
+
+    private Bitmap mGloBalContour;
 
     public BitmapProcessor() {
         mListRectangle = new ArrayList<>();
         mMapFeatures = new HashMap<>();
         resetMap();
-        mSplit = false;
     }
 
     public void resetMap() {
@@ -169,7 +214,8 @@ public class BitmapProcessor {
     }
 
     public void onDetectCharacter(final Character character, RecognitionCallback callback) {
-        this.mListRectangle.addAll(detectAreasOnBitmap(character.mBitmap, 0, 0));
+        Bitmap src = character.mBitmap;
+        this.mListRectangle.addAll(detectAreasOnBitmap(src, 0, 0));
 
         ArrayList<Character> detectedBitmaps = new ArrayList<>();
         for (Rect rect : mListRectangle) {
@@ -182,26 +228,84 @@ public class BitmapProcessor {
             detectedBitmaps.add(character1);
         }
 
-        if (mSplit) {
-            ArrayList<Character> resultBitmaps = new ArrayList<>();
-            for (Character f : detectedBitmaps) {
-                resultBitmaps.addAll(getSegments(f));
-                //highLight(f.mBitmap, 0, f.mBitmap.getWidth() - 1, (int) (f.mBitmap.getHeight() * 0.8d), f.mBitmap.getHeight() - 1);
-                //resultBitmaps.add(f);
-            }
-            callback.onRecognizeSuccess(resultBitmaps.isEmpty() ? detectedBitmaps : resultBitmaps);
-        } else {
-            callback.onRecognizeSuccess(detectedBitmaps);
+        ArrayList<Character> resultBitmaps = new ArrayList<>();
+        switch (mMode) {
+            case SPLIT:
+                for (Character f : detectedBitmaps) {
+                    resultBitmaps.addAll(getSegments(f));
+                    //highLight(f.mBitmap, 0, f.mBitmap.getWidth() - 1, (int) (f.mBitmap.getHeight() * 0.8d), f.mBitmap.getHeight() - 1);
+                    //resultBitmaps.add(f);
+                }
+                callback.onRecognizeSuccess(resultBitmaps.isEmpty() ? detectedBitmaps : resultBitmaps);
+                break;
+            case CONTOUR:
+                for (Character f : detectedBitmaps) {
+                    for (Bitmap bitmap : findContour(f.mBitmap)) {
+                        Character fContour = new Character();
+                        fContour.mBitmap = bitmap;
+                        resultBitmaps.add(fContour);
+                    }
+                }
+                if (mGloBalContour != null) {
+                    Character c = new Character();
+                    c.mBitmap = mGloBalContour;
+                    resultBitmaps.add(c);
+                    mGloBalContour = null;
+                }
+                callback.onRecognizeSuccess(resultBitmaps.isEmpty() ? detectedBitmaps : resultBitmaps);
+                break;
+            case VERTICAL_PP:
+                for (Character f : detectedBitmaps) {
+                    int[] verticalHistogram = getHorizontalHistogram(f.mBitmap);
+                    Bitmap bmp = Bitmap.createBitmap(f.mBitmap.getWidth(), f.mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                    for (int i = 0; i < bmp.getHeight(); i++) {
+                        for (int j = 0; j < bmp.getWidth(); j++) {
+                            if (verticalHistogram[i] > 0) {
+                                bmp.setPixel(j, i, Color.BLACK);
+                                verticalHistogram[i]--;
+                            } else {
+                                bmp.setPixel(j, i, Color.WHITE);
+                            }
+                        }
+                    }
+                    Character c = new Character();
+                    c.mBitmap = bmp;
+                    resultBitmaps.add(c);
+                }
+                callback.onRecognizeSuccess(resultBitmaps.isEmpty() ? detectedBitmaps : resultBitmaps);
+                break;
+            case HORIZONTAL_PP:
+                for (Character f : detectedBitmaps) {
+                    int[] horizontalHistogram = getHorizontalHistogram(f.mBitmap);
+                    Bitmap bmp = Bitmap.createBitmap(f.mBitmap.getWidth(), f.mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                    for (int i = 0; i < bmp.getWidth(); i++) {
+                        for (int j = bmp.getHeight() - 1; j >= 0; j--) {
+                            if (horizontalHistogram[i] > 0) {
+                                bmp.setPixel(i, j, Color.BLACK);
+                                horizontalHistogram[i]--;
+                            } else {
+                                bmp.setPixel(i, j, Color.WHITE);
+                            }
+                        }
+                    }
+                    Character c = new Character();
+                    c.mBitmap = bmp;
+                    resultBitmaps.add(c);
+                }
+                callback.onRecognizeSuccess(resultBitmaps.isEmpty() ? detectedBitmaps : resultBitmaps);
+                break;
+            case SPLIT_TOP_DOWN:
+                resultBitmaps.addAll(topDownSegmenting(character));
+                callback.onRecognizeSuccess(resultBitmaps.isEmpty() ? detectedBitmaps : resultBitmaps);
+                break;
+            case SPLIT_BOTTOM_UP:
+                resultBitmaps.addAll(bottomUpSegmenting(character));
+                callback.onRecognizeSuccess(resultBitmaps.isEmpty() ? detectedBitmaps : resultBitmaps);
+                break;
+            default:
+                callback.onRecognizeSuccess(detectedBitmaps);
+                break;
         }
-
-        /*ArrayList<Character> resultBitmaps = new ArrayList<>();
-        for (Character f : detectedBitmaps) {
-            for (Bitmap bitmap : findContour(f.mBitmap)) {
-                Character fContour = new Character();
-                fContour.mBitmap = bitmap;
-                resultBitmaps.add(fContour);
-            }
-        }*/
         this.mListRectangle.clear();
         //callback.onRecognizeSuccess(resultBitmaps);
     }
@@ -447,166 +551,179 @@ public class BitmapProcessor {
 
     private ArrayList<Character> getSegments(Character character) {
         ArrayList<Character> resultBitmaps = new ArrayList<>();
-        Bitmap src = character.mBitmap;
-        /*int height = src.getHeight();
-        double threshold = height * 0.8d;
-        ArrayList<Rect> listRect = new ArrayList<>();
-        boolean flag = true;
-        for (int i = 0; i < src.getWidth() - 1; i++) {
-            if (getColumnHeightFromTop(src, i) < threshold) {
-                int index = listRect.size() - 1;
-                if (flag) {
-                    listRect.add(new Rect(i, 0, i + 1, src.getHeight() - 1));
-                    flag = false;
-                } else {
-                    listRect.get(index).right = listRect.get(index).right + 1;
-                }
-            } else {
-                flag = true;
-            }
-        }
-
-        for (int i = 0; i < listRect.size() - 1; i++) {
-            if (listRect.get(i) != null) {
-                boolean stop = false;
-                for (int j = i + 1; j < listRect.size() && !stop; j++) {
-                    if (listRect.get(j).left - listRect.get(i).right <= 0.05d * src.getWidth()) {
-                        listRect.get(i).right = listRect.get(j).right;
-                        listRect.set(j, null);
-                    } else {
-                        stop = true;
-                    }
-                }
-            }
-        }
-
-        for (Rect rect : listRect) {
-            if (rect != null) {
-                Character fImage = new Character();
-                fImage.mBitmap = cropBitmap(src, rect.left, rect.top, rect.width(), rect.height());
-                resultBitmaps.add(fImage);
-            }
-        }*/
+        Bitmap src = copyBitmap(character.mBitmap);
         ArrayList<Bitmap> listContours = findContour(src);
-        if (listContours.size() > 1) {
-            if (listContours.size() == 2) {
-
-            } else {
-                ArrayList<Rect> list = new ArrayList<>();
-                for (Bitmap bmp : listContours) {
-                    list.addAll(detectAreasOnBitmap(bmp, 0, 0));
+        int[] horizontalHistogram = getHorizontalHistogram(src);
+        int[] verticalHistogram = getVerticalHistogram(src);
+        int offsetY = -1;
+        for (int i = horizontalHistogram.length - 1; i >= 0 && offsetY < 0; i--) {
+            double percent = (double) horizontalHistogram[i] / src.getWidth();
+            int startCol = -1, endCol = -1;
+            for (int j = 0; j < src.getWidth() && startCol < 0; j++) {
+                if (src.getPixel(j, i) != Color.WHITE) {
+                    startCol = j;
                 }
-                if (list.size() == listContours.size()) {
-                    int max_pos = -1;
-                    int width = Integer.MIN_VALUE;
+            }
+            for (int j = src.getWidth() - 1; j >= 0 && endCol < 0; j--) {
+                if (src.getPixel(j, i) != Color.WHITE) {
+                    endCol = j;
+                }
+            }
+            int width = endCol - startCol;
+            if (percent > 0.4d || (width > 0.7d * src.getWidth() && countRowSegments(i, src) >= 3)) {
+                offsetY = i;
+            }
+        }
+
+        /*if (offsetY >= 0) {
+            for (int j = 0; j < src.getWidth(); j++) {
+                character.mBitmap.setPixel(j, offsetY, Color.RED);
+            }
+            resultBitmaps.add(character);
+        }*/
+        if (listContours.size() > 1) {
+            ArrayList<Rect> list = new ArrayList<>();
+            for (Bitmap bmp : listContours) {
+                list.addAll(detectAreasOnBitmap(bmp, 0, 0));
+            }
+            if (list.size() == listContours.size()) {
+                int max_pos = -1;
+                int width = Integer.MIN_VALUE;
+                for (Rect rect : list) {
+                    if (rect.width() > width) {
+                        max_pos = list.indexOf(rect);
+                        width = rect.width();
+                    }
+                }
+                if (max_pos >= 0) {
+                    int offsetX = (int) (FingerDrawerView.CurrentPaintSize);
+                    ArrayList<Rect> finalList = new ArrayList<>();
+                    ArrayList<Boolean> flags = new ArrayList<>();
+                    Rect rBig = list.remove(max_pos);
                     for (Rect rect : list) {
-                        if (rect.width() > width) {
-                            max_pos = list.indexOf(rect);
-                            width = rect.width();
+                        flags.add(false);
+                    }
+                    for (int i = 0; i < list.size(); i++) {
+                        Rect r1 = null;
+                        if (!flags.get(i)) {
+                            r1 = list.get(i);
+                            flags.set(i, true);
+                        }
+                        for (int j = i + 1; j < list.size(); j++) {
+                            if (r1 != null) {
+                                if (!flags.get(j)) {
+                                    Rect r2 = list.get(j);
+                                    if (mixableRect(r1, r2)) {
+                                        int left = Math.min(r1.left, r2.left);
+                                        int top = Math.min(r1.top, r2.top);
+                                        int right = Math.max(r1.right, r2.right);
+                                        int bottom = Math.max(r1.bottom, r2.bottom);
+                                        r1 = new Rect(left, top, right, bottom);
+                                        flags.set(j, true);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (r1 != null) {
+                            r1.left = (r1.left - offsetX >= 0) ? r1.left - offsetX : 0;
+                            r1.right = (r1.right + offsetX < src.getWidth()) ? r1.right + offsetX : src.getWidth();
+                            finalList.add(r1);
                         }
                     }
-                    if (max_pos >= 0) {
-                        ArrayList<Rect> finalList = new ArrayList<>();
-                        ArrayList<Boolean> flags = new ArrayList<>();
-                        Rect rBig = list.remove(max_pos);
-                        for (Rect rect : list) {
-                            flags.add(false);
-                        }
-                        for (int i = 0; i < list.size(); i++) {
-                            Rect r1 = null;
-                            if (!flags.get(i)) {
-                                r1 = list.get(i);
-                                flags.set(i, true);
-                            }
-                            for (int j = i + 1; j < list.size(); j++) {
-                                if (r1 != null) {
-                                    if (!flags.get(j)) {
-                                        Rect r2 = list.get(j);
-                                        if (mixableRect(r1, r2)) {
-                                            int left = Math.min(r1.left, r2.left);
-                                            int top = Math.min(r1.top, r2.top);
-                                            int right = Math.max(r1.right, r2.right);
-                                            int bottom = Math.max(r1.bottom, r2.bottom);
-                                            r1 = new Rect(left, top, right, bottom);
-                                            flags.set(j, true);
-                                        }
-                                    }
-                                }
-                            }
 
-                            if (r1 != null) {
-                                finalList.add(r1);
+                    flags.clear();
+                    list.clear();
+
+                    for (int i = 0; i < finalList.size() - 1; i++) {
+                        Rect r1 = finalList.get(i);
+                        for (int j = i + 1; j < finalList.size(); j++) {
+                            Rect r2 = finalList.get(j);
+                            if (r1.left > r2.left) {
+                                Collections.swap(finalList, i, j);
                             }
                         }
+                    }
 
-                        flags.clear();
-                        list.clear();
-
-                        for (int i = 0; i < finalList.size() - 1; i++) {
-                            Rect r1 = finalList.get(i);
-                            for (int j = i + 1; j < finalList.size(); j++) {
-                                Rect r2 = finalList.get(j);
-                                if (r1.left > r2.left) {
-                                    Collections.swap(finalList, i, j);
+                    for (int i = 0; i < finalList.size(); i++) {
+                        Rect rect = finalList.get(i);
+                        Rect next = null;
+                        Rect prev = null;
+                        if (i + 1 < finalList.size()) {
+                            next = finalList.get(i + 1);
+                        }
+                        if (i - 1 >= 0) {
+                            prev = finalList.get(i - 1);
+                        }
+                        boolean stop = false;
+                        int prevCol = 0;
+                        if (prev != null) {
+                            prevCol = prev.right;
+                        }
+                        for (int j = rect.left; j >= prevCol && !stop; j--) {
+                            int height = getColumnHeightFromTop(src, j);
+                            if (height <= offsetY) {
+                                character.mBitmap.setPixel(j, height, Color.GREEN);
+                                if (rect.left > 0) {
+                                    rect.left--;
                                 }
+                            } else {
+                                stop = true;
                             }
                         }
 
-                        for (int i = 0; i < finalList.size(); i++) {
-                            Rect rect = finalList.get(i);
-                            if (i == 0 && rect.left - FingerDrawerView.CurrentPaintSize > 0) {
-                                Bitmap bmp = cropBitmap(src, 0, 0, (int) (rect.left - FingerDrawerView.CurrentPaintSize), src.getHeight());
-                                for (Bitmap b : filterTrash(bmp, src)) {
-                                    Character c = new Character();
-                                    c.mBitmap = b;
-                                    resultBitmaps.add(c);
+                        stop = false;
+                        int nextCol = -1;
+                        if (next != null) {
+                            nextCol = next.left;
+                        } else {
+                            nextCol = src.getWidth() - 1;
+                        }
+                        for (int j = rect.right; j <= nextCol && !stop; j++) {
+                            int height = getColumnHeightFromTop(src, j);
+                            if (height <= offsetY) {
+                                character.mBitmap.setPixel(j, height, Color.GREEN);
+                                if (rect.right < src.getWidth()) {
+                                    rect.right++;
                                 }
+                            } else {
+                                stop = true;
+                                Log.d("Stop", "true");
                             }
-                            int x = (rect.left - FingerDrawerView.CurrentPaintSize >= 0) ? (int) (rect.left - FingerDrawerView.CurrentPaintSize) : 0;
-                            int w = (rect.left + rect.width() + 2 * FingerDrawerView.CurrentPaintSize <= src.getWidth()) ?
-                                    (int) (rect.width() + 2 * FingerDrawerView.CurrentPaintSize) : (int) (src.getWidth() - rect.left + FingerDrawerView.CurrentPaintSize);
-                            Character c = new Character();
-                            c.mBitmap = cropBitmap(src, x, 0, w, src.getHeight());
-                            resultBitmaps.add(c);
-                            if (i + 1 < finalList.size() && rect.right + FingerDrawerView.CurrentPaintSize <= src.getWidth()) {
-                                Rect next = finalList.get(i + 1);
-                                x = (int) (rect.right + FingerDrawerView.CurrentPaintSize);
-                                w = (int) (next.left - FingerDrawerView.CurrentPaintSize - x);
-                                if (w > 0) {
-                                    Bitmap bmp = cropBitmap(src, x, 0, w, src.getHeight());
-                                    for (Bitmap b : filterTrash(bmp, src)) {
-                                        Character c1 = new Character();
-                                        c1.mBitmap = b;
-                                        resultBitmaps.add(c1);
-                                    }
-                                }
+                        }
+                    }
 
+                    for (int i = 0; i < finalList.size(); i++) {
+                        Rect rect = finalList.get(i);
+                        if (i == 0 && rect.left - FingerDrawerView.CurrentPaintSize > 0) {
+                            Bitmap bmp = cropBitmap(src, 0, 0, rect.left, src.getHeight());
+                            resultBitmaps.addAll(filterTrash(bmp, src));
+                        }
+                        int x = rect.left;
+                        int w = rect.width();
+                        Bitmap bmp = cropBitmap(src, x, 0, w, src.getHeight());
+                        resultBitmaps.addAll(filterTrash(bmp, src));
+                        /*if (i + 1 < finalList.size() && rect.right <= src.getWidth()) {
+                            Rect next = finalList.get(i + 1);
+                            x = rect.right;
+                            w = next.left - x;
+                            if (w > 0) {
+                                Bitmap bmp = cropBitmap(src, x, 0, w, src.getHeight());
+                                resultBitmaps.addAll(filterTrash(bmp, src));
                             }
-                            if (i == finalList.size() - 1) {
-                                x = (int) (rect.right + FingerDrawerView.CurrentPaintSize);
-                                if (x < src.getWidth() - 1) {
-                                    Bitmap bmp = cropBitmap(src, x, 0, src.getWidth() - x, src.getHeight());
-                                    for (Bitmap b : filterTrash(bmp, src)) {
-                                        Character c2 = new Character();
-                                        c2.mBitmap = b;
-                                        resultBitmaps.add(c2);
-                                    }
-                                }
+
+                        }*/
+                        if (i == finalList.size() - 1) {
+                            x = rect.right;
+                            if (x < src.getWidth() - 1) {
+                                bmp = cropBitmap(src, x, 0, src.getWidth() - x, src.getHeight());
+                                resultBitmaps.addAll(filterTrash(bmp, src));
                             }
                         }
                     }
                 }
             }
         } else {
-            int[] verticalHistogram = getVerticalHistogram(src);
-            int offsetY = -1;
-            for (int i = verticalHistogram.length - 1; i >= 0 && offsetY < 0; i--) {
-                double percent = (double) verticalHistogram[i] / src.getWidth();
-                if (percent > 0.3d) {
-                    offsetY = i;
-                }
-            }
-
             if (offsetY >= 0) {
                 ArrayList<Rect> rect = new ArrayList<>();
                 boolean flag = false;
@@ -626,21 +743,13 @@ public class BitmapProcessor {
                         }
                     }
                 }
-                Character c = new Character();
-                c.mBitmap = src;
-                resultBitmaps.add(c);
-                Log.d("Size", "" + rect.size());
                 if (!rect.isEmpty()) {
                     for (int i = 0; i < rect.size(); i++) {
                         Rect r = rect.get(i);
                         if (i == 0) {
                             Bitmap bmp = cropBitmap(src, 0, 0, r.left, src.getHeight());
                             if (bmp != null) {
-                                for (Bitmap b : filterTrash(bmp, src)) {
-                                    c = new Character();
-                                    c.mBitmap = b;
-                                    resultBitmaps.add(c);
-                                }
+                                resultBitmaps.addAll(filterTrash(bmp, src));
                             }
 
                         }
@@ -648,20 +757,12 @@ public class BitmapProcessor {
                             Rect next = rect.get(i + 1);
                             Bitmap bmp = cropBitmap(src, r.right, 0, next.left, src.getHeight());
                             if (bmp != null) {
-                                for (Bitmap b : filterTrash(bmp, src)) {
-                                    c = new Character();
-                                    c.mBitmap = b;
-                                    resultBitmaps.add(c);
-                                }
+                                resultBitmaps.addAll(filterTrash(bmp, src));
                             }
                         } else {
                             Bitmap bmp = cropBitmap(src, r.right, 0, src.getWidth() - r.right, src.getHeight());
                             if (bmp != null) {
-                                for (Bitmap b : filterTrash(bmp, src)) {
-                                    c = new Character();
-                                    c.mBitmap = b;
-                                    resultBitmaps.add(c);
-                                }
+                                resultBitmaps.addAll(filterTrash(bmp, src));
                             }
                         }
                     }
@@ -671,12 +772,16 @@ public class BitmapProcessor {
         return resultBitmaps;
     }
 
-    private ArrayList<Bitmap> filterTrash(Bitmap bitmap, Bitmap src) {
+    private ArrayList<Character> filterTrash(Bitmap bitmap, Bitmap src) {
         ArrayList<Rect> rect = detectAreasOnBitmap(bitmap, 0, 0);
-        ArrayList<Bitmap> result = new ArrayList<>();
+        ArrayList<Character> result = new ArrayList<>();
         for (Rect r : rect) {
             if (r.width() > 0.15d * src.getWidth() && r.height() > 0.15d * src.getHeight()) {
-                result.add(cropBitmap(bitmap, r.left, r.top, r.width(), r.height()));
+                Character character = new Character();
+                character.mRect = r;
+                character.mBitmap = cropBitmap(bitmap, r.left, r.top, r.width(), r.height());
+                character.mListContours = findContour(character.mBitmap);
+                result.add(character);
             }
         }
         return result;
@@ -687,7 +792,7 @@ public class BitmapProcessor {
                 || (r1.left <= r2.left && r1.right >= r2.right) || (r2.left <= r1.left && r2.right >= r1.right);
     }
 
-    private ArrayList<Rect> detectAreasOnBitmap(final Bitmap bitmap, int dx, int dy) {
+    public ArrayList<Rect> detectAreasOnBitmap(final Bitmap bitmap, int dx, int dy) {
         ArrayList<Rect> listDetectedArea = new ArrayList<>();
         if (bitmap != null) {
             HashMap<Integer, Integer> listColumns = new HashMap<>();
@@ -802,48 +907,94 @@ public class BitmapProcessor {
         return count;
     }
 
-    private int[] getVerticalHistogram(Bitmap bitmap) {
-        int[] verticalHistogram = new int[bitmap.getHeight()];
-        for (int i = 0; i < verticalHistogram.length; i++) {
-            verticalHistogram[i] = 0;
+    private int[] getHorizontalHistogram(Bitmap bitmap) {
+        int[] horizontalHistogram = new int[bitmap.getHeight()];
+        for (int i = 0; i < horizontalHistogram.length; i++) {
+            horizontalHistogram[i] = 0;
             if (bitmap.getWidth() % 2 == 0) {
                 if (bitmap.getWidth() % 4 == 0) {
                     for (int j = 0; j < bitmap.getWidth(); j += 4) {
-                        verticalHistogram[i] += bitmap.getPixel(j, i) == Color.WHITE ? 0 : 1;
-                        verticalHistogram[i] += bitmap.getPixel(j + 1, i) == Color.WHITE ? 0 : 1;
-                        verticalHistogram[i] += bitmap.getPixel(j + 2, i) == Color.WHITE ? 0 : 1;
-                        verticalHistogram[i] += bitmap.getPixel(j + 3, i) == Color.WHITE ? 0 : 1;
+                        horizontalHistogram[i] += bitmap.getPixel(j, i) == Color.WHITE ? 0 : 1;
+                        horizontalHistogram[i] += bitmap.getPixel(j + 1, i) == Color.WHITE ? 0 : 1;
+                        horizontalHistogram[i] += bitmap.getPixel(j + 2, i) == Color.WHITE ? 0 : 1;
+                        horizontalHistogram[i] += bitmap.getPixel(j + 3, i) == Color.WHITE ? 0 : 1;
                     }
                 } else {
                     for (int j = 0; j < bitmap.getWidth(); j += 2) {
-                        verticalHistogram[i] += bitmap.getPixel(j, i) == Color.WHITE ? 0 : 1;
-                        verticalHistogram[i] += bitmap.getPixel(j + 1, i) == Color.WHITE ? 0 : 1;
+                        horizontalHistogram[i] += bitmap.getPixel(j, i) == Color.WHITE ? 0 : 1;
+                        horizontalHistogram[i] += bitmap.getPixel(j + 1, i) == Color.WHITE ? 0 : 1;
                     }
                 }
             } else {
                 if (bitmap.getWidth() % 3 == 0) {
                     for (int j = 0; j < bitmap.getWidth(); j += 3) {
-                        verticalHistogram[i] += bitmap.getPixel(j, i) == Color.WHITE ? 0 : 1;
-                        verticalHistogram[i] += bitmap.getPixel(j + 1, i) == Color.WHITE ? 0 : 1;
-                        verticalHistogram[i] += bitmap.getPixel(j + 2, i) == Color.WHITE ? 0 : 1;
+                        horizontalHistogram[i] += bitmap.getPixel(j, i) == Color.WHITE ? 0 : 1;
+                        horizontalHistogram[i] += bitmap.getPixel(j + 1, i) == Color.WHITE ? 0 : 1;
+                        horizontalHistogram[i] += bitmap.getPixel(j + 2, i) == Color.WHITE ? 0 : 1;
                     }
                 } else {
                     if (bitmap.getWidth() % 5 == 0) {
                         for (int j = 0; j < bitmap.getWidth(); j += 5) {
-                            verticalHistogram[i] += bitmap.getPixel(j, i) == Color.WHITE ? 0 : 1;
-                            verticalHistogram[i] += bitmap.getPixel(j + 1, i) == Color.WHITE ? 0 : 1;
-                            verticalHistogram[i] += bitmap.getPixel(j + 2, i) == Color.WHITE ? 0 : 1;
-                            verticalHistogram[i] += bitmap.getPixel(j + 3, i) == Color.WHITE ? 0 : 1;
-                            verticalHistogram[i] += bitmap.getPixel(j + 4, i) == Color.WHITE ? 0 : 1;
+                            horizontalHistogram[i] += bitmap.getPixel(j, i) == Color.WHITE ? 0 : 1;
+                            horizontalHistogram[i] += bitmap.getPixel(j + 1, i) == Color.WHITE ? 0 : 1;
+                            horizontalHistogram[i] += bitmap.getPixel(j + 2, i) == Color.WHITE ? 0 : 1;
+                            horizontalHistogram[i] += bitmap.getPixel(j + 3, i) == Color.WHITE ? 0 : 1;
+                            horizontalHistogram[i] += bitmap.getPixel(j + 4, i) == Color.WHITE ? 0 : 1;
                         }
                     } else {
                         for (int j = 0; j < bitmap.getWidth(); j++) {
-                            verticalHistogram[i] += bitmap.getPixel(j, i) == Color.WHITE ? 0 : 1;
+                            horizontalHistogram[i] += bitmap.getPixel(j, i) == Color.WHITE ? 0 : 1;
                         }
                     }
                 }
             }
-            Log.d("Percentages", ((double) verticalHistogram[i] / bitmap.getWidth()) + "");
+            Log.d("Percentages", ((double) horizontalHistogram[i] / bitmap.getWidth()) + "");
+        }
+        return horizontalHistogram;
+    }
+
+    private int[] getVerticalHistogram(Bitmap bitmap) {
+        int[] verticalHistogram = new int[bitmap.getWidth()];
+        for (int i = 0; i < verticalHistogram.length; i++) {
+            verticalHistogram[i] = 0;
+            if (bitmap.getHeight() % 2 == 0) {
+                if (bitmap.getHeight() % 4 == 0) {
+                    for (int j = 0; j < bitmap.getHeight(); j += 4) {
+                        verticalHistogram[i] += bitmap.getPixel(i, j) == Color.WHITE ? 0 : 1;
+                        verticalHistogram[i] += bitmap.getPixel(i, j + 1) == Color.WHITE ? 0 : 1;
+                        verticalHistogram[i] += bitmap.getPixel(i, j + 2) == Color.WHITE ? 0 : 1;
+                        verticalHistogram[i] += bitmap.getPixel(i, j + 3) == Color.WHITE ? 0 : 1;
+                    }
+                } else {
+                    for (int j = 0; j < bitmap.getHeight(); j += 2) {
+                        verticalHistogram[i] += bitmap.getPixel(i, j) == Color.WHITE ? 0 : 1;
+                        verticalHistogram[i] += bitmap.getPixel(i, j + 1) == Color.WHITE ? 0 : 1;
+                    }
+                }
+            } else {
+                if (bitmap.getHeight() % 3 == 0) {
+                    for (int j = 0; j < bitmap.getHeight(); j += 3) {
+                        verticalHistogram[i] += bitmap.getPixel(i, j) == Color.WHITE ? 0 : 1;
+                        verticalHistogram[i] += bitmap.getPixel(i, j + 1) == Color.WHITE ? 0 : 1;
+                        verticalHistogram[i] += bitmap.getPixel(i, j + 2) == Color.WHITE ? 0 : 1;
+                    }
+                } else {
+                    if (bitmap.getHeight() % 5 == 0) {
+                        for (int j = 0; j < bitmap.getHeight(); j += 5) {
+                            verticalHistogram[i] += bitmap.getPixel(i, j) == Color.WHITE ? 0 : 1;
+                            verticalHistogram[i] += bitmap.getPixel(i, j + 1) == Color.WHITE ? 0 : 1;
+                            verticalHistogram[i] += bitmap.getPixel(i, j + 2) == Color.WHITE ? 0 : 1;
+                            verticalHistogram[i] += bitmap.getPixel(i, j + 3) == Color.WHITE ? 0 : 1;
+                            verticalHistogram[i] += bitmap.getPixel(i, j + 4) == Color.WHITE ? 0 : 1;
+                        }
+                    } else {
+                        for (int j = 0; j < bitmap.getHeight(); j++) {
+                            verticalHistogram[i] += bitmap.getPixel(i, j) == Color.WHITE ? 0 : 1;
+                        }
+                    }
+                }
+            }
+            Log.d("Percentages", ((double) verticalHistogram[i] / bitmap.getHeight()) + "");
         }
         return verticalHistogram;
     }
@@ -870,16 +1021,6 @@ public class BitmapProcessor {
         for (int i = 0; i < bitmap.getHeight(); i++)
             for (int j = 0; j < bitmap.getWidth(); j++) {
                 if (bitmap.getPixel(j, i) != Color.WHITE) {
-                    return new Point(j, i);
-                }
-            }
-        return null;
-    }
-
-    private Point getFirstPixel(Bitmap bitmap, int color) {
-        for (int i = 0; i < bitmap.getHeight(); i++)
-            for (int j = 0; j < bitmap.getWidth(); j++) {
-                if (bitmap.getPixel(j, i) == color) {
                     return new Point(j, i);
                 }
             }
@@ -971,6 +1112,26 @@ public class BitmapProcessor {
             }
         }
         return count;
+    }
+
+    private int getEndComponent(int row, Bitmap src) {
+        boolean flag = false;
+        int col = -1;
+        int count = 0;
+        for (int i = 0; i < src.getWidth() && col < 0; i++) {
+            if (src.getPixel(i, row) != Color.WHITE) {
+                if (!flag) {
+                    count++;
+                    flag = true;
+                }
+                if (count >= 2) {
+                    col = i;
+                }
+            } else {
+                flag = false;
+            }
+        }
+        return col;
     }
 
     private int triangleFromBot(Character character) {
@@ -1113,7 +1274,7 @@ public class BitmapProcessor {
         return false;
     }
 
-    private ArrayList<Bitmap> findContour(Bitmap bitmap) {
+    public ArrayList<Bitmap> findContour(Bitmap bitmap) {
         ArrayList<Bitmap> list = new ArrayList<>();
         Bitmap src = copyBinaryBitmap(bitmap, Color.WHITE);
 
@@ -1233,10 +1394,10 @@ public class BitmapProcessor {
         }
 
         int count = 0;
-        Bitmap b = Bitmap.createBitmap(src.getWidth(), src.getHeight(), Bitmap.Config.ARGB_8888);
-        for (int i = 0; i < b.getHeight(); i++)
-            for (int j = 0; j < b.getWidth(); j++) {
-                b.setPixel(j, i, Color.WHITE);
+        mGloBalContour = Bitmap.createBitmap(src.getWidth(), src.getHeight(), Bitmap.Config.ARGB_8888);
+        for (int i = 0; i < mGloBalContour.getHeight(); i++)
+            for (int j = 0; j < mGloBalContour.getWidth(); j++) {
+                mGloBalContour.setPixel(j, i, Color.WHITE);
             }
 
         for (MyPath myPath : myPaths) {
@@ -1245,7 +1406,7 @@ public class BitmapProcessor {
                 for (int j = 0; j < bmp.getWidth(); j++) {
                     if (myPath.getListPoint().contains(new Point(j, i))) {
                         bmp.setPixel(j, i, Color.RED);
-                        b.setPixel(j, i, Color.RED);
+                        mGloBalContour.setPixel(j, i, Color.RED);
                     } else {
                         bmp.setPixel(j, i, Color.WHITE);
                     }
@@ -1257,732 +1418,644 @@ public class BitmapProcessor {
             }
         }
 
-        //list.add(b);
         Log.d("Contour", "" + count);
         return list;
     }
 
     public Bundle featureExtraction(Character character, ArrayList<Label> list) {
-        if (character.mListContours == null || character.mListContours.isEmpty()) {
-            character.mListContours = findContour(character.mBitmap);
-        }
-        if (character.mListRectContour == null || character.mListRectContour.isEmpty()) {
-            character.mListRectContour = new ArrayList<>();
-            ArrayList<Bitmap> contours = character.mListContours;
-            if (contours.size() == 2) {
-                ArrayList<Rect> r1 = detectAreasOnBitmap(contours.get(0), 0, 0);
-                ArrayList<Rect> r2 = detectAreasOnBitmap(contours.get(1), 0, 0);
-
-                if (r1 != null && r2 != null) {
-                    if (r1.size() == 1 && r2.size() == 1) {
-                        Rect rSmall = (r1.get(0).width() > r2.get(0).width()) ? r2.get(0) : r1.get(0);
-                        Rect rBig = (r1.get(0).width() <= r2.get(0).width()) ? r2.get(0) : r1.get(0);
-                        character.mListRectContour.add(rSmall);
-                        character.mListRectContour.add(rBig);
-                    }
-                }
-            } else {
-                if (contours.size() == 3) {
+        if (mMapFeatures.containsValue(false)) {
+            if (character.mListContours == null || character.mListContours.isEmpty()) {
+                character.mListContours = findContour(character.mBitmap);
+            }
+            if (character.mListRectContour == null || character.mListRectContour.isEmpty()) {
+                character.mListRectContour = new ArrayList<>();
+                ArrayList<Bitmap> contours = character.mListContours;
+                if (contours.size() == 2) {
                     ArrayList<Rect> r1 = detectAreasOnBitmap(contours.get(0), 0, 0);
                     ArrayList<Rect> r2 = detectAreasOnBitmap(contours.get(1), 0, 0);
-                    ArrayList<Rect> r3 = detectAreasOnBitmap(contours.get(2), 0, 0);
-                    if (r1 != null && r2 != null && r3 != null) {
-                        if (r1.size() == 1 && r2.size() == 1 && r3.size() == 1) {
-                            Rect rMin = null;
-                            Rect r = null;
-                            Rect rBig = null;
-                            if (r1.get(0).width() > r2.get(0).width() && r2.get(0).width() >= r3.get(0).width()) {
-                                r = r2.get(0);
-                                rMin = r3.get(0);
-                                rBig = r1.get(0);
-                            }
-                            if (r1.get(0).width() > r3.get(0).width() && r3.get(0).width() > r2.get(0).width()) {
-                                r = r3.get(0);
-                                rMin = r2.get(0);
-                                rBig = r1.get(0);
-                            }
-                            if (r2.get(0).width() > r1.get(0).width() && r1.get(0).width() >= r3.get(0).width()) {
-                                r = r1.get(0);
-                                rMin = r3.get(0);
-                                rBig = r2.get(0);
-                            }
-                            if (r2.get(0).width() > r3.get(0).width() && r3.get(0).width() > r1.get(0).width()) {
-                                r = r3.get(0);
-                                rMin = r1.get(0);
-                                rBig = r2.get(0);
-                            }
-                            if (r3.get(0).width() > r1.get(0).width() && r1.get(0).width() >= r2.get(0).width()) {
-                                r = r1.get(0);
-                                rMin = r2.get(0);
-                                rBig = r3.get(0);
-                            }
-                            if (r3.get(0).width() > r2.get(0).width() && r2.get(0).width() > r1.get(0).width()) {
-                                r = r2.get(0);
-                                rMin = r1.get(0);
-                                rBig = r3.get(0);
-                            }
 
-                            if (rMin != null && rBig != null && r != null) {
-                                character.mListRectContour.add(rMin);
-                                character.mListRectContour.add(r);
-                                character.mListRectContour.add(rBig);
+                    if (r1 != null && r2 != null) {
+                        if (r1.size() == 1 && r2.size() == 1) {
+                            Rect rSmall = (r1.get(0).width() > r2.get(0).width()) ? r2.get(0) : r1.get(0);
+                            Rect rBig = (r1.get(0).width() <= r2.get(0).width()) ? r2.get(0) : r1.get(0);
+                            character.mListRectContour.add(rSmall);
+                            character.mListRectContour.add(rBig);
+                        }
+                    }
+                } else {
+                    if (contours.size() == 3) {
+                        ArrayList<Rect> r1 = detectAreasOnBitmap(contours.get(0), 0, 0);
+                        ArrayList<Rect> r2 = detectAreasOnBitmap(contours.get(1), 0, 0);
+                        ArrayList<Rect> r3 = detectAreasOnBitmap(contours.get(2), 0, 0);
+                        if (r1 != null && r2 != null && r3 != null) {
+                            if (r1.size() == 1 && r2.size() == 1 && r3.size() == 1) {
+                                Rect rMin = null;
+                                Rect r = null;
+                                Rect rBig = null;
+                                if (r1.get(0).width() > r2.get(0).width() && r2.get(0).width() >= r3.get(0).width()) {
+                                    r = r2.get(0);
+                                    rMin = r3.get(0);
+                                    rBig = r1.get(0);
+                                }
+                                if (r1.get(0).width() > r3.get(0).width() && r3.get(0).width() >= r2.get(0).width()) {
+                                    r = r3.get(0);
+                                    rMin = r2.get(0);
+                                    rBig = r1.get(0);
+                                }
+                                if (r2.get(0).width() > r1.get(0).width() && r1.get(0).width() >= r3.get(0).width()) {
+                                    r = r1.get(0);
+                                    rMin = r3.get(0);
+                                    rBig = r2.get(0);
+                                }
+                                if (r2.get(0).width() > r3.get(0).width() && r3.get(0).width() >= r1.get(0).width()) {
+                                    r = r3.get(0);
+                                    rMin = r1.get(0);
+                                    rBig = r2.get(0);
+                                }
+                                if (r3.get(0).width() > r1.get(0).width() && r1.get(0).width() >= r2.get(0).width()) {
+                                    r = r1.get(0);
+                                    rMin = r2.get(0);
+                                    rBig = r3.get(0);
+                                }
+                                if (r3.get(0).width() > r2.get(0).width() && r2.get(0).width() >= r1.get(0).width()) {
+                                    r = r2.get(0);
+                                    rMin = r1.get(0);
+                                    rBig = r3.get(0);
+                                }
+
+                                if (rMin != null && rBig != null && r != null) {
+                                    character.mListRectContour.add(rMin);
+                                    character.mListRectContour.add(r);
+                                    character.mListRectContour.add(rBig);
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-        for (int i = 0; i < list.size(); i++) {
-            String string = list.get(i).getLabel();
-            Bundle bundle = new Bundle();
-            bundle.putString("Char", string);
-            switch (string) {
-                case "A":
-                    if (!mMapFeatures.get("A")) {
-                        mMapFeatures.put("A", true);
-                    }
-                    if (isA(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-                case "a":
-                    if (!mMapFeatures.get("a")) {
-                        mMapFeatures.put("a", true);
-                    }
-                    if (isa(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "B":
-                    if (!mMapFeatures.get("B")) {
-                        mMapFeatures.put("B", true);
-                    }
-                    if (isB(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "b":
-                    if (!mMapFeatures.get("b")) {
-                        mMapFeatures.put("b", true);
-                    }
-                    if (isb(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    } /*else {
-                        if (isb1(character)) {
-                            return "b1";
-                        }
-                    }*/
-                    break;
-
-                case "b1":
-                    if (!mMapFeatures.get("b1")) {
-                        mMapFeatures.put("b1", true);
-                    }
-                    if (isb1(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    } /*else {
-                        if (isk1(character)) {
-                            return "k1";
-                        }
-                    }*/
-                    break;
-
-                case "C":
-                    if (!mMapFeatures.get("C")) {
-                        mMapFeatures.put("C", true);
-                    }
-                    if (isC(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "D":
-                    if (!mMapFeatures.get("D")) {
-                        mMapFeatures.put("D", true);
-                    }
-                    if (isD(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "d":
-                    if (!mMapFeatures.get("d")) {
-                        mMapFeatures.put("d", true);
-                    }
-                    if (isd(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    } /*else {
-                        if (isA(character)) {
-                            return "A";
-                        }
-                        if (isa(character)) {
-                            return "a";
-                        }
-                        if (isU(character)) {
-                            return "U";
-                        }
-                        if (isb1(character)) {
-                            return "b1";
-                        }
-                    }*/
-                    break;
-
-                case "E":
-                    if (!mMapFeatures.get("E")) {
-                        mMapFeatures.put("E", true);
-                    }
-                    if (isE(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "e":
-                    if (!mMapFeatures.get("e")) {
-                        mMapFeatures.put("e", true);
-                    }
-                    if (ise(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    } /*else {
-                        if (isC(character)) {
-                            return "C";
-                        }
-                    }*/
-                    break;
-
-                case "F":
-                    if (!mMapFeatures.get("F")) {
-                        mMapFeatures.put("F", true);
-                    }
-                    if (isF(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "f":
-                    if (!mMapFeatures.get("f")) {
-                        mMapFeatures.put("f", true);
-                    }
-                    if (isf(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    } /*else {
-                        if (isb1(character)) {
-                            return "b1";
-                        }
-                    }*/
-                    break;
-
-                case "G":
-                    if (!mMapFeatures.get("G")) {
-                        mMapFeatures.put("G", true);
-                    }
-                    if (isG(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "g":
-                    if (!mMapFeatures.get("g")) {
-                        mMapFeatures.put("g", true);
-                    }
-                    if (isg(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "H":
-                    if (!mMapFeatures.get("H")) {
-                        mMapFeatures.put("H", true);
-                    }
-                    if (isH(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    } /*else {
-                        if (isA(character)) {
-                            return "A";
-                        }
-                    }*/
-                    break;
-
-                case "h":
-                    if (!mMapFeatures.get("h")) {
-                        mMapFeatures.put("h", true);
-                    }
-                    if (ish(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    } /*else {
-                        if (isA(character)) {
-                            return "A";
-                        }
-                    }*/
-                    break;
-
-                case "I":
-                    if (!mMapFeatures.get("I")) {
-                        mMapFeatures.put("I", true);
-                    }
-                    if (isI(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "i":
-                    if (!mMapFeatures.get("i")) {
-                        mMapFeatures.put("i", true);
-                    }
-                    if (isi(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "J":
-                    if (!mMapFeatures.get("J")) {
-                        mMapFeatures.put("J", true);
-                    }
-                    if (isJ(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "j":
-                    if (!mMapFeatures.get("j")) {
-                        mMapFeatures.put("j", true);
-                    }
-                    if (isj(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    } /*else {
-                        if (isU(character)) {
-                            return "U";
-                        }
-                    }*/
-                    break;
-
-                case "K":
-                    if (!mMapFeatures.get("K")) {
-                        mMapFeatures.put("K", true);
-                    }
-                    if (isK(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    } /*else {
-                        if (isk(character)) {
-                            return "k";
-                        } else {
-                            if (isk1(character)) {
-                                return "k1";
+            for (int i = 0; i < list.size(); i++) {
+                String string = list.get(i).getLabel();
+                Bundle bundle = new Bundle();
+                bundle.putString("Char", string);
+                switch (string) {
+                    case "A":
+                        if (!mMapFeatures.get("A")) {
+                            mMapFeatures.put("A", true);
+                            if (isA(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
                             }
                         }
-                    }*/
-                    break;
-
-                case "k":
-                    if (!mMapFeatures.get("k")) {
-                        mMapFeatures.put("k", true);
-                    }
-                    if (isk(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "k1":
-                    if (!mMapFeatures.get("k1")) {
-                        mMapFeatures.put("k1", true);
-                    }
-                    if (isk1(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "L":
-                    if (!mMapFeatures.get("L")) {
-                        mMapFeatures.put("L", true);
-                    }
-                    if (isL(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "l":
-                    if (!mMapFeatures.get("l")) {
-                        mMapFeatures.put("l", true);
-                    }
-                    if (isl(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "M":
-                    if (!mMapFeatures.get("M")) {
-                        mMapFeatures.put("M", true);
-                    }
-                    if (isM(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "m":
-                    if (!mMapFeatures.get("m")) {
-                        mMapFeatures.put("m", true);
-                    }
-                    if (ism(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "N":
-                    if (!mMapFeatures.get("N")) {
-                        mMapFeatures.put("N", true);
-                    }
-                    if (isN(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "n":
-                    if (!mMapFeatures.get("n")) {
-                        mMapFeatures.put("n", true);
-                    }
-                    if (isn(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    } /*else {
-                        if (ism(character)) {
-                            return "m";
+                        break;
+                    case "a":
+                        if (!mMapFeatures.get("a")) {
+                            mMapFeatures.put("a", true);
+                            if (isa(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
                         }
-                    }*/
-                    break;
+                        break;
 
-                case "O":
-                    if (!mMapFeatures.get("O")) {
-                        mMapFeatures.put("O", true);
-                    }
-                    if (isO(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    } else {
-                        if (is0(character)) {
-                            bundle.putString("Char", "0");
-                            bundle.putBoolean("Result", true);
-                            return bundle;
+                    case "B":
+                        if (!mMapFeatures.get("B")) {
+                            mMapFeatures.put("B", true);
+                            if (isB(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
                         }
-                        /*if (isC(character)) {
-                            return "C";
-                        }*/
-                    }
-                    break;
+                        break;
 
-                case "P":
-                    if (!mMapFeatures.get("P")) {
-                        mMapFeatures.put("P", true);
-                    }
-                    if (isP(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    } /*else {
-                        if (isB(character)) {
-                            return "B";
+                    case "b":
+                        if (!mMapFeatures.get("b")) {
+                            mMapFeatures.put("b", true);
+                            if (isb(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
                         }
-                    }*/
-                    break;
+                        break;
 
-                case "Q":
-                    if (!mMapFeatures.get("Q")) {
-                        mMapFeatures.put("Q", true);
-                    }
-                    if (isQ(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "q":
-                    if (!mMapFeatures.get("q")) {
-                        mMapFeatures.put("q", true);
-                    }
-                    if (isq(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "R":
-                    if (!mMapFeatures.get("R")) {
-                        mMapFeatures.put("R", true);
-                    }
-                    if (isR(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "r":
-                    if (!mMapFeatures.get("r")) {
-                        mMapFeatures.put("r", true);
-                    }
-                    if (isr(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "S":
-                    if (!mMapFeatures.get("S")) {
-                        mMapFeatures.put("S", true);
-                    }
-                    if (isS(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "U":
-                    if (!mMapFeatures.get("U")) {
-                        mMapFeatures.put("U", true);
-                    }
-                    if (isU(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "u":
-                    if (!mMapFeatures.get("u")) {
-                        mMapFeatures.put("u", true);
-                    }
-                    if (isu(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    } /*else if (isa(character)) {
-                        return "a";
-                    }*/
-                    break;
-
-                case "V":
-                    if (!mMapFeatures.get("V")) {
-                        mMapFeatures.put("V", true);
-                    }
-                    if (isV(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    } /*else {
-                        if (isH(character)) {
-                            return "H";
+                    case "b1":
+                        if (!mMapFeatures.get("b1")) {
+                            mMapFeatures.put("b1", true);
+                            if (isb1(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
                         }
-                    }*/
-                    break;
+                        break;
 
-                case "T":
-                    if (!mMapFeatures.get("T")) {
-                        mMapFeatures.put("T", true);
-                    }
-                    if (isT(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "t":
-                    if (!mMapFeatures.get("t")) {
-                        mMapFeatures.put("t", true);
-                    }
-                    if (ist(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    } /*else {
-                        if (isZ(character)) {
-                            return "Z";
+                    case "C":
+                        if (!mMapFeatures.get("C")) {
+                            mMapFeatures.put("C", true);
+                            if (isC(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
                         }
-                    }*/
-                    break;
+                        break;
 
-                case "W":
-                    if (!mMapFeatures.get("W")) {
-                        mMapFeatures.put("W", true);
-                    }
-                    if (isW(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "X":
-                    if (!mMapFeatures.get("X")) {
-                        mMapFeatures.put("X", true);
-                    }
-                    if (isX(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "Y":
-                    if (!mMapFeatures.get("Y")) {
-                        mMapFeatures.put("Y", true);
-                    }
-                    if (isY(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "y":
-                    if (!mMapFeatures.get("y")) {
-                        mMapFeatures.put("y", true);
-                    }
-                    if (isy(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    } /*else {
-                        if (isb1(character)) {
-                            return "b1";
+                    case "D":
+                        if (!mMapFeatures.get("D")) {
+                            mMapFeatures.put("D", true);
+                            if (isD(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
                         }
-                    }*/
-                    break;
+                        break;
 
-                case "Z":
-                    if (!mMapFeatures.get("Z")) {
-                        mMapFeatures.put("Z", true);
-                    }
-                    if (isZ(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "1":
-                    if (!mMapFeatures.get("1")) {
-                        mMapFeatures.put("1", true);
-                    }
-                    if (is1(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    } /*else {
-                        if (isA(character)) {
-                            return "A";
+                    case "d":
+                        if (!mMapFeatures.get("d")) {
+                            mMapFeatures.put("d", true);
+                            if (isd(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
                         }
-                    }*/
-                    break;
+                        break;
 
-                case "2":
-                    if (!mMapFeatures.get("2")) {
-                        mMapFeatures.put("2", true);
-                    }
-                    if (is2(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    } /*else {
-                        if (isa(character)) {
-                            return "a";
+                    case "E":
+                        if (!mMapFeatures.get("E")) {
+                            mMapFeatures.put("E", true);
+                            if (isE(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
                         }
-                        if (isd(character)) {
-                            return "d";
+                        break;
+
+                    case "e":
+                        if (!mMapFeatures.get("e")) {
+                            mMapFeatures.put("e", true);
+                            if (ise(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
                         }
-                    }*/
-                    break;
+                        break;
 
-                case "3":
-                    if (!mMapFeatures.get("3")) {
-                        mMapFeatures.put("3", true);
-                    }
-                    if (is3(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "4":
-                    if (!mMapFeatures.get("4")) {
-                        mMapFeatures.put("4", true);
-                    }
-                    if (is4(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "5":
-                    if (!mMapFeatures.get("5")) {
-                        mMapFeatures.put("5", true);
-                    }
-                    if (is5(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "6":
-                    if (!mMapFeatures.get("6")) {
-                        mMapFeatures.put("6", true);
-                    }
-                    if (is6(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "7":
-                    if (!mMapFeatures.get("7")) {
-                        mMapFeatures.put("7", true);
-                    }
-                    if (is7(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
-
-                case "8":
-                    if (!mMapFeatures.get("8")) {
-                        mMapFeatures.put("8", true);
-                    }
-                    if (is8(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    } /*else {
-                        if (is3(character)) {
-                            return "3";
+                    case "F":
+                        if (!mMapFeatures.get("F")) {
+                            mMapFeatures.put("F", true);
+                            if (isF(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
                         }
-                    }*/
-                    break;
+                        break;
 
-                case "9":
-                    if (!mMapFeatures.get("9")) {
-                        mMapFeatures.put("9", true);
-                    }
-                    if (is9(character)) {
-                        bundle.putBoolean("Result", true);
-                        return bundle;
-                    }
-                    break;
+                    case "f":
+                        if (!mMapFeatures.get("f")) {
+                            mMapFeatures.put("f", true);
+                            if (isf(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
 
-                default:
-                    break;
+                    case "G":
+                        if (!mMapFeatures.get("G")) {
+                            mMapFeatures.put("G", true);
+                            if (isG(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "g":
+                        if (!mMapFeatures.get("g")) {
+                            mMapFeatures.put("g", true);
+                            if (isg(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "H":
+                        if (!mMapFeatures.get("H")) {
+                            mMapFeatures.put("H", true);
+                            if (isH(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "h":
+                        if (!mMapFeatures.get("h")) {
+                            mMapFeatures.put("h", true);
+                            if (ish(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "I":
+                        if (!mMapFeatures.get("I")) {
+                            mMapFeatures.put("I", true);
+                            if (isI(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "i":
+                        if (!mMapFeatures.get("i")) {
+                            mMapFeatures.put("i", true);
+                            if (isi(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "J":
+                        if (!mMapFeatures.get("J")) {
+                            mMapFeatures.put("J", true);
+                            if (isJ(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "j":
+                        if (!mMapFeatures.get("j")) {
+                            mMapFeatures.put("j", true);
+                            if (isj(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "K":
+                        if (!mMapFeatures.get("K")) {
+                            mMapFeatures.put("K", true);
+                            if (isK(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "k":
+                        if (!mMapFeatures.get("k")) {
+                            mMapFeatures.put("k", true);
+                            if (isk(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "k1":
+                        if (!mMapFeatures.get("k1")) {
+                            mMapFeatures.put("k1", true);
+                            if (isk1(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "L":
+                        if (!mMapFeatures.get("L")) {
+                            mMapFeatures.put("L", true);
+                            if (isL(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "l":
+                        if (!mMapFeatures.get("l")) {
+                            mMapFeatures.put("l", true);
+                            if (isl(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "M":
+                        if (!mMapFeatures.get("M")) {
+                            mMapFeatures.put("M", true);
+                            if (isM(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "m":
+                        if (!mMapFeatures.get("m")) {
+                            mMapFeatures.put("m", true);
+                            if (ism(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "N":
+                        if (!mMapFeatures.get("N")) {
+                            mMapFeatures.put("N", true);
+                            if (isN(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "n":
+                        if (!mMapFeatures.get("n")) {
+                            mMapFeatures.put("n", true);
+                            if (isn(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "O":
+                        if (!mMapFeatures.get("O")) {
+                            mMapFeatures.put("O", true);
+                            if (isO(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            } else {
+                                if (is0(character)) {
+                                    bundle.putString("Char", "0");
+                                    bundle.putBoolean("Result", true);
+                                    return bundle;
+                                }
+                            }
+                        }
+                        break;
+
+                    case "P":
+                        if (!mMapFeatures.get("P")) {
+                            mMapFeatures.put("P", true);
+                            if (isP(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "Q":
+                        if (!mMapFeatures.get("Q")) {
+                            mMapFeatures.put("Q", true);
+                            if (isQ(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "q":
+                        if (!mMapFeatures.get("q")) {
+                            mMapFeatures.put("q", true);
+                            if (isq(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "R":
+                        if (!mMapFeatures.get("R")) {
+                            mMapFeatures.put("R", true);
+                            if (isR(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "r":
+                        if (!mMapFeatures.get("r")) {
+                            mMapFeatures.put("r", true);
+                            if (isr(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "S":
+                        if (!mMapFeatures.get("S")) {
+                            mMapFeatures.put("S", true);
+                            if (isS(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "U":
+                        if (!mMapFeatures.get("U")) {
+                            mMapFeatures.put("U", true);
+                            if (isU(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "u":
+                        if (!mMapFeatures.get("u")) {
+                            mMapFeatures.put("u", true);
+                            if (isu(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "V":
+                        if (!mMapFeatures.get("V")) {
+                            mMapFeatures.put("V", true);
+                            if (isV(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "T":
+                        if (!mMapFeatures.get("T")) {
+                            mMapFeatures.put("T", true);
+                            if (isT(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "t":
+                        if (!mMapFeatures.get("t")) {
+                            mMapFeatures.put("t", true);
+                            if (ist(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "W":
+                        if (!mMapFeatures.get("W")) {
+                            mMapFeatures.put("W", true);
+                            if (isW(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "X":
+                        if (!mMapFeatures.get("X")) {
+                            mMapFeatures.put("X", true);
+                            if (isX(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "Y":
+                        if (!mMapFeatures.get("Y")) {
+                            mMapFeatures.put("Y", true);
+                            if (isY(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "y":
+                        if (!mMapFeatures.get("y")) {
+                            mMapFeatures.put("y", true);
+                            if (isy(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "Z":
+                        if (!mMapFeatures.get("Z")) {
+                            mMapFeatures.put("Z", true);
+                            if (isZ(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "1":
+                        if (!mMapFeatures.get("1")) {
+                            mMapFeatures.put("1", true);
+                            if (is1(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "2":
+                        if (!mMapFeatures.get("2")) {
+                            mMapFeatures.put("2", true);
+                            if (is2(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "3":
+                        if (!mMapFeatures.get("3")) {
+                            mMapFeatures.put("3", true);
+                            if (is3(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "4":
+                        if (!mMapFeatures.get("4")) {
+                            mMapFeatures.put("4", true);
+                            if (is4(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "5":
+                        if (!mMapFeatures.get("5")) {
+                            mMapFeatures.put("5", true);
+                            if (is5(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "6":
+                        if (!mMapFeatures.get("6")) {
+                            mMapFeatures.put("6", true);
+                            if (is6(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "7":
+                        if (!mMapFeatures.get("7")) {
+                            mMapFeatures.put("7", true);
+                            if (is7(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "8":
+                        if (!mMapFeatures.get("8")) {
+                            mMapFeatures.put("8", true);
+                            if (is8(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    case "9":
+                        if (!mMapFeatures.get("9")) {
+                            mMapFeatures.put("9", true);
+                            if (is9(character)) {
+                                bundle.putBoolean("Result", true);
+                                return bundle;
+                            }
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
             }
         }
         String s = "";
@@ -2030,16 +2103,83 @@ public class BitmapProcessor {
     private boolean isa(Character character) {
         ArrayList<Rect> list = character.mListRectContour;
         Bitmap src = character.mBitmap;
+        int right = -1;
         if (list.size() == 2) {
             Rect rSmall = list.get(0);
             Rect rBig = list.get(1);
             if (rSmall != null && rBig != null) {
-                Bitmap right = cropBitmap(src, rSmall.right, 0, src.getWidth() - rSmall.right, src.getHeight());
-                Character f = new Character();
-                f.mBitmap = right;
-                f.mListContours = findContour(right);
-                boolean isi = isi(f), isL = isL(f);
-                return isi || isL;
+                if (rSmall.top >= 0.2d * src.getHeight()) {
+                    return false;
+                }
+                //right = rSmall.right;
+            }
+        } else {
+            Bitmap bmp = cropBitmap(src, 0, 0, src.getWidth(), (int) (src.getHeight() * 0.5d));
+            ArrayList<Rect> rect = detectAreasOnBitmap(bmp, 0, 0);
+            if (rect.size() > 1) {
+                if (rect.size() == 2) {
+                    Rect rLeft = rect.get(0).left < rect.get(1).left ? rect.get(0) : rect.get(1);
+                    Rect rRight = rect.get(0).left >= rect.get(1).left ? rect.get(0) : rect.get(1);
+                    if (Math.abs(rLeft.right - rRight.left) > 0.3d * src.getWidth()) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < src.getWidth() && right < 0; i++) {
+            int h = getColumnHeightFromBot(src, i);
+            if (h < src.getHeight() - 2) {
+                int y = h + 1;
+                int count = 0;
+                if (i - 1 >= 0) {
+                    if (src.getPixel(i - 1, y) != Color.WHITE) {
+                        count++;
+                    }
+                    if (y - 1 >= 0) {
+                        if (src.getPixel(i - 1, y - 1) != Color.WHITE) {
+                            count++;
+                        }
+                    }
+                }
+                if (src.getPixel(i, y - 1) != Color.WHITE) {
+                    count++;
+                }
+                if (i + 1 < src.getWidth()) {
+                    if (src.getPixel(i + 1, y) != Color.WHITE) {
+                        count++;
+                    }
+                    if (y - 1 >= 0) {
+                        if (src.getPixel(i + 1, y - 1) != Color.WHITE) {
+                            count++;
+                        }
+                    }
+                }
+
+                if (count == 5) {
+                    right = i;
+                }
+            }
+        }
+        if (right >= 0) {
+            Bitmap rightFrag = cropBitmap(src, right, 0, src.getWidth() - right, src.getHeight());
+            if (rightFrag != null) {
+                ArrayList<Rect> rect = detectAreasOnBitmap(rightFrag, 0, 0);
+                Rect r = null;
+                if (rect.size() == 1) {
+                    r = rect.get(0);
+                } else {
+                    if (rect.size() == 2) {
+                        r = rect.get(0).width() * rect.get(0).height() > rect.get(1).width() * rect.get(1).height() ? rect.get(0) : rect.get(1);
+                    }
+                }
+                if (r != null) {
+                    Character f = new Character();
+                    f.mBitmap = cropBitmap(rightFrag, r.left, r.top, r.width(), r.height());
+                    f.mListContours = findContour(rightFrag);
+                    boolean isi = isi(f), isL = isL(f);
+                    return isi || isL || filterTrash(rightFrag, src).size() > 0;
+                }
             }
         }
         return false;
@@ -2123,6 +2263,13 @@ public class BitmapProcessor {
                     Rect rBig = (r1.get(0).width() <= r2.get(0).width()) ? r2.get(0) : r1.get(0);
                     c.mListRectContour.add(rSmall);
                     c.mListRectContour.add(rBig);
+                }
+            }
+        } else {
+            ArrayList<Rect> r1 = detectAreasOnBitmap(contours.get(0), 0, 0);
+            if (r1 != null) {
+                if (r1.size() == 1) {
+                    c.mListRectContour.add(r1.get(0));
                 }
             }
         }
@@ -2242,20 +2389,6 @@ public class BitmapProcessor {
                 }
             }
             return listRect.size() == 2;
-            /*if (listRect != null && listRect.size() == 2) {
-                Rect rect1 = listRect.get(0);
-                Bitmap right1 = cropBitmap(right, rect1.left, rect1.top, rect1.width(), rect1.height());
-                int count1 = countBlack(right1);
-                Rect rect2 = listRect.get(1);
-                Bitmap right2 = cropBitmap(right, rect2.left, rect2.top, rect2.width(), rect2.height());
-                int count2 = countBlack(right2);
-
-                if (count1 > count2) {
-                    return (double) count1 / count2 <= 1.5d && !triple;
-                } else {
-                    return (count1 == count2 || (double) count2 / count1 <= 1.5d) && !triple;
-                }
-            }*/
         }
         return false;
     }
@@ -2324,6 +2457,9 @@ public class BitmapProcessor {
             if (list.size() == 2) {
                 Rect rSmall = list.get(0);
                 Rect rBig = list.get(1);
+                if (rSmall.top < 0.2d * src.getHeight()) {
+                    return false;
+                }
 
                 if (Math.abs(rSmall.top - rBig.top) > Math.abs(rSmall.bottom - rBig.bottom)
                         && Math.abs(rSmall.right - rBig.right) > Math.abs(rSmall.left - rBig.left)) {
@@ -2425,7 +2561,7 @@ public class BitmapProcessor {
                             countThree++;
                         }
                     }
-                    return countThree > 0 && rSmall.width() >= rSmall.height();
+                    return countThree > 0 /*&& rSmall.width() >= rSmall.height()*/;
                 }
             }
         }
@@ -2542,15 +2678,18 @@ public class BitmapProcessor {
 
     private boolean isg(Character character) {
         ArrayList<Rect> list = character.mListRectContour;
+        Bitmap src = character.mBitmap;
         if (list != null) {
             if (list.size() == 3) {
-                /*Rect rTop = (list.get(0).top <= list.get(1).top) ? list.get(0) : list.get(1);
+                Rect rTop = (list.get(0).top <= list.get(1).top) ? list.get(0) : list.get(1);
                 Rect rBot = (list.get(0).top > list.get(1).top) ? list.get(0) : list.get(1);
                 if (rTop != null && rBot != null) {
-                    boolean fat = rTop.width() >= rTop.height();
-                    boolean tall = rBot.width() <= rBot.height();
-                    return tall && fat;
-                }*/
+                    for (int i = rBot.bottom + 1; i < src.getHeight(); i++) {
+                        if (countRowSegments(i, src) >= 2) {
+                            return false;
+                        }
+                    }
+                }
                 return true;
             }
         }
@@ -2651,6 +2790,15 @@ public class BitmapProcessor {
             if (list.size() == 1) {
                 int countOne = 0, countTwo = 0;
                 int firstTwo = -1;
+                int countColTwo = 0;
+                for (int i = 0; i < src.getWidth(); i++) {
+                    if (countColumnSegments(i, src) == 2) {
+                        countColTwo++;
+                    }
+                }
+                if (countColTwo >= 0.3d * src.getWidth()) {
+                    return false;
+                }
                 for (int i = 0; i < src.getHeight(); i++) {
                     if (countRowSegments(i, src) == 2) {
                         countTwo++;
@@ -2872,15 +3020,8 @@ public class BitmapProcessor {
 
                         if (offsetY >= 0) {
                             Bitmap interested = cropBitmap(src, offsetX, offsetY, src.getWidth() - offsetX, src.getHeight() - offsetY);
+                            SupportUtils.saveImage(interested, "Draw", "interested", ".png");
                             if (interested != null) {
-                                        /*int two = 0;
-                                        for (int i = 0; i < interested.getHeight(); i++) {
-                                            if (countRowSegments(i, src) == 2) {
-                                                two++;
-                                            }
-                                        }
-
-                                        return two > 0;*/
                                 Character f = new Character();
                                 f.mBitmap = interested;
                                 f.mListContours = findContour(interested);
@@ -2926,7 +3067,7 @@ public class BitmapProcessor {
             if (list.size() == 2) {
                 Rect rect = list.get(0);
                 if (rect != null) {
-                    if (rect.bottom <= src.getHeight() * 0.7d && rect.width() <= rect.height()) {
+                    if (rect.bottom <= src.getHeight() * 0.6d && rect.width() <= rect.height()) {
                         int offsetY = rect.bottom;
                         int offsetX = -1;
                         for (int i = 0; i < src.getWidth() && offsetX < 0; i++) {
@@ -3190,7 +3331,6 @@ public class BitmapProcessor {
         if (list != null) {
             if (list.size() == 2) {
                 Rect rSmall = list.get(0);
-
                 if (rSmall.bottom <= bitmap.getHeight() * 0.7d) {
                     int one = 0, two = 0;
                     int maxHorizontal = -1;
@@ -3214,6 +3354,36 @@ public class BitmapProcessor {
                     }
 
                     return two < 0.1d * one && maxHorizontal >= 0 && maxHorizontal > bitmap.getWidth() * 0.5d;
+                }
+            } else {
+                boolean flag = false;
+                int left = -1;
+                for (int i = 0; i < bitmap.getWidth() && left < 0; i++) {
+                    if (countColumnSegments(i, bitmap) == 1) {
+                        if (flag) {
+                            left = i - 1;
+                        }
+                    } else {
+                        flag = true;
+                    }
+                }
+                Bitmap leftFrag = cropBitmap(bitmap, 0, 0, left, bitmap.getHeight());
+                ArrayList<Rect> rect = detectAreasOnBitmap(leftFrag, 0, 0);
+                if (rect != null) {
+                    Rect r = null;
+                    if (rect.size() == 2) {
+                        r = rect.get(0).width() * rect.get(0).height() > rect.get(1).width() * rect.get(1).height() ? rect.get(0) : rect.get(1);
+                    } else {
+                        if (rect.size() == 1) {
+                            r = rect.get(0);
+                        }
+                    }
+                    if (r != null) {
+                        Bitmap interested = cropBitmap(leftFrag, r.left, r.top, r.width(), r.height());
+                        Character c = new Character();
+                        c.mBitmap = interested;
+                        return isC(c);
+                    }
                 }
             }
         }
@@ -3893,6 +4063,12 @@ public class BitmapProcessor {
             return false;
         }
         int countFatRow = 0;
+        int countThree = 0;
+        for (int j = 0; j < src.getWidth(); j++) {
+            if (countColumnSegments(j, src) == 3) {
+                countThree++;
+            }
+        }
         for (int i = 0; i < src.getHeight(); i++) {
             if (countRowSegments(i, src) == 1) {
                 int count = 0;
@@ -3926,7 +4102,6 @@ public class BitmapProcessor {
         }
 
         if (startCol >= 0 && startRow >= 0) {
-
             Point point = new Point(startCol + 1, startRow);
             boolean moved = false, end = false;
             while (!end) {
@@ -3966,7 +4141,7 @@ public class BitmapProcessor {
                         Character f = new Character();
                         f.mBitmap = rotated;
                         f.mListContours = findContour(rotated);
-                        return isL(f) && countFatRow > 0;
+                        return isL(f) && countFatRow > 0 && countThree >= 0.4d * src.getWidth();
                     }
                 }
             }
