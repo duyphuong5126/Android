@@ -1,7 +1,6 @@
 package duy.phuong.handnote.Recognizer;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -70,6 +69,7 @@ public class BitmapProcessor {
     }
 
     public static final int DEFAULT = R.id.itemDefault;
+
     public static final int SPLIT = 1;
     public static final int VERTICAL_PP = R.id.itemVerticalProjectionProfile;
     public static final int HORIZONTAL_PP = R.id.itemHorizontalProjectionProfile;
@@ -549,6 +549,18 @@ public class BitmapProcessor {
             }
     }
 
+    private int countForegroundInColumn(Bitmap bitmap, int col, int startRow, int endRow) {
+        int count = 0;
+        if (col == 0 || col == bitmap.getWidth() - 1) {
+            count = bitmap.getHeight();
+        } else {
+            for (int i = startRow; i <= endRow; i++) {
+                count += bitmap.getPixel(col, i) == Color.WHITE ? 0 : 1;
+            }
+        }
+        return count;
+    }
+
     private ArrayList<Character> getSegments(Character character) {
         ArrayList<Character> resultBitmaps = new ArrayList<>();
         Bitmap src = copyBitmap(character.mBitmap);
@@ -575,12 +587,12 @@ public class BitmapProcessor {
             }
         }
 
-        /*if (offsetY >= 0) {
+        if (offsetY >= 0) {
             for (int j = 0; j < src.getWidth(); j++) {
                 character.mBitmap.setPixel(j, offsetY, Color.RED);
             }
             resultBitmaps.add(character);
-        }*/
+        }
         if (listContours.size() > 1) {
             ArrayList<Rect> list = new ArrayList<>();
             for (Bitmap bmp : listContours) {
@@ -688,7 +700,6 @@ public class BitmapProcessor {
                                 }
                             } else {
                                 stop = true;
-                                Log.d("Stop", "true");
                             }
                         }
                     }
@@ -697,12 +708,18 @@ public class BitmapProcessor {
                         Rect rect = finalList.get(i);
                         if (i == 0 && rect.left - FingerDrawerView.CurrentPaintSize > 0) {
                             Bitmap bmp = cropBitmap(src, 0, 0, rect.left, src.getHeight());
-                            resultBitmaps.addAll(filterTrash(bmp, src));
+                            //resultBitmaps.addAll(filterTrash(bmp, src));
+                            for (Bitmap bitmap : filterLigatures(bmp)) {
+                                resultBitmaps.addAll(filterTrash(bitmap, bmp));
+                            }
                         }
                         int x = rect.left;
                         int w = rect.width();
                         Bitmap bmp = cropBitmap(src, x, 0, w, src.getHeight());
-                        resultBitmaps.addAll(filterTrash(bmp, src));
+                        //resultBitmaps.addAll(filterTrash(bmp, src));
+                        for (Bitmap bitmap : filterLigatures(bmp)) {
+                            resultBitmaps.addAll(filterTrash(bitmap, bmp));
+                        }
                         /*if (i + 1 < finalList.size() && rect.right <= src.getWidth()) {
                             Rect next = finalList.get(i + 1);
                             x = rect.right;
@@ -717,56 +734,18 @@ public class BitmapProcessor {
                             x = rect.right;
                             if (x < src.getWidth() - 1) {
                                 bmp = cropBitmap(src, x, 0, src.getWidth() - x, src.getHeight());
-                                resultBitmaps.addAll(filterTrash(bmp, src));
+                                //resultBitmaps.addAll(filterTrash(bmp, src));
+                                for (Bitmap bitmap : filterLigatures(bmp)) {
+                                    resultBitmaps.addAll(filterTrash(bitmap, bmp));
+                                }
                             }
                         }
                     }
                 }
             }
         } else {
-            if (offsetY >= 0) {
-                ArrayList<Rect> rect = new ArrayList<>();
-                boolean flag = false;
-                for (int i = 0; i < src.getWidth(); i++) {
-                    int dis = getColumnHeightFromTop(src, i) - offsetY;
-                    if (dis >= 0 || (dis < 0 && -1 * dis <= FingerDrawerView.CurrentPaintSize)) {
-                        if (flag) {
-                            rect.get(rect.size() - 1).right += 1;
-                        } else {
-                            Rect r = new Rect(i, 0, i, src.getHeight());
-                            rect.add(r);
-                            flag = true;
-                        }
-                    } else {
-                        if (!rect.isEmpty()) {
-                            flag = false;
-                        }
-                    }
-                }
-                if (!rect.isEmpty()) {
-                    for (int i = 0; i < rect.size(); i++) {
-                        Rect r = rect.get(i);
-                        if (i == 0) {
-                            Bitmap bmp = cropBitmap(src, 0, 0, r.left, src.getHeight());
-                            if (bmp != null) {
-                                resultBitmaps.addAll(filterTrash(bmp, src));
-                            }
-
-                        }
-                        if (i < rect.size() - 1) {
-                            Rect next = rect.get(i + 1);
-                            Bitmap bmp = cropBitmap(src, r.right, 0, next.left, src.getHeight());
-                            if (bmp != null) {
-                                resultBitmaps.addAll(filterTrash(bmp, src));
-                            }
-                        } else {
-                            Bitmap bmp = cropBitmap(src, r.right, 0, src.getWidth() - r.right, src.getHeight());
-                            if (bmp != null) {
-                                resultBitmaps.addAll(filterTrash(bmp, src));
-                            }
-                        }
-                    }
-                }
+            for (Bitmap bitmap : filterLigatures(src)) {
+                resultBitmaps.addAll(filterTrash(bitmap, src));
             }
         }
         return resultBitmaps;
@@ -776,15 +755,167 @@ public class BitmapProcessor {
         ArrayList<Rect> rect = detectAreasOnBitmap(bitmap, 0, 0);
         ArrayList<Character> result = new ArrayList<>();
         for (Rect r : rect) {
-            if (r.width() > 0.15d * src.getWidth() && r.height() > 0.15d * src.getHeight()) {
-                Character character = new Character();
-                character.mRect = r;
-                character.mBitmap = cropBitmap(bitmap, r.left, r.top, r.width(), r.height());
-                character.mListContours = findContour(character.mBitmap);
-                result.add(character);
-            }
+            /*if (r.width() > 0.15d * src.getWidth() && r.height() > 0.15d * src.getHeight()) {
+            }*/
+            Character character = new Character();
+            character.mRect = r;
+            character.mBitmap = cropBitmap(bitmap, r.left, r.top, r.width(), r.height());
+            character.mListContours = findContour(character.mBitmap);
+            result.add(character);
         }
         return result;
+    }
+
+    private ArrayList<Bitmap> filterLigatures(Bitmap bitmap) {
+        ArrayList<Bitmap> bitmaps = new ArrayList<>();
+        int[] verticalHistogram = getVerticalHistogram(bitmap);
+        ArrayList<Point> listColumns = new ArrayList<>();
+        int startCol = -1;
+        int endCol = -1;
+
+        int index = 0;
+        for (int i : verticalHistogram) {
+            Log.d("Value " + index, i + "");
+            index++;
+        }
+
+        //horizontal fragment
+        for (int c = 0; c < bitmap.getWidth(); c++) {
+            //find the start column
+            if (verticalHistogram[c] <= FingerDrawerView.CurrentPaintSize * 1.5d) {
+                /*startCol = (c > 0) ? c - 1 : c;*/
+                startCol = c;
+            }
+
+            boolean hasEndCol = false;
+            if (startCol >= 0) {
+                int c1 = startCol + 1;
+                while (!hasEndCol && c1 < verticalHistogram.length) {
+                    //find the end column
+                    if (verticalHistogram[c1] > FingerDrawerView.CurrentPaintSize * 1.5d) {
+                        //endCol = (c1 >= bitmap.getWidth()) ? c1 : c1 + 1;
+                        endCol = c1 - 1;
+                    }
+
+                    if (endCol > startCol) {
+                        //save startCol (key) and endCol (value)
+                        listColumns.add(new Point(startCol, endCol));
+                        //save current anchor
+                        c = endCol;
+
+                        startCol = endCol = -1;
+                        hasEndCol = true;
+                    }
+                    c1++;
+                }
+            }
+        }
+
+        /*if (!listColumns.isEmpty()) {
+            if (listColumns.get(0).x <= FingerDrawerView.CurrentPaintSize) {
+                listColumns.remove(0);
+            }
+            if (!listColumns.isEmpty()) {
+                int id = listColumns.size() - 1 >= 0 ? listColumns.size() - 1 : 0;
+                if (listColumns.get(id).y >= bitmap.getWidth() - FingerDrawerView.CurrentPaintSize) {
+                    listColumns.remove(id);
+                }
+            }
+        }*/
+
+        ArrayList<Point> points = new ArrayList<>();
+        for (int i = 0; i < listColumns.size(); i++) {
+            Point point = listColumns.get(i);
+            Point pPrev = (i - 1 >= 0) ? listColumns.get(i - 1) : null;
+            Point pNext = (i + 1 < listColumns.size()) ? listColumns.get(i + 1) : null;
+
+            int hLeft = getColumnHeightFromTop(bitmap, point.x);
+            int hRight = getColumnHeightFromTop(bitmap, point.y);
+
+            Point pLeft = new Point(point.x, (hLeft - 1 >= 0 ? hLeft - 1 : 0));
+            Point pRight = new Point(point.y, (hRight - 1 >= 0 ? hRight - 1 : 0));
+
+            boolean moved = false, end = false;
+            int left = (pPrev != null)?pPrev.y : 0;
+            int right = (pNext != null)?pNext.x : bitmap.getWidth() - 1;
+            while (!end) {
+                int x = pLeft.x, y = pLeft.y;
+                if (x - 1 >= left) {
+                    if (bitmap.getPixel(x - 1, y) == Color.WHITE) {
+                        pLeft = new Point(x - 1, y);
+                        moved = true;
+                    }
+                }
+                if (x - 1 >= left && y - 1 >= 0 && !moved) {
+                    if (bitmap.getPixel(x - 1, y - 1) == Color.WHITE) {
+                        pLeft = new Point(x - 1, y - 1);
+                        moved = true;
+                    }
+                }
+                /*if (x - 1 >= left && y + 1 < bitmap.getHeight() && !moved) {
+                    if (bitmap.getPixel(x - 1, y + 1) == Color.WHITE) {
+                        pLeft = new Point(x - 1, y + 1);
+                        moved = true;
+                    }
+                }*/
+
+                if (moved) {
+                    moved = false;
+                } else {
+                    end = true;
+                }
+            }
+            moved = false; end = false;
+            while (!end) {
+                int x = pRight.x, y = pRight.y;
+                if (x + 1 <= right) {
+                    if (bitmap.getPixel(x + 1, y) == Color.WHITE) {
+                        pRight = new Point(x + 1, y);
+                        moved = true;
+                    }
+                }
+                if (x + 1 <= right && y - 1 >= 0 && !moved) {
+                    if (bitmap.getPixel(x + 1, y - 1) == Color.WHITE) {
+                        pRight = new Point(x + 1, y - 1);
+                        moved = true;
+                    }
+                }
+                /*if (x + 1 <= right && y + 1 < bitmap.getHeight() && !moved) {
+                    if (bitmap.getPixel(x + 1, y + 1) == Color.WHITE) {
+                        pRight = new Point(x + 1, y + 1);
+                        moved = true;
+                    }
+                }*/
+
+                if (moved) {
+                    moved = false;
+                } else {
+                    end = true;
+                }
+            }
+
+            int l = (pLeft.x - 1 >= 0) ? pLeft.x - 1 : 0;
+            int r = (pRight.x + 1 < bitmap.getWidth()) ? pRight.x + 1 : bitmap.getWidth() - 1;
+            if (countForegroundInColumn(bitmap, l, 0, pLeft.y) > 0 && countForegroundInColumn(bitmap, r, 0, pRight.y) > 0) {
+                points.add(point);
+            }
+        }
+
+        for (int i = 0; i < points.size(); i++) {
+            Point point = points.get(i);
+            if (i == 0) {
+                Bitmap leftMost = cropBitmap(bitmap, 0, 0, point.x, bitmap.getHeight());
+                bitmaps.add(leftMost);
+            }
+            int right = (i + 1 < points.size())? points.get(i + 1).x : bitmap.getWidth() - 1;
+            Bitmap bmp = cropBitmap(bitmap, point.y, 0, right - point.y, bitmap.getHeight());
+            bitmaps.add(bmp);
+        }
+
+        if (bitmaps.isEmpty()) {
+            bitmaps.add(bitmap);
+        }
+        return bitmaps;
     }
 
     private boolean mixableRect(Rect r1, Rect r2) {
@@ -833,7 +964,6 @@ public class BitmapProcessor {
 
             //vertical fragment
             for (Map.Entry<Integer, Integer> entry : listColumns.entrySet()) {
-                startCol = endCol = -1;
                 if (entry.getKey() >= 0 && entry.getValue() >= 0) {
                     startCol = entry.getKey();
                     endCol = entry.getValue();
@@ -948,7 +1078,6 @@ public class BitmapProcessor {
                     }
                 }
             }
-            Log.d("Percentages", ((double) horizontalHistogram[i] / bitmap.getWidth()) + "");
         }
         return horizontalHistogram;
     }
@@ -994,7 +1123,6 @@ public class BitmapProcessor {
                     }
                 }
             }
-            Log.d("Percentages", ((double) verticalHistogram[i] / bitmap.getHeight()) + "");
         }
         return verticalHistogram;
     }
@@ -2561,7 +2689,7 @@ public class BitmapProcessor {
                             countThree++;
                         }
                     }
-                    return countThree > 0 /*&& rSmall.width() >= rSmall.height()*/;
+                    return countThree > 0 /*&& rSmall.width() >= rSmall.height()*/ && rSmall.height() >= rBig.height() * 0.6d;
                 }
             }
         }

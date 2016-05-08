@@ -3,7 +3,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:gravity="center"
-    android:layout_height="200dip">
+    android:layout_height="200dip"
+    android:padding="5dip">
 
     <ImageView
         android:id="@+id/itemBitmap"
