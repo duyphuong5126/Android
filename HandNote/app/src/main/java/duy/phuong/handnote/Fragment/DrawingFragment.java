@@ -3,6 +3,7 @@ package duy.phuong.handnote.Fragment;
 import android.app.ActionBar;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 
 import duy.phuong.handnote.DTO.Character;
 import duy.phuong.handnote.Listener.BackPressListener;
+import duy.phuong.handnote.MyView.DrawingView.BitmapPager;
 import duy.phuong.handnote.MyView.DrawingView.FingerDrawerView;
 import duy.phuong.handnote.MyView.BitmapAdapter;
 import duy.phuong.handnote.R;
@@ -34,17 +36,19 @@ import duy.phuong.handnote.Support.SupportUtils;
  */
 public class DrawingFragment extends BaseFragment implements View.OnClickListener, BackPressListener{
     private GridView mListDetectedBitmap;
-    private BitmapAdapter mBitmapAdapter;
     private ArrayList<Bitmap> mListBitmap;
+    private BitmapAdapter mBitmapAdapter;
     private ImageButton mButtonSave, mButtonEmpty, mButtonForward, mButtonMore, mButtonUndo, mButtonRedo;
     private EditText mEdtName;
     private CheckBox mCheckSplit;
-    private LinearLayout mLayoutImageAnalysis;
-    private HorizontalScrollView mScrollAnalysis;
     private int mCurrentMode;
 
     private FingerDrawerView mDrawer;
     private PopupMenu mPopupMenu;
+
+    private ViewPager mBitmapViewPager;
+    private BitmapPager mBitmapPager;
+    private ArrayList<Bitmap> mAnalysisBitmaps;
 
     public DrawingFragment() {
         this.mLayoutRes = R.layout.fragment_drawing;
@@ -66,9 +70,12 @@ public class DrawingFragment extends BaseFragment implements View.OnClickListene
         mButtonForward.setOnClickListener(this);
         mButtonMore = (ImageButton) mFragmentView.findViewById(R.id.buttonMore);
         mButtonMore.setOnClickListener(this);
-        mLayoutImageAnalysis = (LinearLayout) mFragmentView.findViewById(R.id.layoutImageAnalysis);
-        mScrollAnalysis = (HorizontalScrollView) mFragmentView.findViewById(R.id.scrollImageAnalysis);
         mEdtName = (EditText) mFragmentView.findViewById(R.id.edtName);
+        mBitmapViewPager = (ViewPager) mFragmentView.findViewById(R.id.pagerImages);
+        mAnalysisBitmaps = new ArrayList<>();
+        mBitmapPager = new BitmapPager(mActivity, mAnalysisBitmaps, R.layout.item_bitmap_2);
+        mBitmapViewPager.setAdapter(mBitmapPager);
+
         mCheckSplit = (CheckBox) mFragmentView.findViewById(R.id.ckcSplit);
         mCheckSplit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -84,7 +91,7 @@ public class DrawingFragment extends BaseFragment implements View.OnClickListene
         super.onActivityCreated(savedInstanceState);
         mListDetectedBitmap = (GridView) mFragmentView.findViewById(R.id.listDetectedBitmap);
 
-        mBitmapAdapter = new BitmapAdapter(mActivity, 0, mListBitmap);
+        mBitmapAdapter = new BitmapAdapter(mActivity, R.layout.item_bitmap, mListBitmap);
         mListDetectedBitmap.setAdapter(mBitmapAdapter);
 
         mDrawer = (FingerDrawerView) mFragmentView.findViewById(R.id.FingerDrawer);
@@ -92,28 +99,31 @@ public class DrawingFragment extends BaseFragment implements View.OnClickListene
             @Override
             public void onRecognizeSuccess(ArrayList<Character> listCharacters) {
                 mListBitmap.clear();
-                mLayoutImageAnalysis.removeAllViews();
                 switch (mCurrentMode) {
                     case R.id.itemVerticalProjectionProfile:
                     case R.id.itemHorizontalProjectionProfile:
-                        mScrollAnalysis.setVisibility(View.VISIBLE);
                         mListDetectedBitmap.setVisibility(View.GONE);
-                        ViewGroup.LayoutParams layoutParams = mLayoutImageAnalysis.getLayoutParams();
-                        for (Character character : listCharacters) {
-                            ImageView imageView = new ImageView(mActivity);
-                            imageView.setImageBitmap(character.mBitmap);
-                            imageView.setLayoutParams(layoutParams);
-                            mLayoutImageAnalysis.addView(imageView);
+                        mBitmapViewPager.setVisibility(View.VISIBLE);
+                        if (mAnalysisBitmaps != null) {
+                            mAnalysisBitmaps.clear();
+                            for (Character c : listCharacters) {
+                                if (c.mBitmap != null) {
+                                    mAnalysisBitmaps.add(c.mBitmap);
+                                }
+                            }
+                            mBitmapPager = new BitmapPager(mActivity, mAnalysisBitmaps, R.layout.item_bitmap_2);
+                            mBitmapViewPager.setAdapter(mBitmapPager);
                         }
                         break;
                     default:
-                        mScrollAnalysis.setVisibility(View.GONE);
                         mListDetectedBitmap.setVisibility(View.VISIBLE);
+                        mBitmapViewPager.setVisibility(View.GONE);
                         for (Character character : listCharacters) {
                             mListBitmap.add(character.mBitmap);
                         }
                         break;
                 }
+                Toast.makeText(mActivity, "Images analysis done", Toast.LENGTH_SHORT).show();
                 mBitmapAdapter.notifyDataSetChanged();
             }
         });
@@ -149,6 +159,7 @@ public class DrawingFragment extends BaseFragment implements View.OnClickListene
                     default:
                         break;
                 }
+                mCurrentMode = item.getItemId();
                 item.setChecked(true);
                 return false;
             }
@@ -201,7 +212,10 @@ public class DrawingFragment extends BaseFragment implements View.OnClickListene
 
     @Override
     public boolean doBack() {
-        if (mListBitmap.size() > 0) {
+        if (mListBitmap.size() > 0 || mAnalysisBitmaps.size() > 0) {
+            mAnalysisBitmaps.clear();
+            mBitmapPager = new BitmapPager(mActivity, mAnalysisBitmaps, R.layout.item_bitmap_2);
+            mBitmapViewPager.setAdapter(mBitmapPager);
             emptyDrawer();
             return true;
         }

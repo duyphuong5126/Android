@@ -1,6 +1,7 @@
 package duy.phuong.handnote.MyView;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -16,8 +17,11 @@ import android.widget.ImageView;
  * Created by Phuong on 25/07/2015.
  */
 public class RoundImageView extends ImageView {
+    private int mColor;
     public RoundImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, new int[] {android.R.attr.background});
+        mColor = typedArray.getColor(0, Color.TRANSPARENT);
     }
 
     @Override
@@ -27,7 +31,7 @@ public class RoundImageView extends ImageView {
         Bitmap drawable = ((BitmapDrawable) getDrawable()).getBitmap();
         Bitmap src = drawable.copy(Bitmap.Config.ARGB_8888, true);
         Bitmap roundedBitmap = RoundImageView.getRoundedBitmap(src, (getWidth() >= getHeight()) ? getHeight() : getWidth());
-        canvas.drawColor(Color.parseColor("#FFCC0033"));
+        canvas.drawColor(mColor);
         canvas.drawBitmap(roundedBitmap, (getWidth() - roundedBitmap.getWidth()) / 2, (getHeight() - roundedBitmap.getHeight()) / 2, null);
     }
 

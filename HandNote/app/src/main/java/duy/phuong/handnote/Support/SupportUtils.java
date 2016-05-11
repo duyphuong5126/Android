@@ -3,6 +3,7 @@ package duy.phuong.handnote.Support;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
@@ -89,16 +90,6 @@ public abstract class SupportUtils {
         return true;
     }
 
-    public static Bitmap createEmptyBitmap(Bitmap src) {
-        Bitmap bitmap = Bitmap.createBitmap(src.getWidth(), src.getHeight(), Bitmap.Config.ARGB_8888);
-        for (int i = 0; i < src.getWidth(); i++ ) {
-            for (int j = 0; j < src.getHeight(); j++ ) {
-                bitmap.setPixel(i, j, Color.WHITE);
-            }
-        }
-        return bitmap;
-    }
-
     public static ArrayList<String> getListFilePaths(String path) {
         File fileDir = new File(path);
         File[] listFiles = fileDir.listFiles();
@@ -114,10 +105,6 @@ public abstract class SupportUtils {
         }
 
         return paths;
-    }
-
-    public static String getApplicationDir(String folderName) {
-        return "";
     }
 
     public static boolean emptyDirectory(String path) {
@@ -235,13 +222,26 @@ public abstract class SupportUtils {
         return false;
     }
 
-    public static String getPath(Uri uri, Context context) {
+    public static String getDirectoriesPath(Uri uri, Context context) {
         String[] projection = {MediaStore.Images.Media.DATA};
         Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
         if (cursor != null) {
             int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             if (cursor.moveToFirst()) {
                 return getFolderPath(cursor.getString(index));
+            }
+            cursor.close();
+        }
+        return uri.getPath();
+    }
+
+    public static String getPath(Uri uri, Context context) {
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null) {
+            int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            if (cursor.moveToFirst()) {
+                return cursor.getString(index);
             }
             cursor.close();
         }
@@ -258,5 +258,18 @@ public abstract class SupportUtils {
             }
         }
         return folder;
+    }
+
+    public static Bitmap getAvatar() {
+        ArrayList<String> list = getListFilePaths(RootPath + ApplicationDirectory + "Avatar");
+        if (list != null) {
+            for (String s : list) {
+                Bitmap bitmap = BitmapFactory.decodeFile(s);
+                if (bitmap != null) {
+                    return bitmap;
+                }
+            }
+        }
+        return null;
     }
 }

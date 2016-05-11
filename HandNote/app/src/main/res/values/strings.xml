@@ -30,4 +30,8 @@
 
     <string name="create_fragment_en">Create new</string>
     <string name="create_fragment_vi">Tạo Mới</string>
+
+    <string name="templates_fragment_en">Templates</string>
+    <string name="templates_fragment_vi">Mẫu</string>
+
 </resources>

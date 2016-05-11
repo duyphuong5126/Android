@@ -1,6 +1,8 @@
 package duy.phuong.handnote;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -11,11 +13,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,17 +32,22 @@ import java.util.StringTokenizer;
 import duy.phuong.handnote.DTO.ClusterLabel;
 import duy.phuong.handnote.DTO.Label;
 import duy.phuong.handnote.DTO.Note;
+import duy.phuong.handnote.DTO.SideMenuItem;
 import duy.phuong.handnote.Fragment.BaseFragment;
 import duy.phuong.handnote.Fragment.CreateNoteFragment;
 import duy.phuong.handnote.Fragment.DrawingFragment;
 import duy.phuong.handnote.Fragment.LearningFragment;
 import duy.phuong.handnote.Fragment.MainFragment;
+import duy.phuong.handnote.Fragment.TemplatesFragment;
 import duy.phuong.handnote.Fragment.ViewNoteFragment;
 import duy.phuong.handnote.Listener.BackPressListener;
 import duy.phuong.handnote.Listener.MainListener;
+import duy.phuong.handnote.MyView.RoundImageView;
+import duy.phuong.handnote.MyView.SideMenuAdapter;
 import duy.phuong.handnote.Recognizer.MachineLearning.Input;
 import duy.phuong.handnote.Recognizer.MachineLearning.SOM;
 import duy.phuong.handnote.Support.LanguageUtils;
+import duy.phuong.handnote.Support.SharedPreferenceUtils;
 import duy.phuong.handnote.Support.SupportUtils;
 
 public class MainActivity extends FragmentActivity implements MainListener, ImageButton.OnClickListener, BackPressListener, MainFragment.ShowNoteListener {
@@ -48,8 +57,8 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     private LinearLayout mSideMenu;
     private FrameLayout mLayoutBottomTabs;
     private ImageButton mButtonNavigator, mButtonCreate, mButtonBack;
-    private LinearLayout mButtonTraining;
-    private TextView mTvAppTitle;
+    private TextView mTvAppTitle, mTvUsername;
+    private RoundImageView mAvatar;
 
     private BackPressListener mBackPressListener;
     private Stack<String> mStack;
@@ -57,10 +66,12 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     private SOM mGlobalSOM;
     private ArrayList<ClusterLabel> mGlobalMapNames;
 
-    private String mCurrentUser = "Admin";
     private String mFragmentName = "";
 
     private Note mCurrentNote;
+    private SideMenuAdapter mSideMenuAdapter;
+    private ListView mListSideMenu;
+    private ArrayList<SideMenuItem> mItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,17 +84,14 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         mButtonNavigator.setOnClickListener(this);
         mButtonCreate = (ImageButton) findViewById(R.id.buttonCreate);
         mButtonCreate.setOnClickListener(this);
-        mButtonTraining = (LinearLayout) findViewById(R.id.buttonTraining);
-        mButtonTraining.setOnClickListener(this);
         mButtonBack = (ImageButton) findViewById(R.id.buttonBack);
         mButtonBack.setOnClickListener(this);
         mTvAppTitle = (TextView) findViewById(R.id.tvAppTitle);
+        mTvUsername = (TextView) findViewById(R.id.tvUsername);
+        mAvatar = (RoundImageView) findViewById(R.id.imageAvatar);
+        mListSideMenu = (ListView) findViewById(R.id.listSideMenu);
 
         mStack = new Stack<>();
-
-        if ("Admin".equals(mCurrentUser)) {
-            mButtonTraining.setVisibility(View.VISIBLE);
-        }
 
         mFragmentManager = getSupportFragmentManager();
 
@@ -107,6 +115,56 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     @Override
     protected void onStart() {
         super.onStart();
+        mItems = new ArrayList<>();
+        mItems.add(new SideMenuItem(R.mipmap.ic_android_black_24dp, R.mipmap.ic_android_red_24dp, getString(R.string.training_en), false));
+        mItems.add(new SideMenuItem(R.mipmap.ic_format_list_bulleted_black_24dp, R.mipmap.ic_list_red_24dp, getString(R.string.templates_fragment_en), false));
+        mSideMenuAdapter = new SideMenuAdapter(mItems, MainActivity.this, R.layout.layout_side_menu);
+        mListSideMenu.setAdapter(mSideMenuAdapter);
+        mSideMenuAdapter.notifyDataSetChanged();
+        mListSideMenu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                SideMenuItem item = mItems.get(position);
+                switch (item.mTitle) {
+                    case "Training":
+                        final Dialog dialog = new Dialog(MainActivity.this);
+                        dialog.setContentView(R.layout.layout_prompt_1);
+                        dialog.setTitle("Enter password");
+                        final EditText editText = (EditText) dialog.findViewById(R.id.edtPrompt);
+                        Button button = (Button) dialog.findViewById(R.id.buttonConfirm);
+                        button.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                String password = editText.getText().toString();
+                                if ("5126".equals(password)) {
+                                    showFragment(BaseFragment.DRAWING_FRAGMENT);
+                                    mMainNavigator.closeDrawer(mSideMenu);
+                                    dialog.cancel();
+                                } else {
+                                    Toast.makeText(MainActivity.this, "Wrong password", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                        dialog.show();
+                        break;
+                    case "Templates":
+                        showFragment(BaseFragment.TEMPLATES_FRAGMENT);
+                        break;
+                    default:
+                        for (int i = 0; i < mItems.size(); i++) {
+                            mItems.get(i).mFocused = i == position;
+                        }
+                        mSideMenuAdapter.notifyDataSetChanged();
+                        break;
+                }
+                toggleMainNavigator(false);
+            }
+        });
+        Bitmap bitmap = SupportUtils.getAvatar();
+        if (bitmap != null) {
+            mAvatar.setImageBitmap(bitmap);
+        }
+        mTvUsername.setText(SharedPreferenceUtils.getCurrentName());
         if (mFragmentManager.getBackStackEntryCount() <= 0) {
             this.showFragment(mFragmentName);
         } else {
@@ -317,6 +375,10 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                 baseFragment = viewNoteFragment;
                 break;
 
+            case BaseFragment.TEMPLATES_FRAGMENT:
+                baseFragment = new TemplatesFragment();
+                break;
+
             default:
                 break;
         }
@@ -331,8 +393,6 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         checkScreen();
     }
 
-
-
     private void checkScreen() {
         String name = "";
         if (!mStack.isEmpty()) {
@@ -344,15 +404,33 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         }
         switch (name) {
             case BaseFragment.DRAWING_FRAGMENT:
+                for (SideMenuItem item : mItems) {
+                    item.mFocused = item.mTitle.equals(getString(R.string.training_en));
+                }
+                this.toggleMainBottomTabs(false);
+                break;
             case BaseFragment.LEARNING_FRAGMENT:
+                for (SideMenuItem item : mItems) {
+                    item.mFocused = item.mTitle.equals(getString(R.string.training_en));
+                }
+                this.toggleMainBottomTabs(false);
+                break;
             case BaseFragment.CREATE_NOTE_FRAGMENT:
             case BaseFragment.VIEW_NOTE_FRAGMENT:
                 this.toggleMainBottomTabs(false);
+                break;
+            case BaseFragment.TEMPLATES_FRAGMENT:
+                for (SideMenuItem item : mItems) {
+                    item.mFocused = item.mTitle.equals(getString(R.string.templates_fragment_en));
+                }
+                this.toggleMainBottomTabs(true);
                 break;
             default:
                 this.toggleMainBottomTabs(true);
                 break;
         }
+
+        mSideMenuAdapter.notifyDataSetChanged();
 
         mTvAppTitle.setText(LanguageUtils.getFragmentTitle(name, this));
 
@@ -402,27 +480,6 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                 break;
             case R.id.buttonCreate:
                 showFragment(BaseFragment.CREATE_NOTE_FRAGMENT);
-                break;
-            case R.id.buttonTraining:
-                final Dialog dialog = new Dialog(this);
-                dialog.setContentView(R.layout.layout_prompt_1);
-                dialog.setTitle("Enter password");
-                final EditText editText = (EditText) dialog.findViewById(R.id.edtPrompt);
-                Button button = (Button) dialog.findViewById(R.id.buttonConfirm);
-                button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        String password = editText.getText().toString();
-                        if ("5126".equals(password)) {
-                            showFragment(BaseFragment.DRAWING_FRAGMENT);
-                            mMainNavigator.closeDrawer(mSideMenu);
-                            dialog.dismiss();
-                        } else {
-                            Toast.makeText(MainActivity.this, "Wrong password", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-                dialog.show();
                 break;
             case R.id.buttonBack:
                 onBackPressed();

@@ -28,6 +28,7 @@ public class LocalStorage extends SQLiteOpenHelper {
     private static final String Note_Id = "_id";
     private static final String Note_Image = "image";
     private static final String Note_Content = "content";
+
     private static final String create_tblNote = "create table " + TABLE_NOTE + "(" +
             Note_Id + " integer primary key autoincrement," +
             Note_Content + " text not null," +
@@ -70,10 +71,14 @@ public class LocalStorage extends SQLiteOpenHelper {
                 options.inPurgeable = true;
                 options.inInputShareable = true;
                 Bitmap src = BitmapFactory.decodeFile(note.mBitmapPath, options);
-                note.mImage = ThumbnailUtils.extractThumbnail(src, 60, 60);
                 note.mContentPath = cursor.getString(cursor.getColumnIndex(Note_Content));
                 note.mContent = SupportUtils.getStringData(note.mContentPath);
-                notes.add(note);
+                if (src != null) {
+                    note.mImage = ThumbnailUtils.extractThumbnail(src, 60, 60);
+                    notes.add(note);
+                } else {
+                    deleteNote(note);
+                }
             } while (cursor.moveToNext());
         }
         cursor.close();

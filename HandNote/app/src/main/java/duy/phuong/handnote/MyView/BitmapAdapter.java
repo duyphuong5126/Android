@@ -19,16 +19,18 @@ import duy.phuong.handnote.R;
 public class BitmapAdapter extends BaseAdapter{
     private ArrayList<Bitmap> mListBitmap;
     private Activity mActivity;
+    private int mLayoutRes;
 
     public BitmapAdapter(Activity activity, int resource, ArrayList<Bitmap> list) {
         super();
         mActivity = activity;
         mListBitmap = list;
+        mLayoutRes = resource;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        convertView = mActivity.getLayoutInflater().inflate(R.layout.item_bitmap, null);
+        convertView = mActivity.getLayoutInflater().inflate(mLayoutRes, null);
         ImageView imageView = (ImageView) convertView.findViewById(R.id.itemBitmap);
         imageView.setImageBitmap(mListBitmap.get(position));
         return convertView;

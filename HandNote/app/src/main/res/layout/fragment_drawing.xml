@@ -18,24 +18,18 @@
             android:numColumns="5"
             android:stretchMode="columnWidth" />
 
-        <HorizontalScrollView
-            android:id="@+id/scrollImageAnalysis"
+        <android.support.v4.view.ViewPager
+            android:id="@+id/pagerImages"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:id="@+id/layoutImageAnalysis"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"/>
-        </HorizontalScrollView>
+            android:visibility="gone"/>
     </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dip"
         android:layout_weight="1"
+        android:background="#fff"
         android:orientation="horizontal">
 
         <LinearLayout

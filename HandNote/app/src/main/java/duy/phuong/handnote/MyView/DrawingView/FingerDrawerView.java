@@ -531,45 +531,49 @@ public class FingerDrawerView extends View {
     }
 
     private void updatePaintWidth() {
-        DisplayMetrics metrics = mDisplayListener.getScreenResolution();
-        int height = metrics.heightPixels;
-        int width = metrics.widthPixels;
-        if (height >= 480) {
-            if (height <= 800) {
-                FingerDrawerView.CurrentPaintSize = 10f;
-            } else {
-                if (height <= 854) {
-                    FingerDrawerView.CurrentPaintSize = 11f;
-                } else {
-                    if (height <= 960) {
-                        FingerDrawerView.CurrentPaintSize = 14f;
+        if (mDisplayListener != null) {
+            DisplayMetrics metrics = mDisplayListener.getScreenResolution();
+            if (metrics != null) {
+                int height = metrics.heightPixels;
+                int width = metrics.widthPixels;
+                if (height >= 480) {
+                    if (height <= 800) {
+                        FingerDrawerView.CurrentPaintSize = 10f;
                     } else {
-                        if (height <= 1024) {
-                            FingerDrawerView.CurrentPaintSize = 15f;
+                        if (height <= 854) {
+                            FingerDrawerView.CurrentPaintSize = 11f;
                         } else {
-                            if (height <= 1280) {
-                                switch (width) {
-                                    case 800:
-                                        FingerDrawerView.CurrentPaintSize = 18f;
-                                        break;
-                                    case 768:
-                                        FingerDrawerView.CurrentPaintSize = 17f;
-                                        break;
-                                    default:
-                                        FingerDrawerView.CurrentPaintSize = 16f;
-                                        break;
-                                }
+                            if (height <= 960) {
+                                FingerDrawerView.CurrentPaintSize = 14f;
                             } else {
-                                if (height <= 1400) {
-                                    FingerDrawerView.CurrentPaintSize = 20f;
+                                if (height <= 1024) {
+                                    FingerDrawerView.CurrentPaintSize = 15f;
                                 } else {
-                                    if (height <= 1824) {
-                                        FingerDrawerView.CurrentPaintSize = 22f;
+                                    if (height <= 1280) {
+                                        switch (width) {
+                                            case 800:
+                                                FingerDrawerView.CurrentPaintSize = 18f;
+                                                break;
+                                            case 768:
+                                                FingerDrawerView.CurrentPaintSize = 17f;
+                                                break;
+                                            default:
+                                                FingerDrawerView.CurrentPaintSize = 16f;
+                                                break;
+                                        }
                                     } else {
-                                        if (height <= 1920) {
-                                            FingerDrawerView.CurrentPaintSize = (width <= 1200) ? 24f : 25f;
+                                        if (height <= 1400) {
+                                            FingerDrawerView.CurrentPaintSize = 20f;
                                         } else {
-                                            FingerDrawerView.CurrentPaintSize = 30f;
+                                            if (height <= 1824) {
+                                                FingerDrawerView.CurrentPaintSize = 22f;
+                                            } else {
+                                                if (height <= 1920) {
+                                                    FingerDrawerView.CurrentPaintSize = (width <= 1200) ? 24f : 25f;
+                                                } else {
+                                                    FingerDrawerView.CurrentPaintSize = 30f;
+                                                }
+                                            }
                                         }
                                     }
                                 }

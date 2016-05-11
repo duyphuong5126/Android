@@ -18,7 +18,7 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:background="#c03"
+            android:background="#cc0033"
             android:orientation="horizontal">
 
             <FrameLayout
@@ -211,6 +211,7 @@
                 android:layout_weight="5">
 
                 <TextView
+                    android:id="@+id/tvUsername"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:text="Username"
@@ -236,39 +237,11 @@
             android:layout_weight="5"
             android:orientation="vertical">
 
-            <LinearLayout
+            <ListView
+                android:id="@+id/listSideMenu"
                 android:layout_width="match_parent"
-                android:layout_height="50dip"
-                android:visibility="gone"
-                android:id="@+id/buttonTraining">
-
-                <LinearLayout
-                    android:layout_width="0dip"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:layout_weight="1">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@mipmap/ic_android_black_24dp"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dip"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    android:layout_weight="3">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/training_en"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:textColor="#000"/>
-                </LinearLayout>
-            </LinearLayout>
+                android:layout_height="match_parent"
+                android:divider="@null"/>
 
         </LinearLayout>
 

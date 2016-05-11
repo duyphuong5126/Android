@@ -144,7 +144,7 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             Uri uri = data.getData();
-            String path = SupportUtils.getPath(uri, mActivity);
+            String path = SupportUtils.getDirectoriesPath(uri, mActivity);
             switch (requestCode) {
                 case IMAGE_PICK:
                     mListResourcePaths.addAll(SupportUtils.getListFilePaths(path));

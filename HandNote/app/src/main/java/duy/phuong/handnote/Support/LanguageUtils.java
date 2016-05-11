@@ -23,6 +23,8 @@ public abstract class LanguageUtils {
                 return resources.getString(R.string.learning_fragment_en);
             case BaseFragment.CREATE_NOTE_FRAGMENT:
                 return resources.getString(R.string.create_fragment_en);
+            case BaseFragment.TEMPLATES_FRAGMENT:
+                return resources.getString(R.string.templates_fragment_en);
             default:
                 return resources.getString(R.string.app_name);
         }

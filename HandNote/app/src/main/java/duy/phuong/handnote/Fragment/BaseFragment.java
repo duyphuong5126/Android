@@ -23,6 +23,7 @@ public abstract class BaseFragment extends Fragment implements FingerDrawerView.
     public static final String LEARNING_FRAGMENT = "LearningFragment";
     public static final String CREATE_NOTE_FRAGMENT = "CreateNoteFragment";
     public static final String VIEW_NOTE_FRAGMENT = "ViewNoteFragment";
+    public static final String TEMPLATES_FRAGMENT = "TemplatesFragment";
     protected Activity mActivity;
     protected View mFragmentView;
     protected int mLayoutRes;

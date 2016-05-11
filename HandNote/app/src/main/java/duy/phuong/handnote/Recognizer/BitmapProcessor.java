@@ -256,15 +256,15 @@ public class BitmapProcessor {
                 break;
             case VERTICAL_PP:
                 for (Character f : detectedBitmaps) {
-                    int[] verticalHistogram = getHorizontalHistogram(f.mBitmap);
+                    int[] verticalHistogram = getVerticalHistogram(f.mBitmap);
                     Bitmap bmp = Bitmap.createBitmap(f.mBitmap.getWidth(), f.mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
-                    for (int i = 0; i < bmp.getHeight(); i++) {
-                        for (int j = 0; j < bmp.getWidth(); j++) {
+                    for (int i = 0; i < bmp.getWidth(); i++) {
+                        for (int j = bmp.getHeight() - 1; j >= 0; j--) {
                             if (verticalHistogram[i] > 0) {
-                                bmp.setPixel(j, i, Color.BLACK);
+                                bmp.setPixel(i, j, Color.BLACK);
                                 verticalHistogram[i]--;
                             } else {
-                                bmp.setPixel(j, i, Color.WHITE);
+                                bmp.setPixel(i, j, Color.WHITE);
                             }
                         }
                     }
@@ -278,13 +278,13 @@ public class BitmapProcessor {
                 for (Character f : detectedBitmaps) {
                     int[] horizontalHistogram = getHorizontalHistogram(f.mBitmap);
                     Bitmap bmp = Bitmap.createBitmap(f.mBitmap.getWidth(), f.mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
-                    for (int i = 0; i < bmp.getWidth(); i++) {
-                        for (int j = bmp.getHeight() - 1; j >= 0; j--) {
+                    for (int i = 0; i < bmp.getHeight(); i++) {
+                        for (int j = 0; j < bmp.getWidth(); j++) {
                             if (horizontalHistogram[i] > 0) {
-                                bmp.setPixel(i, j, Color.BLACK);
+                                bmp.setPixel(j, i, Color.BLACK);
                                 horizontalHistogram[i]--;
                             } else {
-                                bmp.setPixel(i, j, Color.WHITE);
+                                bmp.setPixel(j, i, Color.WHITE);
                             }
                         }
                     }
@@ -2255,37 +2255,49 @@ public class BitmapProcessor {
             }
         }
 
-        for (int i = 0; i < src.getWidth() && right < 0; i++) {
-            int h = getColumnHeightFromBot(src, i);
-            if (h < src.getHeight() - 2) {
-                int y = h + 1;
-                int count = 0;
-                if (i - 1 >= 0) {
-                    if (src.getPixel(i - 1, y) != Color.WHITE) {
-                        count++;
-                    }
-                    if (y - 1 >= 0) {
-                        if (src.getPixel(i - 1, y - 1) != Color.WHITE) {
+        if (right < 0) {
+            int[] verticalHistogram = getVerticalHistogram(src);
+            int start = -1;
+            for (int i = verticalHistogram.length - 1; i >= 0 && start < 0; i--) {
+                if (verticalHistogram[i] > 1.7d * FingerDrawerView.CurrentPaintSize) {
+                    start = i;
+                }
+            }
+            if (start < 0) {
+                start = src.getWidth() - 1;
+            }
+            for (int i = start; i >= 0 && right < 0; i--) {
+                int h = getColumnHeightFromBot(src, i);
+                if (h < src.getHeight() - 2) {
+                    int y = h + 1;
+                    int count = 0;
+                    if (i - 1 >= 0) {
+                        if (src.getPixel(i - 1, y) != Color.WHITE) {
                             count++;
                         }
-                    }
-                }
-                if (src.getPixel(i, y - 1) != Color.WHITE) {
-                    count++;
-                }
-                if (i + 1 < src.getWidth()) {
-                    if (src.getPixel(i + 1, y) != Color.WHITE) {
-                        count++;
-                    }
-                    if (y - 1 >= 0) {
-                        if (src.getPixel(i + 1, y - 1) != Color.WHITE) {
-                            count++;
+                        if (y - 1 >= 0) {
+                            if (src.getPixel(i - 1, y - 1) != Color.WHITE) {
+                                count++;
+                            }
                         }
                     }
-                }
+                    if (src.getPixel(i, y - 1) != Color.WHITE) {
+                        count++;
+                    }
+                    if (i + 1 < src.getWidth()) {
+                        if (src.getPixel(i + 1, y) != Color.WHITE) {
+                            count++;
+                        }
+                        if (y - 1 >= 0) {
+                            if (src.getPixel(i + 1, y - 1) != Color.WHITE) {
+                                count++;
+                            }
+                        }
+                    }
 
-                if (count == 5) {
-                    right = i;
+                    if (count >= 5) {
+                        right = i;
+                    }
                 }
             }
         }
@@ -2689,7 +2701,7 @@ public class BitmapProcessor {
                             countThree++;
                         }
                     }
-                    return countThree > 0 /*&& rSmall.width() >= rSmall.height()*/ && rSmall.height() >= rBig.height() * 0.6d;
+                    return countThree >= 0 && (rSmall.width() >= rSmall.height() || rSmall.height() >= rBig.height() * 0.6d);
                 }
             }
         }
@@ -2886,6 +2898,10 @@ public class BitmapProcessor {
                 if (r1.size() == 1 && r2.size() == 1) {
                     Rect rSmall = (r1.get(0).width() > r2.get(0).width()) ? r2.get(0) : r1.get(0);
                     Rect rBig = (r1.get(0).width() <= r2.get(0).width()) ? r2.get(0) : r1.get(0);
+
+                    if (rSmall.height() >= 0.7d * rBig.height()) {
+                        return false;
+                    }
                     c.mListRectContour.add(rSmall);
                     c.mListRectContour.add(rBig);
                 }
@@ -3195,7 +3211,7 @@ public class BitmapProcessor {
             if (list.size() == 2) {
                 Rect rect = list.get(0);
                 if (rect != null) {
-                    if (rect.bottom <= src.getHeight() * 0.6d && rect.width() <= rect.height()) {
+                    if (rect.bottom <= src.getHeight() * 0.7d && rect.width() <= rect.height()) {
                         int offsetY = rect.bottom;
                         int offsetX = -1;
                         for (int i = 0; i < src.getWidth() && offsetX < 0; i++) {
@@ -3885,7 +3901,8 @@ public class BitmapProcessor {
             if (list.size() == 2) {
                 Rect rect = list.get(0);
                 if (rect != null) {
-                    boolean closeToBot = Math.abs(rect.bottom - (src.getHeight() - 1)) <= 2.5 * FingerDrawerView.CurrentPaintSize;
+                    int dis = Math.abs(rect.bottom - (src.getHeight() - 1));
+                    boolean closeToBot = dis <= 2.5d * FingerDrawerView.CurrentPaintSize;
                     int count = 0;
                     int increase = 0;
                     boolean stop = false;
