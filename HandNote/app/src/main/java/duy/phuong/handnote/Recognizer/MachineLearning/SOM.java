@@ -14,7 +14,6 @@ public class SOM {
     public SOM() {
         init();
     }
-
     public SOM(double[][] weightMatrix) {
         init(weightMatrix);
     }
@@ -52,9 +51,12 @@ public class SOM {
         }
     }
 
-    public void updateLabelForCluster(int x, int y, String label) {
+    public void updateLabelForCluster(int x, int y, String label, double d) {
         //update map name by counting patterns
         mOutputs[y][x].mMapNames.put(label, mOutputs[y][x].mMapNames.get(label) + 1);
+        if (mOutputs[y][x].mMapDistances.get(label) > d) {
+            mOutputs[y][x].mMapDistances.put(label, d);
+        }
         mOutputs[y][x].mCount++;
     }
 
@@ -96,6 +98,15 @@ public class SOM {
         for (Output[] outputs : mOutputs)
             for (Output output : outputs) {
                 builder.append(output.getNameList()).append("\r\n");
+            }
+        return builder.toString();
+    }
+
+    public String getMapDistances() {
+        StringBuilder builder = new StringBuilder();
+        for (Output[] outputs : mOutputs)
+            for (Output output : outputs) {
+                builder.append(output.getDistances()).append("\r\n");
             }
         return builder.toString();
     }

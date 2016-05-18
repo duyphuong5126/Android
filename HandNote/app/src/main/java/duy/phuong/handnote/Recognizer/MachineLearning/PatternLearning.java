@@ -16,10 +16,14 @@ import duy.phuong.handnote.Support.SupportUtils;
  * Created by Phuong on 01/03/2016.
  */
 
-/*Kohonen Algorithm*/
+/*SOM Network*/
 public class PatternLearning extends Recognizer {
     public static final double INITIAL_LEARNING_RATE = 0.5;//the initial learning rate
     private static final double MAP_RADIUS = (SOM.NUMBERS_OF_CLUSTER / SOM.NUM_OF_ROWS);
+
+    public interface LearningEndListener {
+        void endLearning();
+    }
 
     private ArrayList<Input> mSamples;//training set
     private int mEpochs; //learning rate time const (T2)
@@ -60,8 +64,7 @@ public class PatternLearning extends Recognizer {
         AsyncTask<Void, Bundle, Void> asyncTask = new AsyncTask<Void, Bundle, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                boolean converge = false;
-                    for (int i = 0; i < mEpochs && !converge; i++) {
+                for (int i = 0; i < mEpochs; i++) {
                     mMap.resetMapName();
                     Log.d("Epoch", "" + i);
                     ArrayList<Input> inputs = new ArrayList<>();
@@ -77,8 +80,9 @@ public class PatternLearning extends Recognizer {
                         double min_distance = 1000000000;
                         int win_neuron_position_X = -1;
                         int win_neuron_position_Y = -1;
+                        double d = 0;
                         for (int j = 0; j < mMap.getOutputs().length; j++) {
-                            double d = getDistance(input, mMap.getOutputs()[j][0]);
+                            d = getDistance(input, mMap.getOutputs()[j][0]);
                             if (min_distance > d) {
                                 min_distance = d;
                                 win_neuron_position_Y = j;
@@ -126,24 +130,6 @@ public class PatternLearning extends Recognizer {
                                 win_neuron_position_Y = j;
                                 win_neuron_position_X = 7;
                             }
-                            d = getDistance(input, mMap.getOutputs()[j][8]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 8;
-                            }
-                            d = getDistance(input, mMap.getOutputs()[j][9]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 9;
-                            }
-                            d = getDistance(input, mMap.getOutputs()[j][10]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 10;
-                            }
                         }
 
 
@@ -185,19 +171,76 @@ public class PatternLearning extends Recognizer {
                         }
 
                         //5. update map of names
-                        mMap.updateLabelForCluster(win_neuron_position_X, win_neuron_position_Y, input.mLabel);
+                        //mMap.updateLabelForCluster(win_neuron_position_X, win_neuron_position_Y, input.mLabel, d);
                     }
 
                     //check converge condition
-                    String listNames = checkListNames();
-                    converge = listNames.length() == 0;
                     Bundle bundle = new Bundle();
-                    bundle.putString("ListName", listNames);
                     bundle.putInt("Epoch", i);
                     publishProgress(bundle);
 
                     updateLearningRate(i);
                     updateNeighborRadius(i);
+                }
+
+                //Labeling
+                mMap.resetMapName();
+                for (Input input : mSamples) {
+                    double min_distance = Double.MAX_VALUE;
+                    int win_neuron_position_X = -1;
+                    int win_neuron_position_Y = -1;
+                    double d = 0;
+                    for (int j = 0; j < mMap.getOutputs().length; j++) {
+                        d = getDistance(input, mMap.getOutputs()[j][0]);
+                        if (min_distance > d) {
+                            min_distance = d;
+                            win_neuron_position_Y = j;
+                            win_neuron_position_X = 0;
+                        }
+                        d = getDistance(input, mMap.getOutputs()[j][1]);
+                        if (min_distance > d) {
+                            min_distance = d;
+                            win_neuron_position_Y = j;
+                            win_neuron_position_X = 1;
+                        }
+                        d = getDistance(input, mMap.getOutputs()[j][2]);
+                        if (min_distance > d) {
+                            min_distance = d;
+                            win_neuron_position_Y = j;
+                            win_neuron_position_X = 2;
+                        }
+                        d = getDistance(input, mMap.getOutputs()[j][3]);
+                        if (min_distance > d) {
+                            min_distance = d;
+                            win_neuron_position_Y = j;
+                            win_neuron_position_X = 3;
+                        }
+                        d = getDistance(input, mMap.getOutputs()[j][4]);
+                        if (min_distance > d) {
+                            min_distance = d;
+                            win_neuron_position_Y = j;
+                            win_neuron_position_X = 4;
+                        }
+                        d = getDistance(input, mMap.getOutputs()[j][5]);
+                        if (min_distance > d) {
+                            min_distance = d;
+                            win_neuron_position_Y = j;
+                            win_neuron_position_X = 5;
+                        }
+                        d = getDistance(input, mMap.getOutputs()[j][6]);
+                        if (min_distance > d) {
+                            min_distance = d;
+                            win_neuron_position_Y = j;
+                            win_neuron_position_X = 6;
+                        }
+                        d = getDistance(input, mMap.getOutputs()[j][7]);
+                        if (min_distance > d) {
+                            min_distance = d;
+                            win_neuron_position_Y = j;
+                            win_neuron_position_X = 7;
+                        }
+                    }
+                    mMap.updateLabelForCluster(win_neuron_position_X, win_neuron_position_Y, input.mLabel, d);
                 }
                 return null;
             }
@@ -213,7 +256,7 @@ public class PatternLearning extends Recognizer {
                 super.onPostExecute(aVoid);
                 SupportUtils.writeFile(mMap.toString(), "Trained", "SOM.txt");
                 SupportUtils.writeFile(mMap.getMapNames(), "Trained", "MapNames.txt");
-
+                SupportUtils.writeFile(mMap.getMapDistances(), "Trained", "MapDis.txt");
                 learningListener.finish();
             }
         };
@@ -221,7 +264,7 @@ public class PatternLearning extends Recognizer {
         asyncTask.execute();
     }
 
-    public void learn() {
+    public void learn(final LearningEndListener listener) {
         AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -229,7 +272,7 @@ public class PatternLearning extends Recognizer {
                     ArrayList<Input> inputs = new ArrayList<>();
                     inputs.addAll(mSamples);
 
-                    Log.d("Epoch", "" + i +" , size: " + inputs.size());
+                    Log.d("Epoch", "" + i + " , size: " + inputs.size());
 
                     while (inputs.size() > 0) {
                         //1. grab a random input
@@ -290,24 +333,6 @@ public class PatternLearning extends Recognizer {
                                 win_neuron_position_Y = j;
                                 win_neuron_position_X = 7;
                             }
-                            d = getDistance(input, mMap.getOutputs()[j][8]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 8;
-                            }
-                            d = getDistance(input, mMap.getOutputs()[j][9]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 9;
-                            }
-                            d = getDistance(input, mMap.getOutputs()[j][10]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 10;
-                            }
                         }
 
                         //3. find the neighbor area
@@ -356,8 +381,9 @@ public class PatternLearning extends Recognizer {
                     double min_distance = Double.MAX_VALUE;
                     int win_neuron_position_X = -1;
                     int win_neuron_position_Y = -1;
+                    double d = 0;
                     for (int j = 0; j < mMap.getOutputs().length; j++) {
-                        double d = getDistance(input, mMap.getOutputs()[j][0]);
+                        d = getDistance(input, mMap.getOutputs()[j][0]);
                         if (min_distance > d) {
                             min_distance = d;
                             win_neuron_position_Y = j;
@@ -405,26 +431,8 @@ public class PatternLearning extends Recognizer {
                             win_neuron_position_Y = j;
                             win_neuron_position_X = 7;
                         }
-                        d = getDistance(input, mMap.getOutputs()[j][8]);
-                        if (min_distance > d) {
-                            min_distance = d;
-                            win_neuron_position_Y = j;
-                            win_neuron_position_X = 8;
-                        }
-                        d = getDistance(input, mMap.getOutputs()[j][9]);
-                        if (min_distance > d) {
-                            min_distance = d;
-                            win_neuron_position_Y = j;
-                            win_neuron_position_X = 9;
-                        }
-                        d = getDistance(input, mMap.getOutputs()[j][10]);
-                        if (min_distance > d) {
-                            min_distance = d;
-                            win_neuron_position_Y = j;
-                            win_neuron_position_X = 10;
-                        }
                     }
-                    mMap.updateLabelForCluster(win_neuron_position_X, win_neuron_position_Y, input.mLabel);
+                    mMap.updateLabelForCluster(win_neuron_position_X, win_neuron_position_Y, input.mLabel, d);
                 }
 
                 return null;
@@ -435,8 +443,11 @@ public class PatternLearning extends Recognizer {
                 super.onPostExecute(aVoid);
                 SupportUtils.writeFile(mMap.toString(), "Trained", "SOM.txt");
                 SupportUtils.writeFile(mMap.getMapNames(), "Trained", "MapNames.txt");
+                SupportUtils.writeFile(mMap.getMapDistances(), "Trained", "MapDis.txt");
+                listener.endLearning();
             }
-        }; asyncTask.execute();
+        };
+        asyncTask.execute();
     }
 
     private String checkListNames() {

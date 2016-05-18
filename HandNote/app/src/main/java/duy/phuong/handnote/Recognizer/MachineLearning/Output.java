@@ -10,6 +10,7 @@ import java.util.Random;
 public class Output {
     public double[] mWeights;
     public HashMap<String, Integer> mMapNames;
+    public HashMap<String, Double> mMapDistances;
     public int mCount = 0;
 
     public Output() {
@@ -64,6 +65,39 @@ public class Output {
 
     public void resetLabel() {
         resetMapName();
+        resetDistances();
+    }
+
+    private void resetDistances() {
+        mMapDistances = new HashMap<>();
+        mMapDistances.put("A", Double.MAX_VALUE);mMapDistances.put("B", Double.MAX_VALUE);
+        mMapDistances.put("C", Double.MAX_VALUE);mMapDistances.put("D", Double.MAX_VALUE);
+        mMapDistances.put("E", Double.MAX_VALUE);mMapDistances.put("F", Double.MAX_VALUE);
+        mMapDistances.put("G", Double.MAX_VALUE);mMapDistances.put("H", Double.MAX_VALUE);
+        mMapDistances.put("I", Double.MAX_VALUE);mMapDistances.put("J", Double.MAX_VALUE);
+        mMapDistances.put("K", Double.MAX_VALUE);mMapDistances.put("L", Double.MAX_VALUE);
+        mMapDistances.put("M", Double.MAX_VALUE);mMapDistances.put("N", Double.MAX_VALUE);
+        mMapDistances.put("O", Double.MAX_VALUE);mMapDistances.put("P", Double.MAX_VALUE);
+        mMapDistances.put("Q", Double.MAX_VALUE);mMapDistances.put("R", Double.MAX_VALUE);
+        mMapDistances.put("S", Double.MAX_VALUE);mMapDistances.put("T", Double.MAX_VALUE);
+        mMapDistances.put("W", Double.MAX_VALUE);mMapDistances.put("U", Double.MAX_VALUE);
+        mMapDistances.put("V", Double.MAX_VALUE);mMapDistances.put("X", Double.MAX_VALUE);
+        mMapDistances.put("Y", Double.MAX_VALUE);mMapDistances.put("Z", Double.MAX_VALUE);
+        mMapDistances.put("a", Double.MAX_VALUE);mMapDistances.put("b", Double.MAX_VALUE);
+        mMapDistances.put("b1", Double.MAX_VALUE);mMapDistances.put("d", Double.MAX_VALUE);
+        mMapDistances.put("e", Double.MAX_VALUE);mMapDistances.put("f", Double.MAX_VALUE);
+        mMapDistances.put("g", Double.MAX_VALUE);mMapDistances.put("h", Double.MAX_VALUE);
+        mMapDistances.put("i", Double.MAX_VALUE);mMapDistances.put("j", Double.MAX_VALUE);
+        mMapDistances.put("k", Double.MAX_VALUE);mMapDistances.put("k1", Double.MAX_VALUE);
+        mMapDistances.put("l", Double.MAX_VALUE);mMapDistances.put("m", Double.MAX_VALUE);
+        mMapDistances.put("n", Double.MAX_VALUE);mMapDistances.put("q", Double.MAX_VALUE);
+        mMapDistances.put("r", Double.MAX_VALUE);mMapDistances.put("t", Double.MAX_VALUE);
+        mMapDistances.put("u", Double.MAX_VALUE);mMapDistances.put("y", Double.MAX_VALUE);
+        mMapDistances.put("x", Double.MAX_VALUE);mMapDistances.put("1", Double.MAX_VALUE);
+        mMapDistances.put("2", Double.MAX_VALUE);mMapDistances.put("3", Double.MAX_VALUE);
+        mMapDistances.put("4", Double.MAX_VALUE);mMapDistances.put("5", Double.MAX_VALUE);
+        mMapDistances.put("6", Double.MAX_VALUE);mMapDistances.put("7", Double.MAX_VALUE);
+        mMapDistances.put("8", Double.MAX_VALUE);mMapDistances.put("9", Double.MAX_VALUE);
     }
 
     public void resetMapName() {
@@ -96,11 +130,11 @@ public class Output {
         mMapNames.put("n", 0);mMapNames.put("q", 0);
         mMapNames.put("r", 0);mMapNames.put("t", 0);
         mMapNames.put("u", 0);mMapNames.put("y", 0);
-        mMapNames.put("1", 0);mMapNames.put("2", 0);
-        mMapNames.put("3", 0);mMapNames.put("4", 0);
-        mMapNames.put("5", 0);mMapNames.put("6", 0);
-        mMapNames.put("7", 0);mMapNames.put("8", 0);
-        mMapNames.put("9", 0);
+        mMapNames.put("x", 0);mMapNames.put("1", 0);
+        mMapNames.put("2", 0);mMapNames.put("3", 0);
+        mMapNames.put("4", 0);mMapNames.put("5", 0);
+        mMapNames.put("6", 0);mMapNames.put("7", 0);
+        mMapNames.put("8", 0);mMapNames.put("9", 0);
     }
 
     private double randomWeight() {
@@ -132,26 +166,17 @@ public class Output {
         return string;
     }
 
-    private int getMaxValue() {
-        int max = 0;
-        for (Map.Entry<String, Integer> entry : mMapNames.entrySet()) {
-            int count = entry.getValue();
-            if (count > max) {
-                max = count;
+    public String getDistances() {
+        String string = "";
+        for (Map.Entry<String, Double> entry : mMapDistances.entrySet()) {
+            if (entry.getValue() < Double.MAX_VALUE) {
+                string += entry.getKey() + ":" + entry.getValue() + ";";
             }
         }
-        return max;
-    }
-
-    public String getLabel() {
-        String label = "";
-        int max = getMaxValue();
-        for (Map.Entry<String, Integer> entry : mMapNames.entrySet()) {
-            if (entry.getValue() >= max) {
-                label += entry.getKey();
-            }
+        if (string.length() == 0) {
+            string = "empty;";
         }
-        return label;
+        return string;
     }
 
     @Override

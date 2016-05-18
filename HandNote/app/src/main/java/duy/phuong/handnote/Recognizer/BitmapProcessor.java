@@ -310,6 +310,91 @@ public class BitmapProcessor {
         //callback.onRecognizeSuccess(resultBitmaps);
     }
 
+    public ArrayList<Rect> detectAreasOnBitmap(final Bitmap bitmap, int dx, int dy) {
+        ArrayList<Rect> listDetectedArea = new ArrayList<>();
+        if (bitmap != null) {
+            HashMap<Integer, Integer> listColumns = new HashMap<>();
+            int startCol = -1;
+            int endCol = -1;
+            int[] verticalHistogram = getVerticalHistogram(bitmap);
+
+            //horizontal fragment
+            for (int c = 0; c < verticalHistogram.length; c++) {
+                //find the start column
+                if (verticalHistogram[c] > 0) {
+                /*startCol = (c > 0) ? c - 1 : c;*/
+                    startCol = c;
+                }
+
+                boolean hasEndCol = false;
+                if (startCol >= 0) {
+                    int c1 = startCol + 1;
+                    while (!hasEndCol) {
+                        //find the end column
+                        if (verticalHistogram[c1] <= 0 || c1 == verticalHistogram.length - 1) {
+                            //endCol = (c1 >= bitmap.getWidth()) ? c1 : c1 + 1;
+                            endCol = c1;
+                        }
+
+                        if (endCol > startCol) {
+                            //save startCol (key) and endCol (value)
+                            listColumns.put(startCol, endCol);
+                            //save current anchor
+                            c = endCol;
+
+                            startCol = endCol = -1;
+                            hasEndCol = true;
+                        }
+                        c1++;
+                    }
+                }
+            }
+
+            //vertical fragment
+            for (Map.Entry<Integer, Integer> entry : listColumns.entrySet()) {
+                if (entry.getKey() >= 0 && entry.getValue() >= 0) {
+                    startCol = entry.getKey();
+                    endCol = entry.getValue();
+                    int[] horizontalHistogram = getHorizontalHistogram(bitmap, startCol, endCol);
+                    int startRow = -1;
+                    int endRow = -1;
+                    for (int r = 0; r < horizontalHistogram.length; r++) {
+                        //find the start row
+                        if (/*checkNotEmptyRow(r, startCol, endCol, bitmap)*/horizontalHistogram[r] > 0) {
+                        /*startRow = (r > 0) ? r - 1 : r;*/
+                            startRow = r;
+                        }
+
+                        boolean hasEndRow = false;
+                        if (startRow >= 0) {
+                            int r1 = startRow + 1;
+                            while (!hasEndRow) {
+                                //find the endRow
+                                if (r1 <= horizontalHistogram.length - 1/*!checkNotEmptyRow(r1, startCol, endCol, bitmap)*/) {
+                                    if (horizontalHistogram[r1] <= 0 || r1 == horizontalHistogram.length - 1) {
+                                        /*endRow = (r1 >= bitmap.getHeight()) ? r1 : r1 + 1;*/
+                                        endRow = r1;
+                                    }
+                                }
+
+                                if (endRow > startRow) {
+                                    //save rectangle
+                                    listDetectedArea.add(new Rect(startCol + dx, startRow + dy, endCol + dx, endRow + dy));
+
+                                    r = endRow;
+                                    startRow = endRow = -1;
+                                    hasEndRow = true;
+                                }
+                                r1++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return listDetectedArea;
+    }
+
     private ArrayList<Character> topDownSegmenting(Character character) {
         ArrayList<Character> list = new ArrayList<>();
         Bitmap src = copyBitmap(character.mBitmap);
@@ -755,13 +840,13 @@ public class BitmapProcessor {
         ArrayList<Rect> rect = detectAreasOnBitmap(bitmap, 0, 0);
         ArrayList<Character> result = new ArrayList<>();
         for (Rect r : rect) {
-            /*if (r.width() > 0.15d * src.getWidth() && r.height() > 0.15d * src.getHeight()) {
-            }*/
-            Character character = new Character();
-            character.mRect = r;
-            character.mBitmap = cropBitmap(bitmap, r.left, r.top, r.width(), r.height());
-            character.mListContours = findContour(character.mBitmap);
-            result.add(character);
+            if (r.width() > 0.1d * src.getWidth() && r.height() > 0.1d * src.getHeight()) {
+                Character character = new Character();
+                character.mRect = r;
+                character.mBitmap = cropBitmap(bitmap, r.left, r.top, r.width(), r.height());
+                character.mListContours = findContour(character.mBitmap);
+                result.add(character);
+            }
         }
         return result;
     }
@@ -773,16 +858,10 @@ public class BitmapProcessor {
         int startCol = -1;
         int endCol = -1;
 
-        int index = 0;
-        for (int i : verticalHistogram) {
-            Log.d("Value " + index, i + "");
-            index++;
-        }
-
         //horizontal fragment
         for (int c = 0; c < bitmap.getWidth(); c++) {
             //find the start column
-            if (verticalHistogram[c] <= FingerDrawerView.CurrentPaintSize * 1.5d) {
+            if (verticalHistogram[c] <= FingerDrawerView.CurrentPaintSize * 1.2d) {
                 /*startCol = (c > 0) ? c - 1 : c;*/
                 startCol = c;
             }
@@ -836,8 +915,8 @@ public class BitmapProcessor {
             Point pRight = new Point(point.y, (hRight - 1 >= 0 ? hRight - 1 : 0));
 
             boolean moved = false, end = false;
-            int left = (pPrev != null)?pPrev.y : 0;
-            int right = (pNext != null)?pNext.x : bitmap.getWidth() - 1;
+            int left = (pPrev != null)?pPrev.y : point.x;
+            int right = (pNext != null)?pNext.x : point.y;
             while (!end) {
                 int x = pLeft.x, y = pLeft.y;
                 if (x - 1 >= left) {
@@ -923,87 +1002,6 @@ public class BitmapProcessor {
                 || (r1.left <= r2.left && r1.right >= r2.right) || (r2.left <= r1.left && r2.right >= r1.right);
     }
 
-    public ArrayList<Rect> detectAreasOnBitmap(final Bitmap bitmap, int dx, int dy) {
-        ArrayList<Rect> listDetectedArea = new ArrayList<>();
-        if (bitmap != null) {
-            HashMap<Integer, Integer> listColumns = new HashMap<>();
-            int startCol = -1;
-            int endCol = -1;
-
-            //horizontal fragment
-            for (int c = 0; c < bitmap.getWidth(); c++) {
-                //find the start column
-                if (checkNotEmptyColumn(c, bitmap)) {
-                /*startCol = (c > 0) ? c - 1 : c;*/
-                    startCol = c;
-                }
-
-                boolean hasEndCol = false;
-                if (startCol >= 0) {
-                    int c1 = startCol + 1;
-                    while (!hasEndCol) {
-                        //find the end column
-                        if (!checkNotEmptyColumn(c1, bitmap)) {
-                            //endCol = (c1 >= bitmap.getWidth()) ? c1 : c1 + 1;
-                            endCol = c1;
-                        }
-
-                        if (endCol > startCol) {
-                            //save startCol (key) and endCol (value)
-                            listColumns.put(startCol, endCol);
-                            //save current anchor
-                            c = endCol;
-
-                            startCol = endCol = -1;
-                            hasEndCol = true;
-                        }
-                        c1++;
-                    }
-                }
-            }
-
-            //vertical fragment
-            for (Map.Entry<Integer, Integer> entry : listColumns.entrySet()) {
-                if (entry.getKey() >= 0 && entry.getValue() >= 0) {
-                    startCol = entry.getKey();
-                    endCol = entry.getValue();
-                    int startRow = -1;
-                    int endRow = -1;
-                    for (int r = 0; r < bitmap.getHeight(); r++) {
-                        //find the start row
-                        if (checkNotEmptyRow(r, startCol, endCol, bitmap)) {
-                        /*startRow = (r > 0) ? r - 1 : r;*/
-                            startRow = r;
-                        }
-
-                        boolean hasEndRow = false;
-                        if (startRow >= 0) {
-                            int r1 = startRow + 1;
-                            while (!hasEndRow) {
-                                //find the endRow
-                                if (!checkNotEmptyRow(r1, startCol, endCol, bitmap)) {
-                                /*endRow = (r1 >= bitmap.getHeight()) ? r1 : r1 + 1;*/
-                                    endRow = r1;
-                                }
-
-                                if (endRow > startRow) {
-                                    //save rectangle
-                                    listDetectedArea.add(new Rect(startCol + dx, startRow + dy, endCol + dx, endRow + dy));
-
-                                    r = endRow;
-                                    startRow = endRow = -1;
-                                    hasEndRow = true;
-                                }
-                                r1++;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return listDetectedArea;
-    }
-
     private boolean checkNotEmptyColumn(int c, final Bitmap bitmap) {
         if (c >= bitmap.getWidth()) {
             return false;
@@ -1073,6 +1071,52 @@ public class BitmapProcessor {
                         }
                     } else {
                         for (int j = 0; j < bitmap.getWidth(); j++) {
+                            horizontalHistogram[i] += bitmap.getPixel(j, i) == Color.WHITE ? 0 : 1;
+                        }
+                    }
+                }
+            }
+        }
+        return horizontalHistogram;
+    }
+
+    private int[] getHorizontalHistogram(Bitmap bitmap, int startX, int endX) {
+        int[] horizontalHistogram = new int[bitmap.getHeight()];
+        int width = Math.abs(endX - startX);
+        for (int i = 0; i < horizontalHistogram.length; i++) {
+            horizontalHistogram[i] = 0;
+            if (width % 2 == 0) {
+                if (width % 4 == 0) {
+                    for (int j = startX; j < endX; j += 4) {
+                        horizontalHistogram[i] += bitmap.getPixel(j, i) == Color.WHITE ? 0 : 1;
+                        horizontalHistogram[i] += bitmap.getPixel(j + 1, i) == Color.WHITE ? 0 : 1;
+                        horizontalHistogram[i] += bitmap.getPixel(j + 2, i) == Color.WHITE ? 0 : 1;
+                        horizontalHistogram[i] += bitmap.getPixel(j + 3, i) == Color.WHITE ? 0 : 1;
+                    }
+                } else {
+                    for (int j = startX; j < endX; j += 2) {
+                        horizontalHistogram[i] += bitmap.getPixel(j, i) == Color.WHITE ? 0 : 1;
+                        horizontalHistogram[i] += bitmap.getPixel(j + 1, i) == Color.WHITE ? 0 : 1;
+                    }
+                }
+            } else {
+                if (width % 3 == 0) {
+                    for (int j = startX; j < endX; j += 3) {
+                        horizontalHistogram[i] += bitmap.getPixel(j, i) == Color.WHITE ? 0 : 1;
+                        horizontalHistogram[i] += bitmap.getPixel(j + 1, i) == Color.WHITE ? 0 : 1;
+                        horizontalHistogram[i] += bitmap.getPixel(j + 2, i) == Color.WHITE ? 0 : 1;
+                    }
+                } else {
+                    if (width % 5 == 0) {
+                        for (int j = startX; j < endX; j += 5) {
+                            horizontalHistogram[i] += bitmap.getPixel(j, i) == Color.WHITE ? 0 : 1;
+                            horizontalHistogram[i] += bitmap.getPixel(j + 1, i) == Color.WHITE ? 0 : 1;
+                            horizontalHistogram[i] += bitmap.getPixel(j + 2, i) == Color.WHITE ? 0 : 1;
+                            horizontalHistogram[i] += bitmap.getPixel(j + 3, i) == Color.WHITE ? 0 : 1;
+                            horizontalHistogram[i] += bitmap.getPixel(j + 4, i) == Color.WHITE ? 0 : 1;
+                        }
+                    } else {
+                        for (int j = startX; j < endX; j++) {
                             horizontalHistogram[i] += bitmap.getPixel(j, i) == Color.WHITE ? 0 : 1;
                         }
                     }
@@ -3187,17 +3231,19 @@ public class BitmapProcessor {
                 int split = (int) (src.getWidth() * 0.7d);
                 Bitmap right = cropBitmap(src, split, 0, src.getWidth() - split, src.getHeight());
                 ArrayList<Rect> rect = detectAreasOnBitmap(right, 0, 0);
-                int count = 0;
-                for (int i = 0; i < src.getHeight(); i++) {
-                    if (countRowSegments(i, src) == 2) {
-                        count++;
+                if (!rect.isEmpty()) {
+                    int count = 0;
+                    for (int i = 0; i < src.getHeight(); i++) {
+                        if (countRowSegments(i, src) == 2) {
+                            count++;
+                        }
                     }
-                }
-                boolean halfUnder = rect.get(0).top > 0.7 * src.getHeight();
-                boolean closeToBot = rect.get(0).bottom >= src.getHeight() * 0.9d;
-                boolean segmentsTwo = count <= src.getHeight() * 0.2d;
-                if (rect.size() == 1) {
-                    return (halfUnder && closeToBot && segmentsTwo);
+                    boolean halfUnder = rect.get(0).top > 0.7 * src.getHeight();
+                    boolean closeToBot = rect.get(0).bottom >= src.getHeight() * 0.9d;
+                    boolean segmentsTwo = count <= src.getHeight() * 0.2d;
+                    if (rect.size() == 1) {
+                        return (halfUnder && closeToBot && segmentsTwo);
+                    }
                 }
             }
         }

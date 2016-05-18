@@ -84,9 +84,10 @@ public class Recognizer {
         }
 
         int win_neuron_X = -1, win_neuron_Y = -1;
-        for (int i = 0; i < distance.length; i++) {
-            int neuron = distance[i].position;
-            win_neuron_X = neuron % SOM.NUM_OF_COLUMNS; win_neuron_Y = neuron / SOM.NUM_OF_COLUMNS;
+        for (Neuron Distance : distance) {
+            int neuron = Distance.position;
+            win_neuron_X = neuron % SOM.NUM_OF_COLUMNS;
+            win_neuron_Y = neuron / SOM.NUM_OF_COLUMNS;
             Bundle r = mProcessor.featureExtraction(character, mMapNames.get(neuron).getListLabel());
             if (r.getBoolean("Result")) {
                 Bundle bundle = new Bundle();
@@ -101,7 +102,7 @@ public class Recognizer {
         }
 
         int win_neuron = distance[0].position;
-        win_neuron_X = win_neuron % 11; win_neuron_Y = win_neuron / 11;
+        win_neuron_X = win_neuron % SOM.NUM_OF_COLUMNS; win_neuron_Y = win_neuron / SOM.NUM_OF_COLUMNS;
         Bundle result = mProcessor.featureExtraction(character, mMapNames.get(win_neuron).getListLabel());
         Bundle bundle = new Bundle();
         bundle.putSerializable("input", input);

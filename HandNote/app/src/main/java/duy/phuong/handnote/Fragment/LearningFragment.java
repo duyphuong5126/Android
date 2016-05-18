@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -24,6 +25,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.StringTokenizer;
 
 import duy.phuong.handnote.Listener.LearningListener;
@@ -57,6 +60,7 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
     boolean isTraining;
 
     private static final int IMAGE_PICK = 1;
+    private long mTimeElapsed = 0;
 
     public LearningFragment() {
         mLayoutRes = R.layout.fragment_learning;
@@ -288,31 +292,35 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
         } else {
             patternLearning = new PatternLearning(standardImages, number_of_iterations);
         }
-        patternLearning.learn();
-        isTraining = false;
-        Toast.makeText(mActivity, "Training done", Toast.LENGTH_LONG).show();
-        switchMode();
+        patternLearning.learn(new PatternLearning.LearningEndListener() {
+            @Override
+            public void endLearning() {
+                isTraining = false;
+                Toast.makeText(mActivity, "Training done", Toast.LENGTH_LONG).show();
+                switchMode();
+            }
+        });
+
     }
 
     private void learningWithLog(ArrayList<StandardImage> standardImages, int number_of_iterations) {
         mLayoutProgressing.setVisibility(View.VISIBLE);
         mLog = "";
+
         PatternLearning patternLearning;
         if (mListener.getGlobalSOM() != null) {
             patternLearning = new PatternLearning(standardImages, number_of_iterations, mListener.getGlobalSOM());
         } else {
             patternLearning = new PatternLearning(standardImages, number_of_iterations);
         }
+        mTimeElapsed = System.currentTimeMillis();
         patternLearning.learn(new LearningListener() {
             @Override
             public void updateEpoch(Bundle bundle) {
                 if (bundle != null) {
-                    mLog += "Epoch: " + bundle.getInt("Epoch") + "\n";
-
-                    String info = bundle.getString("ListName");
-                    if (info != null && !"".equals(info)) {
-                        mLog += info + "\n\n";
-                    }
+                    long time = System.currentTimeMillis();
+                    mLog += "Epoch: " + bundle.getInt("Epoch") + ", time elapsed: " + (time - mTimeElapsed) + " ms \n";
+                    mTimeElapsed = time;
 
                     mTvLogView.setText(mLog);
 
