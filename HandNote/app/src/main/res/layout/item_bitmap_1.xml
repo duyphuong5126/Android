@@ -3,13 +3,15 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:gravity="center"
-    android:layout_height="200dip"
+    android:layout_height="100dip"
     android:padding="5dip">
 
     <ImageView
         android:id="@+id/itemBitmap"
         android:layout_width="match_parent"
-        android:layout_height="100dip"
-        android:src="@mipmap/ic_launcher"/>
+        android:layout_height="match_parent"
+        android:src="@mipmap/ic_launcher"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"/>
 
 </LinearLayout>

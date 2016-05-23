@@ -10,6 +10,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.v4.util.TimeUtils;
+import android.text.SpannableString;
+import android.text.style.TypefaceSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -313,6 +316,7 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
         } else {
             patternLearning = new PatternLearning(standardImages, number_of_iterations);
         }
+        final long timeStart = System.currentTimeMillis();
         mTimeElapsed = System.currentTimeMillis();
         patternLearning.learn(new LearningListener() {
             @Override
@@ -338,6 +342,16 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                 Toast.makeText(mActivity, "Training done", Toast.LENGTH_LONG).show();
                 mLayoutProgressing.setVisibility(View.GONE);
                 isTraining = false;
+                String timeSum = "Time elapsed " + SupportUtils.getFormattedTime(System.currentTimeMillis() - timeStart);
+                String log = mLog + "\n" + timeSum;
+                mTvLogView.setText(log);
+
+                mScrollProgress.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mScrollProgress.fullScroll(View.FOCUS_DOWN);
+                    }
+                });
                 switchMode();
             }
         });

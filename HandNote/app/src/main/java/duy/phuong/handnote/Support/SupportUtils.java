@@ -272,4 +272,32 @@ public abstract class SupportUtils {
         }
         return null;
     }
+
+    public static String getFormattedTime(long time) {
+        long sec = time / 1000;
+        if (sec <= 0) {
+            return "" + time + " ms";
+        } else {
+            long ms = time % 1000;
+            long minutes = sec / 60;
+            if (minutes <= 0) {
+                return "" + sec + " s " + ms + " ms";
+            } else {
+                long s = sec % 60;
+                long hours = minutes / 60;
+                if (hours <= 0) {
+                    return "" + minutes + " m " + s + " s " + ms + " ms";
+                } else {
+                    long m = minutes % 60;
+                    long days = hours / 24;
+                    if (days <= 0) {
+                        return "" + hours + " h " + m + " m " + s + " s " + ms + " ms";
+                    } else {
+                        long h = hours % 24;
+                        return days + " days" + h + " h " + minutes + " m " + s + " s " + ms + " ms";
+                    }
+                }
+            }
+        }
+    }
 }

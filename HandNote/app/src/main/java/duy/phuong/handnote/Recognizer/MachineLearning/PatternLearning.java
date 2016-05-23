@@ -19,7 +19,7 @@ import duy.phuong.handnote.Support.SupportUtils;
 /*SOM Network*/
 public class PatternLearning extends Recognizer {
     public static final double INITIAL_LEARNING_RATE = 0.5;//the initial learning rate
-    private static final double MAP_RADIUS = (SOM.NUMBERS_OF_CLUSTER / SOM.NUM_OF_ROWS);
+    private static final double MAP_RADIUS = (SOM.NUMBERS_OF_CLUSTER / (2 * SOM.NUM_OF_ROWS));
 
     public interface LearningEndListener {
         void endLearning();
@@ -240,7 +240,7 @@ public class PatternLearning extends Recognizer {
                             win_neuron_position_X = 7;
                         }
                     }
-                    mMap.updateLabelForCluster(win_neuron_position_X, win_neuron_position_Y, input.mLabel, d);
+                    mMap.updateLabelForCluster(win_neuron_position_X, win_neuron_position_Y, input.mLabel);
                 }
                 return null;
             }
@@ -256,7 +256,6 @@ public class PatternLearning extends Recognizer {
                 super.onPostExecute(aVoid);
                 SupportUtils.writeFile(mMap.toString(), "Trained", "SOM.txt");
                 SupportUtils.writeFile(mMap.getMapNames(), "Trained", "MapNames.txt");
-                SupportUtils.writeFile(mMap.getMapDistances(), "Trained", "MapDis.txt");
                 learningListener.finish();
             }
         };
@@ -432,7 +431,7 @@ public class PatternLearning extends Recognizer {
                             win_neuron_position_X = 7;
                         }
                     }
-                    mMap.updateLabelForCluster(win_neuron_position_X, win_neuron_position_Y, input.mLabel, d);
+                    mMap.updateLabelForCluster(win_neuron_position_X, win_neuron_position_Y, input.mLabel);
                 }
 
                 return null;
@@ -443,7 +442,6 @@ public class PatternLearning extends Recognizer {
                 super.onPostExecute(aVoid);
                 SupportUtils.writeFile(mMap.toString(), "Trained", "SOM.txt");
                 SupportUtils.writeFile(mMap.getMapNames(), "Trained", "MapNames.txt");
-                SupportUtils.writeFile(mMap.getMapDistances(), "Trained", "MapDis.txt");
                 listener.endLearning();
             }
         };

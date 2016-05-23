@@ -356,36 +356,38 @@ public class BitmapProcessor {
                     startCol = entry.getKey();
                     endCol = entry.getValue();
                     int[] horizontalHistogram = getHorizontalHistogram(bitmap, startCol, endCol);
-                    int startRow = -1;
-                    int endRow = -1;
-                    for (int r = 0; r < horizontalHistogram.length; r++) {
-                        //find the start row
-                        if (/*checkNotEmptyRow(r, startCol, endCol, bitmap)*/horizontalHistogram[r] > 0) {
+                    if (horizontalHistogram.length > 0) {
+                        int startRow = -1;
+                        int endRow = -1;
+                        for (int r = 0; r < horizontalHistogram.length; r++) {
+                            //find the start row
+                            if (/*checkNotEmptyRow(r, startCol, endCol, bitmap)*/horizontalHistogram[r] > 0) {
                         /*startRow = (r > 0) ? r - 1 : r;*/
-                            startRow = r;
-                        }
+                                startRow = r;
+                            }
 
-                        boolean hasEndRow = false;
-                        if (startRow >= 0) {
-                            int r1 = startRow + 1;
-                            while (!hasEndRow) {
-                                //find the endRow
-                                if (r1 <= horizontalHistogram.length - 1/*!checkNotEmptyRow(r1, startCol, endCol, bitmap)*/) {
-                                    if (horizontalHistogram[r1] <= 0 || r1 == horizontalHistogram.length - 1) {
+                            boolean hasEndRow = false;
+                            if (startRow >= 0) {
+                                int r1 = startRow + 1;
+                                while (!hasEndRow) {
+                                    //find the endRow
+                                    if (r1 <= horizontalHistogram.length - 1/*!checkNotEmptyRow(r1, startCol, endCol, bitmap)*/) {
+                                        if (horizontalHistogram[r1] <= 0 || r1 == horizontalHistogram.length - 1) {
                                         /*endRow = (r1 >= bitmap.getHeight()) ? r1 : r1 + 1;*/
-                                        endRow = r1;
+                                            endRow = r1;
+                                        }
                                     }
-                                }
 
-                                if (endRow > startRow) {
-                                    //save rectangle
-                                    listDetectedArea.add(new Rect(startCol + dx, startRow + dy, endCol + dx, endRow + dy));
+                                    if (endRow > startRow) {
+                                        //save rectangle
+                                        listDetectedArea.add(new Rect(startCol + dx, startRow + dy, endCol + dx, endRow + dy));
 
-                                    r = endRow;
-                                    startRow = endRow = -1;
-                                    hasEndRow = true;
+                                        r = endRow;
+                                        startRow = endRow = -1;
+                                        hasEndRow = true;
+                                    }
+                                    r1++;
                                 }
-                                r1++;
                             }
                         }
                     }
@@ -3187,6 +3189,7 @@ public class BitmapProcessor {
     private boolean isk1(Character character) {
         Bitmap src = character.mBitmap;
         ArrayList<Rect> list = character.mListRectContour;
+        boolean isV_Inverse = false;
         if (list != null) {
             if (list.size() < 3) {
                 return false;
@@ -3195,7 +3198,6 @@ public class BitmapProcessor {
                     Rect rBig = list.get(2);
                     Rect rTop = (Math.abs(rBig.top - list.get(0).top) < Math.abs(rBig.top - list.get(1).top) ? list.get(0) : list.get(1));
                     Rect rMid = (Math.abs(rBig.top - list.get(0).top) >= Math.abs(rBig.top - list.get(1).top) ? list.get(0) : list.get(1));
-                    ;
 
                     if (rTop != null && rMid != null) {
                         int offsetY = rMid.bottom;
@@ -3213,14 +3215,14 @@ public class BitmapProcessor {
                                 Character f = new Character();
                                 f.mBitmap = interested;
                                 f.mListContours = findContour(interested);
-                                return isV_Inverse(f);
+                                isV_Inverse = isV_Inverse(f);
                             }
                         }
                     }
                 }
             }
         }
-        return false;
+        return isV_Inverse;
     }
 
     private boolean isL(Character character) {
@@ -3288,7 +3290,7 @@ public class BitmapProcessor {
 
     private boolean isM(Character character) {
         Bitmap src = character.mBitmap;
-        int left = (int) (src.getWidth() * 0.15d);
+        /*int left = (int) (src.getWidth() * 0.15d);
         Point blackLeft = getFirstBackFromBot(src, left);
         if (blackLeft != null) {
             boolean increase = false;
@@ -3320,7 +3322,8 @@ public class BitmapProcessor {
         }
 
         if (blackLeft != null && blackRight != null) {
-            if (Math.abs(blackLeft.x - blackRight.x) > 0 && src.getHeight() > 0) {
+            if (Math.abs(blackLeft.x - blackRight.x) > 0 && src.getHeight() > 0 && blackLeft.x >= FingerDrawerView.CurrentPaintSize
+                    && blackRight.x <= src.getWidth() - FingerDrawerView.CurrentPaintSize) {
                 Bitmap center = cropBitmap(src, blackLeft.x, 0, blackRight.x - blackLeft.x, src.getHeight());
                 if (center != null) {
                     Character f = new Character();
@@ -3329,6 +3332,45 @@ public class BitmapProcessor {
                     return isV(f);
                 }
             }
+        }*/
+        int mid = src.getWidth() / 2;
+        int split = -1;
+        if (getColumnHeightFromTop(src, mid) > getColumnHeightFromTop(src, mid + 1)) {
+            boolean decrease = false;
+            while (!decrease) {
+                if (getColumnHeightFromTop(src, mid) <= getColumnHeightFromTop(src, mid - 1)) {
+                    mid--;
+                } else {
+                    split = mid;
+                    decrease = true;
+                }
+            }
+        } else {
+            if (getColumnHeightFromTop(src, mid) > getColumnHeightFromTop(src, mid - 1)) {
+                boolean decrease = false;
+                while (!decrease) {
+                    if (getColumnHeightFromTop(src, mid) <= getColumnHeightFromTop(src, mid + 1)) {
+                        mid++;
+                    } else {
+                        split = mid;
+                        decrease = true;
+                    }
+                }
+            } else {
+                split = mid;
+            }
+        }
+        Bitmap left = cropBitmap(src, 0, 0, split, src.getHeight());
+        ArrayList<Rect> r1 = detectAreasOnBitmap(left, 0, 0);
+        Bitmap right = cropBitmap(src, split, 0, src.getWidth() - split, src.getHeight());
+        ArrayList<Rect> r2 = detectAreasOnBitmap(right, 0, 0);
+
+        if (r1.size() == 1 && r2.size() == 1) {
+            Character cLeft = new Character(); cLeft.mBitmap = cropBitmap(left, r1.get(0).left, r1.get(0).top, r1.get(0).width(), r1.get(0).height());
+            cLeft.mListContours = new ArrayList<>();
+            Character cRight = new Character(); cRight.mBitmap = cropBitmap(right, r2.get(0).left, r2.get(0).top, r2.get(0).width(), r2.get(0).height());
+            cRight.mListContours = new ArrayList<>();
+            return isV_Inverse(cLeft) && isV_Inverse(cRight);
         }
         return false;
     }
@@ -4323,7 +4365,7 @@ public class BitmapProcessor {
                 }
             }
 
-            Bitmap cropped = cropBitmap(src, 0, 0, src.getWidth(), point.y);
+            /*Bitmap cropped = cropBitmap(src, 0, 0, src.getWidth(), point.y);
             if (cropped != null) {
                 Bitmap interested = cropBitmap(cropped, 0, 0, cropped.getWidth(), (int) (cropped.getHeight() * 0.8d));
                 if (interested != null) {
@@ -4335,7 +4377,10 @@ public class BitmapProcessor {
                         return isL(f) && countFatRow > 0 && countThree >= 0.4d * src.getWidth();
                     }
                 }
-            }
+            }*/
+            boolean twoSegments = countRowSegments(point.y, src) == 2;
+            boolean fat = getHorizontalHistogram(src)[point.y] >= 0.3d * src.getWidth();
+            return (twoSegments || fat) && countFatRow > 0 && countThree >= 0.4d * src.getWidth();
 
         }
         return false;

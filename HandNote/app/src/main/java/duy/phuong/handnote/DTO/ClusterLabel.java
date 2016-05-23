@@ -31,6 +31,16 @@ public class ClusterLabel {
         }
     }
 
+    public String getLabel() {
+        double accuracy = 0.8d;
+        for (Label label : mListLabel) {
+            if (getLabelPercentage(label) >= accuracy) {
+                return label.getLabel();
+            }
+        }
+        return "";
+    }
+
     public String getClusterLabel() {
         double percent = 1.0d;
         String l = "";

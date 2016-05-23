@@ -253,7 +253,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
             sum += clusterLabel.getTotal();
             String mapNames = "";
             for (Label label : clusterLabel.getListLabel()) {
-                mapNames += label.getLabel() + ":" + clusterLabel.getLabelPercentage(label) + ";";
+                mapNames += label.getLabel() + ":" + clusterLabel.getLabelPercentage(label) + "-" + label.getCount() + ";";
             }
 
             Log.d("List names", mapNames);
@@ -426,6 +426,9 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                 this.toggleMainBottomTabs(true);
                 break;
             default:
+                for (SideMenuItem item : mItems) {
+                    item.mFocused = false;
+                }
                 this.toggleMainBottomTabs(true);
                 break;
         }

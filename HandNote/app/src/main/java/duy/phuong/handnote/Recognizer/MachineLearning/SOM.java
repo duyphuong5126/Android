@@ -7,8 +7,8 @@ package duy.phuong.handnote.Recognizer.MachineLearning;
 /*Self-Organizing Map*/
 public class SOM {
     private Output[][] mOutputs;
-    public static final int NUMBERS_OF_CLUSTER = 55;
-    public static final int NUM_OF_ROWS = 5;
+    public static final int NUMBERS_OF_CLUSTER = 56;
+    public static final int NUM_OF_ROWS = 7;
     public static final int NUM_OF_COLUMNS = NUMBERS_OF_CLUSTER / NUM_OF_ROWS;
 
     public SOM() {
@@ -46,17 +46,14 @@ public class SOM {
             mOutputs = new Output[NUM_OF_ROWS][NUMBERS_OF_CLUSTER / NUM_OF_ROWS];
             for (int i = 0; i < mOutputs.length; i++)
                 for (int j = 0; j < mOutputs[i].length; j++) {
-                    mOutputs[i][j] = new Output(weightMatrix[i * 11 + j]);
+                    mOutputs[i][j] = new Output(weightMatrix[i * NUM_OF_COLUMNS + j]);
                 }
         }
     }
 
-    public void updateLabelForCluster(int x, int y, String label, double d) {
+    public void updateLabelForCluster(int x, int y, String label) {
         //update map name by counting patterns
         mOutputs[y][x].mMapNames.put(label, mOutputs[y][x].mMapNames.get(label) + 1);
-        if (mOutputs[y][x].mMapDistances.get(label) > d) {
-            mOutputs[y][x].mMapDistances.put(label, d);
-        }
         mOutputs[y][x].mCount++;
     }
 
@@ -98,15 +95,6 @@ public class SOM {
         for (Output[] outputs : mOutputs)
             for (Output output : outputs) {
                 builder.append(output.getNameList()).append("\r\n");
-            }
-        return builder.toString();
-    }
-
-    public String getMapDistances() {
-        StringBuilder builder = new StringBuilder();
-        for (Output[] outputs : mOutputs)
-            for (Output output : outputs) {
-                builder.append(output.getDistances()).append("\r\n");
             }
         return builder.toString();
     }
