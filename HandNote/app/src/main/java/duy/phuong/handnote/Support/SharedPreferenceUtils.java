@@ -11,6 +11,7 @@ public class SharedPreferenceUtils {
     private static final String PREFERENCES_NAME = "Preferences";
     private static final String VIEW_INTRODUCTION = "ViewIntro";
     private static final String CURRENT_NAME = "CurrentName";
+    private static final String DICTIONARY_LOADED = "DictionaryLoaded";
     public static void setPreferences(Context context) {
         mContext = context;
     }
@@ -20,15 +21,27 @@ public class SharedPreferenceUtils {
         return preferences.getBoolean(VIEW_INTRODUCTION, false);
     }
 
+    public static boolean isLoadedDict() {
+        SharedPreferences preferences = mContext.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+        return preferences.getBoolean(DICTIONARY_LOADED, false);
+    }
+
     public static String getCurrentName() {
         SharedPreferences preferences = mContext.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
         return preferences.getString(CURRENT_NAME, "");
     }
 
-    public static void viewedIntro() {
+    public static void viewedIntro(boolean viewed) {
         SharedPreferences preferences = mContext.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean(VIEW_INTRODUCTION, true);
+        editor.putBoolean(VIEW_INTRODUCTION, viewed);
+        editor.apply();
+    }
+
+    public static void loadedDict() {
+        SharedPreferences preferences = mContext.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(DICTIONARY_LOADED, true);
         editor.apply();
     }
 

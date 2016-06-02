@@ -45,7 +45,8 @@
                         android:id="@+id/ckcSplit"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:button="@drawable/check_box" />
+                        android:button="@drawable/check_box"
+                        android:visibility="gone" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -121,7 +122,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dip"
         android:layout_weight="10" />
-
 
     <FrameLayout
         android:layout_width="match_parent"

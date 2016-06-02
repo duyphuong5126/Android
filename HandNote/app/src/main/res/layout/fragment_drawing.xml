@@ -5,161 +5,184 @@
     android:orientation="vertical">
 
     <FrameLayout
-        android:layout_width="fill_parent"
-        android:layout_height="0dip"
-        android:layout_weight="5"
-        android:background="#ddd">
-
-        <GridView
-            android:id="@+id/listDetectedBitmap"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal"
-            android:numColumns="5"
-            android:stretchMode="columnWidth" />
-
-        <android.support.v4.view.ViewPager
-            android:id="@+id/pagerImages"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone"/>
-    </FrameLayout>
-
-    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1"
-        android:background="#fff"
-        android:orientation="horizontal">
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:layout_width="0dip"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="horizontal">
+            android:orientation="vertical">
+            <FrameLayout
+                android:layout_width="fill_parent"
+                android:layout_height="0dip"
+                android:layout_weight="5"
+                android:background="#ddd">
+
+                <GridView
+                    android:id="@+id/listDetectedBitmap"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_horizontal"
+                    android:numColumns="5"
+                    android:stretchMode="columnWidth" />
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/pagerImages"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"/>
+            </FrameLayout>
 
             <LinearLayout
-                android:layout_width="0dip"
-                android:layout_height="match_parent"
-                android:layout_weight="1"/>
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="1"
+                android:background="#fff"
+                android:orientation="horizontal">
 
-            <LinearLayout
-                android:layout_width="0dip"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:layout_weight="2">
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
 
-                <ImageButton
-                    android:id="@+id/buttonSave"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/press_effect"
-                    android:src="@mipmap/ic_check_black_24dp" />
+                    <LinearLayout
+                        android:layout_width="0dip"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"/>
+
+                    <LinearLayout
+                        android:layout_width="0dip"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:layout_weight="2">
+
+                        <ImageButton
+                            android:id="@+id/buttonSave"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/press_effect"
+                            android:src="@mipmap/ic_check_black_24dp" />
+                    </LinearLayout>
+
+                    <EditText
+                        android:id="@+id/edtName"
+                        android:layout_width="0dip"
+                        android:layout_height="match_parent"
+                        android:layout_weight="3"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="match_parent"
+                    android:layout_weight="3"
+                    android:orientation="horizontal">
+
+                    <CheckBox
+                        android:id="@+id/ckcSplit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:button="@drawable/check_box"/>
+
+                    <LinearLayout
+                        android:layout_width="0dip"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:layout_weight="1">
+
+                        <ImageButton
+                            android:id="@+id/buttonDelete"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/press_effect"
+                            android:src="@mipmap/ic_delete_black_24dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dip"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:layout_weight="1">
+
+                        <ImageButton
+                            android:id="@+id/buttonUndo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/press_effect"
+                            android:src="@mipmap/ic_undo_black_24dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dip"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:layout_weight="1">
+
+                        <ImageButton
+                            android:id="@+id/buttonRedo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/press_effect"
+                            android:src="@mipmap/ic_redo_black_24dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dip"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:layout_weight="1">
+
+                        <ImageButton
+                            android:id="@+id/buttonMore"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/press_effect"
+                            android:src="@mipmap/ic_arrow_drop_down_black_24dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dip"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:layout_weight="1">
+
+                        <ImageButton
+                            android:id="@+id/buttonForward"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/press_effect"
+                            android:src="@mipmap/ic_arrow_forward_black_24dp" />
+                    </LinearLayout>
+                </LinearLayout>
+
             </LinearLayout>
 
-            <EditText
-                android:id="@+id/edtName"
-                android:layout_width="0dip"
-                android:layout_height="match_parent"
-                android:layout_weight="3"/>
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="0dip"
+                android:layout_weight="4">
 
+                <duy.phuong.handnote.MyView.DrawingView.FingerDrawerView
+                    android:id="@+id/FingerDrawer"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent" />
+
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="0dip"
+            android:id="@+id/layoutProcess"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="3"
-            android:orientation="horizontal">
+            android:visibility="gone"
+            android:background="#D9000000"
+            android:gravity="center">
 
-            <CheckBox
-                android:id="@+id/ckcSplit"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:button="@drawable/check_box"/>
-
-            <LinearLayout
-                android:layout_width="0dip"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:layout_weight="1">
-
-                <ImageButton
-                    android:id="@+id/buttonDelete"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/press_effect"
-                    android:src="@mipmap/ic_delete_black_24dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dip"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:layout_weight="1">
-
-                <ImageButton
-                    android:id="@+id/buttonUndo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/press_effect"
-                    android:src="@mipmap/ic_undo_black_24dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dip"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:layout_weight="1">
-
-                <ImageButton
-                    android:id="@+id/buttonRedo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/press_effect"
-                    android:src="@mipmap/ic_redo_black_24dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dip"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:layout_weight="1">
-
-                <ImageButton
-                    android:id="@+id/buttonMore"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/press_effect"
-                    android:src="@mipmap/ic_arrow_drop_down_black_24dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dip"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:layout_weight="1">
-
-                <ImageButton
-                    android:id="@+id/buttonForward"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/press_effect"
-                    android:src="@mipmap/ic_arrow_forward_black_24dp" />
-            </LinearLayout>
+            <ProgressBar
+                android:layout_width="50dip"
+                android:layout_height="50dip" />
         </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="0dip"
-        android:layout_weight="4">
-
-        <duy.phuong.handnote.MyView.DrawingView.FingerDrawerView
-            android:id="@+id/FingerDrawer"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent" />
-
-    </LinearLayout>
+    </FrameLayout>
 
 </LinearLayout>

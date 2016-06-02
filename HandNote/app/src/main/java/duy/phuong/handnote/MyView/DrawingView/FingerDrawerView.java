@@ -18,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Stack;
 
 import duy.phuong.handnote.DTO.Character;
@@ -38,7 +39,7 @@ public class FingerDrawerView extends View {
 
     private int mCurrentPath = 0;
 
-    private Paint mPaint;
+    private Paint mPaint, mPrivatePaint;
 
     private long mStartRecognizeTime = -1;
     private boolean isReadyForRecognize = false;
@@ -48,9 +49,10 @@ public class FingerDrawerView extends View {
 
     private boolean mUndoRedo;
 
+    private HashMap<MyPath, Integer> mMapColor;
+
     private ArrayList<Line> mLines;
     private ArrayList<Character> mCharacters;
-    private int mLineHeight;
 
     public interface GetDisplayListener {
         DisplayMetrics getScreenResolution();
@@ -69,11 +71,13 @@ public class FingerDrawerView extends View {
         mBitmapProcessor = new BitmapProcessor();
         mLines = new ArrayList<>();
         mCharacters = new ArrayList<>();
+        mPaint = createPaint(); mPrivatePaint = createPaint();
     }
 
     public void setListener(BitmapProcessor.RecognitionCallback callback) {
         this.mListener = callback;
     }
+
 
     public void setDisplayListener(GetDisplayListener listener) {
         mDisplayListener = listener;
@@ -116,20 +120,21 @@ public class FingerDrawerView extends View {
             }
         };
         runnable.run();
-        mPaint = createPaint();
-        mLineHeight = mCacheBitmap.getHeight() / 6;
+        int mLineHeight = mCacheBitmap.getHeight() / 6;
+        if (mLines.isEmpty()) {
+            Line line = new Line(); line.mTop = 0; line.mBottom = mLineHeight;
+            line.mMinTop = line.mTop; line.mMaxBottom = line.mBottom;
+            mLines.add(line);
+        }
         for (int i = mLineHeight; i < mCacheBitmap.getHeight(); i += mLineHeight) {
-            if (mLines.isEmpty()) {
-                Line line = new Line(); line.mTop = 0; line.mBottom = mLineHeight;
-                line.mMinTop = line.mTop; line.mMaxBottom = line.mBottom;
-                mLines.add(line);
-            }
             if (i + mLineHeight < mCacheBitmap.getHeight()) {
                 Line line = new Line(); line.mTop = i; line.mBottom = i + mLineHeight;
                 line.mMinTop = line.mTop; line.mMaxBottom = line.mBottom;
                 mLines.add(line);
             }
         }
+
+        mMapColor = new HashMap<>();
     }
 
     public Bitmap getContent() {
@@ -175,11 +180,6 @@ public class FingerDrawerView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        /*if (!isReadyForRecognize) {
-            mCanvas.drawColor(Color.WHITE);
-            //mCacheCanvas.drawColor(Color.WHITE);
-        }*/
-
         mCacheCanvas.drawColor(Color.WHITE);
         if (!mLines.isEmpty()) {
             for (Line line : mLines) {
@@ -210,16 +210,15 @@ public class FingerDrawerView extends View {
             }
         }
         mCanvas.drawBitmap(mCacheBitmap, 0, 0, mPaint);
-        Paint paint = createPaint();
         for (MyPath myPath : mListPaths) {
+            Paint paint = createPaint(); paint.setColor(mMapColor.get(myPath));
             Path path = new Path();
             boolean first = true;
             ArrayList<Point> points = myPath.getListPoint();
             if (points.size() == 2) {
                 if (points.get(0).equals(points.get(1))) {
                     Point point = points.get(0);
-                    mCanvas.drawPoint(point.x, point.y, mPaint);
-                    //mCacheCanvas.drawPoint(point.x, point.y, mPaint);
+                    mCanvas.drawPoint(point.x, point.y, paint);
                 }
             } else {
                 for (Point point : myPath.getListPoint()) {
@@ -231,8 +230,7 @@ public class FingerDrawerView extends View {
                     }
                 }
 
-                mCanvas.drawPath(path, mPaint);
-                //mCacheCanvas.drawPath(path, mPaint);
+                mCanvas.drawPath(path, paint);
             }
         }
         canvas.drawBitmap(mBitmap, 0, 0, mPaint);
@@ -248,6 +246,7 @@ public class FingerDrawerView extends View {
                 resetStack();
                 ArrayList<Point> listPoint = new ArrayList<>();
                 MyPath myPath = new MyPath(listPoint);
+                mMapColor.put(myPath, mPaint.getColor());
                 listPoint.add(new Point((int) x, (int) y));
                 mListPaths.add(myPath);
                 mStartRecognizeTime = System.currentTimeMillis();
@@ -296,7 +295,7 @@ public class FingerDrawerView extends View {
         if (hasMoreEdges()) {
             ArrayList<MyPath> listPaths = new ArrayList<>();
             for (MyPath path : mListPaths) {
-                if (!path.isChecked() && path.isIntersect(myPath, CurrentWidth, CurrentHeight, mPaint)) {
+                if (!path.isChecked() && path.isIntersect(myPath, CurrentWidth, CurrentHeight, mPrivatePaint)) {
                     listPaths.add(path);
                     path.setChecked(true);
                 }
@@ -374,7 +373,7 @@ public class FingerDrawerView extends View {
                             }
                         }
 
-                        canvas.drawPath(path, mPaint);
+                        canvas.drawPath(path, mPrivatePaint);
                     }
 
                     mBitmapProcessor.onDetectCharacter(character, new BitmapProcessor.RecognitionCallback() {
@@ -432,7 +431,7 @@ public class FingerDrawerView extends View {
                                         }
                                     }
 
-                                    canvas.drawPath(p, mPaint);
+                                    canvas.drawPath(p, mPrivatePaint);
                                 }
                                 Rect rect = mBitmapProcessor.detectAreasOnBitmap(bitmap, 0, 0).get(0);
                                 character.mRect = new Rect(rect.left, rect.top, rect.right, rect.bottom);
@@ -487,7 +486,7 @@ public class FingerDrawerView extends View {
                             }
                         }
 
-                        canvas.drawPath(p, mPaint);
+                        canvas.drawPath(p, mPrivatePaint);
                     }
 
                     mBitmapProcessor.onDetectCharacter(character, new BitmapProcessor.RecognitionCallback() {
@@ -523,6 +522,7 @@ public class FingerDrawerView extends View {
         mListPaths.clear();
         mCurrentPath = 0;
         mCharacters.clear();
+        mMapColor.clear();
         invalidate();
     }
 
@@ -583,5 +583,9 @@ public class FingerDrawerView extends View {
                 }
             }
         }
+    }
+
+    public void setPaintColor(int color) {
+        mPaint.setColor(color);
     }
 }

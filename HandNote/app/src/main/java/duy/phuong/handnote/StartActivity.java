@@ -1,12 +1,18 @@
 package duy.phuong.handnote;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
@@ -15,6 +21,7 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.TextWatcher;
 import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -22,28 +29,32 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import duy.phuong.handnote.DAO.LocalStorage;
 import duy.phuong.handnote.MyView.IntroductionPager;
 import duy.phuong.handnote.MyView.RoundImageView;
 import duy.phuong.handnote.Support.SharedPreferenceUtils;
 import duy.phuong.handnote.Support.SupportUtils;
 
-public class StartActivity extends Activity implements View.OnClickListener{
+public class StartActivity extends Activity implements View.OnClickListener {
     private ViewPager mIntroPager;
-    private IntroductionPager mPagerAdapter;
-    private ScheduledExecutorService mService;
     private int mPosition;
     private HashMap<Integer, View> mListLayout;
     private LinearLayout mLayoutLoading, mLayoutIntro, mLayoutLogin;
-    private LinearLayout mButtonStartApp;
-    private LinearLayout mButtonGetStarted;
-    private ImageButton mButtonVerify, mButtonCancel, mButtonLoadAvatar;
+    private ImageButton mButtonVerify;
+    private ImageButton mButtonCancel;
     private EditText mEdtName;
 
     private RoundImageView mSelectedImage;
@@ -53,26 +64,34 @@ public class StartActivity extends Activity implements View.OnClickListener{
 
     private long mCurrentTime;
 
+    private Uri mCapturedImage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
-        mButtonStartApp = (LinearLayout) findViewById(R.id.buttonStartApp);
+        LinearLayout mButtonStartApp = (LinearLayout) findViewById(R.id.buttonStartApp);
         mButtonStartApp.setOnClickListener(this);
         mLayoutLoading = (LinearLayout) findViewById(R.id.loadScreen);
         mLayoutIntro = (LinearLayout) findViewById(R.id.layoutIntro);
         mLayoutLogin = (LinearLayout) findViewById(R.id.layoutLogin);
-        AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+
+        AsyncTask<Void, Void, Void> evTask = new AsyncTask<Void, Void, Void>() {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
                 mLayoutLoading.setVisibility(View.VISIBLE);
+                if (!SharedPreferenceUtils.isLoadedDict()) {
+                    Toast.makeText(StartActivity.this, "Initializing dictionary data, please wait...", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
             protected Void doInBackground(Void... params) {
-                long time = System.currentTimeMillis();
-                while (System.currentTimeMillis() - time < 5000);
+                if (!SharedPreferenceUtils.isLoadedDict()) {
+                    loadEV_Dict();
+                    SharedPreferenceUtils.loadedDict();
+                }
                 return null;
             }
 
@@ -92,20 +111,24 @@ public class StartActivity extends Activity implements View.OnClickListener{
                 }
             }
         };
-        asyncTask.execute();
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            evTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        } else {
+            evTask.execute();
+        }
     }
 
     private void showLoginScreen() {
         mLayoutIntro.setVisibility(View.GONE);
         mLayoutLogin.setVisibility(View.VISIBLE);
-        mButtonGetStarted = (LinearLayout) findViewById(R.id.buttonGetStarted);
+        LinearLayout mButtonGetStarted = (LinearLayout) findViewById(R.id.buttonGetStarted);
         mButtonGetStarted.setOnClickListener(this);
         mButtonCancel = (ImageButton) findViewById(R.id.buttonCancel);
         mButtonCancel.setOnClickListener(this);
         mButtonVerify = (ImageButton) findViewById(R.id.buttonVerify);
         mButtonVerify.setOnClickListener(this);
-        mButtonLoadAvatar = (ImageButton) findViewById(R.id.buttonSelectAvatar);
+        ImageButton mButtonLoadAvatar = (ImageButton) findViewById(R.id.buttonSelectAvatar);
         mButtonLoadAvatar.setOnClickListener(this);
         mSelectedImage = (RoundImageView) findViewById(R.id.selectedAvatar);
         mEdtName = (EditText) findViewById(R.id.edtCurrentName);
@@ -205,7 +228,7 @@ public class StartActivity extends Activity implements View.OnClickListener{
         contactSpan.setSpan(clickMail, contact.indexOf("G-mail"), contact.indexOf("G-mail") + 6, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         contents.add(contactSpan);
 
-        mPagerAdapter = new IntroductionPager(this, titles, contents, R.layout.layout_slide);
+        IntroductionPager mPagerAdapter = new IntroductionPager(this, titles, contents, R.layout.layout_slide);
         mIntroPager = (ViewPager) findViewById(R.id.layoutSlide);
         mIntroPager.setAdapter(mPagerAdapter);
         mCurrentTime = System.currentTimeMillis();
@@ -234,7 +257,7 @@ public class StartActivity extends Activity implements View.OnClickListener{
 
             }
         });
-        mService = Executors.newSingleThreadScheduledExecutor();
+        ScheduledExecutorService mService = Executors.newSingleThreadScheduledExecutor();
         mService.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
@@ -263,7 +286,6 @@ public class StartActivity extends Activity implements View.OnClickListener{
             case R.id.intro2:
                 mPosition = 1;
                 break;
-
             case R.id.intro3:
                 mPosition = 2;
                 break;
@@ -286,7 +308,7 @@ public class StartActivity extends Activity implements View.OnClickListener{
                 }
                 break;
             case R.id.buttonStartApp:
-                SharedPreferenceUtils.viewedIntro();
+                SharedPreferenceUtils.viewedIntro(true);
                 if (SharedPreferenceUtils.getCurrentName().isEmpty()) {
                     showLoginScreen();
                 }
@@ -307,10 +329,21 @@ public class StartActivity extends Activity implements View.OnClickListener{
         intentPick.setType("image/*");
         intentPick.setAction(Intent.ACTION_GET_CONTENT);
 
+        File root = new File(Environment.getExternalStorageDirectory() + File.separator + "Captured" + File.separator);
+        if (!root.exists()) {
+            root.mkdirs();
+        }
+        String name = "Captured_" + System.nanoTime();
+        File dir = new File(root, name);
+        mCapturedImage = Uri.fromFile(dir);
+
         Intent intentTakePhoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intentTakePhoto.putExtra(MediaStore.EXTRA_OUTPUT, mCapturedImage);
+
         Intent intentChooser = Intent.createChooser(intentPick, "Select a source");
-        intentChooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {intentTakePhoto});
+        intentChooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{intentTakePhoto});
         startActivityForResult(intentChooser, SELECT_IMAGE);
+
     }
 
     private void intentMain() {
@@ -325,15 +358,70 @@ public class StartActivity extends Activity implements View.OnClickListener{
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case SELECT_IMAGE:
-                    String path = SupportUtils.getPath(data.getData(), StartActivity.this);
-                    mAvatar = BitmapFactory.decodeFile(path);
-                    if (mAvatar != null) {
-                        mSelectedImage.setImageBitmap(mAvatar);
+                    boolean isFromCamera = false;
+                    if (data == null) {
+                        isFromCamera = true;
+                    } else {
+                        if (data.getAction() == null) {
+                            isFromCamera = true;
+                        } else {
+                            isFromCamera = data.getAction().equals(MediaStore.ACTION_IMAGE_CAPTURE);
+                        }
+                    }
+
+                    String path = null;
+                    if (isFromCamera) {
+                        path = SupportUtils.getPath(mCapturedImage, StartActivity.this);
+                    } else {
+                        path = SupportUtils.getPath(data.getData(), StartActivity.this);
+                    }
+                    if (path != null) {
+                        mAvatar = BitmapFactory.decodeFile(path);
+                        if (mAvatar != null) {
+                            mSelectedImage.setImageBitmap(mAvatar);
+                        }
                     }
                     break;
                 default:
                     break;
             }
+        }
+    }
+
+    private void loadEV_Dict() {
+        LocalStorage localStorage = new LocalStorage(StartActivity.this);
+        SQLiteDatabase db = localStorage.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        Resources resources = getResources();
+        loadDict(R.raw.eng_vi, resources, localStorage, db, contentValues);
+        db.close();
+    }
+
+    private void loadDict(int raw, Resources resources, LocalStorage storage, SQLiteDatabase db, ContentValues contentValues) {
+        InputStream inputStream = resources.openRawResource(raw);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line = null;
+        try {
+            while ((line = reader.readLine()) != null) {
+                Log.d("line", line);
+                StringTokenizer tokenizer = new StringTokenizer(line, "#");
+                if (tokenizer.countTokens() == 2) {
+                    String word = tokenizer.nextToken();
+                    String definition = tokenizer.nextToken();
+                    Log.d("Infor", "w: " + word + ", def: " + definition);
+                    Log.d("Insert result", String.valueOf(storage.inertEV_DictLine(word, null, definition, db, contentValues)));
+                } else {
+                    if (tokenizer.countTokens() == 3) {
+                        String word = tokenizer.nextToken();
+                        String pronunciation = tokenizer.nextToken();
+                        String definition = tokenizer.nextToken();
+                        Log.d("Infor", "w: " + word + ", pro: " + pronunciation + ", def: " + definition);
+                        Log.d("Insert result", String.valueOf(storage.inertEV_DictLine(word, pronunciation, definition, db, contentValues)));
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

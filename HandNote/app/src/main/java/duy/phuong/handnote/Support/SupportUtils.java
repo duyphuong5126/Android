@@ -17,6 +17,10 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -193,6 +197,7 @@ public abstract class SupportUtils {
         }
         return builder.toString();
     }
+
     public static String getStringData(String path) {
         StringBuilder builder = new StringBuilder();
         File file = new File(path);
@@ -271,6 +276,16 @@ public abstract class SupportUtils {
             }
         }
         return null;
+    }
+
+    public static void deleteAvatar() {
+        ArrayList<String> list = getListFilePaths(RootPath + ApplicationDirectory + "Avatar");
+        if (list != null) {
+            for (String s : list) {
+                File file = new File(s);
+                file.deleteOnExit();
+            }
+        }
     }
 
     public static String getFormattedTime(long time) {

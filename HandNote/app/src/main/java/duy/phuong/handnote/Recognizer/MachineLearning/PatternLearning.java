@@ -21,6 +21,16 @@ public class PatternLearning extends Recognizer {
     public static final double INITIAL_LEARNING_RATE = 0.5;//the initial learning rate
     private static final double MAP_RADIUS = (SOM.NUMBERS_OF_CLUSTER / (2 * SOM.NUM_OF_ROWS));
 
+    public enum STATE {
+        PLAY, PAUSE, STOP;
+    }
+
+    private STATE mState;
+
+    public void setState(STATE State) {
+        this.mState = State;
+    }
+
     public interface LearningEndListener {
         void endLearning();
     }
@@ -42,6 +52,7 @@ public class PatternLearning extends Recognizer {
     }
 
     private void init(ArrayList<StandardImage> samples, int epochs) {
+        mState = STATE.PLAY;
         mEpochs = epochs; //init time const
         if (mEpochs < 0) {
             mEpochs = 0;
@@ -61,126 +72,137 @@ public class PatternLearning extends Recognizer {
     }
 
     public void learn(final LearningListener learningListener) {
+        final ArrayList<Input> inputs = new ArrayList<>();
         AsyncTask<Void, Bundle, Void> asyncTask = new AsyncTask<Void, Bundle, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 for (int i = 0; i < mEpochs; i++) {
-                    mMap.resetMapName();
-                    Log.d("Epoch", "" + i);
-                    ArrayList<Input> inputs = new ArrayList<>();
-                    inputs.addAll(mSamples);
+                    if (mState == STATE.PLAY) {
+                        mMap.resetMapName();
+                        Log.d("Epoch", "" + i);
+                        inputs.clear();
+                        inputs.addAll(mSamples);
 
-                    while (inputs.size() > 0) {
-                        //1. grab a random input
-                        Random rd = new Random();
-                        int position = rd.nextInt(inputs.size());
-                        Input input = inputs.remove(position);
+                        while (inputs.size() > 0) {
+                            //1. grab a random input
+                            Random rd = new Random();
+                            int position = rd.nextInt(inputs.size());
+                            Input input = inputs.remove(position);
 
-                        //2. find best matching unit
-                        double min_distance = 1000000000;
-                        int win_neuron_position_X = -1;
-                        int win_neuron_position_Y = -1;
-                        double d = 0;
-                        for (int j = 0; j < mMap.getOutputs().length; j++) {
-                            d = getDistance(input, mMap.getOutputs()[j][0]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 0;
-                            }
-                            d = getDistance(input, mMap.getOutputs()[j][1]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 1;
-                            }
-                            d = getDistance(input, mMap.getOutputs()[j][2]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 2;
-                            }
-                            d = getDistance(input, mMap.getOutputs()[j][3]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 3;
-                            }
-                            d = getDistance(input, mMap.getOutputs()[j][4]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 4;
-                            }
-                            d = getDistance(input, mMap.getOutputs()[j][5]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 5;
-                            }
-                            d = getDistance(input, mMap.getOutputs()[j][6]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 6;
-                            }
-                            d = getDistance(input, mMap.getOutputs()[j][7]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 7;
-                            }
-                        }
-
-
-                        if (win_neuron_position_X < 0 || win_neuron_position_Y < 0) {
-                            Log.d("Error", "An error occur");
-                            return null;
-                        }
-
-                        //3. find the neighbor area
-                        long radius = Math.round(mNeighborRadius);
-                        long lowerBoundary_X = win_neuron_position_X - radius;
-                        if (lowerBoundary_X < 0) {
-                            lowerBoundary_X = 0;
-                        }
-                        long upperBoundary_X = win_neuron_position_X + radius;
-                        if (upperBoundary_X > mMap.getOutputs()[0].length - 1) {
-                            upperBoundary_X = mMap.getOutputs()[0].length - 1;
-                        }
-                        long lowerBoundary_Y = win_neuron_position_Y - radius;
-                        if (lowerBoundary_Y < 0) {
-                            lowerBoundary_Y = 0;
-                        }
-                        long upperBoundary_Y = win_neuron_position_Y + radius;
-                        if (upperBoundary_Y > mMap.getOutputs().length - 1) {
-                            upperBoundary_Y = mMap.getOutputs().length - 1;
-                        }
-
-                        //4. update weight vector
-                        mMap.updateWeightVector(win_neuron_position_X, win_neuron_position_Y, input, mLearningRate, 1);
-                        for (long j = lowerBoundary_Y; j <= upperBoundary_Y; j++) {
-                            int index_Y = (int) j;
-                            for (long k = lowerBoundary_X; k <= upperBoundary_X; k++) {
-                                int index_X = (int) k;
-                                if (index_X != win_neuron_position_X && index_Y != win_neuron_position_Y) {
-                                    mMap.updateWeightVector(index_X, index_Y, input, mLearningRate,
-                                            neighborInfluence(index_X, index_Y, win_neuron_position_X, win_neuron_position_Y));
+                            //2. find best matching unit
+                            double min_distance = 1000000000;
+                            int win_neuron_position_X = -1;
+                            int win_neuron_position_Y = -1;
+                            double d = 0;
+                            for (int j = 0; j < mMap.getOutputs().length; j++) {
+                                d = getDistance(input, mMap.getOutputs()[j][0]);
+                                if (min_distance > d) {
+                                    min_distance = d;
+                                    win_neuron_position_Y = j;
+                                    win_neuron_position_X = 0;
+                                }
+                                d = getDistance(input, mMap.getOutputs()[j][1]);
+                                if (min_distance > d) {
+                                    min_distance = d;
+                                    win_neuron_position_Y = j;
+                                    win_neuron_position_X = 1;
+                                }
+                                d = getDistance(input, mMap.getOutputs()[j][2]);
+                                if (min_distance > d) {
+                                    min_distance = d;
+                                    win_neuron_position_Y = j;
+                                    win_neuron_position_X = 2;
+                                }
+                                d = getDistance(input, mMap.getOutputs()[j][3]);
+                                if (min_distance > d) {
+                                    min_distance = d;
+                                    win_neuron_position_Y = j;
+                                    win_neuron_position_X = 3;
+                                }
+                                d = getDistance(input, mMap.getOutputs()[j][4]);
+                                if (min_distance > d) {
+                                    min_distance = d;
+                                    win_neuron_position_Y = j;
+                                    win_neuron_position_X = 4;
+                                }
+                                d = getDistance(input, mMap.getOutputs()[j][5]);
+                                if (min_distance > d) {
+                                    min_distance = d;
+                                    win_neuron_position_Y = j;
+                                    win_neuron_position_X = 5;
+                                }
+                                d = getDistance(input, mMap.getOutputs()[j][6]);
+                                if (min_distance > d) {
+                                    min_distance = d;
+                                    win_neuron_position_Y = j;
+                                    win_neuron_position_X = 6;
+                                }
+                                d = getDistance(input, mMap.getOutputs()[j][7]);
+                                if (min_distance > d) {
+                                    min_distance = d;
+                                    win_neuron_position_Y = j;
+                                    win_neuron_position_X = 7;
                                 }
                             }
+
+
+                            if (win_neuron_position_X < 0 || win_neuron_position_Y < 0) {
+                                Log.d("Error", "An error occur");
+                                return null;
+                            }
+
+                            //3. find the neighbor area
+                            long radius = Math.round(mNeighborRadius);
+                            long lowerBoundary_X = win_neuron_position_X - radius;
+                            if (lowerBoundary_X < 0) {
+                                lowerBoundary_X = 0;
+                            }
+                            long upperBoundary_X = win_neuron_position_X + radius;
+                            if (upperBoundary_X > mMap.getOutputs()[0].length - 1) {
+                                upperBoundary_X = mMap.getOutputs()[0].length - 1;
+                            }
+                            long lowerBoundary_Y = win_neuron_position_Y - radius;
+                            if (lowerBoundary_Y < 0) {
+                                lowerBoundary_Y = 0;
+                            }
+                            long upperBoundary_Y = win_neuron_position_Y + radius;
+                            if (upperBoundary_Y > mMap.getOutputs().length - 1) {
+                                upperBoundary_Y = mMap.getOutputs().length - 1;
+                            }
+
+                            //4. update weight vector
+                            mMap.updateWeightVector(win_neuron_position_X, win_neuron_position_Y, input, mLearningRate, 1);
+                            for (long j = lowerBoundary_Y; j <= upperBoundary_Y; j++) {
+                                int index_Y = (int) j;
+                                for (long k = lowerBoundary_X; k <= upperBoundary_X; k++) {
+                                    int index_X = (int) k;
+                                    if (index_X != win_neuron_position_X && index_Y != win_neuron_position_Y) {
+                                        mMap.updateWeightVector(index_X, index_Y, input, mLearningRate,
+                                                neighborInfluence(index_X, index_Y, win_neuron_position_X, win_neuron_position_Y));
+                                    }
+                                }
+                            }
+
+                            //5. update map of names
+                            //mMap.updateLabelForCluster(win_neuron_position_X, win_neuron_position_Y, input.mLabel, d);
                         }
 
-                        //5. update map of names
-                        //mMap.updateLabelForCluster(win_neuron_position_X, win_neuron_position_Y, input.mLabel, d);
+                        //check converge condition
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("Epoch", i);
+                        publishProgress(bundle);
+
+                        updateLearningRate(i);
+                        updateNeighborRadius(i);
+                    } else {
+                        if (mState == STATE.PAUSE) {
+                            Log.d("Pause", "true");
+                            i--;
+                        } else {
+                            Log.d("Stop", "true");
+                            return null;
+                        }
                     }
-
-                    //check converge condition
-                    Bundle bundle = new Bundle();
-                    bundle.putInt("Epoch", i);
-                    publishProgress(bundle);
-
-                    updateLearningRate(i);
-                    updateNeighborRadius(i);
                 }
 
                 //Labeling
@@ -254,8 +276,10 @@ public class PatternLearning extends Recognizer {
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-                SupportUtils.writeFile(mMap.toString(), "Trained", "SOM.txt");
-                SupportUtils.writeFile(mMap.getMapNames(), "Trained", "MapNames.txt");
+                if (mState == STATE.PLAY) {
+                    SupportUtils.writeFile(mMap.toString(), "Trained", "SOM.txt");
+                    SupportUtils.writeFile(mMap.getMapNames(), "Trained", "MapNames.txt");
+                }
                 learningListener.finish();
             }
         };
@@ -268,111 +292,120 @@ public class PatternLearning extends Recognizer {
             @Override
             protected Void doInBackground(Void... params) {
                 for (int i = 0; i < mEpochs; i++) {
-                    ArrayList<Input> inputs = new ArrayList<>();
-                    inputs.addAll(mSamples);
+                    if (mState == STATE.PLAY) {
 
-                    Log.d("Epoch", "" + i + " , size: " + inputs.size());
+                        ArrayList<Input> inputs = new ArrayList<>();
+                        inputs.addAll(mSamples);
 
-                    while (inputs.size() > 0) {
-                        //1. grab a random input
-                        Random rd = new Random();
-                        int position = rd.nextInt(inputs.size());
-                        Input input = inputs.remove(position);
+                        Log.d("Epoch", "" + i + " , size: " + inputs.size());
 
-                        //2. find best matching unit
-                        double min_distance = Double.MAX_VALUE;
-                        int win_neuron_position_X = -1;
-                        int win_neuron_position_Y = -1;
-                        for (int j = 0; j < mMap.getOutputs().length; j++) {
-                            double d = getDistance(input, mMap.getOutputs()[j][0]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 0;
-                            }
-                            d = getDistance(input, mMap.getOutputs()[j][1]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 1;
-                            }
-                            d = getDistance(input, mMap.getOutputs()[j][2]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 2;
-                            }
-                            d = getDistance(input, mMap.getOutputs()[j][3]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 3;
-                            }
-                            d = getDistance(input, mMap.getOutputs()[j][4]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 4;
-                            }
-                            d = getDistance(input, mMap.getOutputs()[j][5]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 5;
-                            }
-                            d = getDistance(input, mMap.getOutputs()[j][6]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 6;
-                            }
-                            d = getDistance(input, mMap.getOutputs()[j][7]);
-                            if (min_distance > d) {
-                                min_distance = d;
-                                win_neuron_position_Y = j;
-                                win_neuron_position_X = 7;
-                            }
-                        }
+                        while (inputs.size() > 0) {
+                            //1. grab a random input
+                            Random rd = new Random();
+                            int position = rd.nextInt(inputs.size());
+                            Input input = inputs.remove(position);
 
-                        //3. find the neighbor area
-                        int radius = (int) Math.round(mNeighborRadius);
-                        int lowerBoundary_X = win_neuron_position_X - radius;
-                        if (lowerBoundary_X < 0) {
-                            lowerBoundary_X = 0;
-                        }
-                        int upperBoundary_X = win_neuron_position_X + radius;
-                        if (upperBoundary_X > mMap.getOutputs()[0].length - 1) {
-                            upperBoundary_X = mMap.getOutputs()[0].length - 1;
-                        }
-                        int lowerBoundary_Y = win_neuron_position_Y - radius;
-                        if (lowerBoundary_Y < 0) {
-                            lowerBoundary_Y = 0;
-                        }
-                        int upperBoundary_Y = win_neuron_position_Y + radius;
-                        if (upperBoundary_Y > mMap.getOutputs().length - 1) {
-                            upperBoundary_Y = mMap.getOutputs().length - 1;
-                        }
-
-                        //4. update weight vector
-                        mMap.updateWeightVector(win_neuron_position_X, win_neuron_position_Y, input, mLearningRate, 1);
-                        for (int index_Y = lowerBoundary_Y; index_Y <= upperBoundary_Y; index_Y++) {
-                            for (int index_X = lowerBoundary_X; index_X <= upperBoundary_X; index_X++) {
-                                if (index_X != win_neuron_position_X && index_Y != win_neuron_position_Y) {
-                                    mMap.updateWeightVector(index_X, index_Y, input, mLearningRate,
-                                            neighborInfluence(index_X, index_Y, win_neuron_position_X, win_neuron_position_Y));
+                            //2. find best matching unit
+                            double min_distance = Double.MAX_VALUE;
+                            int win_neuron_position_X = -1;
+                            int win_neuron_position_Y = -1;
+                            for (int j = 0; j < mMap.getOutputs().length; j++) {
+                                double d = getDistance(input, mMap.getOutputs()[j][0]);
+                                if (min_distance > d) {
+                                    min_distance = d;
+                                    win_neuron_position_Y = j;
+                                    win_neuron_position_X = 0;
+                                }
+                                d = getDistance(input, mMap.getOutputs()[j][1]);
+                                if (min_distance > d) {
+                                    min_distance = d;
+                                    win_neuron_position_Y = j;
+                                    win_neuron_position_X = 1;
+                                }
+                                d = getDistance(input, mMap.getOutputs()[j][2]);
+                                if (min_distance > d) {
+                                    min_distance = d;
+                                    win_neuron_position_Y = j;
+                                    win_neuron_position_X = 2;
+                                }
+                                d = getDistance(input, mMap.getOutputs()[j][3]);
+                                if (min_distance > d) {
+                                    min_distance = d;
+                                    win_neuron_position_Y = j;
+                                    win_neuron_position_X = 3;
+                                }
+                                d = getDistance(input, mMap.getOutputs()[j][4]);
+                                if (min_distance > d) {
+                                    min_distance = d;
+                                    win_neuron_position_Y = j;
+                                    win_neuron_position_X = 4;
+                                }
+                                d = getDistance(input, mMap.getOutputs()[j][5]);
+                                if (min_distance > d) {
+                                    min_distance = d;
+                                    win_neuron_position_Y = j;
+                                    win_neuron_position_X = 5;
+                                }
+                                d = getDistance(input, mMap.getOutputs()[j][6]);
+                                if (min_distance > d) {
+                                    min_distance = d;
+                                    win_neuron_position_Y = j;
+                                    win_neuron_position_X = 6;
+                                }
+                                d = getDistance(input, mMap.getOutputs()[j][7]);
+                                if (min_distance > d) {
+                                    min_distance = d;
+                                    win_neuron_position_Y = j;
+                                    win_neuron_position_X = 7;
                                 }
                             }
-                        }
+
+                            //3. find the neighbor area
+                            int radius = (int) Math.round(mNeighborRadius);
+                            int lowerBoundary_X = win_neuron_position_X - radius;
+                            if (lowerBoundary_X < 0) {
+                                lowerBoundary_X = 0;
+                            }
+                            int upperBoundary_X = win_neuron_position_X + radius;
+                            if (upperBoundary_X >= mMap.getOutputs()[0].length) {
+                                upperBoundary_X = mMap.getOutputs()[0].length - 1;
+                            }
+                            int lowerBoundary_Y = win_neuron_position_Y - radius;
+                            if (lowerBoundary_Y < 0) {
+                                lowerBoundary_Y = 0;
+                            }
+                            int upperBoundary_Y = win_neuron_position_Y + radius;
+                            if (upperBoundary_Y >= mMap.getOutputs().length) {
+                                upperBoundary_Y = mMap.getOutputs().length - 1;
+                            }
+
+                            //4. update weight vector
+                            mMap.updateWeightVector(win_neuron_position_X, win_neuron_position_Y, input, mLearningRate, 1);
+                            for (int index_Y = lowerBoundary_Y; index_Y <= upperBoundary_Y; index_Y++) {
+                                for (int index_X = lowerBoundary_X; index_X <= upperBoundary_X; index_X++) {
+                                    if (index_X != win_neuron_position_X && index_Y != win_neuron_position_Y) {
+                                        mMap.updateWeightVector(index_X, index_Y, input, mLearningRate,
+                                                neighborInfluence(index_X, index_Y, win_neuron_position_X, win_neuron_position_Y));
+                                    }
+                                }
+                            }
 
                         /*//5. update map of names
                         mMap.updateLabelForCluster(win_neuron_position_X, win_neuron_position_Y, input.mLabel);*/
-                    }
+                        }
 
                     /*//check converge condition
                     converge = checkConverge();*/
 
-                    updateLearningRate(i);
-                    updateNeighborRadius(i);
+                        updateLearningRate(i);
+                        updateNeighborRadius(i);
+                    } else {
+                        if (mState == STATE.PAUSE) {
+                            i--;
+                        } else {
+                            return null;
+                        }
+                    }
                 }
 
                 mMap.resetMapName();
@@ -440,8 +473,10 @@ public class PatternLearning extends Recognizer {
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-                SupportUtils.writeFile(mMap.toString(), "Trained", "SOM.txt");
-                SupportUtils.writeFile(mMap.getMapNames(), "Trained", "MapNames.txt");
+                if (mState == STATE.PLAY) {
+                    SupportUtils.writeFile(mMap.toString(), "Trained", "SOM.txt");
+                    SupportUtils.writeFile(mMap.getMapNames(), "Trained", "MapNames.txt");
+                }
                 listener.endLearning();
             }
         };
@@ -484,8 +519,7 @@ public class PatternLearning extends Recognizer {
     }
 
     private double neighborInfluence(int neighborIndex_X, int neighborIndex_Y, int BMU_index_X, int BMU_index_Y) {
-        double distance = Math.pow(neighborIndex_X - BMU_index_X, 2) + Math.pow(neighborIndex_Y - BMU_index_Y, 2);
-        double value = -1 * distance;
+        double value = -1 * (Math.pow(neighborIndex_X - BMU_index_X, 2) + Math.pow(neighborIndex_Y - BMU_index_Y, 2));
         value /= (2 * (Math.pow(mNeighborRadius, 2)));
         return Math.exp(value);
     }

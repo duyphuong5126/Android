@@ -32,7 +32,7 @@ public class ClusterLabel {
     }
 
     public String getLabel() {
-        double accuracy = 0.8d;
+        double accuracy = 0.95d;
         for (Label label : mListLabel) {
             if (getLabelPercentage(label) >= accuracy) {
                 return label.getLabel();

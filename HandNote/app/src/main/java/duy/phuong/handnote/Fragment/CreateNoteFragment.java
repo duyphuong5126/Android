@@ -1,14 +1,19 @@
 package duy.phuong.handnote.Fragment;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
@@ -27,9 +32,11 @@ import duy.phuong.handnote.DTO.Character;
 import duy.phuong.handnote.DTO.Line;
 import duy.phuong.handnote.Listener.BackPressListener;
 import duy.phuong.handnote.MainActivity;
+import duy.phuong.handnote.MyView.ColorPicker.ColorPicker;
 import duy.phuong.handnote.MyView.DrawingView.FingerDrawerView;
 import duy.phuong.handnote.R;
 import duy.phuong.handnote.Recognizer.BitmapProcessor;
+import duy.phuong.handnote.Recognizer.ImageToText;
 import duy.phuong.handnote.Recognizer.MachineLearning.Input;
 import duy.phuong.handnote.Recognizer.Recognizer;
 import duy.phuong.handnote.Support.SupportUtils;
@@ -37,13 +44,15 @@ import duy.phuong.handnote.Support.SupportUtils;
 /**
  * Created by Phuong on 06/03/2016.
  */
-public class CreateNoteFragment extends BaseFragment implements BackPressListener, View.OnClickListener, BitmapProcessor.RecognitionCallback {
+public class CreateNoteFragment extends BaseFragment implements BackPressListener, View.OnClickListener, BitmapProcessor.RecognitionCallback,
+        ColorPicker.OnColorChangedListener {
     private FingerDrawerView mDrawer;
-    private ImageButton mButtonSave, mButtonDelete, mButtonUndo, mButtonRedo, mButtonColor;
     private TextView mTvResult;
-    private CheckBox mCheckSplit;
     private LinearLayout mLayoutProgress;
     private ScrollView mViewResult;
+
+    private ColorPicker mColorPicker;
+    private AlertDialog mDialogChangeColor;
 
     private Recognizer mRecognizer;
 
@@ -66,18 +75,18 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mButtonSave = (ImageButton) mFragmentView.findViewById(R.id.buttonSave);
+        ImageButton mButtonSave = (ImageButton) mFragmentView.findViewById(R.id.buttonSave);
         mButtonSave.setOnClickListener(this);
-        mButtonColor = (ImageButton) mFragmentView.findViewById(R.id.buttonColor);
+        ImageButton mButtonColor = (ImageButton) mFragmentView.findViewById(R.id.buttonColor);
         mButtonColor.setOnClickListener(this);
-        mButtonDelete = (ImageButton) mFragmentView.findViewById(R.id.buttonDelete);
+        ImageButton mButtonDelete = (ImageButton) mFragmentView.findViewById(R.id.buttonDelete);
         mButtonDelete.setOnClickListener(this);
-        mButtonUndo = (ImageButton) mFragmentView.findViewById(R.id.buttonUndo);
+        ImageButton mButtonUndo = (ImageButton) mFragmentView.findViewById(R.id.buttonUndo);
         mButtonUndo.setOnClickListener(this);
-        mButtonRedo = (ImageButton) mFragmentView.findViewById(R.id.buttonRedo);
+        ImageButton mButtonRedo = (ImageButton) mFragmentView.findViewById(R.id.buttonRedo);
         mButtonRedo.setOnClickListener(this);
         mTvResult = (TextView) mFragmentView.findViewById(R.id.tvResult);
-        mCheckSplit = (CheckBox) mFragmentView.findViewById(R.id.ckcSplit);
+        CheckBox mCheckSplit = (CheckBox) mFragmentView.findViewById(R.id.ckcSplit);
         mCheckSplit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -99,6 +108,7 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
         mDrawer.setDefault();
         mCurrentRecognized = new HashMap<>();
         mRecognizer = new Recognizer(mListener.getGlobalSOM(), mListener.getMapNames());
+        initColorPicker();
     }
 
     @Override
@@ -142,12 +152,28 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
                 deleteData();
                 break;
             case R.id.buttonColor:
+                mDialogChangeColor.show();
                 break;
             case R.id.buttonUndo:
                 mDrawer.undo();
                 break;
             case R.id.buttonRedo:
                 mDrawer.redo();
+                break;
+            case R.id.buttonColorBlack:
+            case R.id.buttonColorRed:
+            case R.id.buttonColorGreen:
+            case R.id.buttonColorBlue:
+            case R.id.buttonColorYellow:
+            case R.id.buttonColorGray:
+            case R.id.buttonColorPink:
+            case R.id.buttonColorLime:
+            case R.id.buttonColorBlueSky:
+            case R.id.buttonColorGold:
+                Button button = (Button) v;
+                mColorPicker.setCenterColor(Color.parseColor(button.getText().toString()));
+                break;
+            default:
                 break;
         }
     }
@@ -160,11 +186,7 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
             mCurrentRecognized.clear();
         }
 
-        for (Character character : listCharacters) {
-            character.isSorted = false;
-        }
-
-        final ArrayList<Line> lines = mDrawer.getLines();
+        final ArrayList<Line> currentLines = mDrawer.getLines();
         final String[] paragraph = {""};
         Log.d("List char", "" + listCharacters.size());
 
@@ -177,81 +199,14 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
 
             @Override
             protected Void doInBackground(Void... params) {
-                if (!lines.isEmpty()) {
-                    for (Line line : lines) {
-                        line.mCharacters = new ArrayList<>();
-                        for (Character character : listCharacters) {
-                            if (!character.isSorted) {
-                                if (character.mRect.bottom * 0.8d <= line.mBottom) {
-                                    line.mCharacters.add(character);
-                                    character.isSorted = true;
-                                    if (line.mMinTop > character.mRect.top) {
-                                        line.mMinTop = character.mRect.top;
-                                    }
-                                    if (line.mMaxBottom < character.mRect.bottom) {
-                                        line.mMaxBottom = character.mRect.bottom;
-                                    }
-                                }
-                            }
-                        }
+                ImageToText imageToText = new ImageToText(mListener.getGlobalSOM(), mListener.getMapNames());
+                imageToText.imageToText(currentLines, listCharacters, new ImageToText.ConvertingCompleteCallback() {
+                    @Override
+                    public void convertingComplete(String result, HashMap<Input, Point> map) {
+                        paragraph[0] = result;
+                        mCurrentRecognized.putAll(map);
                     }
-
-                    String p = "";
-                    for (Line line : lines) {
-                        if (!line.mCharacters.isEmpty()) {
-                            boolean end = false;
-                            while (!end) {
-                                boolean swapped = false;
-                                for (int i = 1; i < line.mCharacters.size(); i++) {
-                                    Character c1 = line.mCharacters.get(i), cp = line.mCharacters.get(i - 1);
-                                    if (c1.mRect.left < cp.mRect.left) {
-                                        Collections.swap(line.mCharacters, i, i - 1);
-                                        swapped = true;
-                                    }
-                                }
-
-                                if (!swapped) {
-                                    end = true;
-                                }
-                            }
-                            String text = "";
-                            int h = Math.abs(line.mMaxBottom - line.mMinTop);
-                            for (int i = 0; i < line.mCharacters.size(); i++) {
-                                Character c = line.mCharacters.get(i);
-                                if (c.mAlphabet == null) {
-                                    Bundle bundle = mRecognizer.recognize(c);
-                                    int x = bundle.getInt("cordX");
-                                    int y = bundle.getInt("cordY");
-                                    Input input = (Input) bundle.getSerializable("input");
-                                    String result = bundle.getString("result");
-                                    mCurrentRecognized.put(input, new Point(x, y));
-                                    Log.d("Result", "bitmap " + i + " :" + result);
-                                    switch (result) {
-                                        case "C":case "O":case "P":case "S":case "V":case "W":case "X":case "Z":
-                                            if (c.mRect.height() <= 0.7d * h) {
-                                                c.mAlphabet = result.toLowerCase();
-                                            } else {
-                                                c.mAlphabet = result;
-                                            }
-                                            break;
-
-                                        case "b1":
-                                        case "k1":
-                                            c.mAlphabet = result.substring(0, 1);
-                                            break;
-
-                                        default:
-                                            c.mAlphabet = result;
-                                            break;
-                                    }
-                                }
-                                text += c.mAlphabet;
-                            }
-                            p += text + " ";
-                        }
-                    }
-                    paragraph[0] = p;
-                }
+                });
                 return null;
             }
 
@@ -268,5 +223,39 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
     private void deleteData() {
         mDrawer.emptyDrawer();
         mTvResult.setText("");
+    }
+
+    private void initColorPicker() {
+        if (mColorPicker == null) {
+            mColorPicker = new ColorPicker(mActivity, this, 0xffffff);
+            View view = LayoutInflater.from(mActivity).inflate(R.layout.color_picker_layout, null);
+            ((Button) view.findViewById(R.id.buttonColorBlack)).setOnClickListener(this);
+            ((Button) view.findViewById(R.id.buttonColorRed)).setOnClickListener(this);
+            ((Button) view.findViewById(R.id.buttonColorGreen)).setOnClickListener(this);
+            ((Button) view.findViewById(R.id.buttonColorBlue)).setOnClickListener(this);
+            ((Button) view.findViewById(R.id.buttonColorYellow)).setOnClickListener(this);
+            ((Button) view.findViewById(R.id.buttonColorGray)).setOnClickListener(this);
+            ((Button) view.findViewById(R.id.buttonColorPink)).setOnClickListener(this);
+            ((Button) view.findViewById(R.id.buttonColorLime)).setOnClickListener(this);
+            ((Button) view.findViewById(R.id.buttonColorBlueSky)).setOnClickListener(this);
+            ((Button) view.findViewById(R.id.buttonColorGold)).setOnClickListener(this);
+            ((LinearLayout) view.findViewById(R.id.colorPickerLayout)).addView(mColorPicker.getColorPickerView());
+            AlertDialog.Builder mDialogBuilderChangeColor = new AlertDialog.Builder(mActivity);
+            mDialogBuilderChangeColor.setView(view);
+            mDialogBuilderChangeColor.setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            mDialogChangeColor = mDialogBuilderChangeColor.create();
+        }
+    }
+
+    @Override
+    public void colorChanged(int color) {
+        Toast.makeText(mActivity, "Color's changed", Toast.LENGTH_SHORT).show();
+        mDialogChangeColor.cancel();
+        mDrawer.setPaintColor(color);
     }
 }

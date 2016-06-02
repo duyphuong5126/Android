@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
+import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
@@ -25,14 +26,26 @@ public class LocalStorage extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "Local";
     private static final int DATABASE_VERSION = 2;
     private static final String TABLE_NOTE = "tblNote";
+    private static final String TABLE_EV_DICTIONARY = "tblEV_Dictionary";
     private static final String Note_Id = "_id";
     private static final String Note_Image = "image";
     private static final String Note_Content = "content";
+    private static final String Dict_Id = "_id";
+    private static final String Dict_Word = "word";
+    private static final String Dict_Pronunciation = "pronunciation";
+    private static final String Dict_Definition = "definition";
 
     private static final String create_tblNote = "create table " + TABLE_NOTE + "(" +
             Note_Id + " integer primary key autoincrement," +
             Note_Content + " text not null," +
             Note_Image + " text ot null"
+            + ")";
+
+    private static final String create_tblDictionary = "create table " + TABLE_EV_DICTIONARY + "(" +
+            Dict_Id + " integer primary key autoincrement," +
+            Dict_Word + " text not null," +
+            Dict_Pronunciation + " text not null," +
+            Dict_Definition + " text ot null"
             + ")";
     public LocalStorage(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -41,6 +54,7 @@ public class LocalStorage extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(create_tblNote);
+        db.execSQL(create_tblDictionary);
     }
 
     @Override
@@ -89,5 +103,43 @@ public class LocalStorage extends SQLiteOpenHelper {
     public boolean deleteNote(Note note) {
         SQLiteDatabase db = getWritableDatabase();
         return db.delete(TABLE_NOTE, Note_Image + " = '" + note.mBitmapPath + "' and " + Note_Content + " = '" + note.mContentPath + "'", null) >= 0;
+    }
+
+    public boolean inertEV_DictLine(String word, String pronunciation, String definition, SQLiteDatabase db, ContentValues contentValues) {
+        contentValues.clear();
+        contentValues.put(Dict_Word, word);
+        contentValues.put(Dict_Definition, definition);
+        contentValues.put(Dict_Pronunciation, (pronunciation == null) ? "" : pronunciation);
+        return db.insert(TABLE_EV_DICTIONARY, null, contentValues) > 0;
+    }
+
+    public String findEV_Definition(String word) {
+        SQLiteDatabase db = getReadableDatabase();
+        String sql = "select * from " + TABLE_EV_DICTIONARY + " where " + Dict_Word + " = '" + word + "'";
+        Log.d("Sql", sql);
+        Cursor cursor = db.rawQuery(sql, null);
+        String definition = "";
+        String pronunciation = "";
+        if (cursor.moveToFirst()) {
+            definition = cursor.getString(cursor.getColumnIndex(Dict_Definition));
+            pronunciation = cursor.getString(cursor.getColumnIndex(Dict_Pronunciation));
+        }
+        Log.d("Result dict", "word: " + word + ", pro: " + pronunciation + ", def: " + definition);
+        String result = "";
+        if (pronunciation.length() > 0) {
+            result += pronunciation + "\n";
+        }
+        result += definition;
+        return result;
+    }
+
+    public void deleteAllNotes() {
+        ArrayList<Note> notes = getListNote();
+        for (Note note : notes) {
+            SupportUtils.deleteFile(note.mBitmapPath);
+            SupportUtils.deleteFile(note.mContentPath);
+        }
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(TABLE_NOTE, null ,null);
     }
 }

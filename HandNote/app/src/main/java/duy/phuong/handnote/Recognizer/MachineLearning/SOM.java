@@ -65,7 +65,7 @@ public class SOM {
     }
 
     public boolean updateWeightVector(int x, int y, Input input, double learningRate, double neighborInfluence) {
-        for (int i = 0; i < mOutputs[y][x].mWeights.length; i += 16) {
+        for (int i = 0; i < mOutputs[y][x].mWeights.length; i += 35) {
             mOutputs[y][x].mWeights[i] += (input.mInputData[i] - mOutputs[y][x].mWeights[i]) * learningRate * neighborInfluence;
             mOutputs[y][x].mWeights[i + 1] += (input.mInputData[i + 1] - mOutputs[y][x].mWeights[i + 1]) * learningRate * neighborInfluence;
             mOutputs[y][x].mWeights[i + 2] += (input.mInputData[i + 2] - mOutputs[y][x].mWeights[i + 2]) * learningRate * neighborInfluence;
@@ -82,6 +82,25 @@ public class SOM {
             mOutputs[y][x].mWeights[i + 13] += (input.mInputData[i + 13] - mOutputs[y][x].mWeights[i + 13]) * learningRate * neighborInfluence;
             mOutputs[y][x].mWeights[i + 14] += (input.mInputData[i + 14] - mOutputs[y][x].mWeights[i + 14]) * learningRate * neighborInfluence;
             mOutputs[y][x].mWeights[i + 15] += (input.mInputData[i + 15] - mOutputs[y][x].mWeights[i + 15]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 16] += (input.mInputData[i + 16] - mOutputs[y][x].mWeights[i + 16]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 17] += (input.mInputData[i + 17] - mOutputs[y][x].mWeights[i + 17]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 18] += (input.mInputData[i + 18] - mOutputs[y][x].mWeights[i + 18]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 19] += (input.mInputData[i + 19] - mOutputs[y][x].mWeights[i + 19]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 20] += (input.mInputData[i + 20] - mOutputs[y][x].mWeights[i + 20]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 21] += (input.mInputData[i + 21] - mOutputs[y][x].mWeights[i + 21]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 22] += (input.mInputData[i + 22] - mOutputs[y][x].mWeights[i + 22]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 23] += (input.mInputData[i + 23] - mOutputs[y][x].mWeights[i + 23]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 24] += (input.mInputData[i + 24] - mOutputs[y][x].mWeights[i + 24]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 25] += (input.mInputData[i + 25] - mOutputs[y][x].mWeights[i + 25]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 26] += (input.mInputData[i + 26] - mOutputs[y][x].mWeights[i + 26]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 27] += (input.mInputData[i + 27] - mOutputs[y][x].mWeights[i + 27]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 28] += (input.mInputData[i + 28] - mOutputs[y][x].mWeights[i + 28]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 29] += (input.mInputData[i + 29] - mOutputs[y][x].mWeights[i + 29]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 30] += (input.mInputData[i + 30] - mOutputs[y][x].mWeights[i + 30]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 31] += (input.mInputData[i + 31] - mOutputs[y][x].mWeights[i + 31]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 32] += (input.mInputData[i + 32] - mOutputs[y][x].mWeights[i + 32]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 33] += (input.mInputData[i + 33] - mOutputs[y][x].mWeights[i + 33]) * learningRate * neighborInfluence;
+            mOutputs[y][x].mWeights[i + 34] += (input.mInputData[i + 34] - mOutputs[y][x].mWeights[i + 34]) * learningRate * neighborInfluence;
         }
         return true;
     }

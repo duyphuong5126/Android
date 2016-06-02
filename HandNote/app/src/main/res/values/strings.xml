@@ -8,14 +8,17 @@
     <string name="notes_en">Notes</string>
     <string name="notes_vi">Ghi Chú</string>
 
-    <string name="training_en">Training</string>
-    <string name="training_vi">Huấn Luyện</string>
+    <string name="web_en">Searching online</string>
+    <string name="web_vi">Tìm kiếm online</string>
 
-    <string name="dictionary_en">Dictionary</string>
-    <string name="dictionary_vi">Từ điển</string>
+    <string name="training_en">Image Analysis</string>
+    <string name="training_vi">Phân tích ảnh</string>
 
-    <string name="enter_number_en">Enter the number</string>
-    <string name="enter_number_vi">Nhập số lượng</string>
+    <string name="translate_en">Translate</string>
+    <string name="translate_vi">Dịch</string>
+
+    <string name="enter_number_en">Enter the number of epochs</string>
+    <string name="enter_number_vi">Nhập số lần học</string>
 
     <string name="cancel_en">Cancel</string>
     <string name="cancel_vi">Hủy</string>

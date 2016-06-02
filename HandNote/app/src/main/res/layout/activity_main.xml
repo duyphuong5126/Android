@@ -8,169 +8,209 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".MainActivity">
 
-    <LinearLayout
-        android:id="@+id/layoutMain"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#fff"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:background="#cc0033"
-            android:orientation="horizontal">
-
-            <FrameLayout
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="10dip">
-
-                <ImageButton
-                    android:layout_gravity="center"
-                    android:id="@+id/buttonMainNavigator"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="#00000000"
-                    android:src="@mipmap/ic_menu_white_24dp" />
-
-                <ImageButton
-                    android:id="@+id/buttonBack"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="#00000000"
-                    android:layout_gravity="center"
-                    android:visibility="gone"
-                    android:src="@mipmap/ic_arrow_back_white_24dp" />
-            </FrameLayout>
-
-            <LinearLayout
-                android:layout_width="0dip"
-                android:layout_height="fill_parent"
-                android:layout_weight="4"
-                android:gravity="center">
-
-                <TextView
-                    android:id="@+id/tvAppTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/app_name"
-                    android:textColor="#fff"
-                    android:textSize="23sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:padding="10dip">
-
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="#00000000"
-                    android:src="@mipmap/ic_more_vert_white_24dp" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/layoutFragmentContainer"
+            android:id="@+id/layoutMain"
             android:layout_width="match_parent"
-            android:layout_height="0dip"
-            android:layout_weight="13"
+            android:layout_height="match_parent"
+            android:background="#fff"
             android:orientation="vertical">
 
-        </LinearLayout>
-
-        <FrameLayout
-            android:id="@+id/layoutTabsBottom"
-            android:layout_width="fill_parent"
-            android:layout_height="0dip"
-            android:layout_weight="3"
-            android:background="#0000">
-
             <LinearLayout
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                android:background="#cc0033"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="0dip"
-                    android:layout_weight="1" />
-
-                <LinearLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="0dip"
+                <FrameLayout
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="#c03"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:layout_width="0dip"
-                        android:layout_height="fill_parent"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical">
-
-                        <Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="#0000"
-                            android:layout_marginLeft="20dip"
-                            android:text="@string/notes_en"
-                            android:textColor="#fff"
-                            android:textSize="17sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dip"
-                        android:layout_height="fill_parent"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical|right">
-
-                        <Button
-                            android:id="@+id/buttonDictionary"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="#0000"
-                            android:text="@string/dictionary_en"
-                            android:textColor="#fff"
-                            android:layout_marginRight="10dip"
-                            android:textSize="17sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:gravity="center_horizontal">
-
-                <LinearLayout
-                    android:layout_width="65dip"
-                    android:layout_height="65dip"
-                    android:background="@drawable/circle_white"
-                    android:gravity="center"
-                    android:layout_marginTop="20dip">
+                    android:padding="10dip">
 
                     <ImageButton
-                        android:id="@+id/buttonCreate"
-                        android:layout_width="55dip"
-                        android:layout_height="55dip"
-                        android:background="@drawable/circle_heavy_red"
-                        android:foregroundGravity="center"
-                        android:src="@mipmap/ic_add_white_48dp" />
+                        android:layout_gravity="center"
+                        android:id="@+id/buttonMainNavigator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="#00000000"
+                        android:src="@mipmap/ic_menu_white_24dp" />
+
+                    <ImageButton
+                        android:id="@+id/buttonBack"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="#00000000"
+                        android:layout_gravity="center"
+                        android:visibility="gone"
+                        android:src="@mipmap/ic_arrow_back_white_24dp" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="4"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/tvAppTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/app_name"
+                        android:textColor="#fff"
+                        android:textSize="23sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="10dip">
+
+                    <ImageButton
+                        android:id="@+id/buttonMenu"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="#00000000"
+                        android:src="@mipmap/ic_more_vert_white_24dp" />
+                </LinearLayout>
+
             </LinearLayout>
-        </FrameLayout>
-    </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:id="@+id/layoutFragmentContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dip"
+                        android:layout_weight="13"
+                        android:background="#0000"/>
+
+                    <FrameLayout
+                        android:id="@+id/layoutTabsBottom"
+                        android:layout_width="fill_parent"
+                        android:layout_height="0dip"
+                        android:layout_weight="3"
+                        android:background="#0000">
+
+                        <LinearLayout
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:orientation="vertical"
+                            android:background="#0000">
+
+                            <LinearLayout
+                                android:layout_width="fill_parent"
+                                android:layout_height="0dip"
+                                android:layout_weight="8"
+                                android:background="#0000"/>
+
+                            <LinearLayout
+                                android:layout_width="fill_parent"
+                                android:layout_height="0dip"
+                                android:layout_weight="7"
+                                android:orientation="horizontal">
+
+                                <LinearLayout
+                                    android:layout_width="0dip"
+                                    android:layout_height="fill_parent"
+                                    android:layout_weight="1"
+                                    android:gravity="center_vertical">
+
+                                    <Button
+                                        android:id="@+id/buttonListNotes"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="@drawable/item_tab"
+                                        android:gravity="center_vertical|left"
+                                        android:paddingLeft="50dip"
+                                        android:text="@string/notes_en"
+                                        android:textColor="#fff"
+                                        android:textSize="17sp"
+                                        android:textStyle="bold" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="0dip"
+                                    android:layout_height="fill_parent"
+                                    android:layout_weight="1"
+                                    android:gravity="center_vertical|right">
+
+                                    <Button
+                                        android:id="@+id/buttonTemplates"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:gravity="center_vertical|right"
+                                        android:paddingRight="30dip"
+                                        android:background="@drawable/item_tab"
+                                        android:text="@string/templates_fragment_en"
+                                        android:textColor="#fff"
+                                        android:textSize="17sp"
+                                        android:textStyle="bold" />
+                                </LinearLayout>
+
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layoutBottomTabs"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:gravity="center">
+
+                            <LinearLayout
+                                android:id="@+id/borderButtonCreate"
+                                android:layout_width="65dip"
+                                android:layout_height="65dip"
+                                android:background="@drawable/circle_white"
+                                android:gravity="center">
+
+                                <ImageButton
+                                    android:id="@+id/buttonCreate"
+                                    android:layout_width="55dip"
+                                    android:layout_height="55dip"
+                                    android:background="@drawable/circle_heavy_red"
+                                    android:foregroundGravity="center"
+                                    android:src="@mipmap/ic_add_white_48dp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </FrameLayout>
+                </LinearLayout>
+            </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutLoading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#96000000"
+            android:visibility="gone"
+            android:gravity="center">
+
+            <ProgressBar
+                android:layout_width="60dip"
+                android:layout_height="60dip" />
+        </LinearLayout>
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/layoutSideMenu"
@@ -220,6 +260,7 @@
                     android:textStyle="bold"/>
 
                 <TextView
+                    android:id="@+id/tvInternet"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:text="Status: online"

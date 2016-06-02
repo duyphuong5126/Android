@@ -88,28 +88,46 @@ public class Recognizer {
             int neuron = Distance.position;
             win_neuron_X = neuron % SOM.NUM_OF_COLUMNS;
             win_neuron_Y = neuron / SOM.NUM_OF_COLUMNS;
-            Bundle r = mProcessor.featureExtraction(character, mMapNames.get(neuron).getListLabel());
-            if (r.getBoolean("Result")) {
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("input", input);
-                bundle.putString("result", r.getString("Char"));
-                if (win_neuron_X >= 0 && win_neuron_Y >= 0) {
-                    bundle.putInt("cordX", win_neuron_X);
-                    bundle.putInt("cordY", win_neuron_Y);
-                }
+
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("input", input);
+            Log.d("Recognized", mMapNames.get(neuron).toString());
+            if (win_neuron_X >= 0 && win_neuron_Y >= 0) {
+                bundle.putInt("cordX", win_neuron_X);
+                bundle.putInt("cordY", win_neuron_Y);
+            }
+            String label = mMapNames.get(neuron).getLabel();
+            if (label.length() == 1 || label.equals("k1") || label.equals("b1")) {
+                Log.d("Immediate", "yes");
+                bundle.putString("result", label);
                 return bundle;
+            } else {
+                Bundle result = mProcessor.featureExtraction(character, mMapNames.get(neuron).getListLabel());
+                label = result.getString("Char");
+                if (label.length() == 1 || label.equals("k1") || label.equals("b1")) {
+                    bundle.putString("result", label);
+                    return bundle;
+                }
             }
         }
 
         int win_neuron = distance[0].position;
         win_neuron_X = win_neuron % SOM.NUM_OF_COLUMNS; win_neuron_Y = win_neuron / SOM.NUM_OF_COLUMNS;
-        Bundle result = mProcessor.featureExtraction(character, mMapNames.get(win_neuron).getListLabel());
         Bundle bundle = new Bundle();
         bundle.putSerializable("input", input);
-        bundle.putString("result", result.getString("Char"));
         if (win_neuron_X >= 0 && win_neuron_Y >= 0) {
             bundle.putInt("cordX", win_neuron_X);
             bundle.putInt("cordY", win_neuron_Y);
+        }
+        String label = mMapNames.get(win_neuron).getLabel();
+
+        Log.d("Recognized", mMapNames.get(win_neuron).toString());
+        if (label.length() == 1 || label.equals("k1") || label.equals("b1")) {
+            Log.d("Immediate", "yes");
+            bundle.putString("result", label);
+        } else {
+            Bundle result = mProcessor.featureExtraction(character, mMapNames.get(win_neuron).getListLabel());
+            bundle.putString("result", result.getString("Char"));
         }
         return bundle;
     }
@@ -143,7 +161,7 @@ public class Recognizer {
     protected double getDistance(Input input, Output output) {
         double result = 0;
         if (input != null && output != null) {
-            for (int i = 0; i < Input.VECTOR_DIMENSIONS; i += 16) {
+            for (int i = 0; i < Input.VECTOR_DIMENSIONS; i += 35) {
                 result += Math.pow(input.mInputData[i] - output.mWeights[i], 2);
                 result += Math.pow(input.mInputData[i + 1] - output.mWeights[i + 1], 2);
                 result += Math.pow(input.mInputData[i + 2] - output.mWeights[i + 2], 2);
@@ -160,6 +178,25 @@ public class Recognizer {
                 result += Math.pow(input.mInputData[i + 13] - output.mWeights[i + 13], 2);
                 result += Math.pow(input.mInputData[i + 14] - output.mWeights[i + 14], 2);
                 result += Math.pow(input.mInputData[i + 15] - output.mWeights[i + 15], 2);
+                result += Math.pow(input.mInputData[i + 16] - output.mWeights[i + 16], 2);
+                result += Math.pow(input.mInputData[i + 17] - output.mWeights[i + 17], 2);
+                result += Math.pow(input.mInputData[i + 18] - output.mWeights[i + 18], 2);
+                result += Math.pow(input.mInputData[i + 19] - output.mWeights[i + 19], 2);
+                result += Math.pow(input.mInputData[i + 20] - output.mWeights[i + 20], 2);
+                result += Math.pow(input.mInputData[i + 21] - output.mWeights[i + 21], 2);
+                result += Math.pow(input.mInputData[i + 22] - output.mWeights[i + 22], 2);
+                result += Math.pow(input.mInputData[i + 23] - output.mWeights[i + 23], 2);
+                result += Math.pow(input.mInputData[i + 24] - output.mWeights[i + 24], 2);
+                result += Math.pow(input.mInputData[i + 25] - output.mWeights[i + 25], 2);
+                result += Math.pow(input.mInputData[i + 26] - output.mWeights[i + 26], 2);
+                result += Math.pow(input.mInputData[i + 27] - output.mWeights[i + 27], 2);
+                result += Math.pow(input.mInputData[i + 28] - output.mWeights[i + 28], 2);
+                result += Math.pow(input.mInputData[i + 29] - output.mWeights[i + 29], 2);
+                result += Math.pow(input.mInputData[i + 30] - output.mWeights[i + 30], 2);
+                result += Math.pow(input.mInputData[i + 31] - output.mWeights[i + 31], 2);
+                result += Math.pow(input.mInputData[i + 32] - output.mWeights[i + 32], 2);
+                result += Math.pow(input.mInputData[i + 33] - output.mWeights[i + 33], 2);
+                result += Math.pow(input.mInputData[i + 34] - output.mWeights[i + 34], 2);
             }
         }
         return Math.sqrt(result);

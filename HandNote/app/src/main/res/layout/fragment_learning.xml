@@ -41,23 +41,23 @@
                     android:layout_width="60dip"
                     android:layout_height="60dip"
                     android:background="@drawable/circle_heavy_red"
-                    android:visibility="gone"
-                    android:src="@mipmap/ic_photo_size_select_large_white_36dp" />
+                    android:src="@mipmap/ic_photo_size_select_large_white_36dp"
+                    android:visibility="gone" />
 
                 <ImageButton
                     android:id="@+id/buttonTrain"
                     android:layout_width="60dip"
                     android:layout_height="60dip"
-                    android:visibility="gone"
                     android:background="@drawable/circle_heavy_red"
-                    android:src="@mipmap/ic_android_white_36dp" />
+                    android:src="@mipmap/ic_android_white_36dp"
+                    android:visibility="gone" />
 
                 <LinearLayout
                     android:id="@+id/buttonProgress"
                     android:layout_width="60dip"
                     android:layout_height="60dip"
-                    android:visibility="gone"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:visibility="gone">
 
                     <ProgressBar
                         android:layout_width="40dip"
@@ -72,9 +72,9 @@
             android:id="@+id/layoutProcessing"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
             android:background="#D9000000"
             android:gravity="center"
+            android:orientation="vertical"
             android:visibility="gone">
 
             <ScrollView
@@ -93,19 +93,63 @@
                         android:id="@+id/tvLogView"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:gravity="top"
                         android:paddingLeft="5dip"
                         android:textColor="#fff"
-                        android:textSize="15sp"
-                        android:gravity="top"/>
+                        android:textSize="15sp" />
 
                 </LinearLayout>
             </ScrollView>
 
-            <ProgressBar
-                android:id="@+id/Progress"
-                android:layout_width="40dip"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="40dip"
-                android:layout_marginBottom="50dip"/>
+                android:layout_marginBottom="40dip"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dip">
+
+                    <ImageButton
+                        android:id="@+id/buttonPlay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dip"
+                        android:layout_marginRight="10dip"
+                        android:background="#0000"
+                        android:src="@mipmap/ic_play_arrow_white_24dp"
+                        android:visibility="gone" />
+
+                    <ImageButton
+                        android:id="@+id/buttonPause"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dip"
+                        android:layout_marginRight="10dip"
+                        android:background="#0000"
+                        android:src="@mipmap/ic_pause_white_24dp" />
+                </FrameLayout>
+
+                <ImageButton
+                    android:id="@+id/buttonStop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dip"
+                    android:layout_marginRight="10dip"
+                    android:background="#0000"
+                    android:src="@mipmap/ic_stop_white_24dp" />
+
+                <ProgressBar
+                    android:id="@+id/Progress"
+                    style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="5dip"
+                    android:background="#0000" />
+            </LinearLayout>
         </LinearLayout>
     </FrameLayout>
 

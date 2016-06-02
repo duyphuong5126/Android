@@ -25,6 +25,10 @@ public abstract class LanguageUtils {
                 return resources.getString(R.string.create_fragment_en);
             case BaseFragment.TEMPLATES_FRAGMENT:
                 return resources.getString(R.string.templates_fragment_en);
+            case BaseFragment.WEB_FRAGMENT:
+                return resources.getString(R.string.web_en);
+            case BaseFragment.TRANSLATE_FRAGMENT:
+                return resources.getString(R.string.translate_en);
             default:
                 return resources.getString(R.string.app_name);
         }

@@ -1,23 +1,18 @@
 package duy.phuong.handnote.Fragment;
 
-import android.app.ActionBar;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.support.v7.widget.PopupMenu;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -38,9 +33,8 @@ public class DrawingFragment extends BaseFragment implements View.OnClickListene
     private GridView mListDetectedBitmap;
     private ArrayList<Bitmap> mListBitmap;
     private BitmapAdapter mBitmapAdapter;
-    private ImageButton mButtonSave, mButtonEmpty, mButtonForward, mButtonMore, mButtonUndo, mButtonRedo;
+    private ImageButton mButtonMore;
     private EditText mEdtName;
-    private CheckBox mCheckSplit;
     private int mCurrentMode;
 
     private FingerDrawerView mDrawer;
@@ -50,6 +44,8 @@ public class DrawingFragment extends BaseFragment implements View.OnClickListene
     private BitmapPager mBitmapPager;
     private ArrayList<Bitmap> mAnalysisBitmaps;
 
+    private LinearLayout mLayoutProcessing;
+
     public DrawingFragment() {
         this.mLayoutRes = R.layout.fragment_drawing;
         mListBitmap = new ArrayList<>();
@@ -58,15 +54,15 @@ public class DrawingFragment extends BaseFragment implements View.OnClickListene
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mButtonSave = (ImageButton) mFragmentView.findViewById(R.id.buttonSave);
+        ImageButton mButtonSave = (ImageButton) mFragmentView.findViewById(R.id.buttonSave);
         mButtonSave.setOnClickListener(this);
-        mButtonEmpty = (ImageButton) mFragmentView.findViewById(R.id.buttonDelete);
+        ImageButton mButtonEmpty = (ImageButton) mFragmentView.findViewById(R.id.buttonDelete);
         mButtonEmpty.setOnClickListener(this);
-        mButtonUndo = (ImageButton) mFragmentView.findViewById(R.id.buttonUndo);
+        ImageButton mButtonUndo = (ImageButton) mFragmentView.findViewById(R.id.buttonUndo);
         mButtonUndo.setOnClickListener(this);
-        mButtonRedo = (ImageButton) mFragmentView.findViewById(R.id.buttonRedo);
+        ImageButton mButtonRedo = (ImageButton) mFragmentView.findViewById(R.id.buttonRedo);
         mButtonRedo.setOnClickListener(this);
-        mButtonForward = (ImageButton) mFragmentView.findViewById(R.id.buttonForward);
+        ImageButton mButtonForward = (ImageButton) mFragmentView.findViewById(R.id.buttonForward);
         mButtonForward.setOnClickListener(this);
         mButtonMore = (ImageButton) mFragmentView.findViewById(R.id.buttonMore);
         mButtonMore.setOnClickListener(this);
@@ -76,7 +72,9 @@ public class DrawingFragment extends BaseFragment implements View.OnClickListene
         mBitmapPager = new BitmapPager(mActivity, mAnalysisBitmaps, R.layout.item_bitmap_2);
         mBitmapViewPager.setAdapter(mBitmapPager);
 
-        mCheckSplit = (CheckBox) mFragmentView.findViewById(R.id.ckcSplit);
+        mLayoutProcessing = (LinearLayout) mFragmentView.findViewById(R.id.layoutProcess);
+
+        CheckBox mCheckSplit = (CheckBox) mFragmentView.findViewById(R.id.ckcSplit);
         mCheckSplit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -97,7 +95,7 @@ public class DrawingFragment extends BaseFragment implements View.OnClickListene
         mDrawer = (FingerDrawerView) mFragmentView.findViewById(R.id.FingerDrawer);
         mDrawer.setListener(new BitmapProcessor.RecognitionCallback() {
             @Override
-            public void onRecognizeSuccess(ArrayList<Character> listCharacters) {
+            public void onRecognizeSuccess(final ArrayList<Character> listCharacters) {
                 mListBitmap.clear();
                 switch (mCurrentMode) {
                     case R.id.itemVerticalProjectionProfile:
@@ -127,6 +125,7 @@ public class DrawingFragment extends BaseFragment implements View.OnClickListene
                 mBitmapAdapter.notifyDataSetChanged();
             }
         });
+
         mDrawer.setDisplayListener(this);
 
         mPopupMenu = new PopupMenu(mActivity, mButtonMore);
@@ -164,6 +163,12 @@ public class DrawingFragment extends BaseFragment implements View.OnClickListene
                 return false;
             }
         });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mDrawer.setPaintColor(Color.BLACK);
     }
 
     @Override

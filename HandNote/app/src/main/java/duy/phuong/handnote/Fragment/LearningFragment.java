@@ -23,6 +23,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -62,8 +63,15 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
 
     boolean isTraining;
 
+    private ImageButton mButtonPlay;
+    private ImageButton mButtonPause;
+    private ProgressBar mProgress;
+    private int mCurrent;
+
     private static final int IMAGE_PICK = 1;
     private long mTimeElapsed = 0;
+
+    private PatternLearning mLearner;
 
     public LearningFragment() {
         mLayoutRes = R.layout.fragment_learning;
@@ -88,6 +96,13 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
         mButtonLoad = (ImageButton) mFragmentView.findViewById(R.id.buttonLoad);
         mButtonLoad.setOnClickListener(this);
         mScrollProgress = (ScrollView) mFragmentView.findViewById(R.id.scrProgress);
+        mProgress = (ProgressBar) mFragmentView.findViewById(R.id.Progress);
+        mButtonPlay = (ImageButton) mFragmentView.findViewById(R.id.buttonPlay);
+        mButtonPlay.setOnClickListener(this);
+        mButtonPause = (ImageButton) mFragmentView.findViewById(R.id.buttonPause);
+        mButtonPause.setOnClickListener(this);
+        ImageButton mButtonStop = (ImageButton) mFragmentView.findViewById(R.id.buttonStop);
+        mButtonStop.setOnClickListener(this);
         mDialog = new Dialog(mActivity);
         mDialog.setContentView(R.layout.layout_prompt);
         ((CheckBox) mDialog.findViewById(R.id.checkLearningMethod)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -229,7 +244,7 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                                 public void onClick(View v) {
                                     String data = editText.getText().toString();
                                     int number_of_iterations = (("".equals(data)) ? 0 : Integer.valueOf(data));
-
+                                    mProgress.setMax(number_of_iterations);
                                     if (number_of_iterations <= 0) {
                                         Toast.makeText(mActivity, "Can't start the training", Toast.LENGTH_LONG).show();
                                     } else {
@@ -283,19 +298,43 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                 mLayoutProgressing.setVisibility(View.VISIBLE);
                 break;
 
+            case R.id.buttonPlay:
+                Toast.makeText(mActivity, "Resuming", Toast.LENGTH_SHORT).show();
+                if (mLearner != null) {
+                    mLearner.setState(PatternLearning.STATE.PLAY);
+                }
+                mButtonPause.setVisibility(View.VISIBLE);
+                mButtonPlay.setVisibility(View.GONE);
+                break;
+
+            case R.id.buttonPause:
+                Toast.makeText(mActivity, "Pausing", Toast.LENGTH_SHORT).show();
+                if (mLearner != null) {
+                    mLearner.setState(PatternLearning.STATE.PAUSE);
+                }
+                mButtonPlay.setVisibility(View.VISIBLE);
+                mButtonPause.setVisibility(View.GONE);
+                break;
+
+            case R.id.buttonStop:
+                Toast.makeText(mActivity, "Learning process is going to stop, please wait!", Toast.LENGTH_SHORT).show();
+                if (mLearner != null) {
+                    mLearner.setState(PatternLearning.STATE.STOP);
+                }
+                break;
+
             default:
                 break;
         }
     }
 
     private void learningWithNoLog(ArrayList<StandardImage> standardImages, int number_of_iterations) {
-        PatternLearning patternLearning;
         if (mListener.getGlobalSOM() != null) {
-            patternLearning = new PatternLearning(standardImages, number_of_iterations, mListener.getGlobalSOM());
+            mLearner = new PatternLearning(standardImages, number_of_iterations, mListener.getGlobalSOM());
         } else {
-            patternLearning = new PatternLearning(standardImages, number_of_iterations);
+            mLearner = new PatternLearning(standardImages, number_of_iterations);
         }
-        patternLearning.learn(new PatternLearning.LearningEndListener() {
+        mLearner.learn(new PatternLearning.LearningEndListener() {
             @Override
             public void endLearning() {
                 isTraining = false;
@@ -310,15 +349,15 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
         mLayoutProgressing.setVisibility(View.VISIBLE);
         mLog = "";
 
-        PatternLearning patternLearning;
+        mCurrent = 1;
         if (mListener.getGlobalSOM() != null) {
-            patternLearning = new PatternLearning(standardImages, number_of_iterations, mListener.getGlobalSOM());
+            mLearner = new PatternLearning(standardImages, number_of_iterations, mListener.getGlobalSOM());
         } else {
-            patternLearning = new PatternLearning(standardImages, number_of_iterations);
+            mLearner = new PatternLearning(standardImages, number_of_iterations);
         }
         final long timeStart = System.currentTimeMillis();
         mTimeElapsed = System.currentTimeMillis();
-        patternLearning.learn(new LearningListener() {
+        mLearner.learn(new LearningListener() {
             @Override
             public void updateEpoch(Bundle bundle) {
                 if (bundle != null) {
@@ -327,6 +366,7 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                     mTimeElapsed = time;
 
                     mTvLogView.setText(mLog);
+                    mProgress.setProgress(mCurrent++);
 
                     mScrollProgress.post(new Runnable() {
                         @Override
@@ -340,7 +380,6 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
             @Override
             public void finish() {
                 Toast.makeText(mActivity, "Training done", Toast.LENGTH_LONG).show();
-                mLayoutProgressing.setVisibility(View.GONE);
                 isTraining = false;
                 String timeSum = "Time elapsed " + SupportUtils.getFormattedTime(System.currentTimeMillis() - timeStart);
                 String log = mLog + "\n" + timeSum;
