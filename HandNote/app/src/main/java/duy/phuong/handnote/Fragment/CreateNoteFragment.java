@@ -2,11 +2,8 @@ package duy.phuong.handnote.Fragment;
 
 import android.app.Activity;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -23,7 +20,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,7 +40,7 @@ import duy.phuong.handnote.Support.SupportUtils;
 /**
  * Created by Phuong on 06/03/2016.
  */
-public class CreateNoteFragment extends BaseFragment implements BackPressListener, View.OnClickListener, BitmapProcessor.RecognitionCallback,
+public class CreateNoteFragment extends BaseFragment implements BackPressListener, View.OnClickListener, BitmapProcessor.DetectCharactersCallback,
         ColorPicker.OnColorChangedListener {
     private FingerDrawerView mDrawer;
     private TextView mTvResult;
@@ -179,45 +175,33 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
     }
 
     @Override
-    public void onRecognizeSuccess(final ArrayList<Character> listCharacters) {
+    public void onBeginDetect(Bundle bundle) {
+        mLayoutProgress.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onDetectSuccess(final ArrayList<Character> listCharacters) {
         if (mCurrentRecognized == null) {
             mCurrentRecognized = new HashMap<>();
         } else {
             mCurrentRecognized.clear();
         }
+        Toast.makeText(mActivity, "Size: " + listCharacters.size(), Toast.LENGTH_LONG).show();
 
         final ArrayList<Line> currentLines = mDrawer.getLines();
-        final String[] paragraph = {""};
         Log.d("List char", "" + listCharacters.size());
 
-        AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+        mLayoutProgress.setVisibility(View.VISIBLE);
+        ImageToText imageToText = new ImageToText(mListener.getGlobalSOM(), mListener.getMapNames());
+        imageToText.imageToText(currentLines, listCharacters, new ImageToText.ConvertingCompleteCallback() {
             @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                mLayoutProgress.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                ImageToText imageToText = new ImageToText(mListener.getGlobalSOM(), mListener.getMapNames());
-                imageToText.imageToText(currentLines, listCharacters, new ImageToText.ConvertingCompleteCallback() {
-                    @Override
-                    public void convertingComplete(String result, HashMap<Input, Point> map) {
-                        paragraph[0] = result;
-                        mCurrentRecognized.putAll(map);
-                    }
-                });
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                mTvResult.setText(paragraph[0]);
+            public void convertingComplete(String result, HashMap<Input, Point> map) {
+                Log.d("Converting complete", "in");
+                mCurrentRecognized.putAll(map);
+                mTvResult.setText(result);
                 mLayoutProgress.setVisibility(View.GONE);
             }
-        };
-        asyncTask.execute();
+        });
     }
 
     private void deleteData() {
@@ -257,5 +241,11 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
         Toast.makeText(mActivity, "Color's changed", Toast.LENGTH_SHORT).show();
         mDialogChangeColor.cancel();
         mDrawer.setPaintColor(color);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mDrawer.setPaintColor(Color.BLACK);
     }
 }

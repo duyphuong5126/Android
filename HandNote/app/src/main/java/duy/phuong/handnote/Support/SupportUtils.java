@@ -309,7 +309,7 @@ public abstract class SupportUtils {
                         return "" + hours + " h " + m + " m " + s + " s " + ms + " ms";
                     } else {
                         long h = hours % 24;
-                        return days + " days" + h + " h " + minutes + " m " + s + " s " + ms + " ms";
+                        return days + " days " + h + " h " + m + " m " + s + " s " + ms + " ms";
                     }
                 }
             }

@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,10 +28,12 @@ import duy.phuong.handnote.Recognizer.MachineLearning.Input;
 /**
  * Created by Phuong on 25/05/2016.
  */
-public class TranslateFragment extends BaseFragment implements BackPressListener, BitmapProcessor.RecognitionCallback, View.OnClickListener{
+public class TranslateFragment extends BaseFragment implements BackPressListener, BitmapProcessor.DetectCharactersCallback, View.OnClickListener {
     private FingerDrawerView mDrawer;
     private LocalStorage mStorage;
     private TextView mTvDefinition;
+    private LinearLayout mLayoutProcess;
+
     public TranslateFragment() {
         mLayoutRes = R.layout.fragment_dictionary;
     }
@@ -49,13 +52,13 @@ public class TranslateFragment extends BaseFragment implements BackPressListener
         buttonRedo.setOnClickListener(this);
         mStorage = new LocalStorage(mActivity);
         mTvDefinition = (TextView) mFragmentView.findViewById(R.id.textDefinition);
+        mLayoutProcess = (LinearLayout) mFragmentView.findViewById(R.id.layoutProcessing);
         Toast.makeText(mActivity, "This version only support English - Vietnamese for offline translation", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        mDrawer.setPaintColor(Color.BLACK);
     }
 
     @Override
@@ -73,34 +76,21 @@ public class TranslateFragment extends BaseFragment implements BackPressListener
     }
 
     @Override
-    public void onRecognizeSuccess(final ArrayList<Character> listCharacters) {
+    public void onBeginDetect(Bundle bundle) {
+        mLayoutProcess.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onDetectSuccess(final ArrayList<Character> listCharacters) {
         final ArrayList<Line> currentLines = mDrawer.getLines();
-        final String[] paragraph = {""};
         Log.d("List char", "" + listCharacters.size());
-
-        AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+        mLayoutProcess.setVisibility(View.VISIBLE);
+        ImageToText imageToText = new ImageToText(mListener.getGlobalSOM(), mListener.getMapNames());
+        imageToText.imageToText(currentLines, listCharacters, new ImageToText.ConvertingCompleteCallback() {
             @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-            }
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                ImageToText imageToText = new ImageToText(mListener.getGlobalSOM(), mListener.getMapNames());
-                imageToText.imageToText(currentLines, listCharacters, new ImageToText.ConvertingCompleteCallback() {
-                    @Override
-                    public void convertingComplete(String result, HashMap<Input, Point> map) {
-                        paragraph[0] = result;
-                    }
-                });
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                String def = mStorage.findEV_Definition(paragraph[0].toLowerCase().replace(" ", ""));
-                String p = paragraph[0].toLowerCase() + " " + def;
+            public void convertingComplete(String result, HashMap<Input, Point> map) {
+                String def = mStorage.findEV_Definition(result.toLowerCase().replace(" ", ""));
+                String p = result.toLowerCase() + " " + def;
                 if (def.length() > 0) {
                     p = p.replace("* ", "\n\t");
                     p = p.replace("|-", ": ");
@@ -110,11 +100,11 @@ public class TranslateFragment extends BaseFragment implements BackPressListener
                     Log.d("Text", p);
                     mTvDefinition.setText(p);
                 } else {
-                    mTvDefinition.setText("Can not find definition for '" + paragraph[0] + "'");
+                    mTvDefinition.setText("Can not find definition for '" + result + "'");
                 }
+                mLayoutProcess.setVisibility(View.GONE);
             }
-        };
-        asyncTask.execute();
+        });
     }
 
 

@@ -9,6 +9,9 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
@@ -18,13 +21,12 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Stack;
 
 import duy.phuong.handnote.DTO.Character;
 import duy.phuong.handnote.DTO.Line;
 import duy.phuong.handnote.Recognizer.BitmapProcessor;
-import duy.phuong.handnote.Support.SupportUtils;
 
 /**
  * Created by Phuong on 23/11/2015.
@@ -49,8 +51,6 @@ public class FingerDrawerView extends View {
 
     private boolean mUndoRedo;
 
-    private HashMap<MyPath, Integer> mMapColor;
-
     private ArrayList<Line> mLines;
     private ArrayList<Character> mCharacters;
 
@@ -58,7 +58,7 @@ public class FingerDrawerView extends View {
         DisplayMetrics getScreenResolution();
     }
 
-    private BitmapProcessor.RecognitionCallback mListener;
+    private BitmapProcessor.DetectCharactersCallback mListener;
     private GetDisplayListener mDisplayListener;
 
     private BitmapProcessor mBitmapProcessor;
@@ -71,10 +71,9 @@ public class FingerDrawerView extends View {
         mBitmapProcessor = new BitmapProcessor();
         mLines = new ArrayList<>();
         mCharacters = new ArrayList<>();
-        mPaint = createPaint(); mPrivatePaint = createPaint();
     }
 
-    public void setListener(BitmapProcessor.RecognitionCallback callback) {
+    public void setListener(BitmapProcessor.DetectCharactersCallback callback) {
         this.mListener = callback;
     }
 
@@ -87,6 +86,7 @@ public class FingerDrawerView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         updatePaintWidth();
+        mPaint = createPaint(); mPrivatePaint = createPaint();
         CurrentWidth = w;
         CurrentHeight = h;
         try {
@@ -133,8 +133,6 @@ public class FingerDrawerView extends View {
                 mLines.add(line);
             }
         }
-
-        mMapColor = new HashMap<>();
     }
 
     public Bitmap getContent() {
@@ -167,14 +165,6 @@ public class FingerDrawerView extends View {
 
     public void setDefault() {
         mBitmapProcessor.setDefault();
-    }
-
-    public void setSplitTopDown() {
-        mBitmapProcessor.setTopDown();
-    }
-
-    public void setSplitBottomUp() {
-        mBitmapProcessor.setBottomUp();
     }
 
     @Override
@@ -211,7 +201,7 @@ public class FingerDrawerView extends View {
         }
         mCanvas.drawBitmap(mCacheBitmap, 0, 0, mPaint);
         for (MyPath myPath : mListPaths) {
-            Paint paint = createPaint(); paint.setColor(mMapColor.get(myPath));
+            Paint paint = createPaint(); paint.setColor(myPath.getColor());
             Path path = new Path();
             boolean first = true;
             ArrayList<Point> points = myPath.getListPoint();
@@ -231,6 +221,7 @@ public class FingerDrawerView extends View {
                 }
 
                 mCanvas.drawPath(path, paint);
+                myPath.mCanvas.drawPath(path, mPrivatePaint);
             }
         }
         canvas.drawBitmap(mBitmap, 0, 0, mPaint);
@@ -246,7 +237,10 @@ public class FingerDrawerView extends View {
                 resetStack();
                 ArrayList<Point> listPoint = new ArrayList<>();
                 MyPath myPath = new MyPath(listPoint);
-                mMapColor.put(myPath, mPaint.getColor());
+                if (myPath.getBitmap() == null) {
+                    myPath.createBitmap(CurrentWidth, CurrentHeight);
+                }
+                myPath.setColor(mPaint.getColor());
                 listPoint.add(new Point((int) x, (int) y));
                 mListPaths.add(myPath);
                 mStartRecognizeTime = System.currentTimeMillis();
@@ -295,7 +289,7 @@ public class FingerDrawerView extends View {
         if (hasMoreEdges()) {
             ArrayList<MyPath> listPaths = new ArrayList<>();
             for (MyPath path : mListPaths) {
-                if (!path.isChecked() && path.isIntersect(myPath, CurrentWidth, CurrentHeight, mPrivatePaint)) {
+                if (!path.isChecked() && path.isIntersect(myPath)) {
                     listPaths.add(path);
                     path.setChecked(true);
                 }
@@ -323,186 +317,102 @@ public class FingerDrawerView extends View {
     }
 
     private void detectCharacters() {
-        if (mUndoRedo || mBitmapProcessor.getMode() != BitmapProcessor.DEFAULT) {
-            mCharacters.clear();
+        if (mUndoRedo) {
             mUndoRedo = false;
         }
-        if (mCharacters.isEmpty()) {
-            ArrayList<MyShape> listShapes = new ArrayList<>();
-
-            for (int i = 0; i < mListPaths.size(); i++) {
-                MyPath myPath = mListPaths.get(i);
-                if (!myPath.isChecked()) {
-                    ArrayList<MyPath> list = new ArrayList<>();
-                    ArrayList<MyPath> paths = new ArrayList<>();
-                    list.add(myPath);
-                    myPath.setChecked(true);
-                    list.addAll(doDFS(paths, myPath));
-
-                    if (!list.isEmpty()) {
-                        MyShape myShape = new MyShape(list);
-                        listShapes.add(myShape);
-                    }
-                }
+        mCharacters.clear();
+        AsyncTask<Void, Bitmap, Void> asyncTask = new AsyncTask<Void, Bitmap, Void>() {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                mListener.onBeginDetect(null);
             }
 
-            for (int i = 0; i < mListPaths.size(); i++) {
-                mListPaths.get(i).setChecked(false);
-                mListPaths.get(i).setSettled(true);
-            }
+            @Override
+            protected Void doInBackground(Void... params) {
+                ArrayList<MyShape> listShapes = new ArrayList<>();
+                for (int i = 0; i < mListPaths.size(); i++) {
+                    MyPath myPath = mListPaths.get(i);
+                    if (!myPath.isChecked()) {
+                        ArrayList<MyPath> list = new ArrayList<>();
+                        ArrayList<MyPath> paths = new ArrayList<>();
+                        list.add(myPath);
+                        myPath.setChecked(true);
+                        list.addAll(doDFS(paths, myPath));
 
-            if (!listShapes.isEmpty()) {
-                for (MyShape myShape : listShapes) {
-                    final Character character = new Character();
-                    character.mBitmap = Bitmap.createBitmap(mCacheBitmap.getWidth(), mCacheBitmap.getHeight(), Bitmap.Config.ARGB_8888);
-                    character.mMyShape = myShape;
-                    character.mParentWidth = CurrentWidth;
-                    character.mParentHeight = CurrentHeight;
-
-                    Canvas canvas = new Canvas(character.mBitmap);
-                    canvas.drawColor(Color.WHITE);
-                    for (MyPath myPath : myShape.getListPaths()) {
-                        Path path = new Path();
-                        boolean first = true;
-                        for (Point point : myPath.getListPoint()) {
-                            if (first) {
-                                first = false;
-                                path.moveTo(point.x, point.y);
-                            } else {
-                                path.lineTo(point.x, point.y);
-                            }
-                        }
-
-                        canvas.drawPath(path, mPrivatePaint);
-                    }
-
-                    mBitmapProcessor.onDetectCharacter(character, new BitmapProcessor.RecognitionCallback() {
-                        @Override
-                        public void onRecognizeSuccess(ArrayList<Character> listCharacters) {
-                            for (Character c : listCharacters) {
-                                c.isSettled = true;
-                            }
-                            mCharacters.addAll(listCharacters);
-                        }
-                    });
-                }
-            }
-        } else {
-            ArrayList<MyShape> listShapes = new ArrayList<>();
-            for (MyPath myPath : mListPaths) {
-                if (!myPath.isSettled() && !myPath.isChecked()) {
-                    ArrayList<MyPath> list = new ArrayList<>();
-                    ArrayList<MyPath> paths = new ArrayList<>();
-                    list.add(myPath);
-                    myPath.setChecked(true);
-                    list.addAll(doDFS(paths, myPath));
-
-                    boolean related = false;
-                    ArrayList<Character> characters = new ArrayList<>();
-                    for (Character character : mCharacters) {
-                        ArrayList<MyPath> myPaths = character.mMyShape.getListPaths();
-                        boolean contain = false;
-                        for (int j = 0; j < list.size() && !contain; j++)  {
-                            if (myPaths.contains(list.get(j))) {
-                                contain = true;
-                                related = true;
-                            }
-                        }
-                        if (contain) {
-                            for (int j = 0; j < list.size(); j++)  {
-                                MyPath path = list.get(j);
-                                if (!myPaths.contains(path)) {
-                                    myPaths.add(path);
-                                    myPath.setSettled(true);
-                                    character.isSettled = false;
-                                }
-                                Bitmap bitmap = Bitmap.createBitmap(CurrentWidth, CurrentHeight, Bitmap.Config.ARGB_8888);
-                                Canvas canvas = new Canvas(bitmap);
-                                canvas.drawColor(Color.WHITE);
-                                for (MyPath myPath1 : character.mMyShape.getListPaths()) {
-                                    Path p = new Path();
-                                    boolean first = true;
-                                    for (Point point : myPath1.getListPoint()) {
-                                        if (first) {
-                                            first = false;
-                                            p.moveTo(point.x, point.y);
-                                        } else {
-                                            p.lineTo(point.x, point.y);
-                                        }
-                                    }
-
-                                    canvas.drawPath(p, mPrivatePaint);
-                                }
-                                Rect rect = mBitmapProcessor.detectAreasOnBitmap(bitmap, 0, 0).get(0);
-                                character.mRect = new Rect(rect.left, rect.top, rect.right, rect.bottom);
-                                character.mBitmap = BitmapProcessor.cropBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height());
-                                if (character.mListContours != null) {
-                                    character.mListContours.clear();
-                                }
-                                if (character.mListContours == null) {
-                                    character.mListContours = new ArrayList<>();
-                                }
-                                character.mListContours.addAll(mBitmapProcessor.findContour(character.mBitmap));
-                            }
-                            characters.add(character);
-                            character.mAlphabet = null;
-                        }
-                    }
-                    if (!characters.isEmpty()) {
-                        if (characters.size() > 1) {
-                            while (characters.size() > 1) {
-                                int index = characters.size() - 1;
-                                mCharacters.remove(characters.remove(index));
-                            }
-                        }
-                    }
-                    if (!related) {
                         if (!list.isEmpty()) {
                             MyShape myShape = new MyShape(list);
                             listShapes.add(myShape);
                         }
                     }
                 }
-            }
-            if (!listShapes.isEmpty()) {
-                for (MyShape shape : listShapes) {
-                    final Character character = new Character();
-                    character.mBitmap = Bitmap.createBitmap(mCacheBitmap.getWidth(), mCacheBitmap.getHeight(), Bitmap.Config.ARGB_8888);
-                    character.mMyShape = shape;
-                    character.mParentWidth = CurrentWidth;
-                    character.mParentHeight = CurrentHeight;
 
-                    Canvas canvas = new Canvas(character.mBitmap);
-                    canvas.drawColor(Color.WHITE);
-                    for (MyPath path : shape.getListPaths()) {
-                        Path p = new Path();
-                        boolean first = true;
-                        for (Point point : path.getListPoint()) {
-                            if (first) {
-                                first = false;
-                                p.moveTo(point.x, point.y);
-                            } else {
-                                p.lineTo(point.x, point.y);
+                for (int i = 0; i < mListPaths.size(); i++) {
+                    mListPaths.get(i).setChecked(false);
+                    mListPaths.get(i).setSettled(true);
+                }
+
+                if (!listShapes.isEmpty()) {
+                    for (MyShape myShape : listShapes) {
+                        final Character character = new Character();
+                        character.mBitmap = Bitmap.createBitmap(mCacheBitmap.getWidth(), mCacheBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                        character.mMyShape = myShape;
+                        character.mParentWidth = CurrentWidth;
+                        character.mParentHeight = CurrentHeight;
+
+                        Canvas canvas = new Canvas(character.mBitmap);
+                        canvas.drawColor(Color.WHITE);
+                        for (MyPath myPath : myShape.getListPaths()) {
+                           canvas.drawBitmap(myPath.getBitmap(), 0, 0, mPrivatePaint);
+                        }
+
+                        mBitmapProcessor.onDetectCharacter(character, new BitmapProcessor.DetectCharactersCallback() {
+                            @Override
+                            public void onBeginDetect(Bundle bundle) {
+
                             }
-                        }
 
-                        canvas.drawPath(p, mPrivatePaint);
+                            @Override
+                            public void onDetectSuccess(ArrayList<Character> listCharacters) {
+                                for (Character c : listCharacters) {
+                                    c.isSettled = true;
+                                }
+                                mCharacters.addAll(listCharacters);
+                            }
+                        });
                     }
+                }
+                return null;
+            }
 
-                    mBitmapProcessor.onDetectCharacter(character, new BitmapProcessor.RecognitionCallback() {
-                        @Override
-                        public void onRecognizeSuccess(ArrayList<Character> listCharacters) {
-                            mCharacters.addAll(listCharacters);
-                        }
-                    });
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                for (MyPath myPath : mListPaths) {
+                    myPath.setChecked(false);
+                }
+                mListener.onDetectSuccess(mCharacters);
+            }
+        };
+        asyncTask.execute();
+    }
+
+    private void sortListChars(ArrayList<Character> characters) {
+        boolean end = false;
+        while (!end) {
+            boolean swapped = false;
+            for (int i = 1; i < characters.size(); i++) {
+                Character c1 = characters.get(i), c2 = characters.get(i - 1);
+                if (c1.mRect.left < c2.mRect.left || c1.mRect.top < c2.mRect.top) {
+                    Collections.swap(characters, i, i - 1);
+                    swapped = true;
                 }
             }
-        }
 
-        for (MyPath myPath : mListPaths) {
-            myPath.setChecked(false);
+            if (!swapped) {
+                end = true;
+            }
         }
-        mListener.onRecognizeSuccess(mCharacters);
     }
 
     private Paint createPaint() {
@@ -522,7 +432,6 @@ public class FingerDrawerView extends View {
         mListPaths.clear();
         mCurrentPath = 0;
         mCharacters.clear();
-        mMapColor.clear();
         invalidate();
     }
 

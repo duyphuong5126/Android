@@ -5,13 +5,12 @@ import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.LinearLayout;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 
 import duy.phuong.handnote.DTO.Character;
@@ -27,10 +26,10 @@ import duy.phuong.handnote.Recognizer.Recognizer;
 /**
  * Created by Phuong on 24/05/2016.
  */
-public class WebFragment extends BaseFragment implements BitmapProcessor.RecognitionCallback, BackPressListener {
+public class WebFragment extends BaseFragment implements BitmapProcessor.DetectCharactersCallback, BackPressListener {
     private WebView mWebView;
     private FingerDrawerView mDrawer;
-    private Recognizer mRecognizer;
+    private LinearLayout mLayoutProcessing;
     private String mUrl = "";
     public WebFragment() {
         mLayoutRes = R.layout.fragment_web;
@@ -54,13 +53,12 @@ public class WebFragment extends BaseFragment implements BitmapProcessor.Recogni
         mWebView.getSettings().setLoadsImagesAutomatically(true);
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-        mRecognizer = new Recognizer(mListener.getGlobalSOM(), mListener.getMapNames());
+        mLayoutProcessing = (LinearLayout) mFragmentView.findViewById(R.id.layoutProcessing);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        mDrawer.setPaintColor(Color.BLACK);
     }
 
     @Override
@@ -69,41 +67,27 @@ public class WebFragment extends BaseFragment implements BitmapProcessor.Recogni
     }
 
     @Override
-    public void onRecognizeSuccess(final ArrayList<Character> listCharacters) {
+    public void onBeginDetect(Bundle bundle) {
+        mLayoutProcessing.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onDetectSuccess(final ArrayList<Character> listCharacters) {
         for (Character character : listCharacters) {
             character.isSorted = false;
         }
 
         final ArrayList<Line> currentLines = mDrawer.getLines();
-        final String[] paragraph = {""};
 
-        AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+        ImageToText imageToText = new ImageToText(mListener.getGlobalSOM(), mListener.getMapNames());
+        imageToText.imageToText(currentLines, listCharacters, new ImageToText.ConvertingCompleteCallback() {
             @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-            }
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                ImageToText imageToText = new ImageToText(mListener.getGlobalSOM(), mListener.getMapNames());
-                imageToText.imageToText(currentLines, listCharacters, new ImageToText.ConvertingCompleteCallback() {
-                    @Override
-                    public void convertingComplete(String result, HashMap<Input, Point> map) {
-                        paragraph[0] = result;
-                    }
-                });
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                String text = paragraph[0];
-                mUrl = "https://www.google.com.vn/search?q=" + text;
+            public void convertingComplete(String result, HashMap<Input, Point> map) {
+                mUrl = "https://www.google.com.vn/search?q=" + result;
                 mWebView.loadUrl(mUrl);
+                mLayoutProcessing.setVisibility(View.GONE);
             }
-        };
-        asyncTask.execute();
+        });
     }
 
     @Override

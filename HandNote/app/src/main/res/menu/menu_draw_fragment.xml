@@ -2,8 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/itemContour" android:title="Contours"/>
     <item android:id="@+id/itemProfile" android:title="Profile"/>
-    <item android:id="@+id/itemTopDown" android:title="Top down"/>
-    <item android:id="@+id/itemBottomUp" android:title="Bottom up"/>
     <item android:id="@+id/itemVerticalProjectionProfile" android:title="Vertical Projection Profile"/>
     <item android:id="@+id/itemHorizontalProjectionProfile" android:title="Horizontal Projection Profile"/>
     <item android:id="@+id/itemDefault" android:title="Defaults"/>

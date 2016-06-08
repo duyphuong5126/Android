@@ -202,6 +202,10 @@ public class StartActivity extends Activity implements View.OnClickListener {
             @Override
             public void onClick(View widget) {
                 Toast.makeText(StartActivity.this, "Facebook: Duy Phuong", Toast.LENGTH_LONG).show();
+                String url = "https://www.facebook.com/duyphuong.nguyenhoang.7";
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(url));
+                startActivity(intent);
             }
 
             @Override

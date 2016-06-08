@@ -2,6 +2,8 @@ package duy.phuong.handnote.Recognizer;
 
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -19,14 +21,16 @@ import duy.phuong.handnote.Recognizer.MachineLearning.SOM;
  * Created by Phuong on 25/05/2016.
  */
 public class ImageToText {
+    private int mCountCharacters;
+    private int mLineCount;
+    private SOM mSOM;
+    private ArrayList<ClusterLabel> mLabels;
     public interface ConvertingCompleteCallback {
         void convertingComplete(String result, HashMap<Input, Point> map);
     }
 
-    private Recognizer mRecognizer;
-
     public ImageToText(SOM som, ArrayList<ClusterLabel> mapNames) {
-        mRecognizer = new Recognizer(som, mapNames);
+        mSOM = som; mLabels = mapNames;
     }
 
     private boolean isSameLine(Character c1, Character c2) {
@@ -47,11 +51,12 @@ public class ImageToText {
         }
     }
 
-    public void imageToText(ArrayList<Line> currentLines, ArrayList<Character> listCharacters, ConvertingCompleteCallback callback) {
-        HashMap<Input, Point> map = new HashMap<>();
+    public void imageToText(ArrayList<Line> currentLines, ArrayList<Character> listCharacters, final ConvertingCompleteCallback callback) {
+        final HashMap<Input, Point> map = new HashMap<>();
         for (Character character : listCharacters) {
             character.isSorted = false;
         }
+        mCountCharacters = mLineCount = 0;
 
         final ArrayList<Line> lines = new ArrayList<>();
         for (Character c : listCharacters) {
@@ -74,8 +79,10 @@ public class ImageToText {
         }
 
         if (!lines.isEmpty()) {
-            String p = "";
+            final String[] lists = new String[lines.size()];
+            mCountCharacters = listCharacters.size();
             for (Line line : lines) {
+                final int indexLine = lines.indexOf(line);
                 if (!line.mCharacters.isEmpty()) {
                     boolean end = false;
                     while (!end) {
@@ -92,43 +99,77 @@ public class ImageToText {
                             end = true;
                         }
                     }
-                    String text = "";
-                    int h = Math.abs(line.mMaxBottom - line.mMinTop);
+                    final String[] text = new String[line.mCharacters.size()];
+                    final int h = Math.abs(line.mMaxBottom - line.mMinTop);
+                    mLineCount = line.mCharacters.size();
                     for (int i = 0; i < line.mCharacters.size(); i++) {
-                        Character c = line.mCharacters.get(i);
+                        final Character c = line.mCharacters.get(i);
+                        final int index = i;
                         if (c.mAlphabet == null) {
-                            Bundle bundle = mRecognizer.recognize(c);
-                            int x = bundle.getInt("cordX");
-                            int y = bundle.getInt("cordY");
-                            Input input = (Input) bundle.getSerializable("input");
-                            String result = bundle.getString("result");
-                            map.put(input, new Point(x, y));
-                            Log.d("Result", "bitmap " + i + " :" + result);
-                            switch (result) {
-                                case "C":case "O":case "P":case "S":case "V":case "W":case "X":case "Z":
-                                    if (c.mRect.height() <= 0.7d * h) {
-                                        c.mAlphabet = result.toLowerCase();
-                                    } else {
-                                        c.mAlphabet = result;
+                            final AsyncTask<Void, Void, Bundle> asyncTask = new AsyncTask<Void, Void, Bundle>() {
+                                @Override
+                                protected Bundle doInBackground(Void... params) {
+                                    Recognizer recognizer = new Recognizer(mSOM, mLabels);
+                                    return recognizer.recognize(c);
+                                }
+
+                                @Override
+                                protected void onPostExecute(Bundle bundle) {
+                                    super.onPostExecute(bundle);
+                                    int x = bundle.getInt("cordX");
+                                    int y = bundle.getInt("cordY");
+                                    Input input = (Input) bundle.getSerializable("input");
+                                    String result = bundle.getString("result");
+                                    map.put(input, new Point(x, y));
+                                    Log.d("Result", "bitmap " + index + " :" + result);
+                                    switch (result) {
+                                        case "C":case "O":case "P":case "S":case "V":case "W":case "X":case "Z":
+                                            if (c.mRect.height() <= 0.7d * h) {
+                                                c.mAlphabet = result.toLowerCase();
+                                            } else {
+                                                c.mAlphabet = result;
+                                            }
+                                            break;
+
+                                        case "b1":
+                                        case "k1":
+                                            c.mAlphabet = result.substring(0, 1);
+                                            break;
+
+                                        default:
+                                            c.mAlphabet = result;
+                                            break;
                                     }
-                                    break;
-
-                                case "b1":
-                                case "k1":
-                                    c.mAlphabet = result.substring(0, 1);
-                                    break;
-
-                                default:
-                                    c.mAlphabet = result;
-                                    break;
+                                    text[index] = c.mAlphabet;
+                                    if (mLineCount <= 1) {
+                                        String t = "";
+                                        for (String s : text) {
+                                            t += s;
+                                        }
+                                        lists[indexLine] = t;
+                                    } else {
+                                        mLineCount--;
+                                    }
+                                    if (mCountCharacters <= 1) {
+                                        String p = "";
+                                        for (String s : lists) {
+                                            p += s + " ";
+                                        }
+                                        callback.convertingComplete(p, map);
+                                    } else {
+                                        mCountCharacters--;
+                                    }
+                                }
+                            };
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                                asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                            } else {
+                                asyncTask.execute();
                             }
                         }
-                        text += c.mAlphabet;
                     }
-                    p += text + " ";
                 }
             }
-            callback.convertingComplete(p, map);
         }
     }
 }

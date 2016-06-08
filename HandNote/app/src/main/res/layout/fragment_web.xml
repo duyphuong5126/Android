@@ -1,20 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <duy.phuong.handnote.MyView.DrawingView.FingerDrawerView
-        android:id="@+id/FingerDrawer"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <WebView
-        android:id="@+id/webSearch"
+        <duy.phuong.handnote.MyView.DrawingView.FingerDrawerView
+            android:id="@+id/FingerDrawer"
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1" />
+
+        <WebView
+            android:id="@+id/webSearch"
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            android:background="#fff"></WebView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutProcessing"
         android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1"
-        android:background="#fff"></WebView>
+        android:layout_height="match_parent"
+        android:background="#D9000000"
+        android:gravity="center"
+        android:visibility="gone">
 
-</LinearLayout>
+        <ProgressBar
+            android:layout_width="50dip"
+            android:layout_height="50dip" />
+    </LinearLayout>
+
+</FrameLayout>
