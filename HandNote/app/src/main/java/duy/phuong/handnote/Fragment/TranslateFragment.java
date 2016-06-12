@@ -1,8 +1,11 @@
 package duy.phuong.handnote.Fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -18,12 +21,14 @@ import java.util.HashMap;
 import duy.phuong.handnote.DAO.LocalStorage;
 import duy.phuong.handnote.DTO.Character;
 import duy.phuong.handnote.DTO.Line;
+import duy.phuong.handnote.HandNote;
 import duy.phuong.handnote.Listener.BackPressListener;
 import duy.phuong.handnote.MyView.DrawingView.FingerDrawerView;
 import duy.phuong.handnote.R;
 import duy.phuong.handnote.Recognizer.BitmapProcessor;
 import duy.phuong.handnote.Recognizer.ImageToText;
 import duy.phuong.handnote.Recognizer.MachineLearning.Input;
+import duy.phuong.handnote.Support.SharedPreferenceUtils;
 
 /**
  * Created by Phuong on 25/05/2016.
@@ -33,6 +38,11 @@ public class TranslateFragment extends BaseFragment implements BackPressListener
     private LocalStorage mStorage;
     private TextView mTvDefinition;
     private LinearLayout mLayoutProcess;
+
+    private AsyncTask<Void, Void, Void> mEVTask;
+
+    private AlertDialog.Builder mBuilder;
+    private AlertDialog mDialog;
 
     public TranslateFragment() {
         mLayoutRes = R.layout.fragment_dictionary;
@@ -53,7 +63,66 @@ public class TranslateFragment extends BaseFragment implements BackPressListener
         mStorage = new LocalStorage(mActivity);
         mTvDefinition = (TextView) mFragmentView.findViewById(R.id.textDefinition);
         mLayoutProcess = (LinearLayout) mFragmentView.findViewById(R.id.layoutProcessing);
-        Toast.makeText(mActivity, "This version only support English - Vietnamese for offline translation", Toast.LENGTH_LONG).show();
+
+        mEVTask = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                mLayoutProcess.setVisibility(View.VISIBLE);
+                if (mDialog != null) {
+                    if (mDialog.isShowing()) {
+                        mDialog.cancel();
+                    }
+                }
+                Toast.makeText(mActivity, "Initializing dictionary data, please wait...", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                HandNote handNote = (HandNote) mActivity.getApplication();
+                handNote.loadEV_Dict();
+                SharedPreferenceUtils.loadedDict(true);
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                mLayoutProcess.setVisibility(View.GONE);
+            }
+        };
+        mBuilder = new AlertDialog.Builder(mActivity);
+        mBuilder.setTitle("You haven't installed dictionary yet. Install it now?").setNegativeButton("Skip", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(mActivity, "You can't use translate feature before installed dictionary", Toast.LENGTH_LONG).show();
+                mLayoutProcess.setVisibility(View.GONE);
+                mActivity.onBackPressed();
+            }
+        }).setPositiveButton("Install", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                initDict();
+            }
+        });
+        mDialog = mBuilder.create();
+        if (!SharedPreferenceUtils.isLoadedDict()) {
+            if (mDialog != null) {
+                mDialog.show();
+            }
+        } else
+            Toast.makeText(mActivity, "This version only support English - Vietnamese for offline translation", Toast.LENGTH_LONG).show();
+        }
+
+
+    private void initDict() {
+        if (mEVTask != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                mEVTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            } else {
+                mEVTask.execute();
+            }
+        }
     }
 
     @Override

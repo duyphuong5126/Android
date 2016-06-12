@@ -38,10 +38,10 @@ public class SharedPreferenceUtils {
         editor.apply();
     }
 
-    public static void loadedDict() {
+    public static void loadedDict(boolean loaded) {
         SharedPreferences preferences = mContext.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean(DICTIONARY_LOADED, true);
+        editor.putBoolean(DICTIONARY_LOADED, loaded);
         editor.apply();
     }
 

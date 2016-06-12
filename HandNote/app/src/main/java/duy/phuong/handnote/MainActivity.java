@@ -69,6 +69,8 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     private TextView mTvAppTitle, mTvUsername;
     private RoundImageView mAvatar;
 
+    private int mTabWidth = 0, mTabHeight = 0;
+
     private BackPressListener mBackPressListener;
     private Stack<String> mStack;
 
@@ -85,7 +87,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     private Button mTabNotes, mTabTemplates;
     private TextView mTvInternet;
 
-    private LinearLayout mBottomTabs;
+    private LinearLayout mBottomTabs, mBackBottomTabs;
     private ImageButton mButtonCreate;
     private LinearLayout mBorderButtonCreate;
 
@@ -94,6 +96,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
 
     private LinearLayout mLayoutLoading;
     private HandNote mHandNote;
+    private boolean mSetTabSize;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,12 +106,15 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         mLayoutLoading = (LinearLayout) findViewById(R.id.layoutLoading);
         mLayoutLoading.setVisibility(View.VISIBLE);
 
+        mSetTabSize = false;
+
         mTabTemplates = (Button) findViewById(R.id.buttonTemplates);
         mTabTemplates.setOnClickListener(this);
         mTabNotes = (Button) findViewById(R.id.buttonListNotes);
         mTabNotes.setOnClickListener(this);
 
         mLayoutBottomTabs = (FrameLayout) findViewById(R.id.layoutTabsBottom);
+        mBackBottomTabs = (LinearLayout) findViewById(R.id.layoutBackBottomTab);
         mSideMenu = (LinearLayout) findViewById(R.id.layoutSideMenu);
         mMainNavigator = (DrawerLayout) findViewById(R.id.layoutMainNavigator);
         mButtonNavigator = (ImageButton) findViewById(R.id.buttonMainNavigator);
@@ -158,6 +164,9 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         initSOM();
         if (savedInstanceState != null) {
             mFragmentName = savedInstanceState.getString("Fragment");
+            mSetTabSize = savedInstanceState.getBoolean("isSetSize");
+            mTabWidth = savedInstanceState.getInt("tabWidth");
+            mTabHeight = savedInstanceState.getInt("tabHeight");
             ArrayList<String> list = savedInstanceState.getStringArrayList("Stack");
             if (list != null) {
                 for (int i = list.size() - 1; i >= 0; i--) {
@@ -174,6 +183,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     @Override
     protected void onStart() {
         super.onStart();
+        updateButtonAdd();
         mItems = new ArrayList<>();
         mItems.add(new SideMenuItem(R.mipmap.ic_android_black_24dp, R.mipmap.ic_android_red_24dp, getString(R.string.training_en), false));
         mItems.add(new SideMenuItem(R.mipmap.ic_translate_black_24dp, R.mipmap.ic_translate_red_24dp, getString(R.string.translate_en), false));
@@ -281,16 +291,25 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        int parentW = mBottomTabs.getWidth(); int parentH = mBottomTabs.getHeight();
-        Log.d("Size", "w: " + parentW + ", h: " + parentH);
+        if (!mSetTabSize) {
+            mTabWidth = mBottomTabs.getWidth();
+            mTabHeight = mBottomTabs.getHeight();
+            mSetTabSize = true;
+        }
+        updateButtonAdd();
+        mLayoutLoading.setVisibility(View.GONE);
+    }
+
+    private void updateButtonAdd() {
+        Log.d("Size", "w: " + mTabWidth + ", h: " + mTabHeight);
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         float border = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, metrics);
         mButtonCreate.requestLayout();
-        mButtonCreate.getLayoutParams().height = parentH - 3 * border > 0 ? (int) (parentH - 3 * border) : parentH;
-        mButtonCreate.getLayoutParams().width = parentH - 3 * border > 0 ? (int) (parentH - 3 * border) : parentH;
-        mBorderButtonCreate.getLayoutParams().height = parentH - 2 * border > 0 ? (int) (parentH - 2 * border) : parentH;
-        mBorderButtonCreate.getLayoutParams().width = parentH - 2 * border > 0 ? (int) (parentH - 2 * border) : parentH;
-        mLayoutLoading.setVisibility(View.GONE);
+        mButtonCreate.getLayoutParams().height = mTabHeight - 3 * border > 0 ? (int) (mTabHeight - 3 * border) : mTabHeight;
+        mButtonCreate.getLayoutParams().width = mTabHeight - 3 * border > 0 ? (int) (mTabHeight - 3 * border) : mTabHeight;
+        mBorderButtonCreate.requestLayout();
+        mBorderButtonCreate.getLayoutParams().height = mTabHeight - 2 * border > 0 ? (int) (mTabHeight - 2 * border) : mTabHeight;
+        mBorderButtonCreate.getLayoutParams().width = mTabHeight - 2 * border > 0 ? (int) (mTabHeight - 2 * border) : mTabHeight;
     }
 
     private void initMapNames() {
@@ -418,6 +437,9 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putString("Fragment", mFragmentName);
+        outState.putBoolean("isSetSize", mSetTabSize);
+        outState.putInt("tabWidth", mTabWidth);
+        outState.putInt("tabHeight", mTabHeight);
         ArrayList<String> list = new ArrayList<>();
         List<Fragment> listFragments = mFragmentManager.getFragments();
         for (Fragment fragment : listFragments) {
@@ -642,6 +664,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                 mStack.pop();
             }
             checkScreen();
+            updateButtonAdd();
         }
     }
 

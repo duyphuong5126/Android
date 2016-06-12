@@ -1,7 +1,10 @@
 package duy.phuong.handnote;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
@@ -66,6 +69,11 @@ public class StartActivity extends Activity implements View.OnClickListener {
 
     private Uri mCapturedImage;
 
+    private AsyncTask<Void, Void, Void> mEVTask;
+
+    private AlertDialog.Builder mBuilder;
+    private AlertDialog mDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,23 +83,26 @@ public class StartActivity extends Activity implements View.OnClickListener {
         mLayoutLoading = (LinearLayout) findViewById(R.id.loadScreen);
         mLayoutIntro = (LinearLayout) findViewById(R.id.layoutIntro);
         mLayoutLogin = (LinearLayout) findViewById(R.id.layoutLogin);
+        mLayoutLoading.setVisibility(View.VISIBLE);
 
-        AsyncTask<Void, Void, Void> evTask = new AsyncTask<Void, Void, Void>() {
+        mEVTask = new AsyncTask<Void, Void, Void>() {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
                 mLayoutLoading.setVisibility(View.VISIBLE);
-                if (!SharedPreferenceUtils.isLoadedDict()) {
-                    Toast.makeText(StartActivity.this, "Initializing dictionary data, please wait...", Toast.LENGTH_SHORT).show();
+                if (mDialog != null) {
+                    if (mDialog.isShowing()) {
+                        mDialog.cancel();
+                    }
                 }
+                Toast.makeText(StartActivity.this, "Initializing dictionary data, please wait...", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             protected Void doInBackground(Void... params) {
-                if (!SharedPreferenceUtils.isLoadedDict()) {
-                    loadEV_Dict();
-                    SharedPreferenceUtils.loadedDict();
-                }
+                HandNote handNote = (HandNote) getApplication();
+                handNote.loadEV_Dict();
+                SharedPreferenceUtils.loadedDict(true);
                 return null;
             }
 
@@ -111,11 +122,42 @@ public class StartActivity extends Activity implements View.OnClickListener {
                 }
             }
         };
+        mBuilder = new AlertDialog.Builder(this);
+        mBuilder.setTitle("You haven't installed dictionary yet. Install it now?").setNegativeButton("Skip", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(StartActivity.this, "You can't use translate feature before installed dictionary", Toast.LENGTH_LONG).show();
+                if (SharedPreferenceUtils.getCurrentName().isEmpty()) {
+                    showLoginScreen();
+                    mLayoutLoading.setVisibility(View.GONE);
+                } else {
+                    intentMain();
+                }
+            }
+        }).setPositiveButton("Install", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                initDict();
+            }
+        });
+        mDialog = mBuilder.create();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            evTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        if (!SharedPreferenceUtils.isLoadedDict()) {
+            if (mDialog != null) {
+                mDialog.show();
+            }
         } else {
-            evTask.execute();
+            intentMain();
+        }
+    }
+
+    private void initDict() {
+        if (mEVTask != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                mEVTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            } else {
+                mEVTask.execute();
+            }
         }
     }
 
@@ -389,43 +431,6 @@ public class StartActivity extends Activity implements View.OnClickListener {
                 default:
                     break;
             }
-        }
-    }
-
-    private void loadEV_Dict() {
-        LocalStorage localStorage = new LocalStorage(StartActivity.this);
-        SQLiteDatabase db = localStorage.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        Resources resources = getResources();
-        loadDict(R.raw.eng_vi, resources, localStorage, db, contentValues);
-        db.close();
-    }
-
-    private void loadDict(int raw, Resources resources, LocalStorage storage, SQLiteDatabase db, ContentValues contentValues) {
-        InputStream inputStream = resources.openRawResource(raw);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-        String line = null;
-        try {
-            while ((line = reader.readLine()) != null) {
-                Log.d("line", line);
-                StringTokenizer tokenizer = new StringTokenizer(line, "#");
-                if (tokenizer.countTokens() == 2) {
-                    String word = tokenizer.nextToken();
-                    String definition = tokenizer.nextToken();
-                    Log.d("Infor", "w: " + word + ", def: " + definition);
-                    Log.d("Insert result", String.valueOf(storage.inertEV_DictLine(word, null, definition, db, contentValues)));
-                } else {
-                    if (tokenizer.countTokens() == 3) {
-                        String word = tokenizer.nextToken();
-                        String pronunciation = tokenizer.nextToken();
-                        String definition = tokenizer.nextToken();
-                        Log.d("Infor", "w: " + word + ", pro: " + pronunciation + ", def: " + definition);
-                        Log.d("Insert result", String.valueOf(storage.inertEV_DictLine(word, pronunciation, definition, db, contentValues)));
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

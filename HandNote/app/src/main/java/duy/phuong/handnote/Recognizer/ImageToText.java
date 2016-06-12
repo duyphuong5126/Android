@@ -39,8 +39,14 @@ public class ImageToText {
         return (r1.top <= mid2 && r1.bottom >= mid2) || (r2.top <= mid1 && r2.bottom >= mid1);
     }
 
-    private void makeLine(Character c, ArrayList<Character> line, ArrayList<Character> characters) {
-        line.add(c);
+    private void makeLine(Character c, Line line, ArrayList<Character> characters) {
+        if (line.mCharacters != null) {
+            line.mCharacters.add(c);
+            if (line.mMaxBottom - line.mMinTop < c.mRect.height()) {
+                line.mMinTop = c.mRect.top;
+                line.mMaxBottom = c.mRect.bottom;
+            }
+        }
         c.isSorted = true;
         for (Character character : characters) {
             if (!character.isSorted) {
@@ -72,7 +78,7 @@ public class ImageToText {
 
                 if (line != null) {
                     line.mCharacters = new ArrayList<>();
-                    makeLine(c, line.mCharacters, listCharacters);
+                    makeLine(c, line, listCharacters);
                     lines.add(line);
                 }
             }
@@ -101,6 +107,7 @@ public class ImageToText {
                     }
                     final String[] text = new String[line.mCharacters.size()];
                     final int h = Math.abs(line.mMaxBottom - line.mMinTop);
+                    Log.d("Line height", h + "");
                     mLineCount = line.mCharacters.size();
                     for (int i = 0; i < line.mCharacters.size(); i++) {
                         final Character c = line.mCharacters.get(i);
@@ -122,6 +129,7 @@ public class ImageToText {
                                     String result = bundle.getString("result");
                                     map.put(input, new Point(x, y));
                                     Log.d("Result", "bitmap " + index + " :" + result);
+                                    Log.d("Char height", c.mRect.height() + "");
                                     switch (result) {
                                         case "C":case "O":case "P":case "S":case "V":case "W":case "X":case "Z":
                                             if (c.mRect.height() <= 0.7d * h) {

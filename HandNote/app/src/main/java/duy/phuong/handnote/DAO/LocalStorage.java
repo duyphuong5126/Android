@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import duy.phuong.handnote.DTO.Note;
+import duy.phuong.handnote.Support.SharedPreferenceUtils;
 import duy.phuong.handnote.Support.SupportUtils;
 
 /**
@@ -141,5 +142,15 @@ public class LocalStorage extends SQLiteOpenHelper {
         }
         SQLiteDatabase db = getWritableDatabase();
         db.delete(TABLE_NOTE, null ,null);
+    }
+
+    public void deleteAllDict(SQLiteDatabase db) {
+        if (db == null) {
+            SQLiteDatabase database = getWritableDatabase();
+            database.delete(TABLE_EV_DICTIONARY, null, null);
+        } else {
+            db.delete(TABLE_EV_DICTIONARY, null, null);
+        }
+        SharedPreferenceUtils.loadedDict(false);
     }
 }

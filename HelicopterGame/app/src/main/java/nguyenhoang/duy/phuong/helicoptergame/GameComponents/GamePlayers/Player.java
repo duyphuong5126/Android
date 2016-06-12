@@ -16,58 +16,58 @@ public class Player extends GameObject {
     protected boolean Up;
     protected boolean Playing;
     protected Animation mAnimate = new Animation();
-    protected long startTime;
-    protected boolean Disapear;
+    protected long mStartTime;
+    protected boolean Disappear;
     private int mStatus;
-    private int Life;
+    private int mLife;
 
-    public Player(int w, int h){
+    public Player(int w, int h) {
         dy = 0;
         mScore = 0;
         height = h;
         width = w;
         mStatus = 0;
-        Life = 1;
+        mLife = 1;
     }
 
-    public void initSprites(Bitmap res, int numFrames){
+    public void initSprites(Bitmap res, int numFrames) {
         Bitmap[] images = new Bitmap[numFrames];
         mSpriteSheet = res;
-        for (int i=0; i<images.length; i++) {
-            images[i] = Bitmap.createBitmap(mSpriteSheet, i*width, 0, width, height);
+        for (int i = 0; i < images.length; i++) {
+            images[i] = Bitmap.createBitmap(mSpriteSheet, i * width, 0, width, height);
         }
         mAnimate.setFrames(images);
         mAnimate.setDelay(10);
-        startTime = System.nanoTime();
+        mStartTime = System.nanoTime();
     }
 
     public void setUp(boolean up) {
         this.Up = up;
     }
-    public void update(GamePanel gamePanel){
-        long eslapsed = (System.nanoTime() - startTime)/1000000;
-        if(eslapsed>100){
+
+    public void update(GamePanel gamePanel) {
+        long elapsed = (System.nanoTime() - mStartTime) / 1000000;
+        if (elapsed > 100) {
             mScore++;
-            startTime = System.nanoTime();
+            mStartTime = System.nanoTime();
         }
         mAnimate.update();
 
-        if(Up){
-            dy -= 1;
+        if (Up) {
+            dy -= 0.35d;
+        } else {
+            dy += 0.35d;
         }
-        else{
-            dy += 1;
-        }
-        if(dy>14) dy = 14;
-        if(dy<-14) dy = -14;
+        if (dy > 14) dy = 14;
+        if (dy < -14) dy = -14;
 
-        y += dy*2;
-        if(y > gamePanel.getHeight() - height) y = gamePanel.getHeight() - height;
-        if(y < 10) y = 10;
+        y += dy * 2;
+        if (y > gamePanel.getHeight() - height) y = gamePanel.getHeight() - height;
+        if (y < 10) y = 10;
     }
 
-    public void draw(Canvas canvas){
-        canvas.drawBitmap(mAnimate.getImage(),x,y,null);
+    public void draw(Canvas canvas) {
+        canvas.drawBitmap(mAnimate.getImage(), x, y, null);
     }
 
     public int getScore() {
@@ -81,22 +81,26 @@ public class Player extends GameObject {
     public void setPlaying(boolean playing) {
         this.Playing = playing;
     }
-    public void resetScore(){
-        mScore =0;
+
+    public void resetScore() {
+        mScore = 0;
         mStatus = 0;
     }
-    public void resetDY(){ dy=0; }
+
+    public void resetDY() {
+        dy = 0;
+    }
 
     public void setScore(int score) {
         this.mScore = score;
     }
 
-    public boolean isDissapear() {
-        return Disapear;
+    public boolean isDisappear() {
+        return Disappear;
     }
 
-    public void setDissapear(boolean dissapear) {
-        this.Disapear = dissapear;
+    public void setDisappear(boolean disappear) {
+        this.Disappear = disappear;
     }
 
     public void setStatus(int status) {
@@ -108,10 +112,10 @@ public class Player extends GameObject {
     }
 
     public int getLife() {
-        return Life;
+        return mLife;
     }
 
     public void setLife(int life) {
-        Life = life;
+        mLife = life;
     }
 }

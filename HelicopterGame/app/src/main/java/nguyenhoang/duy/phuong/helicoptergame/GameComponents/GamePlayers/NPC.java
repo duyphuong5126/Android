@@ -16,7 +16,7 @@ public class NPC extends Enemy {
         this.x = positionX;
         this.y = positionY;
         this.mPosition = positionY / 160;
-        this.Disapear = true;
+        this.Disappear = true;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class NPC extends Enemy {
 
         mAnimate.setFrames(images);
         mAnimate.setDelay(20);
-        startTime = System.nanoTime();
+        mStartTime = System.nanoTime();
     }
 
     @Override

@@ -25,7 +25,7 @@ public class Enemy extends Player {
     public void initSprites(Bitmap[] res) {
         mAnimate.setFrames(res);
         mAnimate.setDelay(10);
-        startTime = System.nanoTime();
+        mStartTime = System.nanoTime();
     }
 
     @Override

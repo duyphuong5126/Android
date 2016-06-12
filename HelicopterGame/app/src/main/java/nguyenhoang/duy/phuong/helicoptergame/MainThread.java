@@ -25,7 +25,7 @@ public class MainThread extends Thread {
 
     @Override
     public void run() {
-        long startTime, timeMilis, waitTime, totalTime = 0, targetTime = 1000 / mFPS;
+        long startTime, timeMillis, waitTime, totalTime = 0, targetTime = 1000 / mFPS;
         int frameCount = 0;
         while (mRunning){
             startTime = System.nanoTime();
@@ -50,8 +50,8 @@ public class MainThread extends Thread {
                     }
                 }
             }
-            timeMilis = (System.nanoTime() - startTime) / 1000000;
-            waitTime = targetTime - timeMilis;
+            timeMillis = (System.nanoTime() - startTime) / 1000000;
+            waitTime = targetTime - timeMillis;
 
             try {
                 this.sleep(waitTime);

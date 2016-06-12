@@ -8,8 +8,8 @@ import android.graphics.Rect;
 public abstract class GameObject {
     protected int x;
     protected int y;
-    protected int dx;
-    protected int dy;
+    protected double dx;
+    protected double dy;
     protected int width;
     protected int height;
 

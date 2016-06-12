@@ -18,7 +18,9 @@ public class Missile extends MovableUnit {
         mScore = s;
         mSpeed = 5 + mRandom.nextInt(10);
         //cap missile mSpeed
-        if (mSpeed > 50) mSpeed = 50;
+        if (mSpeed > 35) {
+            mSpeed = 35;
+        }
         Bitmap[] images = new Bitmap[numFrames];
         mSpriteSheet = res;
         for (int i = 0; i < images.length; i++) {
@@ -26,11 +28,6 @@ public class Missile extends MovableUnit {
         }
         mAnimate.setFrames(images);
         mAnimate.setDelay(100 - mSpeed);
-    }
-
-    @Override
-    public void setSpeed(int speed) {
-        super.setSpeed(speed);
     }
 
     public boolean isLive() {

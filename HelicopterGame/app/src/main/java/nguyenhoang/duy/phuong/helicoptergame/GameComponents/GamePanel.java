@@ -123,7 +123,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
         mEnemy.setX(GamePanel.WIDTH - mEnemy.getWidth() - 10);
         mEnemy.setY(GamePanel.HEIGHT / 2);
         mEnemy.setPlaying(true);
-        mEnemy.setDissapear(true);
+        mEnemy.setDisappear(true);
         if(mLevel == 1){
             //init number of mGolds
             NumOfCoins = 5;
@@ -225,7 +225,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
     public void newNPC(int x, int y, int w, int h, int speed, int frames, Bitmap res){
         NPC npc = new NPC(w, h, y, x);
         npc.initSprites(res, frames);
-        npc.setDissapear(false);
+        npc.setDisappear(false);
         npc.setSpeed(speed);
         mNPCs.add(npc);
     }
@@ -240,7 +240,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
         NPC npc = new NPC(w, h, x, y);
         npc.initSprites(res, 8);
         npc.setSpeed(speed);
-        npc.setDissapear(false);
+        npc.setDisappear(false);
         return npc;
     }
 
@@ -375,7 +375,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
             //when mGolds and mMissiles didn't come out anymore, the boss appear
             if(NumOfCoins == 0){
                 mEnemy.setPlaying(true);
-                mEnemy.setDissapear(false);
+                mEnemy.setDisappear(false);
                 //update mEnemy position on timer
                 long enemy_eslapsed = (System.nanoTime() - mEnemyStartTime)/1000000;
                 if(enemy_eslapsed > 200 && mEnemy.isPlaying()){
@@ -386,7 +386,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
                     }
                 }
 
-                if(score == 0&& mGolds.size() == 0&& mBullets.size() == 0&&!mEnemy.isDissapear()&& mEnemy.isPlaying()){
+                if(score == 0&& mGolds.size() == 0&& mBullets.size() == 0&&!mEnemy.isDisappear()&& mEnemy.isPlaying()){
                     mPlayer.setPlaying(false);
                     Result = -1;
                 }
@@ -420,7 +420,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
                 startReset = System.nanoTime();
                 reset = true;
                 if(!mPlayer.isPlaying()){
-                    mPlayer.setDissapear(true);
+                    mPlayer.setDisappear(true);
                     explosion = new Explosion(BitmapFactory.decodeResource(getResources(), R.drawable.explosion), mPlayer.getX(),
                             mPlayer.getY() - 30, 100, 100, 25);
                     for(Gold coin: mGolds){
@@ -428,7 +428,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
                     }
                 }
                 if(!mEnemy.isPlaying()){
-                    mEnemy.setDissapear(true);
+                    mEnemy.setDisappear(true);
                     explosion = new Explosion(BitmapFactory.decodeResource(getResources(), R.drawable.explosion), mEnemy.getX(),
                             mEnemy.getY() - 30, 100, 100, 25);
                     mPlayer.setPlaying(false);
@@ -539,7 +539,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
             //when mGolds and mMissiles didn't come out anymore, the boss appear
             if(NumOfCoins == 0){
                 mEnemy.setPlaying(true);
-                mEnemy.setDissapear(false);
+                mEnemy.setDisappear(false);
                 //update mEnemy position on timer
                 long enemy_eslapsed = (System.nanoTime() - mEnemyStartTime)/1000000;
                 if(enemy_eslapsed > 200 && mEnemy.isPlaying()){
@@ -560,7 +560,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
                     }
                 }
 
-                if(score == 0&& mGolds.size() == 0&& mBullets.size() == 0&&!mEnemy.isDissapear()&& mEnemy.isPlaying()){
+                if(score == 0&& mGolds.size() == 0&& mBullets.size() == 0&&!mEnemy.isDisappear()&& mEnemy.isPlaying()){
                     mPlayer.setPlaying(false);
                     Result = -1;
                 }
@@ -609,7 +609,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
                 startReset = System.nanoTime();
                 reset = true;
                 if(!mPlayer.isPlaying()){
-                    mPlayer.setDissapear(true);
+                    mPlayer.setDisappear(true);
                     explosion = new Explosion(BitmapFactory.decodeResource(getResources(), R.drawable.explosion), mPlayer.getX(),
                             mPlayer.getY() - 30, 100, 100, 25);
                     for(Gold coin: mGolds){
@@ -620,7 +620,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
                     }
                 }
                 if(!mEnemy.isPlaying()){
-                    mEnemy.setDissapear(true);
+                    mEnemy.setDisappear(true);
                     explosion = new Explosion(BitmapFactory.decodeResource(getResources(), R.drawable.explosion), mEnemy.getX(),
                             mEnemy.getY() - 30, 100, 100, 25);
                     mPlayer.setPlaying(false);
@@ -658,7 +658,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
                 if(rd.nextInt(5)==1&& NunOfNPC > 0){
                     boolean flag = false;
                     for (NPC n: mNPCs){
-                        if(!n.isDissapear()) flag = true;
+                        if(!n.isDisappear()) flag = true;
                     }
                     if(!flag){
                         int npcWidth = 64, npcHeight = 64;
@@ -745,8 +745,8 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
 
             for(Bullet bullet: mBullets){
                 for (NPC n: mNPCs){
-                    if(collision(n, bullet)&&!n.isDissapear()){
-                        n.setDissapear(true);
+                    if(collision(n, bullet)&&!n.isDisappear()){
+                        n.setDisappear(true);
                         explosion = new Explosion(BitmapFactory.decodeResource(getResources(), R.drawable.explosion), n.getX(),
                                 n.getY() - 30, 100, 100, 25);
                         bullet.setLive(false);
@@ -776,10 +776,10 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
             }
 
             for (NPC n: mNPCs){
-                if(!n.isDissapear()) n.update(this);
-                if(n.getX() < -n.getWidth()) n.setDissapear(true);
-                if(collision(n, mPlayer)&&!n.isDissapear()){
-                    n.setDissapear(true);
+                if(!n.isDisappear()) n.update(this);
+                if(n.getX() < -n.getWidth()) n.setDisappear(true);
+                if(collision(n, mPlayer)&&!n.isDisappear()){
+                    n.setDisappear(true);
                     if(mPlayer.getLife() <= 1){
                         if(!started) started = true;
                         mPlayer.setPlaying(false);
@@ -845,7 +845,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
             //when mGolds and mMissiles didn't come out anymore, the boss appear
             if(NumOfCoins == 0){
                 mEnemy.setPlaying(true);
-                mEnemy.setDissapear(false);
+                mEnemy.setDisappear(false);
                 //update mEnemy position on timer
                 long enemy_eslapsed = (System.nanoTime() - mEnemyStartTime)/1000000;
                 if(enemy_eslapsed > 200 && mEnemy.isPlaying()){
@@ -853,7 +853,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
                     if(rd.nextInt(50) == 1){
                         Missile bullet = new Missile(mEnemy.getX()+5, mEnemy.getY()+(mEnemy.getHeight()/2) - 8, 45, 15);
                         bullet.initSprites(mPlayer.getScore(),13, BitmapFactory.decodeResource(getResources(), R.drawable.missile));
-                        bullet.setSpeed(20 + rd.nextInt(10));
+                        bullet.setSpeed(10 + rd.nextInt(10));
                         mMissiles.add(bullet);
                     }
                     if(rd.nextInt(60) == 1){
@@ -870,7 +870,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
                     }
                 }
 
-                if(score == 0&& mGolds.size() == 0&& mBullets.size() == 0&&!mEnemy.isDissapear()&& mEnemy.isPlaying()){
+                if(score == 0&& mGolds.size() == 0&& mBullets.size() == 0&&!mEnemy.isDisappear()&& mEnemy.isPlaying()){
                     mPlayer.setPlaying(false);
                     mPlayer.setLife(1);
                     Result = -1;
@@ -920,7 +920,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
                 startReset = System.nanoTime();
                 reset = true;
                 if(!mPlayer.isPlaying()){
-                    mPlayer.setDissapear(true);
+                    mPlayer.setDisappear(true);
                     explosion = new Explosion(BitmapFactory.decodeResource(getResources(), R.drawable.explosion), mPlayer.getX(),
                             mPlayer.getY() - 30, 100, 100, 25);
                     for(Gold coin: mGolds){
@@ -931,7 +931,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
                     }
                 }
                 if(!mEnemy.isPlaying()){
-                    mEnemy.setDissapear(true);
+                    mEnemy.setDisappear(true);
                     explosion = new Explosion(BitmapFactory.decodeResource(getResources(), R.drawable.explosion), mEnemy.getX(),
                             mEnemy.getY() - 30, 100, 100, 25);
                     mPlayer.setPlaying(false);
@@ -1014,20 +1014,20 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
                 }
             }
             fire_controller.draw(canvas);
-            if(!mPlayer.isDissapear()){
+            if(!mPlayer.isDisappear()){
                 mPlayer.draw(canvas);
                 for(SmokePuff sp: mSmokes){
                     sp.draw(canvas);
                 }
                 //draw NPC
                 for (NPC n: mNPCs){
-                    if(!n.isDissapear()){
+                    if(!n.isDisappear()){
                         n.draw(canvas);
                     }
                     else mNPCs.remove(n);
                 }
 
-                if(mPlayer.isPlaying() && mEnemy.isPlaying() && !mEnemy.isDissapear()){
+                if(mPlayer.isPlaying() && mEnemy.isPlaying() && !mEnemy.isDisappear()){
                     if(mLevel > 1){
                         Paint paint = new Paint();
                         int x = mEnemy.getX()+10; int y = mEnemy.getY();
@@ -1070,7 +1070,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback{
     public void newGame(){
         mEnemyMissiles.clear(); mItems.clear(); mMissiles.clear(); mSmokes.clear();
         mBullets.clear(); mMiniExplosions.clear(); mNPCs.clear();
-        mPlayer.setDissapear(false); mEnemy.setDissapear(true);
+        mPlayer.setDisappear(false); mEnemy.setDisappear(true);
         mPlayer.resetScore(); mPlayer.setY(HEIGHT / 2); mPlayer.resetDY();
         if(Result == 1){
             mLevel++;

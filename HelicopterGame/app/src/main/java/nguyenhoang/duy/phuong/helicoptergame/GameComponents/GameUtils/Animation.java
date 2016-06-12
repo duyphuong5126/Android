@@ -26,19 +26,19 @@ public class Animation {
         this.mCurrentFrame = currentFrames;
     }
 
-    public void update(){
-        long eslapsed = (System.nanoTime()- mStartTime)/1000000;
-        if(eslapsed> mDelay){
+    public void update() {
+        long elapsed = (System.nanoTime() - mStartTime) / 1000000;
+        if (elapsed > mDelay) {
             mCurrentFrame++;
             mStartTime = System.nanoTime();
         }
-        if(mCurrentFrame == mFrames.length){
+        if (mCurrentFrame == mFrames.length) {
             mCurrentFrame = 0;
             PlayOnce = true;
         }
     }
 
-    public Bitmap getImage(){
+    public Bitmap getImage() {
         return mFrames[mCurrentFrame];
     }
 
