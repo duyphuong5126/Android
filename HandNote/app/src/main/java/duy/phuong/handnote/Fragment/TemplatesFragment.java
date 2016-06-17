@@ -6,18 +6,19 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.GridView;
+import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 
 import duy.phuong.handnote.MyView.BitmapAdapter;
+import duy.phuong.handnote.MyView.ExpandableGridView;
 import duy.phuong.handnote.R;
 
 /**
  * Created by Phuong on 10/05/2016.
  */
 public class TemplatesFragment extends BaseFragment {
-    private GridView mListDetectedBitmap;
+    private ExpandableGridView mListTemplates;
     private BitmapAdapter mBitmapAdapter;
     private ArrayList<Bitmap> mListBitmap;
     public TemplatesFragment() {
@@ -87,9 +88,21 @@ public class TemplatesFragment extends BaseFragment {
         mListBitmap.add(BitmapFactory.decodeResource(resources, R.drawable._z_));
         mBitmapAdapter = new BitmapAdapter(mActivity, R.layout.item_bitmap_1, mListBitmap);
         Log.d("Size", "" + mListBitmap.size());
-        mListDetectedBitmap = (GridView) mFragmentView.findViewById(R.id.listTemplateBitmaps);
-        mListDetectedBitmap.setAdapter(mBitmapAdapter);
+        mListTemplates = (ExpandableGridView) mFragmentView.findViewById(R.id.listTemplateBitmaps);
+        mListTemplates.setExpanded(true);
+        mListTemplates.setAdapter(mBitmapAdapter);
+        mBitmapAdapter.notifyDataSetChanged();
     }
+
+    /*@Override
+    public void onStart() {
+        super.onStart();
+        if (mHolderGetter != null) {
+            mHolder.requestLayout();
+            mHolder.getLayoutParams().height = mHolderGetter.holderHeight();
+            Log.d("Holder", mHolderGetter.holderHeight() + "");
+        }
+    }*/
 
     @Override
     public String fragmentIdentify() {

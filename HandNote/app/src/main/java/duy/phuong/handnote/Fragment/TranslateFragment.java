@@ -1,7 +1,11 @@
 package duy.phuong.handnote.Fragment;
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.res.Resources;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.AsyncTask;
@@ -12,11 +16,17 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.StringTokenizer;
 
 import duy.phuong.handnote.DAO.LocalStorage;
 import duy.phuong.handnote.DTO.Character;
@@ -39,10 +49,15 @@ public class TranslateFragment extends BaseFragment implements BackPressListener
     private TextView mTvDefinition;
     private LinearLayout mLayoutProcess;
 
-    private AsyncTask<Void, Void, Void> mEVTask;
+    private AsyncTask<Void, Integer, Void> mEVTask;
 
     private AlertDialog.Builder mBuilder;
     private AlertDialog mDialog;
+
+    private LinearLayout mLayoutInstalling;
+    private ProgressBar mProgress;
+    private TextView mTextProgress;
+    private int mProgressNumber, mMax;
 
     public TranslateFragment() {
         mLayoutRes = R.layout.fragment_dictionary;
@@ -64,33 +79,10 @@ public class TranslateFragment extends BaseFragment implements BackPressListener
         mTvDefinition = (TextView) mFragmentView.findViewById(R.id.textDefinition);
         mLayoutProcess = (LinearLayout) mFragmentView.findViewById(R.id.layoutProcessing);
 
-        mEVTask = new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                mLayoutProcess.setVisibility(View.VISIBLE);
-                if (mDialog != null) {
-                    if (mDialog.isShowing()) {
-                        mDialog.cancel();
-                    }
-                }
-                Toast.makeText(mActivity, "Initializing dictionary data, please wait...", Toast.LENGTH_SHORT).show();
-            }
+        mLayoutInstalling = (LinearLayout) mFragmentView.findViewById(R.id.layoutInstalling);
+        mProgress = (ProgressBar) mFragmentView.findViewById(R.id.Progress);
+        mTextProgress = (TextView) mFragmentView.findViewById(R.id.textProgress);
 
-            @Override
-            protected Void doInBackground(Void... params) {
-                HandNote handNote = (HandNote) mActivity.getApplication();
-                handNote.loadEV_Dict();
-                SharedPreferenceUtils.loadedDict(true);
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                mLayoutProcess.setVisibility(View.GONE);
-            }
-        };
         mBuilder = new AlertDialog.Builder(mActivity);
         mBuilder.setTitle("You haven't installed dictionary yet. Install it now?").setNegativeButton("Skip", new DialogInterface.OnClickListener() {
             @Override
@@ -116,6 +108,78 @@ public class TranslateFragment extends BaseFragment implements BackPressListener
 
 
     private void initDict() {
+        final LocalStorage localStorage = new LocalStorage(mActivity);
+        final SQLiteDatabase db = localStorage.getWritableDatabase();
+        final ContentValues contentValues = new ContentValues();
+        Resources resources = getResources();
+        final InputStream inputStream = resources.openRawResource(R.raw.eng_vi);
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        localStorage.deleteAllDict(db);
+        mEVTask = new AsyncTask<Void, Integer, Void>() {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                mLayoutProcess.setVisibility(View.VISIBLE);
+                if (mDialog != null) {
+                    if (mDialog.isShowing()) {
+                        mDialog.cancel();
+                    }
+                }
+                try {
+                    mMax = inputStream.available();
+                    mProgress.setMax(mMax);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                mLayoutInstalling.setVisibility(View.VISIBLE);
+                mProgressNumber = 0;
+                Toast.makeText(mActivity, "Installation begin...", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                String line;
+                try {
+                    while ((line = reader.readLine()) != null) {
+                        Log.d("line", line);
+                        StringTokenizer tokenizer = new StringTokenizer(line, "#");
+                        if (tokenizer.countTokens() == 2) {
+                            String word = tokenizer.nextToken();
+                            String definition = tokenizer.nextToken();
+                            Log.d("Infor", "w: " + word + ", def: " + definition);
+                            Log.d("Insert result", String.valueOf(localStorage.inertEV_DictLine(word, null, definition, db, contentValues)));
+                        } else {
+                            if (tokenizer.countTokens() == 3) {
+                                String word = tokenizer.nextToken();
+                                String pronunciation = tokenizer.nextToken();
+                                String definition = tokenizer.nextToken();
+                                Log.d("Infor", "w: " + word + ", pro: " + pronunciation + ", def: " + definition);
+                                Log.d("Insert result", String.valueOf(localStorage.inertEV_DictLine(word, pronunciation, definition, db, contentValues)));
+                            }
+                        }
+                        publishProgress(line.getBytes().length);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                super.onProgressUpdate(values);
+                mProgressNumber += values[0];
+                mTextProgress.setText("Installing " + Math.round((((double) mProgressNumber)/mMax) * 100) + "%, please wait...");
+                mProgress.setProgress(mProgressNumber);
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                mLayoutInstalling.setVisibility(View.GONE);
+                mLayoutProcess.setVisibility(View.GONE);
+                SharedPreferenceUtils.loadedDict(true);
+            }
+        };
         if (mEVTask != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                 mEVTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -151,29 +215,33 @@ public class TranslateFragment extends BaseFragment implements BackPressListener
 
     @Override
     public void onDetectSuccess(final ArrayList<Character> listCharacters) {
-        final ArrayList<Line> currentLines = mDrawer.getLines();
-        Log.d("List char", "" + listCharacters.size());
-        mLayoutProcess.setVisibility(View.VISIBLE);
-        ImageToText imageToText = new ImageToText(mListener.getGlobalSOM(), mListener.getMapNames());
-        imageToText.imageToText(currentLines, listCharacters, new ImageToText.ConvertingCompleteCallback() {
-            @Override
-            public void convertingComplete(String result, HashMap<Input, Point> map) {
-                String def = mStorage.findEV_Definition(result.toLowerCase().replace(" ", ""));
-                String p = result.toLowerCase() + " " + def;
-                if (def.length() > 0) {
-                    p = p.replace("* ", "\n\t");
-                    p = p.replace("|-", ": ");
-                    p = p.replace("|=", "\n\t\t");
-                    p = p.replace("|+", ": (dẫn xuất) ");
-                    p = p.replace("|", "");
-                    Log.d("Text", p);
-                    mTvDefinition.setText(p);
-                } else {
-                    mTvDefinition.setText("Can not find definition for '" + result + "'");
+        if (listCharacters.size() > 0) {
+            final ArrayList<Line> currentLines = mDrawer.getLines();
+            Log.d("List char", "" + listCharacters.size());
+            mLayoutProcess.setVisibility(View.VISIBLE);
+            ImageToText imageToText = new ImageToText(mListener.getGlobalSOM(), mListener.getMapNames());
+            imageToText.imageToText(currentLines, listCharacters, new ImageToText.ConvertingCompleteCallback() {
+                @Override
+                public void convertingComplete(String result, HashMap<Input, Point> map) {
+                    String def = mStorage.findEV_Definition(result.toLowerCase().replace(" ", ""));
+                    String p = result.toLowerCase() + " " + def;
+                    if (def.length() > 0) {
+                        p = p.replace("* ", "\n\t");
+                        p = p.replace("|-", ": ");
+                        p = p.replace("|=", "\n\t\t");
+                        p = p.replace("|+", ": (dẫn xuất) ");
+                        p = p.replace("|", "");
+                        Log.d("Text", p);
+                        mTvDefinition.setText(p);
+                    } else {
+                        mTvDefinition.setText("Can not find definition for '" + result + "'");
+                    }
+                    mLayoutProcess.setVisibility(View.GONE);
                 }
-                mLayoutProcess.setVisibility(View.GONE);
-            }
-        });
+            });
+        } else {
+            mLayoutProcess.setVisibility(View.GONE);
+        }
     }
 
 

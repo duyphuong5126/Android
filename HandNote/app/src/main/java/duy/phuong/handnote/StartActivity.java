@@ -30,6 +30,8 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -55,7 +57,7 @@ public class StartActivity extends Activity implements View.OnClickListener {
     private ViewPager mIntroPager;
     private int mPosition;
     private HashMap<Integer, View> mListLayout;
-    private LinearLayout mLayoutLoading, mLayoutIntro, mLayoutLogin;
+    private LinearLayout mLayoutLoading, mLayoutIntro, mLayoutLogin, mLayoutInstalling;
     private ImageButton mButtonVerify;
     private ImageButton mButtonCancel;
     private EditText mEdtName;
@@ -69,10 +71,12 @@ public class StartActivity extends Activity implements View.OnClickListener {
 
     private Uri mCapturedImage;
 
-    private AsyncTask<Void, Void, Void> mEVTask;
-
+    private AsyncTask<Void, Integer, Void> mEVTask;
+    private TextView mTextProgress;
     private AlertDialog.Builder mBuilder;
     private AlertDialog mDialog;
+    private ProgressBar mProgress;
+    private int mProgressNumber, mMax;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,54 +88,23 @@ public class StartActivity extends Activity implements View.OnClickListener {
         mLayoutIntro = (LinearLayout) findViewById(R.id.layoutIntro);
         mLayoutLogin = (LinearLayout) findViewById(R.id.layoutLogin);
         mLayoutLoading.setVisibility(View.VISIBLE);
-
-        mEVTask = new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                mLayoutLoading.setVisibility(View.VISIBLE);
-                if (mDialog != null) {
-                    if (mDialog.isShowing()) {
-                        mDialog.cancel();
-                    }
-                }
-                Toast.makeText(StartActivity.this, "Initializing dictionary data, please wait...", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                HandNote handNote = (HandNote) getApplication();
-                handNote.loadEV_Dict();
-                SharedPreferenceUtils.loadedDict(true);
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                if (!SharedPreferenceUtils.isViewIntro()) {
-                    showIntroScreen();
-                    mLayoutLoading.setVisibility(View.GONE);
-                } else {
-                    if (SharedPreferenceUtils.getCurrentName().isEmpty()) {
-                        showLoginScreen();
-                        mLayoutLoading.setVisibility(View.GONE);
-                    } else {
-                        intentMain();
-                    }
-                }
-            }
-        };
+        mProgress = (ProgressBar) findViewById(R.id.Progress);
+        mLayoutInstalling = (LinearLayout) findViewById(R.id.layoutInstalling);
+        mTextProgress = (TextView) findViewById(R.id.textProgress);
         mBuilder = new AlertDialog.Builder(this);
         mBuilder.setTitle("You haven't installed dictionary yet. Install it now?").setNegativeButton("Skip", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Toast.makeText(StartActivity.this, "You can't use translate feature before installed dictionary", Toast.LENGTH_LONG).show();
-                if (SharedPreferenceUtils.getCurrentName().isEmpty()) {
-                    showLoginScreen();
+                if (!SharedPreferenceUtils.isViewIntro()) {
                     mLayoutLoading.setVisibility(View.GONE);
+                    showIntroScreen();
                 } else {
-                    intentMain();
+                    if (SharedPreferenceUtils.getCurrentName().isEmpty()) {
+                        showLoginScreen();
+                    } else {
+                        intentMain();
+                    }
                 }
             }
         }).setPositiveButton("Install", new DialogInterface.OnClickListener() {
@@ -152,6 +125,88 @@ public class StartActivity extends Activity implements View.OnClickListener {
     }
 
     private void initDict() {
+        final LocalStorage localStorage = new LocalStorage(getApplicationContext());
+        final SQLiteDatabase db = localStorage.getWritableDatabase();
+        final ContentValues contentValues = new ContentValues();
+        Resources resources = getResources();
+        final InputStream inputStream = resources.openRawResource(R.raw.eng_vi);
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        localStorage.deleteAllDict(db);
+        mEVTask = new AsyncTask<Void, Integer, Void>() {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                mLayoutLoading.setVisibility(View.VISIBLE);
+                if (mDialog != null) {
+                    if (mDialog.isShowing()) {
+                        mDialog.cancel();
+                    }
+                }
+                try {
+                    mMax = inputStream.available();
+                    mProgress.setMax(mMax);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                mLayoutInstalling.setVisibility(View.VISIBLE);
+                mProgressNumber = 0;
+                Toast.makeText(StartActivity.this, "Installation begin...", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                String line;
+                try {
+                    while ((line = reader.readLine()) != null) {
+                        Log.d("line", line);
+                        StringTokenizer tokenizer = new StringTokenizer(line, "#");
+                        if (tokenizer.countTokens() == 2) {
+                            String word = tokenizer.nextToken();
+                            String definition = tokenizer.nextToken();
+                            Log.d("Infor", "w: " + word + ", def: " + definition);
+                            Log.d("Insert result", String.valueOf(localStorage.inertEV_DictLine(word, null, definition, db, contentValues)));
+                        } else {
+                            if (tokenizer.countTokens() == 3) {
+                                String word = tokenizer.nextToken();
+                                String pronunciation = tokenizer.nextToken();
+                                String definition = tokenizer.nextToken();
+                                Log.d("Infor", "w: " + word + ", pro: " + pronunciation + ", def: " + definition);
+                                Log.d("Insert result", String.valueOf(localStorage.inertEV_DictLine(word, pronunciation, definition, db, contentValues)));
+                            }
+                        }
+                        publishProgress(line.getBytes().length);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                super.onProgressUpdate(values);
+                mProgressNumber += values[0];
+                mTextProgress.setText("Installing " + Math.round((((double) mProgressNumber)/mMax) * 100) + "%, please wait...");
+                mProgress.setProgress(mProgressNumber);
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                SharedPreferenceUtils.loadedDict(true);
+                if (!SharedPreferenceUtils.isViewIntro()) {
+                    showIntroScreen();
+                    mLayoutLoading.setVisibility(View.GONE);
+                } else {
+                    if (SharedPreferenceUtils.getCurrentName().isEmpty()) {
+                        showLoginScreen();
+                        mLayoutLoading.setVisibility(View.GONE);
+                    } else {
+                        intentMain();
+                    }
+                }
+            }
+        };
         if (mEVTask != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                 mEVTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -230,13 +285,13 @@ public class StartActivity extends Activity implements View.OnClickListener {
                 "If you are looking for an application that can understand your handwriting text, \n here we bring you some solutions for this."
         ));
         contents.add(new SpannableString(
-                "Let write all your letters by your fingers or your pen (if you have one) \non your device screen surface\n and we'll recognize it for you."
+                "Let write all your letters by your fingers or pen \non your device screen surface\n and we'll recognize it for you."
         ));
         contents.add(new SpannableString(
                 "It can be smarter and smarter by recognizing your text.\n Here we give you some features that allow you to know generally how this app work."
         ));
         contents.add(new SpannableString(
-                "Our app have no third-party engines, so it's still quite limited. \n If you're interested in developing this kind of app, please help us to improve it or tell us you problems by contacting us."
+                "If you're interested in developing this kind of app, please help us to improve it by contacting."
         ));
         String contact = "Social: Facebook. \nMail: G-mail";
         SpannableString contactSpan = new SpannableString(contact);

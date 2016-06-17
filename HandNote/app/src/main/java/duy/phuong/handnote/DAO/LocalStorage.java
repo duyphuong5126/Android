@@ -80,7 +80,7 @@ public class LocalStorage extends SQLiteOpenHelper {
             do {
                 Note note = new Note();
                 note.mBitmapPath = cursor.getString(cursor.getColumnIndex(Note_Image));
-
+                note.Focused = false;
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inDither = false;
                 options.inPurgeable = true;

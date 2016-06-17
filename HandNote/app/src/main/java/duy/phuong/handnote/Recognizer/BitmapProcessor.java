@@ -205,15 +205,14 @@ public class BitmapProcessor {
         return bitmap;
     }
 
-    public void onDetectCharacter(final Character character, DetectCharactersCallback callback) {
-        Bitmap src = character.mBitmap;
+    public void onDetectCharacter(final Character character, Bitmap src, DetectCharactersCallback callback) {
         ArrayList<Rect> mListRectangle = new ArrayList<>();
         mListRectangle.addAll(detectAreasOnBitmap(src, 0, 0));
 
         ArrayList<Character> detectedBitmaps = new ArrayList<>();
         for (Rect rect : mListRectangle) {
             Character character1 = new Character();
-            character1.mBitmap = cropBitmap(character.mBitmap, rect.left, rect.top, rect.width(), rect.height());
+            character1.mBitmap = cropBitmap(src, rect.left, rect.top, rect.width(), rect.height());
             character1.mMyShape = character.mMyShape;
             character1.mParentHeight = character.mParentHeight;
             character1.mParentWidth = character.mParentWidth;
@@ -2518,7 +2517,7 @@ public class BitmapProcessor {
                 }
             }
 
-            if (count != 2) {
+            if (count != 3) {
                 return false;
             }
             for (int i = 0; i < bitmap.getWidth(); i++) {

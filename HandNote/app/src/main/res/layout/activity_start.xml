@@ -409,11 +409,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:textColor="#fff"
                     android:fontFamily="sans-serif-condensed"
-                    android:textSize="17sp"
-                    android:text="You are female?" />
+                    android:gravity="center"
+                    android:text="You are female?"
+                    android:textColor="#fff"
+                    android:textSize="17sp" />
 
                 <CheckBox
                     android:id="@+id/checkGender"
@@ -426,9 +426,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="40dip"
-                android:layout_marginTop="5dip"
                 android:layout_marginLeft="20dip"
                 android:layout_marginRight="20dip"
+                android:layout_marginTop="5dip"
                 android:background="@drawable/corner_radius_white">
 
                 <LinearLayout
@@ -442,18 +442,18 @@
                     <LinearLayout
                         android:layout_width="0dip"
                         android:layout_height="match_parent"
-                        android:layout_weight="1"/>
+                        android:layout_weight="1" />
 
                     <TextView
                         android:layout_width="0dip"
                         android:layout_height="match_parent"
                         android:layout_weight="4"
+                        android:fontFamily="sans-serif-condensed"
                         android:gravity="center"
                         android:text="Get Started"
-                        android:fontFamily="sans-serif-condensed"
                         android:textColor="#fff"
                         android:textSize="20sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
 
                     <FrameLayout
                         android:layout_width="0dip"
@@ -466,18 +466,18 @@
                             android:layout_width="30dip"
                             android:layout_height="30dip"
                             android:layout_gravity="center"
-                            android:visibility="gone"
                             android:background="@drawable/circle_heavy_red"
-                            android:src="@mipmap/ic_close_white_24dp"/>
+                            android:src="@mipmap/ic_close_white_24dp"
+                            android:visibility="gone" />
 
                         <ImageButton
                             android:id="@+id/buttonVerify"
                             android:layout_width="30dip"
                             android:layout_height="30dip"
                             android:layout_gravity="center"
-                            android:visibility="gone"
                             android:background="@drawable/circle_light_green"
-                            android:src="@mipmap/ic_check_white_24dp"/>
+                            android:src="@mipmap/ic_check_white_24dp"
+                            android:visibility="gone" />
                     </FrameLayout>
 
                 </LinearLayout>
@@ -499,7 +499,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dip"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:gravity="center">
 
             <ImageView
@@ -508,17 +508,45 @@
                 android:src="@mipmap/ic_pen" />
         </LinearLayout>
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dip"
-            android:layout_weight="1"
-            android:gravity="center">
+            android:layout_weight="2"
+            android:gravity="center"
+            android:orientation="vertical">
 
             <ProgressBar
                 android:layout_width="50dip"
                 android:layout_height="50dip"
                 android:layout_marginTop="10dip" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutInstalling"
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            android:paddingLeft="5dip"
+            android:paddingRight="5dip"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:gravity="center">
+
+            <ProgressBar
+                android:id="@+id/Progress"
+                style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="50dip"
+                android:layout_marginTop="10dip" />
+
+            <TextView
+                android:id="@+id/textProgress"
+                android:layout_width="match_parent"
+                android:layout_height="40dip"
+                android:gravity="center"
+                android:text="Installing, please wait..."
+                android:textColor="#fff"
+                android:textSize="20sp"/>
         </LinearLayout>
     </LinearLayout>
 

@@ -14,6 +14,7 @@ import java.util.HashMap;
 import duy.phuong.handnote.DTO.Character;
 import duy.phuong.handnote.DTO.ClusterLabel;
 import duy.phuong.handnote.DTO.Line;
+import duy.phuong.handnote.MyView.DrawingView.FingerDrawerView;
 import duy.phuong.handnote.Recognizer.MachineLearning.Input;
 import duy.phuong.handnote.Recognizer.MachineLearning.SOM;
 
@@ -112,68 +113,81 @@ public class ImageToText {
                     for (int i = 0; i < line.mCharacters.size(); i++) {
                         final Character c = line.mCharacters.get(i);
                         final int index = i;
-                        if (c.mAlphabet == null) {
-                            final AsyncTask<Void, Void, Bundle> asyncTask = new AsyncTask<Void, Void, Bundle>() {
-                                @Override
-                                protected Bundle doInBackground(Void... params) {
+                        final AsyncTask<Void, Void, Bundle> asyncTask = new AsyncTask<Void, Void, Bundle>() {
+                            @Override
+                            protected Bundle doInBackground(Void... params) {
+                                int size = (int) FingerDrawerView.CurrentPaintSize;
+                                if (c.mRect.height() > 2 * size || c.mRect.width() > 2 * size) {
                                     Recognizer recognizer = new Recognizer(mSOM, mLabels);
                                     return recognizer.recognize(c);
                                 }
-
-                                @Override
-                                protected void onPostExecute(Bundle bundle) {
-                                    super.onPostExecute(bundle);
-                                    int x = bundle.getInt("cordX");
-                                    int y = bundle.getInt("cordY");
-                                    Input input = (Input) bundle.getSerializable("input");
-                                    String result = bundle.getString("result");
-                                    map.put(input, new Point(x, y));
-                                    Log.d("Result", "bitmap " + index + " :" + result);
-                                    Log.d("Char height", c.mRect.height() + "");
-                                    switch (result) {
-                                        case "C":case "O":case "P":case "S":case "V":case "W":case "X":case "Z":
-                                            if (c.mRect.height() <= 0.7d * h) {
-                                                c.mAlphabet = result.toLowerCase();
-                                            } else {
-                                                c.mAlphabet = result;
-                                            }
-                                            break;
-
-                                        case "b1":
-                                        case "k1":
-                                            c.mAlphabet = result.substring(0, 1);
-                                            break;
-
-                                        default:
-                                            c.mAlphabet = result;
-                                            break;
-                                    }
-                                    text[index] = c.mAlphabet;
-                                    if (mLineCount <= 1) {
-                                        String t = "";
-                                        for (String s : text) {
-                                            t += s;
-                                        }
-                                        lists[indexLine] = t;
-                                    } else {
-                                        mLineCount--;
-                                    }
-                                    if (mCountCharacters <= 1) {
-                                        String p = "";
-                                        for (String s : lists) {
-                                            p += s + " ";
-                                        }
-                                        callback.convertingComplete(p, map);
-                                    } else {
-                                        mCountCharacters--;
-                                    }
-                                }
-                            };
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                                asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                            } else {
-                                asyncTask.execute();
+                                Bundle bundle = new Bundle();
+                                bundle.putSerializable("input", null);
+                                bundle.putString("result", ".");
+                                return bundle;
                             }
+
+                            @Override
+                            protected void onPostExecute(Bundle bundle) {
+                                super.onPostExecute(bundle);
+                                int x = bundle.getInt("cordX");
+                                int y = bundle.getInt("cordY");
+                                Input input = (Input) bundle.getSerializable("input");
+                                String result = bundle.getString("result");
+                                if (input != null) {
+                                    map.put(input, new Point(x, y));
+                                }
+                                Log.d("Result", "bitmap " + index + " :" + result);
+                                Log.d("Char height", c.mRect.height() + "");
+                                switch (result) {
+                                    case "C":case "O":case "P":case "S":case "V":case "W":case "X":case "Z":
+                                        if (c.mRect.height() <= 0.7d * h) {
+                                            c.mAlphabet = result.toLowerCase();
+                                        } else {
+                                            c.mAlphabet = result;
+                                        }
+                                        if (result.equals("O")) {
+                                            int w = c.mRect.width(), h = c.mRect.height();
+                                            if (w <= h * 0.85d) {
+                                                c.mAlphabet = "0";
+                                            }
+                                        }
+                                        break;
+
+                                    case "b1":
+                                    case "k1":
+                                        c.mAlphabet = result.substring(0, 1);
+                                        break;
+
+                                    default:
+                                        c.mAlphabet = result;
+                                        break;
+                                }
+                                text[index] = c.mAlphabet;
+                                if (mLineCount <= 1) {
+                                    String t = "";
+                                    for (String s : text) {
+                                        t += s;
+                                    }
+                                    lists[indexLine] = t;
+                                } else {
+                                    mLineCount--;
+                                }
+                                if (mCountCharacters <= 1) {
+                                    String p = "";
+                                    for (String s : lists) {
+                                        p += s + " ";
+                                    }
+                                    callback.convertingComplete(p, map);
+                                } else {
+                                    mCountCharacters--;
+                                }
+                            }
+                        };
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                            asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                        } else {
+                            asyncTask.execute();
                         }
                     }
                 }

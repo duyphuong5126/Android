@@ -38,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 
 import duy.phuong.handnote.DTO.ClusterLabel;
 import duy.phuong.handnote.DTO.Label;
+import duy.phuong.handnote.DTO.Line;
 import duy.phuong.handnote.DTO.Note;
 import duy.phuong.handnote.DTO.SideMenuItem;
 import duy.phuong.handnote.Fragment.BaseFragment;
@@ -59,7 +60,8 @@ import duy.phuong.handnote.Support.LanguageUtils;
 import duy.phuong.handnote.Support.SharedPreferenceUtils;
 import duy.phuong.handnote.Support.SupportUtils;
 
-public class MainActivity extends FragmentActivity implements MainListener, ImageButton.OnClickListener, BackPressListener, MainFragment.ShowNoteListener {
+public class MainActivity extends FragmentActivity implements MainListener, ImageButton.OnClickListener, BackPressListener,
+        MainFragment.ShowNoteListener{
     private FragmentManager mFragmentManager;
     private DrawerLayout mMainNavigator;
     private LinearLayout mSideMenu;
@@ -87,16 +89,21 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     private Button mTabNotes, mTabTemplates;
     private TextView mTvInternet;
 
-    private LinearLayout mBottomTabs, mBackBottomTabs;
+    private LinearLayout mBottomTabs;
     private ImageButton mButtonCreate;
     private LinearLayout mBorderButtonCreate;
 
-    private ImageButton mButtonMenu;
     private PopupMenu mPopUpMenu;
 
     private LinearLayout mLayoutLoading;
     private HandNote mHandNote;
     private boolean mSetTabSize;
+    private boolean LandScape;
+    private LinearLayout mLayoutAvatar;
+
+    private MainFragment mMainFragment;
+    private LinearLayout mLayoutSubFragment;
+    private int mBackClickCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +121,6 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         mTabNotes.setOnClickListener(this);
 
         mLayoutBottomTabs = (FrameLayout) findViewById(R.id.layoutTabsBottom);
-        mBackBottomTabs = (LinearLayout) findViewById(R.id.layoutBackBottomTab);
         mSideMenu = (LinearLayout) findViewById(R.id.layoutSideMenu);
         mMainNavigator = (DrawerLayout) findViewById(R.id.layoutMainNavigator);
         mButtonNavigator = (ImageButton) findViewById(R.id.buttonMainNavigator);
@@ -124,13 +130,15 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         mBorderButtonCreate = (LinearLayout) findViewById(R.id.borderButtonCreate);
         mButtonBack = (ImageButton) findViewById(R.id.buttonBack);
         mButtonBack.setOnClickListener(this);
-        mButtonMenu = (ImageButton) findViewById(R.id.buttonMenu);
+        ImageButton mButtonMenu = (ImageButton) findViewById(R.id.buttonMenu);
         mButtonMenu.setOnClickListener(this);
         mTvAppTitle = (TextView) findViewById(R.id.tvAppTitle);
         mTvUsername = (TextView) findViewById(R.id.tvUsername);
         mTvInternet = (TextView) findViewById(R.id.tvInternet);
         mAvatar = (RoundImageView) findViewById(R.id.imageAvatar);
         mListSideMenu = (ListView) findViewById(R.id.listSideMenu);
+        mLayoutAvatar = (LinearLayout) findViewById(R.id.layoutAvatar);
+        mLayoutSubFragment = (LinearLayout) findViewById(R.id.layoutSubFragmentContainer);
 
         mBottomTabs = (LinearLayout) findViewById(R.id.layoutBottomTabs);
 
@@ -167,6 +175,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
             mSetTabSize = savedInstanceState.getBoolean("isSetSize");
             mTabWidth = savedInstanceState.getInt("tabWidth");
             mTabHeight = savedInstanceState.getInt("tabHeight");
+            LandScape = savedInstanceState.getBoolean("LandScape");
             ArrayList<String> list = savedInstanceState.getStringArrayList("Stack");
             if (list != null) {
                 for (int i = list.size() - 1; i >= 0; i--) {
@@ -183,6 +192,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     @Override
     protected void onStart() {
         super.onStart();
+        mBackClickCount = 1;
         updateButtonAdd();
         mItems = new ArrayList<>();
         mItems.add(new SideMenuItem(R.mipmap.ic_android_black_24dp, R.mipmap.ic_android_red_24dp, getString(R.string.training_en), false));
@@ -240,22 +250,29 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
             mAvatar.setImageBitmap(bitmap);
         }
         mTvUsername.setText(SharedPreferenceUtils.getCurrentName());
-        if (mFragmentManager.getBackStackEntryCount() <= 0) {
-            this.showFragment(mFragmentName);
-        } else {
+        if (mFragmentManager.getBackStackEntryCount() > 0) {
             List<Fragment> list = mFragmentManager.getFragments();
             for (Fragment fragment : list) {
                 BaseFragment baseFragment = (BaseFragment) fragment;
                 if (baseFragment != null) {
                     baseFragment.setListener(this);
                     if (baseFragment.fragmentIdentify().equals(BaseFragment.MAIN_FRAGMENT)) {
-                        MainFragment mainFragment = (MainFragment) baseFragment;
-                        mainFragment.setShowNoteListener(this);
+                        mMainFragment = (MainFragment) baseFragment;
+                        if (!LandScape) {
+                            mMainFragment.setShowNoteListener(this);
+                        } else {
+                            ViewNoteFragment viewNoteFragment =
+                                    (ViewNoteFragment) mFragmentManager.findFragmentById(R.id.layoutSubFragmentContainer);
+                            mMainFragment.setShowNoteListener(viewNoteFragment);
+                        }
                     }
 
                     if (baseFragment.fragmentIdentify().equals(BaseFragment.VIEW_NOTE_FRAGMENT)) {
                         ViewNoteFragment viewNoteFragment = (ViewNoteFragment) baseFragment;
                         viewNoteFragment.setNote(mCurrentNote);
+                        if (mMainFragment != null) {
+                            mMainFragment.setShowNoteListener(viewNoteFragment);
+                        }
                     }
                 }
             }
@@ -270,14 +287,14 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                     }
                 }
             }
+            checkScreen();
         }
-        checkScreen();
 
         ScheduledExecutorService mService = Executors.newSingleThreadScheduledExecutor();
         mService.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                final String available = mHandNote.checkInternetAvailability()? "available" : "not available";
+                final String available = mHandNote.checkInternetAvailability() ? "available" : "not available";
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -296,12 +313,23 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
             mTabHeight = mBottomTabs.getHeight();
             mSetTabSize = true;
         }
-        updateButtonAdd();
+        DisplayMetrics metrics = updateButtonAdd();
+        float thresholdLandScape = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 600, metrics);
+        if (metrics.widthPixels >= thresholdLandScape) {
+            LandScape = true;
+        }
+        if (mFragmentManager.getBackStackEntryCount() <= 0) {
+            showFragment(mFragmentName);
+        }
+        float dip_5 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, metrics);
+        int avatarHeight = mLayoutAvatar.getHeight();
+        mAvatar.requestLayout();
+        mAvatar.getLayoutParams().width = avatarHeight - 2 * dip_5 > 0 ? (int) (avatarHeight - 2 * dip_5) : avatarHeight;
+        mAvatar.getLayoutParams().height = avatarHeight - 2 * dip_5 > 0 ? (int) (avatarHeight - 2 * dip_5) : avatarHeight;
         mLayoutLoading.setVisibility(View.GONE);
     }
 
-    private void updateButtonAdd() {
-        Log.d("Size", "w: " + mTabWidth + ", h: " + mTabHeight);
+    private DisplayMetrics updateButtonAdd() {
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         float border = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, metrics);
         mButtonCreate.requestLayout();
@@ -310,6 +338,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         mBorderButtonCreate.requestLayout();
         mBorderButtonCreate.getLayoutParams().height = mTabHeight - 2 * border > 0 ? (int) (mTabHeight - 2 * border) : mTabHeight;
         mBorderButtonCreate.getLayoutParams().width = mTabHeight - 2 * border > 0 ? (int) (mTabHeight - 2 * border) : mTabHeight;
+        return metrics;
     }
 
     private void initMapNames() {
@@ -438,6 +467,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     public void onSaveInstanceState(Bundle outState) {
         outState.putString("Fragment", mFragmentName);
         outState.putBoolean("isSetSize", mSetTabSize);
+        outState.putBoolean("LandScape", LandScape);
         outState.putInt("tabWidth", mTabWidth);
         outState.putInt("tabHeight", mTabHeight);
         ArrayList<String> list = new ArrayList<>();
@@ -466,51 +496,83 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         BaseFragment baseFragment = null;
         if (mStack != null) {
             if (!mStack.isEmpty()) {
-                if (mStack.peek().equals(name)) {
+                String current = mStack.peek();
+                if (current.equals(name)) {
                     Toast.makeText(MainActivity.this, "You're in this screen now", Toast.LENGTH_SHORT).show();
                     return;
+                } else {
+                    if ((current.equals(BaseFragment.TEMPLATES_FRAGMENT) && name.equals(BaseFragment.MAIN_FRAGMENT))
+                            || (name.equals(BaseFragment.TEMPLATES_FRAGMENT) && current.equals(BaseFragment.MAIN_FRAGMENT))) {
+                        mStack.pop();
+                    }
                 }
             }
         }
         switch (name) {
             case BaseFragment.MAIN_FRAGMENT:
                 MainFragment mainFragment = new MainFragment();
-                mainFragment.setShowNoteListener(this);
+                Bundle bundle = new Bundle();
+                bundle.putInt("TabHeight", mTabHeight);
+                mainFragment.setArguments(bundle);
+                if (!LandScape) {
+                    mainFragment.setShowNoteListener(this);
+                } else {
+                    ViewNoteFragment viewNoteFragment = new ViewNoteFragment();
+                    mainFragment.setShowNoteListener(viewNoteFragment);
+                    FragmentTransaction transaction = mFragmentManager.beginTransaction();
+                    transaction.replace(R.id.layoutSubFragmentContainer, viewNoteFragment, viewNoteFragment.fragmentIdentify());
+                    transaction.addToBackStack(null);
+                    transaction.commit();
+                }
                 baseFragment = mainFragment;
+                mMainNavigator.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 break;
 
             case BaseFragment.DRAWING_FRAGMENT:
                 baseFragment = new DrawingFragment();
                 mBackPressListener = (DrawingFragment) baseFragment;
+                mBackClickCount = 1;
+                mMainNavigator.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 break;
 
             case BaseFragment.LEARNING_FRAGMENT:
                 baseFragment = new LearningFragment();
+                mBackClickCount = 1;
+                mMainNavigator.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 break;
 
             case BaseFragment.CREATE_NOTE_FRAGMENT:
                 baseFragment = new CreateNoteFragment();
                 mBackPressListener = (CreateNoteFragment) baseFragment;
+                mBackClickCount = 1;
+                mMainNavigator.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 break;
 
             case BaseFragment.VIEW_NOTE_FRAGMENT:
                 ViewNoteFragment viewNoteFragment = new ViewNoteFragment();
                 mBackPressListener = viewNoteFragment;
                 baseFragment = viewNoteFragment;
+                mBackClickCount = 1;
+                mMainNavigator.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 break;
 
             case BaseFragment.TEMPLATES_FRAGMENT:
                 baseFragment = new TemplatesFragment();
+                mMainNavigator.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 break;
 
             case BaseFragment.WEB_FRAGMENT:
                 baseFragment = new WebFragment();
                 mBackPressListener = (WebFragment) baseFragment;
+                mBackClickCount = 1;
+                mMainNavigator.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 break;
 
             case BaseFragment.TRANSLATE_FRAGMENT:
                 baseFragment = new TranslateFragment();
                 mBackPressListener = (TranslateFragment) baseFragment;
+                mBackClickCount = 1;
+                mMainNavigator.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 break;
 
             default:
@@ -542,22 +604,34 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                     item.mFocused = item.mTitle.equals(getString(R.string.training_en));
                 }
                 this.toggleMainBottomTabs(false);
+                if (mLayoutSubFragment != null) {
+                    mLayoutSubFragment.setVisibility(View.GONE);
+                }
                 break;
             case BaseFragment.LEARNING_FRAGMENT:
                 for (SideMenuItem item : mItems) {
                     item.mFocused = item.mTitle.equals(getString(R.string.training_en));
                 }
                 this.toggleMainBottomTabs(false);
+                if (mLayoutSubFragment != null) {
+                    mLayoutSubFragment.setVisibility(View.GONE);
+                }
                 break;
             case BaseFragment.TRANSLATE_FRAGMENT:
                 for (SideMenuItem item : mItems) {
                     item.mFocused = item.mTitle.equals(getString(R.string.translate_en));
                 }
                 this.toggleMainBottomTabs(false);
+                if (mLayoutSubFragment != null) {
+                    mLayoutSubFragment.setVisibility(View.GONE);
+                }
                 break;
             case BaseFragment.CREATE_NOTE_FRAGMENT:
             case BaseFragment.VIEW_NOTE_FRAGMENT:
                 this.toggleMainBottomTabs(false);
+                if (mLayoutSubFragment != null) {
+                    mLayoutSubFragment.setVisibility(View.GONE);
+                }
                 break;
             case BaseFragment.TEMPLATES_FRAGMENT:
                 for (SideMenuItem item : mItems) {
@@ -566,6 +640,9 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                 this.toggleMainBottomTabs(true);
                 mTabNotes.setSelected(false);
                 mTabTemplates.setSelected(true);
+                if (mLayoutSubFragment != null) {
+                    mLayoutSubFragment.setVisibility(View.GONE);
+                }
                 break;
 
             case BaseFragment.WEB_FRAGMENT:
@@ -573,10 +650,16 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                     item.mFocused = item.mTitle.equals(getString(R.string.web_en));
                 }
                 this.toggleMainBottomTabs(false);
+                if (mLayoutSubFragment != null) {
+                    mLayoutSubFragment.setVisibility(View.GONE);
+                }
                 break;
             default:
                 for (SideMenuItem item : mItems) {
                     item.mFocused = false;
+                }
+                if (mLayoutSubFragment != null) {
+                    mLayoutSubFragment.setVisibility(View.VISIBLE);
                 }
                 this.toggleMainBottomTabs(true);
                 mTabNotes.setSelected(true);
@@ -655,13 +738,19 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     @Override
     public void onBackPressed() {
         if (mBackPressListener == null || !mBackPressListener.doBack()) {
+            if (!mStack.isEmpty()) {
+                mFragmentName = mStack.pop();
+            }
             if (!doBack()) {
                 super.onBackPressed();
             } else {
-                finish();
-            }
-            if (!mStack.isEmpty()) {
-                mStack.pop();
+                if (mBackClickCount > 0) {
+                    mBackClickCount--;
+                    mStack.push(mFragmentName);
+                    Toast.makeText(MainActivity.this, "Press again to exit", Toast.LENGTH_SHORT).show();
+                } else {
+                    finish();
+                }
             }
             checkScreen();
             updateButtonAdd();
@@ -670,7 +759,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
 
     @Override
     public boolean doBack() {
-        return (mFragmentManager.getBackStackEntryCount() == 1);
+        return mFragmentName.equals(BaseFragment.MAIN_FRAGMENT) || mFragmentName.equals(BaseFragment.TEMPLATES_FRAGMENT);
     }
 
     private void addFragment(Fragment fragment, String name) {

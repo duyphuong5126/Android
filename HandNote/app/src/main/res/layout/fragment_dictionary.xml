@@ -116,13 +116,49 @@
         android:id="@+id/layoutProcessing"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
         android:background="#D9000000"
-        android:gravity="center">
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
 
-        <ProgressBar
-            android:layout_width="50dip"
-            android:layout_height="50dip" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:gravity="center"
+            android:layout_weight="1">
+
+            <ProgressBar
+                android:layout_width="50dip"
+                android:layout_height="50dip" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutInstalling"
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingLeft="5dip"
+            android:paddingRight="5dip"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:id="@+id/Progress"
+                style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="50dip"
+                android:layout_marginTop="10dip" />
+
+            <TextView
+                android:id="@+id/textProgress"
+                android:layout_width="match_parent"
+                android:layout_height="40dip"
+                android:gravity="center"
+                android:text="Installing, please wait..."
+                android:textColor="#fff"
+                android:textSize="20sp" />
+        </LinearLayout>
     </LinearLayout>
 
 </FrameLayout>

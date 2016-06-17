@@ -46,7 +46,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Check if you want to see error log"
+                android:text="Check if you want to see log"
                 android:gravity="center_vertical"
                 android:textColor="#000"/>
         </LinearLayout>

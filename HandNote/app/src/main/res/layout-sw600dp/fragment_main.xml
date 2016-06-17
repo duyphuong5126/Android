@@ -18,7 +18,7 @@
             <LinearLayout
                 android:id="@+id/layoutBanner"
                 android:layout_width="match_parent"
-                android:layout_height="250dip"
+                android:layout_height="350dip"
                 android:background="#ddd"
                 android:orientation="vertical"
                 android:visibility="visible"
@@ -104,7 +104,7 @@
                 android:gravity="center"
                 android:text="Empty list note"
                 android:textColor="#c03"
-                android:textSize="30sp"
+                android:textSize="40sp"
                 android:layout_marginTop="10dip"
                 android:visibility="gone" />
 

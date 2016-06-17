@@ -209,6 +209,7 @@ public class FingerDrawerView extends View {
                 if (points.get(0).equals(points.get(1))) {
                     Point point = points.get(0);
                     mCanvas.drawPoint(point.x, point.y, paint);
+                    myPath.mCanvas.drawPoint(point.x, point.y, mPrivatePaint);
                 }
             } else {
                 for (Point point : myPath.getListPoint()) {
@@ -352,21 +353,21 @@ public class FingerDrawerView extends View {
                     mListPaths.get(i).setSettled(true);
                 }
 
+                Bitmap bitmap = Bitmap.createBitmap(mCacheBitmap.getWidth(), mCacheBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(bitmap);
                 if (!listShapes.isEmpty()) {
                     for (MyShape myShape : listShapes) {
                         final Character character = new Character();
-                        character.mBitmap = Bitmap.createBitmap(mCacheBitmap.getWidth(), mCacheBitmap.getHeight(), Bitmap.Config.ARGB_8888);
                         character.mMyShape = myShape;
                         character.mParentWidth = CurrentWidth;
                         character.mParentHeight = CurrentHeight;
 
-                        Canvas canvas = new Canvas(character.mBitmap);
-                        canvas.drawColor(Color.WHITE);
+                        bitmap.eraseColor(Color.WHITE);
                         for (MyPath myPath : myShape.getListPaths()) {
                            canvas.drawBitmap(myPath.getBitmap(), 0, 0, mPrivatePaint);
                         }
 
-                        mBitmapProcessor.onDetectCharacter(character, new BitmapProcessor.DetectCharactersCallback() {
+                        mBitmapProcessor.onDetectCharacter(character, bitmap, new BitmapProcessor.DetectCharactersCallback() {
                             @Override
                             public void onBeginDetect(Bundle bundle) {
 

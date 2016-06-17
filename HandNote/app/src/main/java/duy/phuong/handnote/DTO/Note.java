@@ -12,4 +12,5 @@ public class Note implements Serializable {
     public String mBitmapPath;
     public String mContent;
     public String mContentPath;
+    public boolean Focused;
 }

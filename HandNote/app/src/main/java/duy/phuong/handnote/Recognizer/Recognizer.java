@@ -97,7 +97,7 @@ public class Recognizer {
                 bundle.putInt("cordY", win_neuron_Y);
             }
             String label = mMapNames.get(neuron).getLabel();
-            if (label.length() == 1 || label.equals("k1") || label.equals("b1")) {
+            if ((label.length() == 1 && !label.equals("u")) || label.equals("k1") || label.equals("b1")) {
                 Log.d("Immediate", "yes");
                 bundle.putString("result", label);
                 return bundle;

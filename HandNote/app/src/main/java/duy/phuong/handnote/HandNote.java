@@ -52,42 +52,4 @@ public class HandNote extends Application {
     public void deleteAllNote() {
         mStorage.deleteAllNotes();
     }
-
-    public void loadEV_Dict() {
-        LocalStorage localStorage = new LocalStorage(getApplicationContext());
-        SQLiteDatabase db = localStorage.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        Resources resources = getResources();
-        loadDict(R.raw.eng_vi, resources, localStorage, db, contentValues);
-        db.close();
-    }
-
-    private void loadDict(int raw, Resources resources, LocalStorage storage, SQLiteDatabase db, ContentValues contentValues) {
-        InputStream inputStream = resources.openRawResource(raw);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-        storage.deleteAllDict(db);
-        String line;
-        try {
-            while ((line = reader.readLine()) != null) {
-                Log.d("line", line);
-                StringTokenizer tokenizer = new StringTokenizer(line, "#");
-                if (tokenizer.countTokens() == 2) {
-                    String word = tokenizer.nextToken();
-                    String definition = tokenizer.nextToken();
-                    Log.d("Infor", "w: " + word + ", def: " + definition);
-                    Log.d("Insert result", String.valueOf(storage.inertEV_DictLine(word, null, definition, db, contentValues)));
-                } else {
-                    if (tokenizer.countTokens() == 3) {
-                        String word = tokenizer.nextToken();
-                        String pronunciation = tokenizer.nextToken();
-                        String definition = tokenizer.nextToken();
-                        Log.d("Infor", "w: " + word + ", pro: " + pronunciation + ", def: " + definition);
-                        Log.d("Insert result", String.valueOf(storage.inertEV_DictLine(word, pronunciation, definition, db, contentValues)));
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }

@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -184,7 +186,7 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
     }
 
     @Override
-    public void onClick(View v) {
+    public void onClick(final View v) {
         switch (v.getId()) {
             case R.id.buttonLoad:
                 intentPick("image/*", IMAGE_PICK);
@@ -194,37 +196,59 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                     Log.e("Error", "Directory not exist");
                 }
 
-                mCurrentImage = mListResourcePaths.size();
-                for (final String path : mListResourcePaths) {
-                    Runnable runnable = new Runnable() {
-                        @Override
-                        public void run() {
+                AsyncTask<Void, String, Void> asyncTask = new AsyncTask<Void, String, Void>() {
+                    @Override
+                    protected void onPreExecute() {
+                        super.onPreExecute();
+                        Toast.makeText(mActivity, "Resize images begin!", Toast.LENGTH_SHORT).show();
+                        if (mButtonProcess.getVisibility() != View.VISIBLE) {
+                            mButtonProcess.setVisibility(View.VISIBLE);
+                        }
+                    }
+
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        for (final String path : mListResourcePaths) {
                             Bitmap bitmap = BitmapProcessor.resizeBitmap(BitmapFactory.decodeFile(path), 20, 28);
                             String name = "";
                             StringTokenizer tokenizer = new StringTokenizer(path, "/");
                             while (tokenizer.hasMoreTokens()) {
                                 name = tokenizer.nextToken();
                             }
-                            String[] split  = name.split("_");
+                            String[] split = name.split("_");
                             if (split.length >= 2) {
                                 name = name.split("_")[1];
                             }
                             if (!SupportUtils.saveImage(bitmap, "Train", name, ".png")) {
-                                Toast.makeText(mActivity, "Save images error", Toast.LENGTH_SHORT).show();
-                            }
-                            if (mCurrentImage == mListResourcePaths.size()) {
-                                Toast.makeText(mActivity, "Resize images begin!", Toast.LENGTH_SHORT).show();
-                            }
-                            mCurrentImage--;
-                            if (mCurrentImage <= 0) {
-                                mCurrentImage = 0;
-                                Toast.makeText(mActivity, "Resize images done!", Toast.LENGTH_SHORT).show();
-                                switchMode();
+                                publishProgress("Save images error");
                             }
                         }
-                    };
-                    runnable.run();
+
+                        return null;
+                    }
+
+                    @Override
+                    protected void onProgressUpdate(String... values) {
+                        super.onProgressUpdate(values);
+                        Toast.makeText(mActivity, values[0], Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        super.onPostExecute(aVoid);
+                        if (mButtonProcess.getVisibility() != View.GONE) {
+                            mButtonProcess.setVisibility(View.GONE);
+                        }
+                        Toast.makeText(mActivity, "Resize images done!", Toast.LENGTH_SHORT).show();
+                        switchMode();
+                    }
+                };
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                } else {
+                    asyncTask.execute();
                 }
+
                 break;
 
             case R.id.buttonTrain:
@@ -277,7 +301,7 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
                         @Override
                         public void run() {
                             String name = getNameFromPath(path);
-                            String[] split  = name.split("_");
+                            String[] split = name.split("_");
                             if (split.length >= 2) {
                                 name = name.split("_")[1];
                             }

@@ -198,34 +198,38 @@ public class DrawingFragment extends BaseFragment implements View.OnClickListene
     @Override
     public void onDetectSuccess(ArrayList<Character> listCharacters) {
         mListBitmap.clear();
-        switch (mCurrentMode) {
-            case R.id.itemVerticalProjectionProfile:
-            case R.id.itemHorizontalProjectionProfile:
-            case R.id.itemContour:
-            case R.id.itemProfile:
-                mListDetectedBitmap.setVisibility(View.GONE);
-                mBitmapViewPager.setVisibility(View.VISIBLE);
-                if (mAnalysisBitmaps != null) {
-                    mAnalysisBitmaps.clear();
-                    for (Character c : listCharacters) {
-                        if (c.mBitmap != null) {
-                            mAnalysisBitmaps.add(c.mBitmap);
+        if (listCharacters.size() > 0) {
+            switch (mCurrentMode) {
+                case R.id.itemVerticalProjectionProfile:
+                case R.id.itemHorizontalProjectionProfile:
+                case R.id.itemContour:
+                case R.id.itemProfile:
+                    mListDetectedBitmap.setVisibility(View.GONE);
+                    mBitmapViewPager.setVisibility(View.VISIBLE);
+                    if (mAnalysisBitmaps != null) {
+                        mAnalysisBitmaps.clear();
+                        for (Character c : listCharacters) {
+                            if (c.mBitmap != null) {
+                                mAnalysisBitmaps.add(c.mBitmap);
+                            }
                         }
+                        mBitmapPager = new BitmapPager(mActivity, mAnalysisBitmaps, R.layout.item_bitmap_2);
+                        mBitmapViewPager.setAdapter(mBitmapPager);
                     }
-                    mBitmapPager = new BitmapPager(mActivity, mAnalysisBitmaps, R.layout.item_bitmap_2);
-                    mBitmapViewPager.setAdapter(mBitmapPager);
-                }
-                break;
-            default:
-                mListDetectedBitmap.setVisibility(View.VISIBLE);
-                mBitmapViewPager.setVisibility(View.GONE);
-                for (Character character : listCharacters) {
-                    mListBitmap.add(character.mBitmap);
-                }
-                break;
+                    break;
+                default:
+                    mListDetectedBitmap.setVisibility(View.VISIBLE);
+                    mBitmapViewPager.setVisibility(View.GONE);
+                    for (Character character : listCharacters) {
+                        mListBitmap.add(character.mBitmap);
+                    }
+                    break;
+            }
+            mLayoutProcessing.setVisibility(View.GONE);
+            Toast.makeText(mActivity, "Images analysis done", Toast.LENGTH_SHORT).show();
+            mBitmapAdapter.notifyDataSetChanged();
+        } else {
+            mLayoutProcessing.setVisibility(View.GONE);
         }
-        mLayoutProcessing.setVisibility(View.GONE);
-        Toast.makeText(mActivity, "Images analysis done", Toast.LENGTH_SHORT).show();
-        mBitmapAdapter.notifyDataSetChanged();
     }
 }

@@ -186,22 +186,26 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
         } else {
             mCurrentRecognized.clear();
         }
-        Toast.makeText(mActivity, "Size: " + listCharacters.size(), Toast.LENGTH_LONG).show();
+        if (listCharacters.size() > 0) {
+            Toast.makeText(mActivity, "Size: " + listCharacters.size(), Toast.LENGTH_SHORT).show();
 
-        final ArrayList<Line> currentLines = mDrawer.getLines();
-        Log.d("List char", "" + listCharacters.size());
+            final ArrayList<Line> currentLines = mDrawer.getLines();
+            Log.d("List char", "" + listCharacters.size());
 
-        mLayoutProgress.setVisibility(View.VISIBLE);
-        ImageToText imageToText = new ImageToText(mListener.getGlobalSOM(), mListener.getMapNames());
-        imageToText.imageToText(currentLines, listCharacters, new ImageToText.ConvertingCompleteCallback() {
-            @Override
-            public void convertingComplete(String result, HashMap<Input, Point> map) {
-                Log.d("Converting complete", "in");
-                mCurrentRecognized.putAll(map);
-                mTvResult.setText(result);
-                mLayoutProgress.setVisibility(View.GONE);
-            }
-        });
+            mLayoutProgress.setVisibility(View.VISIBLE);
+            ImageToText imageToText = new ImageToText(mListener.getGlobalSOM(), mListener.getMapNames());
+            imageToText.imageToText(currentLines, listCharacters, new ImageToText.ConvertingCompleteCallback() {
+                @Override
+                public void convertingComplete(String result, HashMap<Input, Point> map) {
+                    Log.d("Converting complete", "in");
+                    mCurrentRecognized.putAll(map);
+                    mTvResult.setText(result);
+                    mLayoutProgress.setVisibility(View.GONE);
+                }
+            });
+        } else {
+            mLayoutProgress.setVisibility(View.GONE);
+        }
     }
 
     private void deleteData() {

@@ -1,13 +1,16 @@
 package duy.phuong.handnote.Fragment;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import duy.phuong.handnote.DAO.LocalStorage;
@@ -20,13 +23,13 @@ import duy.phuong.handnote.Support.SupportUtils;
  * Created by Phuong on 26/01/2016.
  */
 public class MainFragment extends BaseFragment implements NotesAdapter.AdapterListener {
-    private ScrollView mMainScroll;
     private ListView mListNotes;
     private ArrayList<Note> mNotes;
     private LocalStorage mLocalStorage;
-    private NotesAdapter mAdapter;
     private TextView mMainTextView;
     private ShowNoteListener mShowNoteListener;
+    private LinearLayout mLayoutHolder;
+    private int mHolderHeight;
 
     public interface ShowNoteListener {
         void showNote(Note note);
@@ -42,11 +45,17 @@ public class MainFragment extends BaseFragment implements NotesAdapter.AdapterLi
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mHolderHeight = getArguments().getInt("TabHeight");
+    }
+
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mMainTextView = (TextView) mFragmentView.findViewById(R.id.mainTextView);
-        mMainScroll = (ScrollView) mFragmentView.findViewById(R.id.mainScroll);
         mListNotes = (ListView) mFragmentView.findViewById(R.id.listNotes);
+        mLayoutHolder = (LinearLayout) mFragmentView.findViewById(R.id.layoutHolder);
     }
 
     @Override
@@ -55,12 +64,20 @@ public class MainFragment extends BaseFragment implements NotesAdapter.AdapterLi
         mLocalStorage = new LocalStorage(mActivity);
         mNotes = new ArrayList<>();
         mNotes.addAll(mLocalStorage.getListNote());
-        mAdapter = new NotesAdapter(mNotes, mActivity, R.layout.item_note);
+        NotesAdapter mAdapter = new NotesAdapter(mNotes, mActivity, R.layout.item_note);
         mAdapter.setListener(this);
         mListNotes.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
         setListViewHeight(mListNotes);
         checkEmptyList();
+        if (!mNotes.isEmpty() && mShowNoteListener != null) {
+            if (mShowNoteListener.getClass() == ViewNoteFragment.class) {
+                mNotes.get(0).Focused = true;
+                mShowNoteListener.showNote(mNotes.get(0));
+            }
+        }
+        mLayoutHolder.requestLayout();
+        mLayoutHolder.getLayoutParams().height = mHolderHeight;
     }
 
     private void checkEmptyList() {
@@ -87,6 +104,8 @@ public class MainFragment extends BaseFragment implements NotesAdapter.AdapterLi
 
     @Override
     public void showNote(Note note) {
-        mShowNoteListener.showNote(note);
+        if (mShowNoteListener != null) {
+            mShowNoteListener.showNote(note);
+        }
     }
 }
