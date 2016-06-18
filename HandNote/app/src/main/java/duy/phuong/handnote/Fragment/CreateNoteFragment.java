@@ -151,10 +151,30 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
                 mDialogChangeColor.show();
                 break;
             case R.id.buttonUndo:
-                mDrawer.undo();
+                mDrawer.undo(new FingerDrawerView.UndoRedoCallback() {
+                    @Override
+                    public void canUndoRedo(boolean possibility) {
+                        Toast.makeText(mActivity, "Undo is aborted because the latest action isn't completed yet", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void emptyStack() {
+                        mTvResult.setText("");
+                    }
+                });
                 break;
             case R.id.buttonRedo:
-                mDrawer.redo();
+                mDrawer.redo(new FingerDrawerView.UndoRedoCallback() {
+                    @Override
+                    public void canUndoRedo(boolean possibility) {
+                        Toast.makeText(mActivity, "Redo is aborted because the latest action isn't completed yet", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void emptyStack() {
+                        Toast.makeText(mActivity, "Nothing to redo", Toast.LENGTH_SHORT).show();
+                    }
+                });
                 break;
             case R.id.buttonColorBlack:
             case R.id.buttonColorRed:

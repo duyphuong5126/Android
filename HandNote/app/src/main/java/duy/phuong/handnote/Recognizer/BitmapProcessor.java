@@ -4097,7 +4097,7 @@ public class BitmapProcessor {
     private boolean isx(Character character) {
         Bitmap src = character.mBitmap;
         int topTwo = -1, botTwo = -1;
-        if (character.mListRectContour.size() == 1) {
+        if (character.mListRectContour.size() == 0) {
             int midY = src.getHeight() / 2;
             for (int i = midY; i >= 0 && topTwo < 0; i--) {
                 topTwo = countRowSegments(i, src) > 1 ? i : -1;

@@ -8,6 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dip"
         android:layout_weight="1"
+        android:background="#fff"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -32,7 +33,7 @@
                     android:layout_width="0dip"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:background="#0000"
+                    android:background="#fff"
                     android:src="@mipmap/ic_check_black_24dp" />
 
                 <LinearLayout

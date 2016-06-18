@@ -77,8 +77,14 @@ public class ViewNoteFragment extends BaseFragment implements BackPressListener,
 
     @Override
     public void showNote(Note note) {
-        mNote = note;
-        showNote();
+        if (note != null) {
+            mNote = note;
+            showNote();
+        } else {
+            mNoteEmpty.setVisibility(View.VISIBLE);
+            mNoteImage.setVisibility(View.GONE);
+            mNoteContent.setVisibility(View.GONE);
+        }
     }
 
     private void showNote() {

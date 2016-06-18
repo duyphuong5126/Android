@@ -37,8 +37,7 @@ public class NotesAdapter extends BaseAdapter {
     public NotesAdapter(List<Note> notes, Activity activity, int layout) {
         super();
         mActivity = activity;
-        mNotes = new ArrayList<>();
-        mNotes.addAll(notes);
+        mNotes = notes;
         mLayout = layout;
     }
 
@@ -77,9 +76,7 @@ public class NotesAdapter extends BaseAdapter {
         ((ImageButton) convertView.findViewById(R.id.buttonDelete)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Note note = mNotes.remove(position);
-                mListener.deleteNote(note);
-                notifyDataSetChanged();
+                mListener.deleteNote(mNotes.get(position));
             }
         });
         ((ImageButton) convertView.findViewById(R.id.buttonShow)).setOnClickListener(new View.OnClickListener() {

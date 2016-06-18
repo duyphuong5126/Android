@@ -53,6 +53,10 @@ public class FingerDrawerView extends View {
 
     private ArrayList<Line> mLines;
     private ArrayList<Character> mCharacters;
+    public interface UndoRedoCallback {
+        void canUndoRedo(boolean possibility);
+        void emptyStack();
+    }
 
     public interface GetDisplayListener {
         DisplayMetrics getScreenResolution();
@@ -261,24 +265,34 @@ public class FingerDrawerView extends View {
         return super.onTouchEvent(event);
     }
 
-    public void undo() {
-        if (mListPaths.size() > 0) {
-            mUndoRedo = true;
-            MyPath myPath = mListPaths.remove(mListPaths.size() - 1);
-            mUndoRedoStack.push(myPath);
-            mCurrentPath--;
-            detectCharacters();
-            invalidate();
+    public void undo(UndoRedoCallback callback) {
+        if (mUndoRedo) {
+            callback.canUndoRedo(false);
+        } else {
+            if (mListPaths.size() > 0) {
+                mUndoRedo = true;
+                MyPath myPath = mListPaths.remove(mListPaths.size() - 1);
+                mUndoRedoStack.push(myPath);
+                mCurrentPath--;
+                detectCharacters();
+                invalidate();
+            } else {
+                callback.emptyStack();
+            }
         }
     }
 
-    public void redo() {
-        if (mUndoRedoStack.size() > 0) {
-            mUndoRedo = true;
-            mListPaths.add(mUndoRedoStack.pop());
-            mCurrentPath++;
-            detectCharacters();
-            invalidate();
+    public void redo(UndoRedoCallback callback) {
+        if (mUndoRedo) {
+            callback.canUndoRedo(false);
+        } else {
+            if (mUndoRedoStack.size() > 0) {
+                mUndoRedo = true;
+                mListPaths.add(mUndoRedoStack.pop());
+                mCurrentPath++;
+                detectCharacters();
+                invalidate();
+            }
         }
     }
 
@@ -318,9 +332,6 @@ public class FingerDrawerView extends View {
     }
 
     private void detectCharacters() {
-        if (mUndoRedo) {
-            mUndoRedo = false;
-        }
         mCharacters.clear();
         AsyncTask<Void, Bitmap, Void> asyncTask = new AsyncTask<Void, Bitmap, Void>() {
             @Override
@@ -393,6 +404,9 @@ public class FingerDrawerView extends View {
                     myPath.setChecked(false);
                 }
                 mListener.onDetectSuccess(mCharacters);
+                if (mUndoRedo) {
+                    mUndoRedo = false;
+                }
             }
         };
         asyncTask.execute();

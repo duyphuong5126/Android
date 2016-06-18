@@ -88,7 +88,7 @@ public class ImageToText {
         if (!lines.isEmpty()) {
             final String[] lists = new String[lines.size()];
             mCountCharacters = listCharacters.size();
-            for (Line line : lines) {
+            for (final Line line : lines) {
                 final int indexLine = lines.indexOf(line);
                 if (!line.mCharacters.isEmpty()) {
                     boolean end = false;
@@ -140,20 +140,39 @@ public class ImageToText {
                                 Log.d("Result", "bitmap " + index + " :" + result);
                                 Log.d("Char height", c.mRect.height() + "");
                                 switch (result) {
-                                    case "C":case "O":case "P":case "S":case "V":case "W":case "X":case "Z":
+                                    case "C":case "S":case "V":case "W":case "X":case "Z":
                                         if (c.mRect.height() <= 0.7d * h) {
                                             c.mAlphabet = result.toLowerCase();
                                         } else {
                                             c.mAlphabet = result;
                                         }
-                                        if (result.equals("O")) {
-                                            int w = c.mRect.width(), h = c.mRect.height();
-                                            if (w <= h * 0.85d) {
-                                                c.mAlphabet = "0";
+                                        break;
+                                    case "P":
+                                        ArrayList<Character> characters = line.mCharacters;
+                                        double bottom = 0.d;
+                                        for (int j = 0; j < characters.size(); j++) {
+                                            if (j != index) {
+                                                bottom += characters.get(j).mRect.bottom;
                                             }
                                         }
+                                        bottom /= (characters.size() - 1);
+                                        if (c.mRect.bottom - bottom > 0.4d * c.mRect.height()) {
+                                            c.mAlphabet = "p";
+                                        } else {
+                                            c.mAlphabet = result;
+                                        }
                                         break;
-
+                                    case "O":
+                                        if (c.mRect.height() <= 0.7d * h) {
+                                            c.mAlphabet = result.toLowerCase();
+                                        } else {
+                                            c.mAlphabet = result;
+                                        }
+                                        int w = c.mRect.width(), h = c.mRect.height();
+                                        if (w <= h * 0.85d) {
+                                            c.mAlphabet = "0";
+                                        }
+                                        break;
                                     case "b1":
                                     case "k1":
                                         c.mAlphabet = result.substring(0, 1);

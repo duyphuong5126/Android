@@ -30,6 +30,7 @@ public class MainFragment extends BaseFragment implements NotesAdapter.AdapterLi
     private ShowNoteListener mShowNoteListener;
     private LinearLayout mLayoutHolder;
     private int mHolderHeight;
+    private NotesAdapter mAdapter;
 
     public interface ShowNoteListener {
         void showNote(Note note);
@@ -64,7 +65,7 @@ public class MainFragment extends BaseFragment implements NotesAdapter.AdapterLi
         mLocalStorage = new LocalStorage(mActivity);
         mNotes = new ArrayList<>();
         mNotes.addAll(mLocalStorage.getListNote());
-        NotesAdapter mAdapter = new NotesAdapter(mNotes, mActivity, R.layout.item_note);
+        mAdapter = new NotesAdapter(mNotes, mActivity, R.layout.item_note);
         mAdapter.setListener(this);
         mListNotes.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
@@ -95,11 +96,37 @@ public class MainFragment extends BaseFragment implements NotesAdapter.AdapterLi
 
     @Override
     public void deleteNote(Note note) {
+        boolean focused = note.Focused;
+        int index = mNotes.indexOf(note);
+        mNotes.remove(note);
         mLocalStorage.deleteNote(note);
         SupportUtils.deleteFile(note.mBitmapPath);
         SupportUtils.deleteFile(note.mContentPath);
         Toast.makeText(mActivity, "Delete done", Toast.LENGTH_SHORT).show();
         checkEmptyList();
+        if (!mNotes.isEmpty()) {
+            if (focused) {
+                if (mShowNoteListener != null) {
+                    if (mShowNoteListener.getClass() == ViewNoteFragment.class) {
+                        if (index == 0 || index != mNotes.size()) {
+                            mShowNoteListener.showNote(mNotes.get(index));
+                            mNotes.get(index).Focused = true;
+                        } else {
+                            mShowNoteListener.showNote(mNotes.get(index - 1));
+                            mNotes.get(index - 1).Focused = true;
+                        }
+                    }
+                }
+            }
+        } else {
+            if (mShowNoteListener != null) {
+                if (mShowNoteListener.getClass() == ViewNoteFragment.class) {
+                    mShowNoteListener.showNote(null);
+                }
+            }
+        }
+        mAdapter.notifyDataSetChanged();
+        setListViewHeight(mListNotes);
     }
 
     @Override
