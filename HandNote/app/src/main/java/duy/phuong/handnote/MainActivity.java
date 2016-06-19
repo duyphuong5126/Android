@@ -314,8 +314,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
             mSetTabSize = true;
         }
         DisplayMetrics metrics = updateButtonAdd();
-        float thresholdLandScape = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 600, metrics);
-        if (metrics.widthPixels >= thresholdLandScape) {
+        if (mLayoutSubFragment != null) {
             LandScape = true;
         }
         if (mFragmentManager.getBackStackEntryCount() <= 0) {

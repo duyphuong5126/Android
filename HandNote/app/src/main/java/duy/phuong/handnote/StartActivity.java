@@ -120,7 +120,16 @@ public class StartActivity extends Activity implements View.OnClickListener {
                 mDialog.show();
             }
         } else {
-            intentMain();
+            if (!SharedPreferenceUtils.isViewIntro()) {
+                mLayoutLoading.setVisibility(View.GONE);
+                showIntroScreen();
+            } else {
+                if (SharedPreferenceUtils.getCurrentName().isEmpty()) {
+                    showLoginScreen();
+                } else {
+                    intentMain();
+                }
+            }
         }
     }
 
