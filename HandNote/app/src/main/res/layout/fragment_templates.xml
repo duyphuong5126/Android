@@ -20,6 +20,12 @@
                 android:gravity="center_horizontal"
                 android:numColumns="7"
                 android:stretchMode="columnWidth" />
+
+            <LinearLayout
+                android:id="@+id/layoutHolder"
+                android:layout_width="match_parent"
+                android:layout_height="50dip"
+                android:orientation="vertical"/>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

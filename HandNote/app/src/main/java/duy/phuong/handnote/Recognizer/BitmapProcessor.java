@@ -71,12 +71,6 @@ public class BitmapProcessor {
 
     private int mMode;
 
-    public int getMode() {
-        return mMode;
-    }
-
-    /*private ArrayList<Rect> mListRectangle;*/
-
     private Bitmap mGloBalContour;
 
     public BitmapProcessor() {
@@ -838,7 +832,7 @@ public class BitmapProcessor {
                         }
 
                         stop = false;
-                        int nextCol = -1;
+                        int nextCol;
                         if (next != null) {
                             nextCol = next.left;
                         } else {
@@ -1069,30 +1063,6 @@ public class BitmapProcessor {
     private boolean mixableRect(Rect r1, Rect r2) {
         return (r1.left >= r2.left && r1.left <= r2.right) || (r1.right >= r2.left && r1.right <= r2.right)
                 || (r1.left <= r2.left && r1.right >= r2.right) || (r2.left <= r1.left && r2.right >= r1.right);
-    }
-
-    private boolean checkNotEmptyColumn(int c, final Bitmap bitmap) {
-        if (c >= bitmap.getWidth()) {
-            return false;
-        }
-        for (int r = 0; r < bitmap.getHeight(); r++) {
-            if (bitmap.getPixel(c, r) != Color.WHITE) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean checkNotEmptyRow(int r, int start, int end, final Bitmap bitmap) {
-        if (r >= bitmap.getHeight()) {
-            return false;
-        }
-        for (int i = start; i < end; i++) {
-            if (bitmap.getPixel(i, r) != Color.WHITE) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private int countBlack(Bitmap bitmap) {
@@ -1379,26 +1349,6 @@ public class BitmapProcessor {
             }
         }
         return count;
-    }
-
-    private int getEndComponent(int row, Bitmap src) {
-        boolean flag = false;
-        int col = -1;
-        int count = 0;
-        for (int i = 0; i < src.getWidth() && col < 0; i++) {
-            if (src.getPixel(i, row) != Color.WHITE) {
-                if (!flag) {
-                    count++;
-                    flag = true;
-                }
-                if (count >= 2) {
-                    col = i;
-                }
-            } else {
-                flag = false;
-            }
-        }
-        return col;
     }
 
     private int triangleFromBot(Character character) {

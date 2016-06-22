@@ -41,8 +41,6 @@ public class HandNote extends Application {
             mConnection.setReadTimeout(5000);
             mConnection.connect();
             return mConnection.getResponseCode() == 200;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

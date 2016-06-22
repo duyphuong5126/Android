@@ -1,7 +1,6 @@
 package duy.phuong.handnote.Fragment;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.view.MenuItem;

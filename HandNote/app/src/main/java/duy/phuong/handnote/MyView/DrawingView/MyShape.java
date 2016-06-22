@@ -15,10 +15,6 @@ public class MyShape {
         this.mListPaths = mListPaths;
     }
 
-    public MyShape() {
-        mListPaths = new ArrayList<>();
-    }
-
     public ArrayList<MyPath> getListPaths() {
         return mListPaths;
     }
@@ -59,28 +55,5 @@ public class MyShape {
         }
 
         return Math.abs(maxY - minY);
-    }
-
-    public Rect getRect() {
-        int left = mListPaths.get(0).getListPoint().get(0).x; int right = left;
-        int top = mListPaths.get(0).getListPoint().get(0).y; int bot = top;
-        for (MyPath myPath : mListPaths)
-            for (Point point : myPath.getListPoint()) {
-                if (left > point.x) {
-                    left = point.x;
-                }
-
-                if (right < point.x) {
-                    right = point.x;
-                }
-                if (top > point.y) {
-                    top = point.y;
-                }
-
-                if (bot < point.y) {
-                    bot = point.y;
-                }
-            }
-        return new Rect(left, top, right, bot);
     }
 }

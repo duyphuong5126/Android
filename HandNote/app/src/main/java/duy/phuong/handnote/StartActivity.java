@@ -2,7 +2,6 @@ package duy.phuong.handnote;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -71,9 +70,7 @@ public class StartActivity extends Activity implements View.OnClickListener {
 
     private Uri mCapturedImage;
 
-    private AsyncTask<Void, Integer, Void> mEVTask;
     private TextView mTextProgress;
-    private AlertDialog.Builder mBuilder;
     private AlertDialog mDialog;
     private ProgressBar mProgress;
     private int mProgressNumber, mMax;
@@ -91,7 +88,7 @@ public class StartActivity extends Activity implements View.OnClickListener {
         mProgress = (ProgressBar) findViewById(R.id.Progress);
         mLayoutInstalling = (LinearLayout) findViewById(R.id.layoutInstalling);
         mTextProgress = (TextView) findViewById(R.id.textProgress);
-        mBuilder = new AlertDialog.Builder(this);
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
         mBuilder.setTitle("You haven't installed dictionary yet. Install it now?").setNegativeButton("Skip", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -141,7 +138,7 @@ public class StartActivity extends Activity implements View.OnClickListener {
         final InputStream inputStream = resources.openRawResource(R.raw.eng_vi);
         final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         localStorage.deleteAllDict(db);
-        mEVTask = new AsyncTask<Void, Integer, Void>() {
+        AsyncTask<Void, Integer, Void> mEVTask = new AsyncTask<Void, Integer, Void>() {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
@@ -195,7 +192,7 @@ public class StartActivity extends Activity implements View.OnClickListener {
             protected void onProgressUpdate(Integer... values) {
                 super.onProgressUpdate(values);
                 mProgressNumber += values[0];
-                mTextProgress.setText("Installing " + Math.round((((double) mProgressNumber)/mMax) * 100) + "%, please wait...");
+                mTextProgress.setText("Installing " + Math.round((((double) mProgressNumber) / mMax) * 100) + "%, please wait...");
                 mProgress.setProgress(mProgressNumber);
             }
 
@@ -216,12 +213,10 @@ public class StartActivity extends Activity implements View.OnClickListener {
                 }
             }
         };
-        if (mEVTask != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                mEVTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            } else {
-                mEVTask.execute();
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            mEVTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        } else {
+            mEVTask.execute();
         }
     }
 
@@ -468,7 +463,7 @@ public class StartActivity extends Activity implements View.OnClickListener {
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case SELECT_IMAGE:
-                    boolean isFromCamera = false;
+                    boolean isFromCamera;
                     if (data == null) {
                         isFromCamera = true;
                     } else {
@@ -479,7 +474,7 @@ public class StartActivity extends Activity implements View.OnClickListener {
                         }
                     }
 
-                    String path = null;
+                    String path;
                     if (isFromCamera) {
                         path = SupportUtils.getPath(mCapturedImage, StartActivity.this);
                     } else {

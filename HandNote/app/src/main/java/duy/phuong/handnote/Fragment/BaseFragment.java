@@ -1,16 +1,13 @@
 package duy.phuong.handnote.Fragment;
 
 import android.app.Activity;
-import android.content.res.Resources;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 

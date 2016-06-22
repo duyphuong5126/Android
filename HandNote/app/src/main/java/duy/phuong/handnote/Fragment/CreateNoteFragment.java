@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -15,7 +14,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,7 +43,6 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
     private FingerDrawerView mDrawer;
     private TextView mTvResult;
     private LinearLayout mLayoutProgress;
-    private ScrollView mViewResult;
 
     private ColorPicker mColorPicker;
     private AlertDialog mDialogChangeColor;
@@ -90,7 +87,6 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
             }
         });
         mLayoutProgress = (LinearLayout) mFragmentView.findViewById(R.id.viewProgress);
-        mViewResult = (ScrollView) mFragmentView.findViewById(R.id.viewResult);
 
         mLocalStorage = new LocalStorage(mActivity);
     }
@@ -237,16 +233,16 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
         if (mColorPicker == null) {
             mColorPicker = new ColorPicker(mActivity, this, 0xffffff);
             View view = LayoutInflater.from(mActivity).inflate(R.layout.color_picker_layout, null);
-            ((Button) view.findViewById(R.id.buttonColorBlack)).setOnClickListener(this);
-            ((Button) view.findViewById(R.id.buttonColorRed)).setOnClickListener(this);
-            ((Button) view.findViewById(R.id.buttonColorGreen)).setOnClickListener(this);
-            ((Button) view.findViewById(R.id.buttonColorBlue)).setOnClickListener(this);
-            ((Button) view.findViewById(R.id.buttonColorYellow)).setOnClickListener(this);
-            ((Button) view.findViewById(R.id.buttonColorGray)).setOnClickListener(this);
-            ((Button) view.findViewById(R.id.buttonColorPink)).setOnClickListener(this);
-            ((Button) view.findViewById(R.id.buttonColorLime)).setOnClickListener(this);
-            ((Button) view.findViewById(R.id.buttonColorBlueSky)).setOnClickListener(this);
-            ((Button) view.findViewById(R.id.buttonColorGold)).setOnClickListener(this);
+            view.findViewById(R.id.buttonColorBlack).setOnClickListener(this);
+            view.findViewById(R.id.buttonColorRed).setOnClickListener(this);
+            view.findViewById(R.id.buttonColorGreen).setOnClickListener(this);
+            view.findViewById(R.id.buttonColorBlue).setOnClickListener(this);
+            view.findViewById(R.id.buttonColorYellow).setOnClickListener(this);
+            view.findViewById(R.id.buttonColorGray).setOnClickListener(this);
+            view.findViewById(R.id.buttonColorPink).setOnClickListener(this);
+            view.findViewById(R.id.buttonColorLime).setOnClickListener(this);
+            view.findViewById(R.id.buttonColorBlueSky).setOnClickListener(this);
+            view.findViewById(R.id.buttonColorGold).setOnClickListener(this);
             ((LinearLayout) view.findViewById(R.id.colorPickerLayout)).addView(mColorPicker.getColorPickerView());
             AlertDialog.Builder mDialogBuilderChangeColor = new AlertDialog.Builder(mActivity);
             mDialogBuilderChangeColor.setView(view);

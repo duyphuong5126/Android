@@ -13,14 +13,12 @@ public class ClusterLabel {
 
     public ClusterLabel() {
         mListLabel = new ArrayList<>();
-
         computeClusterCount();
     }
 
     public ClusterLabel(ArrayList<Label> ListLabel) {
         mListLabel = new ArrayList<>();
         mListLabel.addAll(ListLabel);
-
         computeClusterCount();
     }
 
@@ -79,7 +77,6 @@ public class ClusterLabel {
         }
 
         computeClusterCount();
-
         return true;
     }
 

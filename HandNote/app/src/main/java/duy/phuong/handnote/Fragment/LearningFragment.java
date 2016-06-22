@@ -46,7 +46,6 @@ import duy.phuong.handnote.Support.SupportUtils;
  * Created by Phuong on 28/02/2016.
  */
 public class LearningFragment extends BaseFragment implements View.OnClickListener {
-    private ListView mListImages;
     private ArrayList<String> mListResourcePaths;
     private ArrayAdapter<String> mListFilesAdapter;
     private ScrollView mScrollProgress;
@@ -84,7 +83,7 @@ public class LearningFragment extends BaseFragment implements View.OnClickListen
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mTvLogView = (TextView) mFragmentView.findViewById(R.id.tvLogView);
-        mListImages = (ListView) mFragmentView.findViewById(R.id.listFiles);
+        ListView mListImages = (ListView) mFragmentView.findViewById(R.id.listFiles);
         mListFilesAdapter = new ArrayAdapter<>(mActivity, R.layout.item_text, mListResourcePaths);
         mListImages.setAdapter(mListFilesAdapter);
         mButtonResize = (ImageButton) mFragmentView.findViewById(R.id.buttonResize);

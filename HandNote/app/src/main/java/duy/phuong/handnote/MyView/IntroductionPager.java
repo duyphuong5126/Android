@@ -35,7 +35,7 @@ public class IntroductionPager extends PagerAdapter {
 
     @Override
     public boolean isViewFromObject(View view, Object object) {
-        return view.equals((LinearLayout) object);
+        return view.equals(object);
     }
 
     @Override

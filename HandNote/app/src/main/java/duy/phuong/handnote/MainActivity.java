@@ -16,7 +16,6 @@ import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -556,7 +555,10 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                 break;
 
             case BaseFragment.TEMPLATES_FRAGMENT:
+                Bundle b = new Bundle();
                 baseFragment = new TemplatesFragment();
+                b.putInt("TabHeight", mTabHeight);
+                baseFragment.setArguments(b);
                 mMainNavigator.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 break;
 
@@ -606,6 +608,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                 if (mLayoutSubFragment != null) {
                     mLayoutSubFragment.setVisibility(View.GONE);
                 }
+                mMainNavigator.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 break;
             case BaseFragment.LEARNING_FRAGMENT:
                 for (SideMenuItem item : mItems) {
@@ -615,6 +618,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                 if (mLayoutSubFragment != null) {
                     mLayoutSubFragment.setVisibility(View.GONE);
                 }
+                mMainNavigator.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 break;
             case BaseFragment.TRANSLATE_FRAGMENT:
                 for (SideMenuItem item : mItems) {
@@ -624,13 +628,21 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                 if (mLayoutSubFragment != null) {
                     mLayoutSubFragment.setVisibility(View.GONE);
                 }
+                mMainNavigator.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 break;
             case BaseFragment.CREATE_NOTE_FRAGMENT:
+                this.toggleMainBottomTabs(false);
+                if (mLayoutSubFragment != null) {
+                    mLayoutSubFragment.setVisibility(View.GONE);
+                }
+                mMainNavigator.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                break;
             case BaseFragment.VIEW_NOTE_FRAGMENT:
                 this.toggleMainBottomTabs(false);
                 if (mLayoutSubFragment != null) {
                     mLayoutSubFragment.setVisibility(View.GONE);
                 }
+                mMainNavigator.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 break;
             case BaseFragment.TEMPLATES_FRAGMENT:
                 for (SideMenuItem item : mItems) {
@@ -642,6 +654,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                 if (mLayoutSubFragment != null) {
                     mLayoutSubFragment.setVisibility(View.GONE);
                 }
+                mMainNavigator.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 break;
 
             case BaseFragment.WEB_FRAGMENT:
@@ -652,6 +665,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                 if (mLayoutSubFragment != null) {
                     mLayoutSubFragment.setVisibility(View.GONE);
                 }
+                mMainNavigator.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 break;
             default:
                 for (SideMenuItem item : mItems) {
@@ -660,6 +674,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
                 if (mLayoutSubFragment != null) {
                     mLayoutSubFragment.setVisibility(View.VISIBLE);
                 }
+                mMainNavigator.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 this.toggleMainBottomTabs(true);
                 mTabNotes.setSelected(true);
                 mTabTemplates.setSelected(false);

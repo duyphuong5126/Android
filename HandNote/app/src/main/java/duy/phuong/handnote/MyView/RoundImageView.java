@@ -41,7 +41,7 @@ public class RoundImageView extends ImageView {
     }
 
     public static Bitmap getRoundedBitmap(Bitmap src, int radius) {
-        Bitmap roundBitmap = null;
+        Bitmap roundBitmap;
         roundBitmap = (src.getWidth() == radius || src.getHeight() == radius) ? src : Bitmap.createScaledBitmap(src, radius, radius, false);
         Bitmap des = Bitmap.createBitmap(roundBitmap.getWidth(), roundBitmap.getHeight(), Bitmap.Config.ARGB_8888);
 

@@ -5,17 +5,15 @@ import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import duy.phuong.handnote.DTO.Line;
 import duy.phuong.handnote.DTO.Note;
 import duy.phuong.handnote.R;
+import duy.phuong.handnote.Support.SupportUtils;
 
 /**
  * Created by Phuong on 16/04/2016.
@@ -61,9 +59,9 @@ public class NotesAdapter extends BaseAdapter {
         final Note note = mNotes.get(position);
         convertView = mActivity.getLayoutInflater().inflate(mLayout, null);
         final LinearLayout noteLayout = (LinearLayout) convertView.findViewById(R.id.layoutNote);
-        noteLayout.setBackgroundColor((note.Focused)? Color.parseColor("#FFDDDDDD") : Color.WHITE);
         ((ImageView) convertView.findViewById(R.id.imageView)).setImageBitmap(note.mImage);
-        ((TextView) convertView.findViewById(R.id.textView)).setText(note.mContent);
+        ((TextView) convertView.findViewById(R.id.textContent)).setText(note.mContent);
+        ((TextView) convertView.findViewById(R.id.textCreateDate)).setText("Create at: " + SupportUtils.getDateModified(note.mBitmapPath));
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,19 +71,11 @@ public class NotesAdapter extends BaseAdapter {
                 notifyDataSetChanged();
             }
         });
-        ((ImageButton) convertView.findViewById(R.id.buttonDelete)).setOnClickListener(new View.OnClickListener() {
+        convertView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
                 mListener.deleteNote(mNotes.get(position));
-            }
-        });
-        ((ImageButton) convertView.findViewById(R.id.buttonShow)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.showNote(note);
-                setFocusNote(position);
-                noteLayout.setBackgroundColor((note.Focused)? Color.RED : Color.WHITE);
-                notifyDataSetChanged();
+                return false;
             }
         });
         return convertView;

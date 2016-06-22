@@ -6,7 +6,6 @@ import java.util.ArrayList;
  * Created by Phuong on 09/04/2016.
  */
 public class Line {
-    public ArrayList<Word> mWords;
     public ArrayList<Character> mCharacters;
     public int mTop, mBottom;
     public int mMinTop, mMaxBottom;

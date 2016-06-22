@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -17,12 +16,9 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.Date;
 
 /**
  * Created by Phuong on 28/11/2015.
@@ -180,7 +176,7 @@ public abstract class SupportUtils {
     public static String getStringData(String folder, String fileName) {
         StringBuilder builder = new StringBuilder();
         File file = new File(RootPath + ApplicationDirectory + folder + "/" + fileName);
-        BufferedReader reader = null;
+        BufferedReader reader;
         try {
             reader = new BufferedReader(new FileReader(file));
             String s = "";
@@ -204,7 +200,7 @@ public abstract class SupportUtils {
         BufferedReader reader;
         try {
             reader = new BufferedReader(new FileReader(file));
-            String s = "";
+            String s;
             while ((s = reader.readLine()) != null) {
                 builder.append(s);
                 builder.append("\r\n");
@@ -314,5 +310,15 @@ public abstract class SupportUtils {
                 }
             }
         }
+    }
+
+    public static String getDateModified(String filePath) {
+        if (filePath == null || filePath.equals("")) {
+            return "";
+        }
+        File file = new File(filePath);
+        Date date = new Date(file.lastModified());
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        return formatter.format(date);
     }
 }

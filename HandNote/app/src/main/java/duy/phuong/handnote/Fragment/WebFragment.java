@@ -1,8 +1,6 @@
 package duy.phuong.handnote.Fragment;
 
-import android.graphics.Color;
 import android.graphics.Point;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -23,7 +21,6 @@ import duy.phuong.handnote.R;
 import duy.phuong.handnote.Recognizer.BitmapProcessor;
 import duy.phuong.handnote.Recognizer.ImageToText;
 import duy.phuong.handnote.Recognizer.MachineLearning.Input;
-import duy.phuong.handnote.Recognizer.Recognizer;
 
 /**
  * Created by Phuong on 24/05/2016.

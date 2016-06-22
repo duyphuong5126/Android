@@ -1,20 +1,19 @@
 package duy.phuong.handnote.Fragment;
 
-import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 import duy.phuong.handnote.DAO.LocalStorage;
 import duy.phuong.handnote.DTO.Note;
+import duy.phuong.handnote.MyView.ExpandableGridView;
 import duy.phuong.handnote.MyView.NotesAdapter;
 import duy.phuong.handnote.R;
 import duy.phuong.handnote.Support.SupportUtils;
@@ -23,7 +22,7 @@ import duy.phuong.handnote.Support.SupportUtils;
  * Created by Phuong on 26/01/2016.
  */
 public class MainFragment extends BaseFragment implements NotesAdapter.AdapterListener {
-    private ListView mListNotes;
+    private ExpandableGridView mListNotes;
     private ArrayList<Note> mNotes;
     private LocalStorage mLocalStorage;
     private TextView mMainTextView;
@@ -46,8 +45,8 @@ public class MainFragment extends BaseFragment implements NotesAdapter.AdapterLi
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         mHolderHeight = getArguments().getInt("TabHeight");
     }
 
@@ -55,8 +54,10 @@ public class MainFragment extends BaseFragment implements NotesAdapter.AdapterLi
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mMainTextView = (TextView) mFragmentView.findViewById(R.id.mainTextView);
-        mListNotes = (ListView) mFragmentView.findViewById(R.id.listNotes);
+        mListNotes = (ExpandableGridView) mFragmentView.findViewById(R.id.listNotes);
+        mListNotes.setExpanded(true);
         mLayoutHolder = (LinearLayout) mFragmentView.findViewById(R.id.layoutHolder);
+
     }
 
     @Override
@@ -69,7 +70,6 @@ public class MainFragment extends BaseFragment implements NotesAdapter.AdapterLi
         mAdapter.setListener(this);
         mListNotes.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
-        setListViewHeight(mListNotes);
         checkEmptyList();
         if (!mNotes.isEmpty() && mShowNoteListener != null) {
             if (mShowNoteListener.getClass() == ViewNoteFragment.class) {
@@ -95,38 +95,52 @@ public class MainFragment extends BaseFragment implements NotesAdapter.AdapterLi
     }
 
     @Override
-    public void deleteNote(Note note) {
-        boolean focused = note.Focused;
-        int index = mNotes.indexOf(note);
-        mNotes.remove(note);
-        mLocalStorage.deleteNote(note);
-        SupportUtils.deleteFile(note.mBitmapPath);
-        SupportUtils.deleteFile(note.mContentPath);
-        Toast.makeText(mActivity, "Delete done", Toast.LENGTH_SHORT).show();
-        checkEmptyList();
-        if (!mNotes.isEmpty()) {
-            if (focused) {
-                if (mShowNoteListener != null) {
-                    if (mShowNoteListener.getClass() == ViewNoteFragment.class) {
-                        if (index == 0 || index != mNotes.size()) {
-                            mShowNoteListener.showNote(mNotes.get(index));
-                            mNotes.get(index).Focused = true;
-                        } else {
-                            mShowNoteListener.showNote(mNotes.get(index - 1));
-                            mNotes.get(index - 1).Focused = true;
-                        }
+    public void deleteNote(final Note note) {
+        AlertDialog.Builder builder =
+                new AlertDialog.Builder(mActivity)
+                        .setTitle("Confirm delete?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                boolean focused = note.Focused;
+                                int index = mNotes.indexOf(note);
+                                mNotes.remove(note);
+                                mLocalStorage.deleteNote(note);
+                                SupportUtils.deleteFile(note.mBitmapPath);
+                                SupportUtils.deleteFile(note.mContentPath);
+                                Toast.makeText(mActivity, "Delete done", Toast.LENGTH_SHORT).show();
+                                checkEmptyList();
+                                if (!mNotes.isEmpty()) {
+                                    if (focused) {
+                                        if (mShowNoteListener != null) {
+                                            if (mShowNoteListener.getClass() == ViewNoteFragment.class) {
+                                                if (index == 0 || index != mNotes.size()) {
+                                                    mShowNoteListener.showNote(mNotes.get(index));
+                                                    mNotes.get(index).Focused = true;
+                                                } else {
+                                                    mShowNoteListener.showNote(mNotes.get(index - 1));
+                                                    mNotes.get(index - 1).Focused = true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    if (mShowNoteListener != null) {
+                                        if (mShowNoteListener.getClass() == ViewNoteFragment.class) {
+                                            mShowNoteListener.showNote(null);
+                                        }
+                                    }
+                                }
+                                mAdapter.notifyDataSetChanged();
+                            }
+                        })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
                     }
-                }
-            }
-        } else {
-            if (mShowNoteListener != null) {
-                if (mShowNoteListener.getClass() == ViewNoteFragment.class) {
-                    mShowNoteListener.showNote(null);
-                }
-            }
-        }
-        mAdapter.notifyDataSetChanged();
-        setListViewHeight(mListNotes);
+                });
+        builder.create().show();
     }
 
     @Override

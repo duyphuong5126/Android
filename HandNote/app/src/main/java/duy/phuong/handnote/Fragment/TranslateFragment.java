@@ -3,10 +3,8 @@ package duy.phuong.handnote.Fragment;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -31,7 +29,6 @@ import java.util.StringTokenizer;
 import duy.phuong.handnote.DAO.LocalStorage;
 import duy.phuong.handnote.DTO.Character;
 import duy.phuong.handnote.DTO.Line;
-import duy.phuong.handnote.HandNote;
 import duy.phuong.handnote.Listener.BackPressListener;
 import duy.phuong.handnote.MyView.DrawingView.FingerDrawerView;
 import duy.phuong.handnote.R;
@@ -49,9 +46,6 @@ public class TranslateFragment extends BaseFragment implements BackPressListener
     private TextView mTvDefinition;
     private LinearLayout mLayoutProcess;
 
-    private AsyncTask<Void, Integer, Void> mEVTask;
-
-    private AlertDialog.Builder mBuilder;
     private AlertDialog mDialog;
 
     private LinearLayout mLayoutInstalling;
@@ -83,7 +77,7 @@ public class TranslateFragment extends BaseFragment implements BackPressListener
         mProgress = (ProgressBar) mFragmentView.findViewById(R.id.Progress);
         mTextProgress = (TextView) mFragmentView.findViewById(R.id.textProgress);
 
-        mBuilder = new AlertDialog.Builder(mActivity);
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(mActivity);
         mBuilder.setTitle("You haven't installed dictionary yet. Install it now?").setNegativeButton("Skip", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -115,7 +109,7 @@ public class TranslateFragment extends BaseFragment implements BackPressListener
         final InputStream inputStream = resources.openRawResource(R.raw.eng_vi);
         final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         localStorage.deleteAllDict(db);
-        mEVTask = new AsyncTask<Void, Integer, Void>() {
+        AsyncTask<Void, Integer, Void> mEVTask = new AsyncTask<Void, Integer, Void>() {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
@@ -164,11 +158,12 @@ public class TranslateFragment extends BaseFragment implements BackPressListener
                 }
                 return null;
             }
+
             @Override
             protected void onProgressUpdate(Integer... values) {
                 super.onProgressUpdate(values);
                 mProgressNumber += values[0];
-                mTextProgress.setText("Installing " + Math.round((((double) mProgressNumber)/mMax) * 100) + "%, please wait...");
+                mTextProgress.setText("Installing " + Math.round((((double) mProgressNumber) / mMax) * 100) + "%, please wait...");
                 mProgress.setProgress(mProgressNumber);
             }
 
@@ -180,12 +175,10 @@ public class TranslateFragment extends BaseFragment implements BackPressListener
                 SharedPreferenceUtils.loadedDict(true);
             }
         };
-        if (mEVTask != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                mEVTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            } else {
-                mEVTask.execute();
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            mEVTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        } else {
+            mEVTask.execute();
         }
     }
 

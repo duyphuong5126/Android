@@ -3,14 +3,11 @@ package duy.phuong.handnote.MyView.DrawingView;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.support.v4.view.PagerAdapter;
-import android.text.SpannableString;
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -31,11 +28,6 @@ public class BitmapPager extends PagerAdapter {
         mViews = new ArrayList<>();
     }
 
-    public void removeAllViews() {
-        mViews.clear();
-        notifyDataSetChanged();
-    }
-
     @Override
     public int getCount() {
         return mBitmaps.size();
@@ -43,12 +35,12 @@ public class BitmapPager extends PagerAdapter {
 
     @Override
     public boolean isViewFromObject(View view, Object object) {
-        return view.equals((LinearLayout) object);
+        return view.equals(object);
     }
 
     @Override
     public int getItemPosition(Object object) {
-        return mViews.indexOf((View) object);
+        return mViews.indexOf(object);
     }
 
     @Override

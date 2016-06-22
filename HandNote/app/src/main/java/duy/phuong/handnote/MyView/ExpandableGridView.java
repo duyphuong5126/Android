@@ -1,6 +1,8 @@
 package duy.phuong.handnote.MyView;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.widget.GridView;
@@ -22,14 +24,11 @@ public class ExpandableGridView extends GridView {
         super(context, attrs, defStyleAttr);
     }
 
-    public boolean isExpanded() {
-        return Expanded;
-    }
-
     public void setExpanded(boolean expanded) {
         Expanded = expanded;
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         if (Expanded) {

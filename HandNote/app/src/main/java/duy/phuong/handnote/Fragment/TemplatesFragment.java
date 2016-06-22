@@ -1,5 +1,6 @@
 package duy.phuong.handnote.Fragment;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,17 +19,24 @@ import duy.phuong.handnote.R;
  * Created by Phuong on 10/05/2016.
  */
 public class TemplatesFragment extends BaseFragment {
-    private ExpandableGridView mListTemplates;
-    private BitmapAdapter mBitmapAdapter;
-    private ArrayList<Bitmap> mListBitmap;
+    private int mHolderHeight;
+    private LinearLayout mLayoutHolder;
+
     public TemplatesFragment() {
         mLayoutRes = R.layout.fragment_templates;
+        mHolderHeight = 0;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mHolderHeight = getArguments().getInt("TabHeight");
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mListBitmap = new ArrayList<>();
+        ArrayList<Bitmap> mListBitmap = new ArrayList<>();
         Resources resources = mActivity.getResources();
         mListBitmap.add(BitmapFactory.decodeResource(resources, R.drawable._1_));
         mListBitmap.add(BitmapFactory.decodeResource(resources, R.drawable._2_));
@@ -86,23 +94,20 @@ public class TemplatesFragment extends BaseFragment {
         mListBitmap.add(BitmapFactory.decodeResource(resources, R.drawable._y_));
         mListBitmap.add(BitmapFactory.decodeResource(resources, R.drawable._y1_));
         mListBitmap.add(BitmapFactory.decodeResource(resources, R.drawable._z_));
-        mBitmapAdapter = new BitmapAdapter(mActivity, R.layout.item_bitmap_1, mListBitmap);
+        BitmapAdapter mBitmapAdapter = new BitmapAdapter(mActivity, R.layout.item_bitmap_1, mListBitmap);
         Log.d("Size", "" + mListBitmap.size());
-        mListTemplates = (ExpandableGridView) mFragmentView.findViewById(R.id.listTemplateBitmaps);
+        ExpandableGridView mListTemplates = (ExpandableGridView) mFragmentView.findViewById(R.id.listTemplateBitmaps);
+        mLayoutHolder = (LinearLayout) mFragmentView.findViewById(R.id.layoutHolder);
         mListTemplates.setExpanded(true);
         mListTemplates.setAdapter(mBitmapAdapter);
         mBitmapAdapter.notifyDataSetChanged();
     }
 
-    /*@Override
+    @Override
     public void onStart() {
         super.onStart();
-        if (mHolderGetter != null) {
-            mHolder.requestLayout();
-            mHolder.getLayoutParams().height = mHolderGetter.holderHeight();
-            Log.d("Holder", mHolderGetter.holderHeight() + "");
-        }
-    }*/
+        mLayoutHolder.getLayoutParams().height = mHolderHeight;
+    }
 
     @Override
     public String fragmentIdentify() {

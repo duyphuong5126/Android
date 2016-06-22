@@ -18,7 +18,7 @@
             <LinearLayout
                 android:id="@+id/layoutBanner"
                 android:layout_width="match_parent"
-                android:layout_height="250dip"
+                android:layout_height="200dip"
                 android:background="#ddd"
                 android:orientation="vertical"
                 android:visibility="visible"
@@ -108,13 +108,15 @@
                 android:layout_marginTop="10dip"
                 android:visibility="gone" />
 
-            <ListView
+            <duy.phuong.handnote.MyView.ExpandableGridView
                 android:id="@+id/listNotes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:numColumns="2"
                 android:layout_marginLeft="5dip"
                 android:layout_marginRight="5dip"
-                android:layout_marginTop="5dip" />
+                android:horizontalSpacing="5dip"
+                android:verticalSpacing="5dip"/>
 
             <LinearLayout
                 android:id="@+id/layoutHolder"

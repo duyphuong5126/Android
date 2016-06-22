@@ -3,15 +3,10 @@ package duy.phuong.handnote.MyView.DrawingView;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.CornerPathEffect;
-import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.Rect;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by Phuong on 27/01/2016.
@@ -20,7 +15,6 @@ public class MyPath {
     private ArrayList<Point> mListPoint;
     private Rect mRect;
     private boolean mChecked;
-    private boolean mSettled;
     private int mColor;
     private Bitmap mBitmap;
     public Canvas mCanvas;
@@ -28,7 +22,6 @@ public class MyPath {
     public MyPath(ArrayList<Point> ListPoint) {
         this.mListPoint = ListPoint;
         mChecked = false;
-        mSettled = false;
     }
 
     public void createBitmap(int w, int h) {
@@ -54,14 +47,6 @@ public class MyPath {
 
     public void setChecked(boolean Checked) {
         this.mChecked = Checked;
-    }
-
-    public boolean isSettled() {
-        return mSettled;
-    }
-
-    public void setSettled(boolean Settled) {
-        this.mSettled = Settled;
     }
 
     public ArrayList<Point> getListPoint() {

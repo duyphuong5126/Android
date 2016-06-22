@@ -8,9 +8,7 @@ import android.graphics.CornerPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
-import android.graphics.Rect;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -361,7 +359,6 @@ public class FingerDrawerView extends View {
 
                 for (int i = 0; i < mListPaths.size(); i++) {
                     mListPaths.get(i).setChecked(false);
-                    mListPaths.get(i).setSettled(true);
                 }
 
                 Bitmap bitmap = Bitmap.createBitmap(mCacheBitmap.getWidth(), mCacheBitmap.getHeight(), Bitmap.Config.ARGB_8888);
@@ -410,24 +407,6 @@ public class FingerDrawerView extends View {
             }
         };
         asyncTask.execute();
-    }
-
-    private void sortListChars(ArrayList<Character> characters) {
-        boolean end = false;
-        while (!end) {
-            boolean swapped = false;
-            for (int i = 1; i < characters.size(); i++) {
-                Character c1 = characters.get(i), c2 = characters.get(i - 1);
-                if (c1.mRect.left < c2.mRect.left || c1.mRect.top < c2.mRect.top) {
-                    Collections.swap(characters, i, i - 1);
-                    swapped = true;
-                }
-            }
-
-            if (!swapped) {
-                end = true;
-            }
-        }
     }
 
     private Paint createPaint() {
