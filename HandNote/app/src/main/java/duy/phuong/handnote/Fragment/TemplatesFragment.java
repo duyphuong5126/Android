@@ -95,7 +95,6 @@ public class TemplatesFragment extends BaseFragment {
         mListBitmap.add(BitmapFactory.decodeResource(resources, R.drawable._y1_));
         mListBitmap.add(BitmapFactory.decodeResource(resources, R.drawable._z_));
         BitmapAdapter mBitmapAdapter = new BitmapAdapter(mActivity, R.layout.item_bitmap_1, mListBitmap);
-        Log.d("Size", "" + mListBitmap.size());
         ExpandableGridView mListTemplates = (ExpandableGridView) mFragmentView.findViewById(R.id.listTemplateBitmaps);
         mLayoutHolder = (LinearLayout) mFragmentView.findViewById(R.id.layoutHolder);
         mListTemplates.setExpanded(true);

@@ -108,7 +108,6 @@ public class ImageToText {
                     }
                     final String[] text = new String[line.mCharacters.size()];
                     final int h = Math.abs(line.mMaxBottom - line.mMinTop);
-                    Log.d("Line height", h + "");
                     mLineCount = line.mCharacters.size();
                     for (int i = 0; i < line.mCharacters.size(); i++) {
                         final Character c = line.mCharacters.get(i);
@@ -138,7 +137,6 @@ public class ImageToText {
                                     map.put(input, new Point(x, y));
                                 }
                                 Log.d("Result", "bitmap " + index + " :" + result);
-                                Log.d("Char height", c.mRect.height() + "");
                                 switch (result) {
                                     case "C":case "S":case "V":case "W":case "X":case "Z":
                                         if (c.mRect.height() <= 0.7d * h) {
@@ -182,7 +180,17 @@ public class ImageToText {
                                         c.mAlphabet = result;
                                         break;
                                 }
-                                text[index] = c.mAlphabet;
+                                if (index - 1 >= 0) {
+                                    Character prev = line.mCharacters.get(index - 1);
+                                    Character c = line.mCharacters.get(index);
+                                    if (c.mRect.left - prev.mRect.right > Line.WIDTH / 10) {
+                                        text[index] = " " + c.mAlphabet;
+                                    } else {
+                                        text[index] = c.mAlphabet;
+                                    }
+                                } else {
+                                    text[index] = c.mAlphabet;
+                                }
                                 if (mLineCount <= 1) {
                                     String t = "";
                                     for (String s : text) {

@@ -9,6 +9,7 @@ public class Line {
     public ArrayList<Character> mCharacters;
     public int mTop, mBottom;
     public int mMinTop, mMaxBottom;
+    public static int WIDTH = -1;
 
     public Line() {
         mMinTop = mMaxBottom = 0;

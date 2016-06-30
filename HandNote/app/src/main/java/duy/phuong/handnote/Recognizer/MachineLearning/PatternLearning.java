@@ -193,10 +193,8 @@ public class PatternLearning extends Recognizer {
                         updateNeighborRadius(i);
                     } else {
                         if (mState == STATE.PAUSE) {
-                            Log.d("Pause", "true");
                             i--;
                         } else {
-                            Log.d("Stop", "true");
                             return null;
                         }
                     }

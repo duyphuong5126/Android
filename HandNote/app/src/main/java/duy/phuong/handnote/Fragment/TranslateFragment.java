@@ -96,9 +96,10 @@ public class TranslateFragment extends BaseFragment implements BackPressListener
             if (mDialog != null) {
                 mDialog.show();
             }
-        } else
+        } else {
             Toast.makeText(mActivity, "This version only support English - Vietnamese for offline translation", Toast.LENGTH_LONG).show();
         }
+    }
 
 
     private void initDict() {
@@ -135,20 +136,15 @@ public class TranslateFragment extends BaseFragment implements BackPressListener
                 String line;
                 try {
                     while ((line = reader.readLine()) != null) {
-                        Log.d("line", line);
                         StringTokenizer tokenizer = new StringTokenizer(line, "#");
                         if (tokenizer.countTokens() == 2) {
                             String word = tokenizer.nextToken();
                             String definition = tokenizer.nextToken();
-                            Log.d("Infor", "w: " + word + ", def: " + definition);
-                            Log.d("Insert result", String.valueOf(localStorage.inertEV_DictLine(word, null, definition, db, contentValues)));
                         } else {
                             if (tokenizer.countTokens() == 3) {
                                 String word = tokenizer.nextToken();
                                 String pronunciation = tokenizer.nextToken();
                                 String definition = tokenizer.nextToken();
-                                Log.d("Infor", "w: " + word + ", pro: " + pronunciation + ", def: " + definition);
-                                Log.d("Insert result", String.valueOf(localStorage.inertEV_DictLine(word, pronunciation, definition, db, contentValues)));
                             }
                         }
                         publishProgress(line.getBytes().length);
@@ -210,7 +206,6 @@ public class TranslateFragment extends BaseFragment implements BackPressListener
     public void onDetectSuccess(final ArrayList<Character> listCharacters) {
         if (listCharacters.size() > 0) {
             final ArrayList<Line> currentLines = mDrawer.getLines();
-            Log.d("List char", "" + listCharacters.size());
             mLayoutProcess.setVisibility(View.VISIBLE);
             ImageToText imageToText = new ImageToText(mListener.getGlobalSOM(), mListener.getMapNames());
             imageToText.imageToText(currentLines, listCharacters, new ImageToText.ConvertingCompleteCallback() {
@@ -224,7 +219,6 @@ public class TranslateFragment extends BaseFragment implements BackPressListener
                         p = p.replace("|=", "\n\t\t");
                         p = p.replace("|+", ": (dẫn xuất) ");
                         p = p.replace("|", "");
-                        Log.d("Text", p);
                         mTvDefinition.setText(p);
                     } else {
                         mTvDefinition.setText("Can not find definition for '" + result + "'");

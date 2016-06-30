@@ -8,8 +8,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +23,7 @@ import duy.phuong.handnote.R;
 import duy.phuong.handnote.Recognizer.BitmapProcessor;
 import duy.phuong.handnote.Recognizer.ImageToText;
 import duy.phuong.handnote.Recognizer.MachineLearning.Input;
+import duy.phuong.handnote.Support.SupportUtils;
 
 /**
  * Created by Phuong on 24/05/2016.
@@ -29,9 +32,7 @@ public class WebFragment extends BaseFragment implements BitmapProcessor.DetectC
     private WebView mWebView;
     private FingerDrawerView mDrawer;
     private LinearLayout mLayoutProcessing;
-    private String mUrl = "";
-    private static final String URL_REGEX = "^((https?|ftp)://|(www|ftp)\\.)?[a-z0-9-]+(\\.[a-z0-9-]+)+([/?].*)?$";
-    private Pattern mPattern;
+    private ArrayList<String> mListDomainNames;
     public WebFragment() {
         mLayoutRes = R.layout.fragment_web;
     }
@@ -43,7 +44,6 @@ public class WebFragment extends BaseFragment implements BitmapProcessor.DetectC
         mDrawer.setListener(this);
         mDrawer.setDisplayListener(this);
         mDrawer.setDefault();
-        mPattern = Pattern.compile(URL_REGEX);
         mWebView = (WebView) mFragmentView.findViewById(R.id.webSearch);
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
@@ -69,7 +69,9 @@ public class WebFragment extends BaseFragment implements BitmapProcessor.DetectC
                 mLayoutProcessing.setVisibility(View.GONE);
             }
         });
+        mWebView.loadUrl("about:blank");
         mLayoutProcessing = (LinearLayout) mFragmentView.findViewById(R.id.layoutProcessing);
+        initDomainNames();
     }
 
     @Override
@@ -100,13 +102,14 @@ public class WebFragment extends BaseFragment implements BitmapProcessor.DetectC
             imageToText.imageToText(currentLines, listCharacters, new ImageToText.ConvertingCompleteCallback() {
                 @Override
                 public void convertingComplete(String result, HashMap<Input, Point> map) {
-                    Matcher m = mPattern.matcher(result);
-                    if(m.find()) {
-                        mUrl = result;
-                    } else {
-                        mUrl = "https://www.google.com.vn/search?q=" + result;
+                    String url = result.replace(" ", "").toLowerCase();
+                    for (String domain : mListDomainNames) {
+                        if (url.contains(domain)) {
+                            mWebView.loadUrl("https://" + url);
+                            return;
+                        }
                     }
-                    mWebView.loadUrl(mUrl);
+                    mWebView.loadUrl("https://www.google.com.vn/search?q=" + result);
                 }
             });
         } else {
@@ -118,9 +121,38 @@ public class WebFragment extends BaseFragment implements BitmapProcessor.DetectC
     public boolean doBack() {
         if (!mDrawer.isEmpty()) {
             mDrawer.emptyDrawer();
-            mUrl = "";
+            mWebView.loadUrl("about:blank");
             return true;
         }
         return false;
+    }
+
+    public void initDomainNames() {
+        if (mListDomainNames == null) {
+            mListDomainNames = new ArrayList<>();
+        } else {
+            mListDomainNames.clear();
+        }
+        try {
+            String data = SupportUtils.getStringResource(mActivity, R.raw.domain);
+            String[] domainData = data.split("\r\n");
+            if (domainData.length > 0) {
+                for (String s : domainData) {
+                    if (s.length() > 0) {
+                        StringTokenizer tokenizer = new StringTokenizer(s, ".");
+                        if (tokenizer.countTokens() > 0) {
+                            while (tokenizer.hasMoreTokens()) {
+                                String domain = tokenizer.nextToken();
+                                if (domain.length() > 0) {
+                                    mListDomainNames.add("." + domain);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

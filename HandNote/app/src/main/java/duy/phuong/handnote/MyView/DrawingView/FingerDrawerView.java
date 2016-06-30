@@ -51,6 +51,7 @@ public class FingerDrawerView extends View {
 
     private ArrayList<Line> mLines;
     private ArrayList<Character> mCharacters;
+    private boolean drawnBackground;
     public interface UndoRedoCallback {
         void canUndoRedo(boolean possibility);
         void emptyStack();
@@ -101,6 +102,7 @@ public class FingerDrawerView extends View {
 
         mCanvas = new Canvas(mBitmap);
         mCacheCanvas = new Canvas(mCacheBitmap);
+        drawnBackground = false;
 
         final Handler handler = new Handler() {
             @Override
@@ -124,6 +126,11 @@ public class FingerDrawerView extends View {
         runnable.run();
         int mLineHeight = mCacheBitmap.getHeight() / 6;
         if (mLines.isEmpty()) {
+            Line line = new Line(); line.mTop = 0; line.mBottom = mLineHeight;
+            line.mMinTop = line.mTop; line.mMaxBottom = line.mBottom;
+            mLines.add(line);
+        } else {
+            mLines.clear();
             Line line = new Line(); line.mTop = 0; line.mBottom = mLineHeight;
             line.mMinTop = line.mTop; line.mMaxBottom = line.mBottom;
             mLines.add(line);
@@ -172,39 +179,47 @@ public class FingerDrawerView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        mCacheCanvas.drawColor(Color.WHITE);
-        if (!mLines.isEmpty()) {
-            for (Line line : mLines) {
-                for (int j = 10; j <= mCacheBitmap.getWidth() - 10; j += 6) {
-                    mCacheBitmap.setPixel(j, line.mTop, Color.BLACK);
-                    if (j + 1 < mCacheBitmap.getWidth()) {
-                        mCacheBitmap.setPixel(j + 1, line.mTop, Color.BLACK);
+        if (!drawnBackground) {
+            mCacheCanvas.drawColor(Color.WHITE);
+            if (!mLines.isEmpty()) {
+                for (Line line : mLines) {
+                    for (int j = 10; j <= mCacheBitmap.getWidth() - 10; j += 6) {
+                        mCacheBitmap.setPixel(j, line.mTop, Color.BLACK);
+                        if (j + 1 < mCacheBitmap.getWidth()) {
+                            mCacheBitmap.setPixel(j + 1, line.mTop, Color.BLACK);
+                        }
+                        if (j + 2 < mCacheBitmap.getWidth()) {
+                            mCacheBitmap.setPixel(j + 2, line.mTop, Color.BLACK);
+                        }
+                        if (j + 3 < mCacheBitmap.getWidth()) {
+                            mCacheBitmap.setPixel(j + 3, line.mTop, Color.BLACK);
+                        }
                     }
-                    if (j + 2 < mCacheBitmap.getWidth()) {
-                        mCacheBitmap.setPixel(j + 2, line.mTop, Color.BLACK);
-                    }
-                    if (j + 3 < mCacheBitmap.getWidth()) {
-                        mCacheBitmap.setPixel(j + 3, line.mTop, Color.BLACK);
-                    }
-                }
-                for (int j = 10; j <= mCacheBitmap.getWidth() - 10; j += 6) {
-                    mCacheBitmap.setPixel(j, line.mBottom, Color.BLACK);
-                    if (j + 1 < mCacheBitmap.getWidth()) {
-                        mCacheBitmap.setPixel(j + 1, line.mBottom, Color.BLACK);
-                    }
-                    if (j + 2 < mCacheBitmap.getWidth()) {
-                        mCacheBitmap.setPixel(j + 2, line.mBottom, Color.BLACK);
-                    }
-                    if (j + 3 < mCacheBitmap.getWidth()) {
-                        mCacheBitmap.setPixel(j + 3, line.mBottom, Color.BLACK);
+                    for (int j = 10; j <= mCacheBitmap.getWidth() - 10; j += 6) {
+                        mCacheBitmap.setPixel(j, line.mBottom, Color.BLACK);
+                        if (j + 1 < mCacheBitmap.getWidth()) {
+                            mCacheBitmap.setPixel(j + 1, line.mBottom, Color.BLACK);
+                        }
+                        if (j + 2 < mCacheBitmap.getWidth()) {
+                            mCacheBitmap.setPixel(j + 2, line.mBottom, Color.BLACK);
+                        }
+                        if (j + 3 < mCacheBitmap.getWidth()) {
+                            mCacheBitmap.setPixel(j + 3, line.mBottom, Color.BLACK);
+                        }
                     }
                 }
             }
+            drawnBackground = true;
         }
         mCanvas.drawBitmap(mCacheBitmap, 0, 0, mPaint);
+        Path path = null;
         for (MyPath myPath : mListPaths) {
             Paint paint = createPaint(); paint.setColor(myPath.getColor());
-            Path path = new Path();
+            if (path == null) {
+                path = new Path();
+            } else {
+                path.reset();
+            }
             boolean first = true;
             ArrayList<Point> points = myPath.getListPoint();
             if (points.size() == 2) {
@@ -439,6 +454,7 @@ public class FingerDrawerView extends View {
             if (metrics != null) {
                 int height = metrics.heightPixels;
                 int width = metrics.widthPixels;
+                Line.WIDTH = width;
                 if (height >= 480) {
                     if (height <= 800) {
                         FingerDrawerView.CurrentPaintSize = 10f;

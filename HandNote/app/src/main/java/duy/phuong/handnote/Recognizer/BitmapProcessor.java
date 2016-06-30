@@ -917,7 +917,6 @@ public class BitmapProcessor {
         ArrayList<Point> listColumns = new ArrayList<>();
         int startCol = -1;
         int endCol = -1;
-        Log.d("Ligature", "in");
 
         //horizontal fragment
         for (int c = 0; c < bitmap.getWidth(); c++) {
@@ -964,7 +963,6 @@ public class BitmapProcessor {
         }*/
 
         ArrayList<Point> points = new ArrayList<>();
-        Log.d("listColumns", "" + listColumns.size());
         for (int i = 0; i < listColumns.size(); i++) {
             Point point = listColumns.get(i);
             Point pPrev = (i - 1 >= 0) ? listColumns.get(i - 1) : null;

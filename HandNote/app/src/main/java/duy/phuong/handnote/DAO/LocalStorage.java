@@ -117,7 +117,6 @@ public class LocalStorage extends SQLiteOpenHelper {
     public String findEV_Definition(String word) {
         SQLiteDatabase db = getReadableDatabase();
         String sql = "select * from " + TABLE_EV_DICTIONARY + " where " + Dict_Word + " = '" + word + "'";
-        Log.d("Sql", sql);
         Cursor cursor = db.rawQuery(sql, null);
         String definition = "";
         String pronunciation = "";
@@ -125,7 +124,6 @@ public class LocalStorage extends SQLiteOpenHelper {
             definition = cursor.getString(cursor.getColumnIndex(Dict_Definition));
             pronunciation = cursor.getString(cursor.getColumnIndex(Dict_Pronunciation));
         }
-        Log.d("Result dict", "word: " + word + ", pro: " + pronunciation + ", def: " + definition);
         String result = "";
         if (pronunciation.length() > 0) {
             result += pronunciation + "\n";

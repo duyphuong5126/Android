@@ -1,8 +1,13 @@
 package duy.phuong.handnote;
 
+import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -191,6 +196,7 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     @Override
     protected void onStart() {
         super.onStart();
+        screenOrientation(mFragmentName);
         mBackClickCount = 1;
         updateButtonAdd();
         mItems = new ArrayList<>();
@@ -203,45 +209,64 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         mListSideMenu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                SideMenuItem item = mItems.get(position);
-                switch (item.mTitle) {
-                    case "Image Analysis":
-                        final Dialog dialog = new Dialog(MainActivity.this);
-                        dialog.setContentView(R.layout.layout_prompt_1);
-                        dialog.setTitle("Enter password");
-                        final EditText editText = (EditText) dialog.findViewById(R.id.edtPrompt);
-                        Button button = (Button) dialog.findViewById(R.id.buttonConfirm);
-                        button.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                String password = editText.getText().toString();
-                                if ("5126".equals(password)) {
-                                    showFragment(BaseFragment.DRAWING_FRAGMENT);
-                                    mMainNavigator.closeDrawer(mSideMenu);
-                                    dialog.cancel();
-                                } else {
-                                    Toast.makeText(MainActivity.this, "Wrong password", Toast.LENGTH_SHORT).show();
+                AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected void onPreExecute() {
+                        super.onPreExecute();
+                        toggleMainNavigator(false);
+                    }
+
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        long times = System.currentTimeMillis();
+                        while (System.currentTimeMillis() - times < 500);
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        super.onPostExecute(aVoid);
+                        SideMenuItem item = mItems.get(position);
+                        switch (item.mTitle) {
+                            case "Image Analysis":
+                                final Dialog dialog = new Dialog(MainActivity.this);
+                                dialog.setContentView(R.layout.layout_prompt_1);
+                                dialog.setTitle("Enter password");
+                                final EditText editText = (EditText) dialog.findViewById(R.id.edtPrompt);
+                                Button button = (Button) dialog.findViewById(R.id.buttonConfirm);
+                                button.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        String password = editText.getText().toString();
+                                        if ("5126".equals(password)) {
+                                            showFragment(BaseFragment.DRAWING_FRAGMENT);
+                                            mMainNavigator.closeDrawer(mSideMenu);
+                                            dialog.cancel();
+                                        } else {
+                                            Toast.makeText(MainActivity.this, "Wrong password", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                                dialog.show();
+                                break;
+                            case "Translate":
+                                showFragment(BaseFragment.TRANSLATE_FRAGMENT);
+                                break;
+
+                            case "Searching online":
+                                showFragment(BaseFragment.WEB_FRAGMENT);
+                                break;
+
+                            default:
+                                for (int i = 0; i < mItems.size(); i++) {
+                                    mItems.get(i).mFocused = i == position;
                                 }
-                            }
-                        });
-                        dialog.show();
-                        break;
-                    case "Translate":
-                        showFragment(BaseFragment.TRANSLATE_FRAGMENT);
-                        break;
-
-                    case "Searching online":
-                        showFragment(BaseFragment.WEB_FRAGMENT);
-                        break;
-
-                    default:
-                        for (int i = 0; i < mItems.size(); i++) {
-                            mItems.get(i).mFocused = i == position;
+                                mSideMenuAdapter.notifyDataSetChanged();
+                                break;
                         }
-                        mSideMenuAdapter.notifyDataSetChanged();
-                        break;
-                }
-                toggleMainNavigator(false);
+                    }
+                };
+                asyncTask.execute();
             }
         });
         Bitmap bitmap = SupportUtils.getAvatar();
@@ -440,6 +465,29 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
     }
 
     @Override
+    public void screenOrientation(String fragmentName) {
+        Configuration configuration = getResources().getConfiguration();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            if (!configuration.isLayoutSizeAtLeast(Configuration.SCREENLAYOUT_SIZE_XLARGE)) {
+                if (fragmentName.equals(BaseFragment.MAIN_FRAGMENT) || fragmentName.equals(BaseFragment.TEMPLATES_FRAGMENT)) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+                } else {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+                }
+            } else {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            }
+        } else {
+            if (fragmentName.equals(BaseFragment.MAIN_FRAGMENT) || fragmentName.equals(BaseFragment.TEMPLATES_FRAGMENT)) {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+            } else {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+            }
+        }
+
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -581,10 +629,11 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         }
 
         if (baseFragment != null) {
+            mFragmentName = name;
+            screenOrientation(mFragmentName);
             baseFragment.setListener(this);
             mStack.push(name);
             addFragment(baseFragment, baseFragment.fragmentIdentify());
-            mFragmentName = name;
         }
 
         checkScreen();
@@ -757,6 +806,11 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
             }
             if (!doBack()) {
                 super.onBackPressed();
+                if (!mStack.isEmpty()) {
+                    screenOrientation(mStack.peek());
+                } else {
+                    screenOrientation(mFragmentName);
+                }
             } else {
                 if (mBackClickCount > 0) {
                     mBackClickCount--;

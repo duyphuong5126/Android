@@ -17,4 +17,5 @@ public interface MainListener {
     ArrayList<ClusterLabel> getMapNames();
     Note getCurrentNote();
     void initSOM();
+    void screenOrientation(String fragmentName);
 }

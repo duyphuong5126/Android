@@ -203,7 +203,7 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
             mCurrentRecognized.clear();
         }
         if (listCharacters.size() > 0) {
-            Toast.makeText(mActivity, "Size: " + listCharacters.size(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, "Characters count: " + listCharacters.size(), Toast.LENGTH_SHORT).show();
 
             final ArrayList<Line> currentLines = mDrawer.getLines();
             Log.d("List char", "" + listCharacters.size());
@@ -213,7 +213,6 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
             imageToText.imageToText(currentLines, listCharacters, new ImageToText.ConvertingCompleteCallback() {
                 @Override
                 public void convertingComplete(String result, HashMap<Input, Point> map) {
-                    Log.d("Converting complete", "in");
                     mCurrentRecognized.putAll(map);
                     mTvResult.setText(result);
                     mLayoutProgress.setVisibility(View.GONE);
