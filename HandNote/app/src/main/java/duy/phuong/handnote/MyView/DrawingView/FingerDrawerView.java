@@ -212,14 +212,11 @@ public class FingerDrawerView extends View {
             drawnBackground = true;
         }
         mCanvas.drawBitmap(mCacheBitmap, 0, 0, mPaint);
-        Path path = null;
+        Path path = new Path();
+        Paint paint = createPaint();
         for (MyPath myPath : mListPaths) {
-            Paint paint = createPaint(); paint.setColor(myPath.getColor());
-            if (path == null) {
-                path = new Path();
-            } else {
-                path.reset();
-            }
+            paint.setColor(myPath.getColor());
+            path.reset();
             boolean first = true;
             ArrayList<Point> points = myPath.getListPoint();
             if (points.size() == 2) {
@@ -247,8 +244,8 @@ public class FingerDrawerView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        float x = event.getX();
-        float y = event.getY();
+        int x = (int) event.getX();
+        int y = (int) event.getY();
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -259,16 +256,16 @@ public class FingerDrawerView extends View {
                     myPath.createBitmap(CurrentWidth, CurrentHeight);
                 }
                 myPath.setColor(mPaint.getColor());
-                listPoint.add(new Point((int) x, (int) y));
+                listPoint.add(new Point(x, y));
                 mListPaths.add(myPath);
                 mStartRecognizeTime = System.currentTimeMillis();
                 return true;
             case MotionEvent.ACTION_MOVE:
-                mListPaths.get(mCurrentPath).getListPoint().add(new Point((int) x, (int) y));
+                mListPaths.get(mCurrentPath).getListPoint().add(new Point(x, y));
                 mStartRecognizeTime = System.currentTimeMillis();
                 break;
             case MotionEvent.ACTION_UP:
-                mListPaths.get(mCurrentPath).getListPoint().add(new Point((int) x, (int) y));
+                mListPaths.get(mCurrentPath).getListPoint().add(new Point(x, y));
                 mListPaths.get(mCurrentPath).initRect();
                 mCurrentPath++;
                 isReadyForRecognize = true;

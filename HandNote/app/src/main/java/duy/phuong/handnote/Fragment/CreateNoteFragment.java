@@ -1,14 +1,18 @@
 package duy.phuong.handnote.Fragment;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -231,7 +235,7 @@ public class CreateNoteFragment extends BaseFragment implements BackPressListene
     private void initColorPicker() {
         if (mColorPicker == null) {
             mColorPicker = new ColorPicker(mActivity, this, 0xffffff);
-            View view = LayoutInflater.from(mActivity).inflate(R.layout.color_picker_layout, null);
+            View view = LayoutInflater.from(mActivity).inflate(R.layout.layout_color_picker, null);
             view.findViewById(R.id.buttonColorBlack).setOnClickListener(this);
             view.findViewById(R.id.buttonColorRed).setOnClickListener(this);
             view.findViewById(R.id.buttonColorGreen).setOnClickListener(this);

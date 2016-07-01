@@ -92,7 +92,7 @@ public class StartActivity extends Activity implements View.OnClickListener {
         mBuilder.setTitle("You haven't installed dictionary yet. Install it now?").setNegativeButton("Skip", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(StartActivity.this, "You can't use translate feature before installed dictionary", Toast.LENGTH_LONG).show();
+                Toast.makeText(StartActivity.this, "You couldn't use translate feature before installed dictionary", Toast.LENGTH_LONG).show();
                 if (!SharedPreferenceUtils.isViewIntro()) {
                     mLayoutLoading.setVisibility(View.GONE);
                     showIntroScreen();

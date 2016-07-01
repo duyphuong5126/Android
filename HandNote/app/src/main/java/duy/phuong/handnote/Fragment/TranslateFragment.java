@@ -81,7 +81,7 @@ public class TranslateFragment extends BaseFragment implements BackPressListener
         mBuilder.setTitle("You haven't installed dictionary yet. Install it now?").setNegativeButton("Skip", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(mActivity, "You can't use translate feature before installed dictionary", Toast.LENGTH_LONG).show();
+                Toast.makeText(mActivity, "You couldn't use translate feature before installed dictionary", Toast.LENGTH_LONG).show();
                 mLayoutProcess.setVisibility(View.GONE);
                 mActivity.onBackPressed();
             }
