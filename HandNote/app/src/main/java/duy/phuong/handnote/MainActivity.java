@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v4.app.Fragment;
@@ -21,6 +22,7 @@ import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -114,6 +116,10 @@ public class MainActivity extends FragmentActivity implements MainListener, Imag
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mHandNote = (HandNote) getApplication();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.setStatusBarColor(Color.parseColor("#FFCC0033"));
+        }
         mLayoutLoading = (LinearLayout) findViewById(R.id.layoutLoading);
         mLayoutLoading.setVisibility(View.VISIBLE);
 
