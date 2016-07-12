@@ -140,11 +140,15 @@ public class TranslateFragment extends BaseFragment implements BackPressListener
                         if (tokenizer.countTokens() == 2) {
                             String word = tokenizer.nextToken();
                             String definition = tokenizer.nextToken();
+                            Log.d("Infor", "w: " + word + ", def: " + definition);
+                            Log.d("Insert result", String.valueOf(localStorage.inertEV_DictLine(word, null, definition, db, contentValues)));
                         } else {
                             if (tokenizer.countTokens() == 3) {
                                 String word = tokenizer.nextToken();
                                 String pronunciation = tokenizer.nextToken();
                                 String definition = tokenizer.nextToken();
+                                Log.d("Infor", "w: " + word + ", pro: " + pronunciation + ", def: " + definition);
+                                Log.d("Insert result", String.valueOf(localStorage.inertEV_DictLine(word, pronunciation, definition, db, contentValues)));
                             }
                         }
                         publishProgress(line.getBytes().length);
