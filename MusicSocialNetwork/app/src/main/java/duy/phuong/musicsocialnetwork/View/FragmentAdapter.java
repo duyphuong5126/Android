@@ -4,27 +4,39 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import duy.phuong.musicsocialnetwork.Base.BaseFragment;
 import duy.phuong.musicsocialnetwork.HomeScreen.HomeFragment;
+import duy.phuong.musicsocialnetwork.Listener.MainListener;
 import duy.phuong.musicsocialnetwork.MusicScreen.MusicFragment;
 
 /**
  * Created by Phuong on 12/07/2016.
  */
 public class FragmentAdapter extends FragmentPagerAdapter {
-    public FragmentAdapter(FragmentManager fm) {
+    private MainListener mListener;
+    public FragmentAdapter(FragmentManager fm, MainListener listener) {
         super(fm);
+        mListener = listener;
     }
 
     @Override
     public Fragment getItem(int position) {
+        BaseFragment baseFragment;
         switch (position) {
             case 0:
-                return new HomeFragment();
+                baseFragment = new HomeFragment();
+                break;
             case 1:
-                return new MusicFragment();
+                baseFragment = new MusicFragment();
+                break;
             default:
-                return new MusicFragment();
+                baseFragment = new MusicFragment();
+                break;
         }
+        if (mListener != null) {
+            baseFragment.setListener(mListener);
+        }
+        return baseFragment;
     }
 
     @Override
