@@ -9,4 +9,6 @@ import duy.phuong.musicsocialnetwork.Data.Music;
  */
 public interface MainListener {
     ArrayList<Music> getMusics();
+    void playMusic(Music music);
+    void loadMusics();
 }

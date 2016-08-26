@@ -1,7 +1,6 @@
 package duy.phuong.musicsocialnetwork.Base;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -51,6 +50,7 @@ public abstract class BaseFragment extends Fragment {
             mActivity.getWindow().setStatusBarColor(mStatusBarColor);
         }
     }
+
     public static void setListViewHeight(ListView listView) {
         ListAdapter listAdapter = listView.getAdapter();
         int desiredWidth, resultHeight = 0;
@@ -69,8 +69,12 @@ public abstract class BaseFragment extends Fragment {
             resultHeight += view.getMeasuredHeight();
         }
         params = listView.getLayoutParams();
-        params.height = resultHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        params.height = resultHeight + (listView.getDividerHeight() * listAdapter.getCount());
         listView.setLayoutParams(params);
         listView.requestLayout();
+    }
+
+    public MainListener getListener() {
+        return mListener;
     }
 }

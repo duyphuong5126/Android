@@ -1,5 +1,9 @@
 package duy.phuong.musicsocialnetwork.Support;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
+
 /**
  * Created by Phuong on 16/07/2016.
  */
@@ -26,5 +30,12 @@ public abstract class SupportUtil {
             }
         }
         return result;
+    }
+
+    public static Bitmap getAudioThumbnail(String audioPath) {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(audioPath);
+        byte[] bytes = retriever.getEmbeddedPicture();
+        return bytes == null ? null : BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 }
