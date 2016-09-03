@@ -6,4 +6,5 @@ package com.huy.monthlyfinance.Listener;
 public interface MainListener {
     void toggleSideMenu(boolean isOpen);
     void setStatusBarColor(int color);
+    void showFragment(Class c);
 }

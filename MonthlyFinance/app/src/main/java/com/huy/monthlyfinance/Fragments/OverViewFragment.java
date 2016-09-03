@@ -20,7 +20,7 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.huy.monthlyfinance.MyView.AccountItem;
-import com.huy.monthlyfinance.MyView.AccountItemAdapter;
+import com.huy.monthlyfinance.MyView.Adapter.AccountItemAdapter;
 import com.huy.monthlyfinance.R;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
@@ -137,7 +137,7 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
 
     @Override
     protected void setStatusBarColor() {
-        mListener.setStatusBarColor(Color.parseColor("#3f51b5"));
+        mListener.setStatusBarColor(Color.parseColor("#008593"));
     }
 
     private void addDataToChart(final ArrayList<String> xValues, final float[] yValuesData, PieChart chart,

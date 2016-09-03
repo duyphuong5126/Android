@@ -1,4 +1,4 @@
-package com.huy.monthlyfinance.MyView;
+package com.huy.monthlyfinance.MyView.Adapter;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.huy.monthlyfinance.MyView.AccountItem;
 import com.huy.monthlyfinance.R;
 
 import java.util.List;
