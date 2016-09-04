@@ -182,7 +182,7 @@
                             <com.github.mikephil.charting.charts.PieChart
                                 android:id="@+id/chartMonthExpense"
                                 android:layout_width="300dip"
-                                android:layout_height="300dip"></com.github.mikephil.charting.charts.PieChart>
+                                android:layout_height="300dip"/>
 
                         </LinearLayout>
                     </LinearLayout>
@@ -220,7 +220,7 @@
                             <com.github.mikephil.charting.charts.PieChart
                                 android:id="@+id/chartMonthCashFlow"
                                 android:layout_width="300dip"
-                                android:layout_height="300dip"></com.github.mikephil.charting.charts.PieChart>
+                                android:layout_height="300dip"/>
 
                         </LinearLayout>
                     </LinearLayout>

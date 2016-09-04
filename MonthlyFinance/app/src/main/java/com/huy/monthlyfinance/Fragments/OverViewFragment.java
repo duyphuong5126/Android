@@ -19,8 +19,8 @@ import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
-import com.huy.monthlyfinance.MyView.AccountItem;
-import com.huy.monthlyfinance.MyView.Adapter.AccountItemAdapter;
+import com.huy.monthlyfinance.MyView.Item.AccountItem;
+import com.huy.monthlyfinance.MyView.BasicAdapter;
 import com.huy.monthlyfinance.R;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
@@ -49,10 +49,11 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
         mLayoutQuickAddSelect = (LinearLayout) view.findViewById(R.id.layoutQuickAddSelect);
         mLayoutQuickAddSelect.setOnClickListener(this);
         mLayoutQuickAdd = (FrameLayout) view.findViewById(R.id.layoutQuickAdd);
-        float[] mMonthExpenseAmount = {40.5f, 20, 10, 5.5f, 24};
-        String[] mMonthExpense = {"Food", "Bill", "Stuff", "Etc", "Dress"};
+        float[] mMonthExpenseAmount = {10.5f, 20f, 10f, 5.5f, 14f, 5f, 10f, 10f, 15f};
+        String[] mMonthExpense = {"Living services", "Health", "Entertainment",
+                "Food", "Dress", "Transport", "House expenses", "Family", "Etc"};
         float[] mMonthCashFlowAmount = {37.5f, 62.5f};
-        String[] mMonthCashFlow = {"Income", "Expense"};
+        String[] mMonthCashFlow = {"Cash", "Expense"};
         PieChart mMonthlyExpenseChart = (PieChart) view.findViewById(R.id.chartMonthExpense);
         PieChart mMonthlyCashFlowChart = (PieChart) view.findViewById(R.id.chartMonthCashFlow);
         addDataToChart(new ArrayList<>(Arrays.asList(mMonthExpense)), mMonthExpenseAmount, mMonthlyExpenseChart,
@@ -105,19 +106,19 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
 
         final ListView mListAccountItems = (ListView) view.findViewById(R.id.listAccountItems);
         final ArrayList<AccountItem> mAccountItems = new ArrayList<>();
-        final AccountItemAdapter adapter = new AccountItemAdapter(mAccountItems, getActivity(), R.layout.item_account);
+        final BasicAdapter<AccountItem> adapter = new BasicAdapter<>(mAccountItems, R.layout.item_account, getActivity().getLayoutInflater());
         mListAccountItems.setAdapter(adapter);
         mAccountItems.add(new AccountItem(
                 R.drawable.circle_dark_blue, R.mipmap.ic_wallet_filled_money_tool_24dp, 100, 40, Color.parseColor("#88c03f"),
-                "Cash", "$3000.05", "Initial Balance: $700", "Spent/ Budget: $50.00/ $700.00", false
+                "Cash", "$3000.05", "Initial Balance: $700", "Spent/ Budget: $50.00/ $700.00", false, true
         ));
         mAccountItems.add(new AccountItem(
                 R.drawable.circle_orange, R.mipmap.ic_bank, 200, 30, Color.parseColor("#88c03f"),
-                "Bank", "$1980.05", "Initial Balance: $2000", "Spent/ Budget: $50.00/ $700.00", false
+                "Bank", "$1980.05", "Initial Balance: $2000", "Spent/ Budget: $50.00/ $700.00", false, true
         ));
         mAccountItems.add(new AccountItem(
                 R.drawable.circle_dark_red, R.mipmap.ic_credit_cards_24dp, 100, 70, Color.parseColor("#f74848"),
-                "Credit Card", "-$10.00", "Initial Balance: $100", "Spent/ Budget: $50.00/ $700.00", false
+                "Credit Card", "-$10.00", "Initial Balance: $100", "Spent/ Budget: $50.00/ $700.00", false, false
         ));
         /*mAccountItems.add(new AccountItem(
                 R.drawable.circle_light_green_1, R.mipmap.ic_more_horiz_white_24dp, 100, 70, Color.parseColor("#88c03f"),

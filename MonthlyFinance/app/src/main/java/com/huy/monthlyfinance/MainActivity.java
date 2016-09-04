@@ -16,8 +16,8 @@ import com.huy.monthlyfinance.Fragments.ExpenseManagerFragment;
 import com.huy.monthlyfinance.Fragments.OverViewFragment;
 import com.huy.monthlyfinance.Listener.MainListener;
 import com.huy.monthlyfinance.Listener.NavigationListener;
-import com.huy.monthlyfinance.MyView.Adapter.SideMenuAdapter;
-import com.huy.monthlyfinance.MyView.SideMenuItem;
+import com.huy.monthlyfinance.MyView.BasicAdapter;
+import com.huy.monthlyfinance.MyView.Item.SideMenuItem;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
     private TreeMap<String, BaseFragment> mFragments;
     private FragmentManager mManager;
     private ArrayList<SideMenuItem> mMenuItems;
-    private SideMenuAdapter mSideMenuAdapter;
+    private BasicAdapter<SideMenuItem> mSideMenuAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +53,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
         mMenuItems.add(new SideMenuItem(R.mipmap.ic_expense_24dp, "Expenses", ""));
         mMenuItems.add(new SideMenuItem(R.mipmap.ic_report_24dp, "Recommendations", ""));
         mMenuItems.add(new SideMenuItem(R.mipmap.ic_chart_24dp, "Statistic", ""));
-        mSideMenuAdapter = new SideMenuAdapter(mMenuItems, R.layout.item_side_menu, getLayoutInflater());
+        mSideMenuAdapter = new BasicAdapter<>(mMenuItems, R.layout.item_side_menu, getLayoutInflater());
         mSideMenu.setAdapter(mSideMenuAdapter);
         mSideMenu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

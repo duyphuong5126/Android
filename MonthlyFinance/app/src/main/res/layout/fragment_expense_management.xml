@@ -88,7 +88,7 @@
                             android:id="@+id/chartExpenses"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="#0000"/>
+                            android:background="#0000" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -107,7 +107,7 @@
                         android:layout_marginRight="15dip"
                         android:fontFamily="sans-serif-condensed"
                         android:gravity="right"
-                        android:text="Manages all your expenses"
+                        android:text="Expenses summary for this month"
                         android:textColor="#555"
                         android:textSize="12sp" />
 
@@ -118,11 +118,44 @@
 
                 </LinearLayout>
 
-                <LinearLayout
+                <android.support.v4.widget.SwipeRefreshLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dip"
                     android:layout_weight="5"
-                    android:background="#fff"></LinearLayout>
+                    android:background="#fff">
+
+                    <ScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center">
+
+                                <com.github.mikephil.charting.charts.PieChart
+                                    android:id="@+id/chartExpensesDetail"
+                                    android:layout_width="200dip"
+                                    android:layout_height="200dip"
+                                    android:layout_marginTop="10dip" />
+                            </LinearLayout>
+
+                            <ListView
+                                android:id="@+id/listExpensesDetail"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="10dip"
+                                android:divider="@null"/>
+
+                        </LinearLayout>
+                    </ScrollView>
+
+                </android.support.v4.widget.SwipeRefreshLayout>
             </LinearLayout>
 
             <LinearLayout
