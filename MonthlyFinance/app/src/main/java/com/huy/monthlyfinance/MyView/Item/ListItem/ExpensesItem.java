@@ -1,13 +1,11 @@
-package com.huy.monthlyfinance.MyView.Item;
+package com.huy.monthlyfinance.MyView.Item.ListItem;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.huy.monthlyfinance.MyView.BaseItem;
 import com.huy.monthlyfinance.R;
 
 /**

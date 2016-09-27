@@ -5,7 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.huy.monthlyfinance.MyView.BaseItem;
+import com.huy.monthlyfinance.MyView.Item.ListItem.BaseItem;
 
 import java.util.List;
 

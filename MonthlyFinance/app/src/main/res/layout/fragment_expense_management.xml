@@ -55,142 +55,637 @@
         </LinearLayout>
     </LinearLayout>
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dip"
         android:layout_weight="10">
 
-        <FrameLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="3"
+                android:background="#5f7c89"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/layoutChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="25dip"
+                    android:orientation="vertical"
+                    android:padding="5dip">
+
+                    <com.github.mikephil.charting.charts.BarChart
+                        android:id="@+id/chartExpenses"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#0000" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="1"
+                android:gravity="bottom"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dip"
+                    android:layout_marginRight="15dip"
+                    android:fontFamily="sans-serif-condensed"
+                    android:gravity="right"
+                    android:text="Expenses summary for this month"
+                    android:textColor="#555"
+                    android:textSize="14sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="5dip"
+                    android:background="@drawable/border_bottom_gray" />
+
+            </LinearLayout>
+
+            <android.support.v4.widget.SwipeRefreshLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="5"
+                android:background="#fff">
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:padding="25dip">
+
+                            <com.github.mikephil.charting.charts.PieChart
+                                android:id="@+id/chartExpensesDetail"
+                                android:layout_width="250dip"
+                                android:layout_height="250dip" />
+                        </LinearLayout>
+
+                        <ListView
+                            android:id="@+id/listExpensesDetail"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dip"
+                            android:layout_marginRight="10dip"
+                            android:divider="@null" />
+
+                    </LinearLayout>
+                </ScrollView>
+
+            </android.support.v4.widget.SwipeRefreshLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="2" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="2"
+                android:gravity="center_vertical">
+
+                <ImageButton
+                    android:id="@+id/buttonLogo"
+                    android:layout_width="50dip"
+                    android:layout_height="50dip"
+                    android:layout_marginLeft="20dip"
+                    android:background="@drawable/circle_light_green"
+                    android:src="@mipmap/ic_cash_24dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="5" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/layoutInput"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#c8ffffff"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:gravity="bottom|left">
+
+                <ImageView
+                    android:layout_width="250dip"
+                    android:layout_height="250dip"
+                    android:src="@drawable/radial_bg_1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="bottom|left">
+
+                <ImageView
+                    android:layout_width="245dip"
+                    android:layout_height="245dip"
+                    android:src="@drawable/radial_bg" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutRadialMenu"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="bottom"
                 android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="0dip"
-                    android:layout_weight="3"
-                    android:background="#5f7c89"
-                    android:orientation="vertical">
+                    android:layout_height="wrap_content">
+
+                    <com.kulik.radial.RadialListView xmlns:radial="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/listExpenses"
+                        android:layout_width="245dip"
+                        android:layout_height="245dip"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
+                        radial:delay_per_item_anim="1000"
+                        radial:delemiter_width="2dp"
+                        radial:horisontal_gravity="left" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <ScrollView
+            android:id="@+id/layoutForm"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#008593"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dip">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
                     <LinearLayout
-                        android:id="@+id/layoutChart"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dip"
                         android:layout_height="match_parent"
-                        android:layout_marginBottom="25dip"
-                        android:orientation="vertical"
-                        android:padding="5dip">
+                        android:layout_weight="2"
+                        android:gravity="center">
 
-                        <com.github.mikephil.charting.charts.BarChart
-                            android:id="@+id/chartExpenses"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="#0000" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-smallcaps"
+                            android:text="Expense"
+                            android:textColor="#fff"
+                            android:textSize="30sp"
+                            android:textStyle="bold" />
+
                     </LinearLayout>
 
+                    <LinearLayout
+                        android:layout_width="0dip"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+                        android:paddingLeft="5dip"
+                        android:paddingTop="5dip">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="50dip"
+                            android:background="@drawable/corner_radius_gray_1"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dip"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1">
+
+                                <ImageButton
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="#0000"
+                                    android:src="@mipmap/ic_chevron_left_white_18dp" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dip"
+                                android:layout_height="match_parent"
+                                android:layout_weight="3"
+                                android:gravity="center">
+
+                                <android.support.v7.widget.RecyclerView
+                                    android:id="@+id/listGroupProduct"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dip"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1">
+
+
+                                <ImageButton
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="#0000"
+                                    android:src="@mipmap/ic_chevron_right_white_18dp" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="0dip"
-                    android:layout_weight="1"
-                    android:gravity="bottom"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="15dip"
-                        android:layout_marginRight="15dip"
-                        android:fontFamily="sans-serif-condensed"
-                        android:gravity="right"
-                        android:text="Expenses summary for this month"
-                        android:textColor="#555"
-                        android:textSize="12sp" />
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingLeft="5dip"
+                    android:paddingRight="5dip">
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="5dip"
-                        android:background="@drawable/border_bottom_gray" />
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dip"
+                        android:orientation="vertical">
 
-                </LinearLayout>
-
-                <android.support.v4.widget.SwipeRefreshLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dip"
-                    android:layout_weight="5"
-                    android:background="#fff">
-
-                    <ScrollView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="5dip"
+                            android:text="Product's name (*)"
+                            android:textColor="#fff"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical">
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="5">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/corner_radius_white"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <ImageButton
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="5dip"
+                                        android:layout_marginLeft="3dip"
+                                        android:layout_marginTop="5dip"
+                                        android:background="#0000"
+                                        android:src="@mipmap/ic_expense_green_1_24dp" />
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:orientation="horizontal">
+                                        <EditText
+                                            android:layout_width="0dip"
+                                            android:layout_height="match_parent"
+                                            android:layout_weight="1"
+                                            android:layout_marginLeft="3dip"
+                                            android:background="#0000"
+                                            android:hint="Product's name"
+                                            android:textColor="#008593"
+                                            android:textColorHint="#008593"
+                                            android:textSize="15sp" />
+
+                                        <ImageButton
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="5dip"
+                                            android:layout_marginLeft="3dip"
+                                            android:layout_marginTop="5dip"
+                                            android:layout_marginRight="5dip"
+                                            android:background="#0000"
+                                            android:src="@mipmap/ic_arrow_drop_down_green_1_18dp" />
+                                    </LinearLayout>
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dip"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:paddingLeft="5dip">
+
+                                <ImageButton
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@drawable/corner_radius_white"
+                                    android:src="@mipmap/ic_more_green_1_24dp" />
+
+                            </LinearLayout>
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dip"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="5dip"
+                            android:text="Amount (*)"
+                            android:textColor="#fff"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:gravity="center">
+                                android:background="@drawable/corner_radius_white"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
 
-                                <com.github.mikephil.charting.charts.PieChart
-                                    android:id="@+id/chartExpensesDetail"
-                                    android:layout_width="200dip"
-                                    android:layout_height="200dip"
-                                    android:layout_marginTop="10dip" />
+                                <ImageButton
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="5dip"
+                                    android:layout_marginLeft="3dip"
+                                    android:layout_marginTop="5dip"
+                                    android:background="#0000"
+                                    android:src="@mipmap/ic_amount_24dp" />
+
+                                <EditText
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_marginLeft="3dip"
+                                    android:background="#0000"
+                                    android:hint="Amount of product"
+                                    android:textColor="#008593"
+                                    android:textColorHint="#008593"
+                                    android:textSize="15sp" />
+
                             </LinearLayout>
 
-                            <ListView
-                                android:id="@+id/listExpensesDetail"
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dip"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="5dip"
+                            android:text="Calculation unit (*)"
+                            android:textColor="#fff"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_margin="10dip"
-                                android:divider="@null"/>
+                                android:background="@drawable/corner_radius_white"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <ImageButton
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="5dip"
+                                    android:layout_marginLeft="3dip"
+                                    android:layout_marginTop="5dip"
+                                    android:background="#0000"
+                                    android:src="@mipmap/ic_unit_24dp" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="horizontal">
+                                    <EditText
+                                        android:layout_width="0dip"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:layout_marginLeft="3dip"
+                                        android:background="#0000"
+                                        android:hint="Unit"
+                                        android:textColor="#008593"
+                                        android:textColorHint="#008593"
+                                        android:textSize="15sp" />
+
+                                    <ImageButton
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="5dip"
+                                        android:layout_marginLeft="3dip"
+                                        android:layout_marginTop="5dip"
+                                        android:layout_marginRight="5dip"
+                                        android:background="#0000"
+                                        android:src="@mipmap/ic_arrow_drop_down_green_1_18dp" />
+                                </LinearLayout>
+
+                            </LinearLayout>
 
                         </LinearLayout>
-                    </ScrollView>
 
-                </android.support.v4.widget.SwipeRefreshLayout>
-            </LinearLayout>
+                    </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dip"
+                        android:orientation="vertical">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dip"
-                    android:layout_weight="2" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="5dip"
+                            android:text="Price (*)"
+                            android:textColor="#fff"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dip"
-                    android:layout_weight="2"
-                    android:gravity="center_vertical">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
 
-                    <ImageButton
-                        android:layout_width="50dip"
-                        android:layout_height="50dip"
-                        android:layout_marginLeft="20dip"
-                        android:background="@drawable/circle_light_green"
-                        android:src="@mipmap/ic_cash_24dp" />
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/corner_radius_white"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <ImageButton
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="5dip"
+                                    android:layout_marginLeft="3dip"
+                                    android:layout_marginTop="5dip"
+                                    android:background="#0000"
+                                    android:src="@mipmap/ic_price_24dp" />
+
+                                <EditText
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_marginLeft="3dip"
+                                    android:background="#0000"
+                                    android:hint="Price of product"
+                                    android:textColor="#008593"
+                                    android:textColorHint="#008593"
+                                    android:textSize="15sp" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dip"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="5dip"
+                            android:text="Total / Current cash"
+                            android:textColor="#fff"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
+                        <ProgressBar
+                            android:id="@+id/itemProgress"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="15dip"
+                            android:layout_marginBottom="10dip"
+                            android:layout_marginTop="5dip"
+                            android:max="100"
+                            android:progress="30"
+                            android:progressDrawable="@drawable/progress_style_1" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dip"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="7dip">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="@drawable/corner_radius_white"
+                                android:padding="3dip">
+
+                                <Button
+                                    android:id="@+id/buttonConfirmExpenses"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@drawable/corner_radius_gray_1"
+                                    android:fontFamily="sans-serif-condensed"
+                                    android:gravity="center"
+                                    android:text="Confirm"
+                                    android:textColor="#fff"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dip"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="7dip">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="@drawable/corner_radius_white"
+                                android:padding="3dip">
+
+                                <Button
+                                    android:id="@+id/buttonCancelExpenses"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@drawable/corner_radius_gray_1"
+                                    android:fontFamily="sans-serif-condensed"
+                                    android:gravity="center"
+                                    android:text="Cancel"
+                                    android:textColor="#fff"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dip"
-                    android:layout_weight="5" />
-
             </LinearLayout>
-        </FrameLayout>
+        </ScrollView>
 
-    </LinearLayout>
+    </FrameLayout>
 
 </LinearLayout>

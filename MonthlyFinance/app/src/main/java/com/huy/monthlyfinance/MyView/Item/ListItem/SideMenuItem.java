@@ -1,12 +1,10 @@
-package com.huy.monthlyfinance.MyView.Item;
+package com.huy.monthlyfinance.MyView.Item.ListItem;
 
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.huy.monthlyfinance.MyView.BaseItem;
 import com.huy.monthlyfinance.R;
 
 /**

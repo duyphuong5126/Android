@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
@@ -281,9 +282,11 @@
                             android:layout_weight="1">
 
                             <ImageButton
+                                android:id="@+id/buttonAddReminder"
                                 android:layout_width="60dip"
                                 android:layout_height="60dip"
                                 android:layout_marginLeft="5dip"
+                                android:rotation="-30"
                                 android:background="@drawable/circle_pink_2"
                                 android:src="@mipmap/ic_alarm_white_36dp" />
 
@@ -320,9 +323,11 @@
                             android:layout_weight="1">
 
                             <ImageButton
+                                android:id="@+id/buttonAddTransfer"
                                 android:layout_width="60dip"
                                 android:layout_height="60dip"
                                 android:layout_marginLeft="5dip"
+                                android:rotation="-30"
                                 android:background="@drawable/circle_blue_1"
                                 android:src="@mipmap/ic_transfer_horizontal_36dp" />
 
@@ -359,9 +364,11 @@
                             android:layout_weight="1">
 
                             <ImageButton
+                                android:id="@+id/buttonAddCash"
                                 android:layout_width="60dip"
                                 android:layout_height="60dip"
                                 android:layout_marginLeft="5dip"
+                                android:rotation="-30"
                                 android:background="@drawable/circle_light_green"
                                 android:src="@mipmap/ic_money_36dp" />
 
@@ -398,9 +405,11 @@
                             android:layout_weight="1">
 
                             <ImageButton
+                                android:id="@+id/buttonAddExpense"
                                 android:layout_width="60dip"
                                 android:layout_height="60dip"
                                 android:layout_marginLeft="5dip"
+                                android:rotation="-30"
                                 android:background="@drawable/circle_pink_1"
                                 android:src="@mipmap/ic_expense_36dp" />
 
