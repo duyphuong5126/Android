@@ -177,17 +177,13 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                 for (RadialItem radialItem : mRadialItems) {
                     radialItem.setFocused(mRadialItems.indexOf(radialItem) == position);
                 }
-                mListExpense.invalidate();
+                mListExpense.requestLayout();
             }
 
             @Override
             public void onLongClick(String data, int position) {
-                Toast.makeText(activity, "Add " + data + " expense", Toast.LENGTH_SHORT).show();
                 mLayoutForm.setVisibility(View.VISIBLE);
                 mLayoutInput.setVisibility(View.GONE);
-                for (RadialItem radialItem : mRadialItems) {
-                    radialItem.setFocused(mRadialItems.indexOf(radialItem) == position);
-                }
             }
         };
         int index = 0;
