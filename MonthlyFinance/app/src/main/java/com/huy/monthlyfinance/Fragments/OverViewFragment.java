@@ -3,6 +3,7 @@ package com.huy.monthlyfinance.Fragments;
 import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
@@ -173,6 +174,11 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
     @Override
     protected void setStatusBarColor() {
         mListener.setStatusBarColor(Color.parseColor("#008593"));
+    }
+
+    @Override
+    protected void fragmentReady(Bundle savedInstanceState) {
+
     }
 
     private void addDataToChart(final ArrayList<String> xValues, final float[] yValuesData, PieChart chart,

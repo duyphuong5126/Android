@@ -18,6 +18,7 @@ public abstract class BaseFragment extends Fragment {
     protected abstract int getLayoutXML();
     protected abstract void initUI(View view);
     protected abstract void setStatusBarColor();
+    protected abstract void fragmentReady(Bundle savedInstanceState);
 
     @Nullable
     @Override
@@ -37,6 +38,7 @@ public abstract class BaseFragment extends Fragment {
         if (mListener != null) {
             setStatusBarColor();
         }
+        this.fragmentReady(savedInstanceState);
     }
 
     public void setListener(MainListener Listener) {
