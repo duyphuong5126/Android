@@ -227,34 +227,29 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         mRadialItems = new ArrayList<>();
         mListRadialAdapter = null;
         if (mRadialItems.isEmpty()) {
-            mRadialItems.add(new RadialItem(mExpenses[0], BitmapFactory.decodeResource(resources, R.drawable.receipt)));
-            mRadialItems.add(new RadialItem(mExpenses[1], BitmapFactory.decodeResource(resources, R.drawable.stethoscope)));
-            mRadialItems.add(new RadialItem(mExpenses[2], BitmapFactory.decodeResource(resources, R.drawable.game_controller)));
-            mRadialItems.add(new RadialItem(mExpenses[3], BitmapFactory.decodeResource(resources, R.drawable.turkey)));
-            mRadialItems.add(new RadialItem(mExpenses[4], BitmapFactory.decodeResource(resources, R.drawable.shirt)));
-            mRadialItems.add(new RadialItem(mExpenses[5], BitmapFactory.decodeResource(resources, R.drawable.car)));
-            mRadialItems.add(new RadialItem(mExpenses[6], BitmapFactory.decodeResource(resources, R.drawable.home)));
-            mRadialItems.add(new RadialItem(mExpenses[7], BitmapFactory.decodeResource(resources, R.drawable.family)));
+            RadialItem.OnClickListener listener = new RadialItem.OnClickListener() {
+                @Override
+                public void onClick(Bundle data) {
+                    mLayoutForm.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onLongClick(Bundle data) {
+
+                }
+            };
+            mRadialItems.add(new RadialItem(listener, mExpenses[0], BitmapFactory.decodeResource(resources, R.drawable.receipt)));
+            mRadialItems.add(new RadialItem(listener, mExpenses[1], BitmapFactory.decodeResource(resources, R.drawable.stethoscope)));
+            mRadialItems.add(new RadialItem(listener, mExpenses[2], BitmapFactory.decodeResource(resources, R.drawable.game_controller)));
+            mRadialItems.add(new RadialItem(listener, mExpenses[3], BitmapFactory.decodeResource(resources, R.drawable.turkey)));
+            mRadialItems.add(new RadialItem(listener, mExpenses[4], BitmapFactory.decodeResource(resources, R.drawable.shirt)));
+            mRadialItems.add(new RadialItem(listener, mExpenses[5], BitmapFactory.decodeResource(resources, R.drawable.car)));
+            mRadialItems.add(new RadialItem(listener, mExpenses[6], BitmapFactory.decodeResource(resources, R.drawable.home)));
+            mRadialItems.add(new RadialItem(listener, mExpenses[7], BitmapFactory.decodeResource(resources, R.drawable.family)));
         }
         mListRadialAdapter =
                 new BasicAdapter<>(mRadialItems, R.layout.item_radial, inflater);
         mListExpense.setAdapter(mListRadialAdapter);
-        mListExpense.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                for (int j = 0; j < mRadialItems.size(); j++) {
-                    mRadialItems.get(j).setFocused(j == i);
-                }
-                mListRadialAdapter.notifyDataSetChanged();
-            }
-        });
-        mListExpense.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                mLayoutForm.setVisibility(View.VISIBLE);
-                return false;
-            }
-        });
 
         if (mListProductGroups == null) {
             mListProductGroups = new ArrayList<>();
