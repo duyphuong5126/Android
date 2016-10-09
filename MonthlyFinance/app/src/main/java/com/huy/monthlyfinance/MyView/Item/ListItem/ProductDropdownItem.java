@@ -15,10 +15,20 @@ import com.huy.monthlyfinance.R;
 public class ProductDropdownItem extends BaseItem {
     private Bitmap mBitmap;
     private String mName;
+    private boolean isFocused;
 
     public ProductDropdownItem(Bitmap Bitmap, String Name) {
         this.mBitmap = Bitmap;
         this.mName = Name;
+        this.isFocused = false;
+    }
+
+    public Bitmap getBitmap() {
+        return mBitmap;
+    }
+
+    public String getName() {
+        return mName;
     }
 
     @Override
@@ -28,11 +38,14 @@ public class ProductDropdownItem extends BaseItem {
         TextView textView = (TextView) view.findViewById(R.id.textName);
         textView.setText(mName);
         final ImageButton iconCheck = (ImageButton) view.findViewById(R.id.iconCheck);
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                iconCheck.setVisibility(iconCheck.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
-            }
-        });
+        iconCheck.setVisibility(isFocused ? View.VISIBLE : View.GONE);
+    }
+
+    public void setFocused(boolean focused) {
+        isFocused = focused;
+    }
+
+    public boolean isFocused() {
+        return isFocused;
     }
 }

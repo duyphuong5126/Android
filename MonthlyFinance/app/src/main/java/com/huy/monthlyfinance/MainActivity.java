@@ -23,6 +23,7 @@ import com.huy.monthlyfinance.Listener.MainListener;
 import com.huy.monthlyfinance.Listener.NavigationListener;
 import com.huy.monthlyfinance.MyView.BasicAdapter;
 import com.huy.monthlyfinance.MyView.Item.ListItem.SideMenuItem;
+import com.huy.monthlyfinance.MyView.RoundImageView;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
 import java.io.File;
@@ -39,6 +40,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
     private FragmentManager mManager;
     private ArrayList<SideMenuItem> mMenuItems;
     private BasicAdapter<SideMenuItem> mSideMenuAdapter;
+    private LinearLayout mLayoutTopSideMenu;
+    private RoundImageView mImageAvatar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +49,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
         setContentView(R.layout.activity_main);
         mDrawer = (DrawerLayout) findViewById(R.id.mainLayout);
         mLayoutSideMenu = (LinearLayout) findViewById(R.id.layoutSideMenu);
+        mLayoutTopSideMenu = (LinearLayout) findViewById(R.id.layoutTopSideMenu);
+        mImageAvatar = (RoundImageView) findViewById(R.id.imageAvatar);
 
         mFragments = new TreeMap<>();
         OverViewFragment overViewFragment = new OverViewFragment();
@@ -73,7 +78,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
                 mSideMenuAdapter.notifyDataSetChanged();
                 switch (mMenuItems.get(i).getTextName()) {
                     case "Expenses":
-                        showFragment(ExpenseManagerFragment.class);
+                        showFragment(ExpenseManagerFragment.class, null);
                         break;
                     default:
                         break;
@@ -115,11 +120,18 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
     }
 
     @Override
-    public void showFragment(Class c) {
+    public void showFragment(Class c, Bundle data) {
         if (c == ExpenseManagerFragment.class) {
             ExpenseManagerFragment fragment = (ExpenseManagerFragment) mFragments.get(c.getName());
+            fragment.setArguments(data);
             mManager.beginTransaction().replace(R.id.layoutFragmentsContainer, fragment, fragment.getClass().getName()).commit();
         }
+    }
+
+    @Override
+    public void changeSideMenuColor(int color) {
+        mLayoutTopSideMenu.setBackgroundColor(color);
+        mImageAvatar.setColor(color);
     }
 
     protected void showFragment(String fragmentName) {

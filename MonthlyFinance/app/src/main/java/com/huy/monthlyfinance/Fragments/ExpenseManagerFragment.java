@@ -1,19 +1,31 @@
 package com.huy.monthlyfinance.Fragments;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.CalendarView;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -30,31 +42,35 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.huy.monthlyfinance.Listener.NavigationListener;
 import com.huy.monthlyfinance.MyView.BasicAdapter;
-import com.huy.monthlyfinance.MyView.BasicRecyclerAdapter;
+import com.huy.monthlyfinance.MyView.Item.ListItem.BoughtProduct;
 import com.huy.monthlyfinance.MyView.Item.ListItem.ExpensesItem;
 import com.huy.monthlyfinance.MyView.Item.ListItem.ProductDropdownItem;
-import com.huy.monthlyfinance.MyView.Item.RecyclerItem.GroupProductItem;
 import com.huy.monthlyfinance.MyView.Item.ListItem.RadialItem;
 import com.huy.monthlyfinance.R;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 import com.kulik.radial.RadialListView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by Phuong on 26/08/2016.
  */
 public class ExpenseManagerFragment extends BaseFragment implements View.OnClickListener {
+    private static final int SELECT_IMAGE = 1;
+
     private NavigationListener mNavListener;
     private FrameLayout mLayoutInput;
     private ScrollView mLayoutForm;
-    private RecyclerView mListGroupProduct;
     private BasicAdapter<RadialItem> mListRadialAdapter;
     private BasicAdapter<ExpensesItem> mRadialAdapter;
     private ArrayList<RadialItem> mRadialItems;
     private RadialListView mListExpense;
+    private TextView mTextRadialProduct;
     private ListView mListProductExamples;
     private ListView mListUnitExamples;
     private ArrayList<BarEntry> mListBarEntries;
@@ -65,6 +81,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
     private ArrayList<Integer> mListBarColors;
     private FrameLayout mLayoutSelectProduct;
     private FrameLayout mLayoutSelectUnit;
+    private FrameLayout mLayoutSelectDate;
     private float[] mMonthExpensePercentages;
     private ArrayList<String> mMonthExpense;
     private String[] mExpenses;
@@ -73,11 +90,41 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
     private ListView mListExpensesDetail;
     private ArrayList<ExpensesItem> mListExpenses;
     private int[] mExpenseImages;
+    private Bitmap[] mExpenseBitmap;
     private int[] mExpenseDrawables;
     private int[] mExpenseProgressDrawables;
-    private ArrayList<GroupProductItem> mListProductGroups;
     private ArrayList<ProductDropdownItem> mListProductExample;
     private ArrayList<String> mListUnit;
+
+    private Button mButtonAdd;
+    private ArrayList<BoughtProduct> mListProducts;
+    private BasicAdapter<BoughtProduct> mBoughtProductsAdapter;
+    private ListView mListBoughtProducts;
+
+    private EditText mEditProductName;
+    private EditText mEditProductCost;
+    private EditText mEditProductUnit;
+    private EditText mEditProductAmount;
+    private EditText mEditDate;
+    private ImageView mImageProductIcon;
+    private int mCurrentGroup;
+
+    private TextView mTextTotalCost;
+    private double mTotalCost;
+    private String mConcurrency;
+    private ProgressBar mCurrentPercentages;
+    private double mCurrentCash;
+
+    private TextView mTextGroupName;
+    private ImageView mImageGroup;
+
+    private CalendarView mLayoutPickDate;
+    private String mDate;
+    private Uri mCapturedImage;
+
+    private Bitmap mProductBitmap;
+
+    private boolean isFormOpen;
 
     @Override
     protected int getLayoutXML() {
@@ -85,18 +132,73 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
     }
 
     @Override
+    protected void onPrepare() {
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            isFormOpen = bundle.getBoolean("isFormOpen");
+        }
+    }
+
+    @Override
     protected void initUI(View view) {
         final Activity activity = getActivity();
         LayoutInflater inflater = activity.getLayoutInflater();
 
-        (view.findViewById(R.id.buttonBack)).setOnClickListener(this);
-        (view.findViewById(R.id.buttonLogo)).setOnClickListener(this);
+        mDate = SupportUtils.formatDate(SupportUtils.milliSec2Date(System.currentTimeMillis()), "dd/MM/yyyy");
+
+        mCurrentGroup = 0;
+
+        mConcurrency = "$";
+        mTotalCost = 0;
+
+        mCurrentPercentages = (ProgressBar) view.findViewById(R.id.itemProgress);
+        mTextTotalCost = (TextView) view.findViewById(R.id.textTotalCost);
+        mTextGroupName = (TextView) view.findViewById(R.id.itemName);
+        mImageGroup = (ImageView) view.findViewById(R.id.itemIcon);
+        mEditProductName = (EditText) view.findViewById(R.id.edtProductName);
+        mEditProductName.setText("");
+        mEditProductCost = (EditText) view.findViewById(R.id.edtProductCost);
+        mEditProductCost.setText("");
+        mEditProductUnit = (EditText) view.findViewById(R.id.edtProductUnit);
+        mEditProductUnit.setText("");
+        mEditProductAmount = (EditText) view.findViewById(R.id.edtProductAmount);
+        mEditProductAmount.setText("");
+        mEditDate = (EditText) view.findViewById(R.id.edtProductDate);
+        mEditDate.setText(mDate);
+        mImageProductIcon = (ImageView) view.findViewById(R.id.imageProductIcon);
+        mTextRadialProduct = (TextView) view.findViewById(R.id.textGroupName);
+        mLayoutPickDate = (CalendarView) view.findViewById(R.id.datePicker);
+        mLayoutPickDate.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView calendarView, int i, int i1, int i2) {
+                mDate = i2 + "/" + (i1 + 1) + "/" + i;
+                mEditDate.setText(mDate);
+            }
+        });
+
+        mEditDate.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                toggleLayoutPickDate(true);
+                return false;
+            }
+        });
+
+        view.findViewById(R.id.buttonBack).setOnClickListener(this);
+        view.findViewById(R.id.buttonLogo).setOnClickListener(this);
+        view.findViewById(R.id.buttonCloseProducts).setOnClickListener(this);
+        view.findViewById(R.id.buttonPrevGroup).setOnClickListener(this);
+        view.findViewById(R.id.buttonNextGroup).setOnClickListener(this);
+        view.findViewById(R.id.buttonCloseDate).setOnClickListener(this);
+        view.findViewById(R.id.buttonLoadImage).setOnClickListener(this);
+        view.findViewById(R.id.buttonConfirmExpenses).setOnClickListener(this);
+        view.findViewById(R.id.buttonCancelExpenses).setOnClickListener(this);
+
+        mButtonAdd = (Button) view.findViewById(R.id.buttonAdd);
+        mListBoughtProducts = (ListView) view.findViewById(R.id.listBoughtProducts);
 
         mLayoutForm = (ScrollView) view.findViewById(R.id.layoutForm);
         mLayoutForm.setOnClickListener(this);
-        mListGroupProduct = (RecyclerView) view.findViewById(R.id.listGroupProduct);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false);
-        mListGroupProduct.setLayoutManager(linearLayoutManager);
 
         Resources resources = activity.getResources();
         mListExpense = (RadialListView) view.findViewById(R.id.listExpenses);
@@ -199,10 +301,15 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         if (mListExpenses == null) {
             mListExpenses = new ArrayList<>();
         }
-        if (mExpenseImages == null) {
+        if (mExpenseImages == null || mExpenseBitmap == null) {
             mExpenseImages = new int[]{R.mipmap.ic_bill_white_18dp, R.mipmap.ic_health_care_white_18dp, R.mipmap.ic_entertainment_white_18dp,
                     R.mipmap.ic_food_18dp, R.mipmap.ic_dressing_white_18dp, R.mipmap.ic_transport_white_18dp,
                     R.mipmap.ic_home_white_18dp, R.mipmap.ic_family_white_18dp, R.mipmap.ic_more_horiz_white_18dp};
+
+            mExpenseBitmap = new Bitmap[mExpenseImages.length];
+            for (int i = 0; i < mExpenseImages.length; i++) {
+                mExpenseBitmap[i] = BitmapFactory.decodeResource(resources, mExpenseImages[i]);
+            }
         }
 
         if (mExpenseDrawables == null) {
@@ -230,7 +337,17 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
             RadialItem.OnClickListener listener = new RadialItem.OnClickListener() {
                 @Override
                 public void onClick(Bundle data) {
-                    mLayoutForm.setVisibility(View.VISIBLE);
+                    if (data != null) {
+                        isFormOpen = data.getBoolean("isFormOpen");
+                        mTextRadialProduct.setText(data.getString("itemSelected"));
+                        mCurrentGroup = data.getInt("pos");
+                    }
+                    changeCurrentGroup();
+                    if (isFormOpen) {
+                        toggleForm(true);
+                    } else {
+                        Toast.makeText(activity, "Press again to access form", Toast.LENGTH_SHORT).show();
+                    }
                 }
 
                 @Override
@@ -238,34 +355,24 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
 
                 }
             };
-            mRadialItems.add(new RadialItem(listener, mExpenses[0], BitmapFactory.decodeResource(resources, R.drawable.receipt)));
-            mRadialItems.add(new RadialItem(listener, mExpenses[1], BitmapFactory.decodeResource(resources, R.drawable.stethoscope)));
-            mRadialItems.add(new RadialItem(listener, mExpenses[2], BitmapFactory.decodeResource(resources, R.drawable.game_controller)));
-            mRadialItems.add(new RadialItem(listener, mExpenses[3], BitmapFactory.decodeResource(resources, R.drawable.turkey)));
-            mRadialItems.add(new RadialItem(listener, mExpenses[4], BitmapFactory.decodeResource(resources, R.drawable.shirt)));
-            mRadialItems.add(new RadialItem(listener, mExpenses[5], BitmapFactory.decodeResource(resources, R.drawable.car)));
-            mRadialItems.add(new RadialItem(listener, mExpenses[6], BitmapFactory.decodeResource(resources, R.drawable.home)));
-            mRadialItems.add(new RadialItem(listener, mExpenses[7], BitmapFactory.decodeResource(resources, R.drawable.family)));
+            int index = 0;
+            mRadialItems.add(new RadialItem(listener, mExpenses[0], BitmapFactory.decodeResource(resources, R.drawable.receipt), index++));
+            mRadialItems.add(new RadialItem(listener, mExpenses[1], BitmapFactory.decodeResource(resources, R.drawable.stethoscope), index++));
+            mRadialItems.add(new RadialItem(listener, mExpenses[2], BitmapFactory.decodeResource(resources, R.drawable.game_controller), index++));
+            mRadialItems.add(new RadialItem(listener, mExpenses[3], BitmapFactory.decodeResource(resources, R.drawable.turkey), index++));
+            mRadialItems.add(new RadialItem(listener, mExpenses[4], BitmapFactory.decodeResource(resources, R.drawable.shirt), index++));
+            mRadialItems.add(new RadialItem(listener, mExpenses[5], BitmapFactory.decodeResource(resources, R.drawable.car), index++));
+            mRadialItems.add(new RadialItem(listener, mExpenses[6], BitmapFactory.decodeResource(resources, R.drawable.home), index++));
+            mRadialItems.add(new RadialItem(listener, mExpenses[7], BitmapFactory.decodeResource(resources, R.drawable.family), index++));
         }
         mListRadialAdapter =
                 new BasicAdapter<>(mRadialItems, R.layout.item_radial, inflater);
         mListExpense.setAdapter(mListRadialAdapter);
 
-        if (mListProductGroups == null) {
-            mListProductGroups = new ArrayList<>();
-        }
-        if (mListProductGroups.isEmpty()) {
-            for (int i = 0; i < mExpenses.length; i++) {
-                mListProductGroups.add(new GroupProductItem(BitmapFactory.decodeResource(resources, mExpenseImages[i]), mExpenses[i]));
-            }
-        }
-        BasicRecyclerAdapter<GroupProductItem> recyclerAdapter =
-                new BasicRecyclerAdapter<>(mListProductGroups, R.layout.item_group_product);
-        mListGroupProduct.setAdapter(recyclerAdapter);
-
         view.findViewById(R.id.buttonSelectProduct).setOnClickListener(this);
         view.findViewById(R.id.buttonSelectUnit).setOnClickListener(this);
         mLayoutSelectProduct = (FrameLayout) view.findViewById(R.id.layoutPickProduct);
+        mLayoutSelectDate = (FrameLayout) view.findViewById(R.id.layoutPickDate);
         mLayoutSelectUnit = (FrameLayout) view.findViewById(R.id.layoutPickUnit);
         mListProductExamples = (ListView) view.findViewById(R.id.listProducts);
         if (mListProductExample == null) {
@@ -303,8 +410,20 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
             mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.syringe), "Syringe"));
             mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.pills), "Drug"));
         }
-        BasicAdapter<ProductDropdownItem> mDropdownAdapter = new BasicAdapter<>(mListProductExample, R.layout.item_drop_down_1, inflater);
+        final BasicAdapter<ProductDropdownItem> mDropdownAdapter = new BasicAdapter<>(mListProductExample, R.layout.item_drop_down_1, inflater);
         mListProductExamples.setAdapter(mDropdownAdapter);
+        mListProductExamples.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                ProductDropdownItem item = mListProductExample.get(i);
+                mEditProductName.setText(item.getName());
+                mProductBitmap = item.getBitmap();
+                mImageProductIcon.setImageBitmap(mProductBitmap);
+                item.setFocused(!item.isFocused());
+                mEditProductCost.setText("");
+                mDropdownAdapter.notifyDataSetChanged();
+            }
+        });
         mListProductExamples.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -398,8 +517,32 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
     }
 
     @Override
-    protected void fragmentReady(Bundle savedInstanceState) {
+    protected int getSideMenuColor() {
+        return Color.parseColor("#5f7c89");
+    }
 
+    @Override
+    protected void fragmentReady(Bundle savedInstanceState) {
+        mCurrentCash = getCurrentCash();
+        mCurrentPercentages.setMax((int) mCurrentCash);
+        mCurrentPercentages.setProgress(0);
+        toggleForm(isFormOpen);
+        changeCurrentGroup();
+        mListProducts = new ArrayList<>();
+        mBoughtProductsAdapter = new BasicAdapter<>(mListProducts, R.layout.item_added_product, getActivity().getLayoutInflater());
+        mListBoughtProducts.setAdapter(mBoughtProductsAdapter);
+        mListBoughtProducts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                BoughtProduct product = mListProducts.get(i);
+                mEditProductName.setText(product.getName());
+                mProductBitmap = product.getImage();
+                mImageProductIcon.setImageBitmap(mProductBitmap);
+                mEditProductCost.setText(String.valueOf(product.getPrice()));
+                mLayoutForm.scrollTo(0, 0);
+            }
+        });
+        mButtonAdd.setOnClickListener(this);
     }
 
     public void setNavListener(NavigationListener NavListener) {
@@ -408,6 +551,71 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
 
     private boolean canGoBack() {
         return mLayoutForm.getVisibility() == View.GONE;
+    }
+
+    private void toggleLayoutProducts(boolean visible) {
+        mLayoutSelectProduct.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    private boolean isLayoutProductVisible() {
+        return mLayoutSelectProduct.getVisibility() == View.VISIBLE;
+    }
+
+    private void toggleLayoutPickDate(boolean visible) {
+        mLayoutSelectDate.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    private boolean isLayoutPickDateVisible() {
+        return mLayoutSelectDate.getVisibility() == View.VISIBLE;
+    }
+
+    private void changeCurrentGroup() {
+        mTextGroupName.setText(mRadialItems.get(mCurrentGroup).getText());
+        mImageGroup.setImageBitmap(mExpenseBitmap[mCurrentGroup]);
+    }
+
+    private void toggleForm(boolean open) {
+        mLayoutForm.setVisibility(open ? View.VISIBLE : View.GONE);
+    }
+
+    private void clearForm() {
+        mEditDate.setText("");
+        mEditProductCost.setText("");
+        mEditProductName.setText("");
+        mEditProductAmount.setText("");
+        mEditProductUnit.setText("");
+        mImageProductIcon.setImageResource(R.mipmap.ic_expense_green_1_24dp);
+        mListProducts.clear();
+        mBoughtProductsAdapter.notifyDataSetChanged();
+        mCurrentCash = getCurrentCash();
+        mTextTotalCost.setText("$0");
+        mCurrentPercentages.setProgress(0);
+        mCurrentGroup = 0;
+        changeCurrentGroup();
+    }
+
+    private void storeData() {
+        //mListProducts contains all bought products that are added on form. Store all of them into database
+        //mTotalCost is the total of all bought products
+        //mCurrentCash is the current cash that not include the mTotalCost. Do mCurrentCash -= mTotalCost and store it
+    }
+
+    private double getCurrentCash() {
+        return 1000;
+    }
+
+    private void changePercentageProgressStyle() {
+        Resources resources = getResources();
+        double percent = mTotalCost / mCurrentCash;
+        if (percent <= 0.25) {
+            mCurrentPercentages.setProgressDrawable(resources.getDrawable(R.drawable.progress_style_1));
+        } else if (percent <= 0.5) {
+            mCurrentPercentages.setProgressDrawable(resources.getDrawable(R.drawable.progress_style_11));
+        } else if ((percent <= 0.75)) {
+            mCurrentPercentages.setProgressDrawable(resources.getDrawable(R.drawable.progress_style_4));
+        } else {
+            mCurrentPercentages.setProgressDrawable(resources.getDrawable(R.drawable.progress_style_10));
+        }
     }
 
     @Override
@@ -430,7 +638,30 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                 mLayoutForm.setVisibility(View.GONE);
                 break;
             case R.id.buttonSelectProduct:
-                mLayoutSelectProduct.setVisibility(mLayoutSelectProduct.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
+                toggleLayoutProducts(!isLayoutProductVisible());
+                break;
+            case R.id.buttonCloseProducts:
+                toggleLayoutProducts(false);
+                break;
+            case R.id.buttonCloseDate:
+                toggleLayoutPickDate(false);
+                break;
+            case R.id.buttonPrevGroup:
+                mCurrentGroup--;
+                if (mCurrentGroup < 0) {
+                    mCurrentGroup = 0;
+                }
+                changeCurrentGroup();
+                break;
+            case R.id.buttonLoadImage:
+                intentLoadImage();
+                break;
+            case R.id.buttonNextGroup:
+                mCurrentGroup++;
+                if (mCurrentGroup >= mRadialItems.size()) {
+                    mCurrentGroup = mRadialItems.size() - 1;
+                }
+                changeCurrentGroup();
                 break;
             case R.id.buttonSelectUnit:
                 if (mListUnit != null) {
@@ -439,8 +670,109 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                     }
                 }
                 break;
+            case R.id.buttonAdd:
+                String name = mEditProductName.getText().toString();
+                String price = mEditProductCost.getText().toString();
+                String unit = mEditProductUnit.getText().toString();
+                Drawable drawable = mImageProductIcon.getDrawable();
+                Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+                double num_price = Double.valueOf(price.length() > 0 ? price : "0");
+                String message = null;
+                if (num_price > 0 && !name.isEmpty()) {
+                    BoughtProduct product = new BoughtProduct(bitmap, name, unit, num_price, false);
+                    boolean existed = false;
+                    if (mTotalCost + num_price> mCurrentCash) {
+                        message = "Current total exceeds your cash limit";
+                    } else {
+                        for (int i = 0; i < mListProducts.size() && !existed; i++) {
+                            BoughtProduct boughtProduct = mListProducts.get(i);
+                            existed = boughtProduct.equals(product);
+                            if (existed) {
+                                mTotalCost += num_price - boughtProduct.getPrice();
+                                boughtProduct.setPrice(num_price);
+                            }
+                        }
+                        if (existed) {
+                            message = "This item is already existed";
+                        } else {
+                            mListProducts.add(product);
+                            mTotalCost += product.getPrice();
+                        }
+                        mTextTotalCost.setText(mConcurrency + mTotalCost);
+                        mBoughtProductsAdapter.notifyDataSetChanged();
+                        mCurrentPercentages.setProgress((int) mTotalCost);
+                        changePercentageProgressStyle();
+                        SupportUtils.setListViewHeight(mListBoughtProducts);
+                    }
+                } else {
+                    message = "You're missing some information";
+                }
+                if (message != null) {
+                    Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case R.id.buttonConfirmExpenses:
+                break;
+            case R.id.buttonCancelExpenses:
+                clearForm();
+                break;
             default:
                 break;
+        }
+    }
+
+    private void intentLoadImage() {
+        Intent intentPick = new Intent();
+        intentPick.setType("image/*");
+        intentPick.setAction(Intent.ACTION_GET_CONTENT);
+
+        File root = new File(Environment.getExternalStorageDirectory() + File.separator + "Captured" + File.separator);
+        if (!root.exists()) {
+            root.mkdirs();
+        }
+        String name = "Captured_" + System.nanoTime();
+        File dir = new File(root, name);
+        mCapturedImage = Uri.fromFile(dir);
+
+        Intent intentTakePhoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intentTakePhoto.putExtra(MediaStore.EXTRA_OUTPUT, mCapturedImage);
+
+        Intent intentChooser = Intent.createChooser(intentPick, "Select a source");
+        intentChooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{intentTakePhoto});
+        startActivityForResult(intentChooser, SELECT_IMAGE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case SELECT_IMAGE:
+                    boolean isFromCamera;
+                    if (data == null) {
+                        isFromCamera = true;
+                    } else {
+                        if (data.getAction() == null) {
+                            isFromCamera = true;
+                        } else {
+                            isFromCamera = data.getAction().equals(MediaStore.ACTION_IMAGE_CAPTURE);
+                        }
+                    }
+
+                    String path;
+                    if (isFromCamera) {
+                        path = SupportUtils.getPath(mCapturedImage, getActivity().getApplicationContext());
+                    } else {
+                        path = SupportUtils.getPath(data.getData(), getActivity().getApplicationContext());
+                    }
+                    if (path != null) {
+                        mProductBitmap = BitmapFactory.decodeFile(path);
+                        mImageProductIcon.setImageBitmap(mProductBitmap);
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

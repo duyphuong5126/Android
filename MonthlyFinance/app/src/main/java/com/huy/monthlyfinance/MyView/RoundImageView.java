@@ -24,6 +24,10 @@ public class RoundImageView extends ImageView {
         mColor = typedArray.getColor(0, Color.TRANSPARENT);
     }
 
+    public void setColor(int Color) {
+        this.mColor = Color;
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);

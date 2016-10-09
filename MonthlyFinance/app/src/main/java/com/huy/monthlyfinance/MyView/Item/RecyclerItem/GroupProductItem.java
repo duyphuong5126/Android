@@ -13,6 +13,7 @@ import com.huy.monthlyfinance.R;
 public class GroupProductItem extends BaseRecyclerItem {
     private Bitmap mIcon;
     private String mName;
+    private boolean isVisible;
 
     private ImageButton mItemIcon;
     private TextView mItemName;
@@ -20,6 +21,7 @@ public class GroupProductItem extends BaseRecyclerItem {
     public GroupProductItem(Bitmap Icon, String Name) {
         this.mIcon = Icon;
         this.mName = Name;
+        this.isVisible = false;
     }
 
     @Override
@@ -32,5 +34,10 @@ public class GroupProductItem extends BaseRecyclerItem {
         }
         mItemIcon.setImageBitmap(mIcon);
         mItemName.setText(mName);
+        view.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+    }
+
+    public void setVisible(boolean visible) {
+        isVisible = visible;
     }
 }

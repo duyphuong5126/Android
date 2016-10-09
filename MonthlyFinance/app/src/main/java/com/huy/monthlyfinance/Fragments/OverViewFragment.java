@@ -45,6 +45,11 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
     }
 
     @Override
+    protected void onPrepare() {
+
+    }
+
+    @Override
     protected void initUI(View view) {Activity activity = getActivity();
         Resources resources = activity.getResources();
         ImageButton mButtonOpenSideMenu = (ImageButton) view.findViewById(R.id.buttonOpenSideMenu);
@@ -177,6 +182,11 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
     }
 
     @Override
+    protected int getSideMenuColor() {
+        return Color.parseColor("#008593");
+    }
+
+    @Override
     protected void fragmentReady(Bundle savedInstanceState) {
 
     }
@@ -255,7 +265,9 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
                 mListener.toggleSideMenu(true);
                 break;
             case R.id.buttonAddExpense:
-                mListener.showFragment(ExpenseManagerFragment.class);
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("isFormOpen", true);
+                mListener.showFragment(ExpenseManagerFragment.class, bundle);
                 break;
             default:
                 break;

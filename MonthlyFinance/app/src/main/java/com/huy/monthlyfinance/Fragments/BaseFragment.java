@@ -16,13 +16,16 @@ public abstract class BaseFragment extends Fragment {
     protected MainListener mListener;
 
     protected abstract int getLayoutXML();
+    protected abstract void onPrepare();
     protected abstract void initUI(View view);
     protected abstract void setStatusBarColor();
+    protected abstract int getSideMenuColor();
     protected abstract void fragmentReady(Bundle savedInstanceState);
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        onPrepare();
         return inflater.inflate(getLayoutXML(), container, false);
     }
 
@@ -37,6 +40,7 @@ public abstract class BaseFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         if (mListener != null) {
             setStatusBarColor();
+            this.mListener.changeSideMenuColor(getSideMenuColor());
         }
         this.fragmentReady(savedInstanceState);
     }
