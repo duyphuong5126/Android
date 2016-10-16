@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    //Vietnamese
+    <string name="food">Thực phẩm</string>
+    <string name="bill">Dịch vụ</string>
+    <string name="entertainment">Giải trí</string>
+    <string name="home">Chi phí nhà cửa</string>
+    <string name="health">Sức khỏe</string>
+    <string name="transport">Giao thông, vận chuyển</string>
+    <string name="etc">Khác</string>
+    <string name="dress">May mặc</string>
+    <string name="family">Chi phí gia đình</string>
+
+    <string name="expense_fragment">Chi phí của bạn</string>
+    <string name="expense_fragment_description">Các chi phí trong tháng</string>
+    <string name="expense">Chi phí</string>
+    <string name="group_name">Tên nhóm</string>
+
+    <string name="product_name">Tên sản phẩm</string>
+    <string name="amount">Số lượng</string>
+    <string name="amount_hint">Số lượng của sản phẩm này</string>
+    <string name="calculation_unit">Đơn vị tính</string>
+    <string name="calculation_unit_hint">Đơn vị</string>
+    <string name="cost">Đơn giá</string>
+    <string name="cost_hint">Đơn giá của sản phẩm này</string>
+    <string name="date">Ngày mua</string>
+    <string name="current_total">Tổng / Lượng tiền mặt</string>
+
+    <string name="add_product">Thêm sản phẩm</string>
+    <string name="all_product">Tất cả sản phẩm</string>
+    <string name="total_cost">Tổng chi phí</string>
+
+    <string name="confirm">Xác nhận</string>
+    <string name="cancel">Hủy</string>
+
+</resources>

@@ -1,12 +1,3 @@
 <resources>
     <string name="app_name">Monthly Finance</string>
-    <string name="food">Food</string>
-    <string name="bill">Living services</string>
-    <string name="entertainment">Entertainment</string>
-    <string name="home">House expenses</string>
-    <string name="health">Health</string>
-    <string name="transport">Transport</string>
-    <string name="etc">Etc</string>
-    <string name="dress">Dress</string>
-    <string name="family">Family</string>
 </resources>

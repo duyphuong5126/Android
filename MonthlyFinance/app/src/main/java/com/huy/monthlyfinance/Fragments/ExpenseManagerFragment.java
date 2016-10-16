@@ -125,6 +125,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
     private Bitmap mProductBitmap;
 
     private boolean isFormOpen;
+    private BasicAdapter<ProductDropdownItem> mDropdownAdapter;
 
     @Override
     protected int getLayoutXML() {
@@ -410,7 +411,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
             mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.syringe), "Syringe"));
             mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.pills), "Drug"));
         }
-        final BasicAdapter<ProductDropdownItem> mDropdownAdapter = new BasicAdapter<>(mListProductExample, R.layout.item_drop_down_1, inflater);
+        mDropdownAdapter = new BasicAdapter<>(mListProductExample, R.layout.item_drop_down_1, inflater);
         mListProductExamples.setAdapter(mDropdownAdapter);
         mListProductExamples.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -592,6 +593,11 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         mCurrentPercentages.setProgress(0);
         mCurrentGroup = 0;
         changeCurrentGroup();
+        for (ProductDropdownItem item : mListProductExample) {
+            item.setFocused(false);
+        }
+        mDropdownAdapter.notifyDataSetChanged();
+        mLayoutPickDate.setDate(System.currentTimeMillis());
     }
 
     private void storeData() {

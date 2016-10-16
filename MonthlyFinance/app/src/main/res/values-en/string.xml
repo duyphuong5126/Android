@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    //English
+    <string name="food">Food</string>
+    <string name="bill">Living services</string>
+    <string name="entertainment">Entertainment</string>
+    <string name="home">House expenses</string>
+    <string name="health">Health</string>
+    <string name="transport">Transport</string>
+    <string name="etc">Etc</string>
+    <string name="dress">Dress</string>
+    <string name="family">Family</string>
+
+    <string name="expense_fragment">Your expenses</string>
+    <string name="expense_fragment_description">Expenses summary for this month</string>
+    <string name="expense">Expense</string>
+    <string name="group_name">Group name</string>
+
+    <string name="product_name">Product\'s name</string>
+    <string name="amount">Amount</string>
+    <string name="amount_hint">Amount of product</string>
+    <string name="calculation_unit">Calculation unit</string>
+    <string name="calculation_unit_hint">Unit</string>
+    <string name="cost">Cost</string>
+    <string name="cost_hint">Total for this product</string>
+    <string name="date">Date</string>
+    <string name="current_total">Total / Current cash</string>
+
+    <string name="add_product">Add to list products</string>
+    <string name="all_product">All products</string>
+    <string name="total_cost">Total cost</string>
+
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+
+</resources>

@@ -34,7 +34,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Your expenses"
+                android:text="@string/expense_fragment"
                 android:textColor="#fff"
                 android:textSize="20sp" />
 
@@ -103,7 +103,7 @@
                     android:layout_marginRight="15dip"
                     android:fontFamily="sans-serif-condensed"
                     android:gravity="right"
-                    android:text="Expenses summary for this month"
+                    android:text="@string/expense_fragment_description"
                     android:textColor="#555"
                     android:textSize="14sp" />
 
@@ -251,7 +251,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="20dip"
                     android:layout_marginLeft="10dip"
-                    android:text="Living services"
+                    android:text="@string/home"
                     android:textColor="#5f7c89"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -286,7 +286,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-smallcaps"
-                            android:text="Expense"
+                            android:text="@string/expense"
                             android:textColor="#fff"
                             android:textSize="30sp"
                             android:textStyle="bold" />
@@ -358,7 +358,7 @@
                                             android:ellipsize="end"
                                             android:fontFamily="sans-serif-condensed"
                                             android:maxLines="1"
-                                            android:text="Group name"
+                                            android:text="@string/group_name"
                                             android:textColor="#fff"
                                             android:textSize="13sp" />
                                     </LinearLayout>
@@ -403,7 +403,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="5dip"
-                            android:text="Product's name (*)"
+                            android:text="@string/product_name"
                             android:textColor="#fff"
                             android:textSize="20sp"
                             android:textStyle="bold" />
@@ -447,7 +447,7 @@
                                             android:layout_marginLeft="3dip"
                                             android:layout_weight="1"
                                             android:background="#0000"
-                                            android:hint="Product's name"
+                                            android:hint="@string/product_name"
                                             android:textColor="#008593"
                                             android:textColorHint="#008593"
                                             android:textSize="15sp" />
@@ -567,7 +567,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="5dip"
-                            android:text="Amount (*)"
+                            android:text="@string/amount"
                             android:textColor="#fff"
                             android:textSize="20sp"
                             android:textStyle="bold" />
@@ -599,7 +599,7 @@
                                     android:layout_marginLeft="3dip"
                                     android:background="#0000"
                                     android:ellipsize="end"
-                                    android:hint="Amount of product"
+                                    android:hint="@string/amount_hint"
                                     android:inputType="number"
                                     android:maxLines="1"
                                     android:textColor="#008593"
@@ -622,7 +622,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="5dip"
-                            android:text="Calculation unit (*)"
+                            android:text="@string/calculation_unit"
                             android:textColor="#fff"
                             android:textSize="20sp"
                             android:textStyle="bold" />
@@ -659,7 +659,7 @@
                                         android:layout_marginLeft="3dip"
                                         android:layout_weight="1"
                                         android:background="#0000"
-                                        android:hint="Unit"
+                                        android:hint="@string/calculation_unit_hint"
                                         android:textColor="#008593"
                                         android:textColorHint="#008593"
                                         android:textSize="15sp" />
@@ -752,7 +752,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="5dip"
-                            android:text="Cost (*)"
+                            android:text="@string/cost"
                             android:textColor="#fff"
                             android:textSize="20sp"
                             android:textStyle="bold" />
@@ -784,7 +784,7 @@
                                     android:layout_marginLeft="3dip"
                                     android:background="#0000"
                                     android:ellipsize="end"
-                                    android:hint="Total for this product"
+                                    android:hint="@string/cost_hint"
                                     android:inputType="numberDecimal"
                                     android:maxLines="1"
                                     android:textColor="#008593"
@@ -807,7 +807,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="5dip"
-                            android:text="Date (*)"
+                            android:text="@string/date"
                             android:textColor="#fff"
                             android:textSize="20sp"
                             android:textStyle="bold" />
@@ -844,7 +844,7 @@
                                         android:layout_marginLeft="3dip"
                                         android:layout_weight="1"
                                         android:background="#0000"
-                                        android:hint="Date"
+                                        android:hint="@string/date"
                                         android:textColor="#008593"
                                         android:textColorHint="#008593"
                                         android:textSize="15sp" />
@@ -926,7 +926,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="5dip"
-                            android:text="Total / Current cash"
+                            android:text="@string/current_total"
                             android:textColor="#fff"
                             android:textSize="17sp"
                             android:textStyle="bold" />
@@ -950,7 +950,7 @@
                         android:background="@drawable/corner_radius_gray_1"
                         android:fontFamily="sans-serif-condensed"
                         android:gravity="center"
-                        android:text="Add to list products"
+                        android:text="@string/add_product"
                         android:textColor="#fff"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -969,7 +969,7 @@
                             android:gravity="center_horizontal"
                             android:paddingBottom="5dip"
                             android:paddingTop="5dip"
-                            android:text="All products"
+                            android:text="@string/all_product"
                             android:textColor="#000"
                             android:textSize="20sp" />
 
@@ -1000,7 +1000,7 @@
                                         android:layout_width="0dip"
                                         android:layout_height="match_parent"
                                         android:layout_weight="3"
-                                        android:text="Total cost:"
+                                        android:text="@string/total_cost"
                                         android:textColor="#000"
                                         android:textSize="17sp" />
 
@@ -1061,7 +1061,7 @@
                                     android:background="@drawable/corner_radius_gray_1"
                                     android:fontFamily="sans-serif-condensed"
                                     android:gravity="center"
-                                    android:text="Confirm"
+                                    android:text="@string/confirm"
                                     android:textColor="#fff"
                                     android:textSize="15sp"
                                     android:textStyle="bold" />
@@ -1087,7 +1087,7 @@
                                     android:background="@drawable/corner_radius_gray_1"
                                     android:fontFamily="sans-serif-condensed"
                                     android:gravity="center"
-                                    android:text="Cancel"
+                                    android:text="@string/cancel"
                                     android:textColor="#fff"
                                     android:textSize="15sp"
                                     android:textStyle="bold" />
