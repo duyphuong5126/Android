@@ -34,7 +34,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="OVERVIEW"
+                android:text="@string/overview"
                 android:textColor="#fff"
                 android:textSize="20sp" />
 
@@ -127,10 +127,10 @@
                                         android:layout_weight="4"
                                         android:ellipsize="end"
                                         android:gravity="right|center_vertical"
-                                        android:singleLine="true"
                                         android:text="$1.000.000"
                                         android:textColor="#000"
-                                        android:textSize="20sp" />
+                                        android:textSize="20sp"
+                                        android:maxLines="1" />
                                 </LinearLayout>
 
                                 <LinearLayout
@@ -166,7 +166,7 @@
                             android:gravity="center_horizontal"
                             android:paddingBottom="5dip"
                             android:paddingTop="5dip"
-                            android:text="THIS MONTH EXPENSE"
+                            android:text="@string/this_month_expense"
                             android:textColor="#000" />
 
                         <LinearLayout
@@ -204,7 +204,7 @@
                             android:gravity="center_horizontal"
                             android:paddingBottom="5dip"
                             android:paddingTop="5dip"
-                            android:text="THIS MONTH CASH FLOW"
+                            android:text="@string/this_month_budget"
                             android:textColor="#000" />
 
                         <LinearLayout
@@ -270,7 +270,7 @@
                                 android:layout_marginRight="10dip"
                                 android:background="@drawable/gray_corner_radius_1"
                                 android:padding="10dip"
-                                android:text="Add Bill Reminder"
+                                android:text="@string/add_bill_reminder"
                                 android:textColor="#fff"
                                 android:textStyle="bold" />
 
@@ -311,7 +311,7 @@
                                 android:layout_marginRight="10dip"
                                 android:background="@drawable/gray_corner_radius_1"
                                 android:padding="10dip"
-                                android:text="Add Transfer"
+                                android:text="@string/add_transfer"
                                 android:textColor="#fff"
                                 android:textStyle="bold" />
 
@@ -352,7 +352,7 @@
                                 android:layout_marginRight="10dip"
                                 android:background="@drawable/gray_corner_radius_1"
                                 android:padding="10dip"
-                                android:text="Add Income"
+                                android:text="@string/add_income"
                                 android:textColor="#fff"
                                 android:textStyle="bold" />
 
@@ -393,7 +393,7 @@
                                 android:layout_marginRight="10dip"
                                 android:background="@drawable/gray_corner_radius_1"
                                 android:padding="10dip"
-                                android:text="Add Expense"
+                                android:text="@string/add_expense"
                                 android:textColor="#fff"
                                 android:textStyle="bold" />
 

@@ -372,7 +372,6 @@
                                 android:layout_height="match_parent"
                                 android:layout_weight="1">
 
-
                                 <ImageButton
                                     android:id="@+id/buttonNextGroup"
                                     android:layout_width="match_parent"
@@ -544,6 +543,67 @@
 
                                     <ImageView
                                         android:id="@+id/buttonCloseProducts"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="5dip"
+                                        android:src="@mipmap/ic_x_green_1_24dp" />
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                        </FrameLayout>
+
+                        <FrameLayout
+                            android:id="@+id/layoutPickImage"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="right">
+
+                                <TextView
+                                    android:layout_width="30dip"
+                                    android:layout_height="30dip"
+                                    android:layout_marginRight="5dip"
+                                    android:text="▲"
+                                    android:textColor="#fff"
+                                    android:textSize="30sp" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="25dip"
+                                android:background="@drawable/corner_radius_white"
+                                android:orientation="vertical">
+
+                                <GridView
+                                    android:id="@+id/gridImages"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="200dip"
+                                    android:layout_marginTop="10dip"
+                                    android:numColumns="5" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_horizontal"
+                                    android:orientation="vertical">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="2dip"
+                                        android:layout_marginBottom="5dip"
+                                        android:layout_marginLeft="5dip"
+                                        android:layout_marginRight="5dip"
+                                        android:layout_marginTop="3dip"
+                                        android:background="#008593" />
+
+                                    <ImageView
+                                        android:id="@+id/buttonCloseImages"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginBottom="5dip"
@@ -884,12 +944,13 @@
                                 <CalendarView
                                     android:id="@+id/datePicker"
                                     android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
+                                    android:layout_height="250dip"
                                     android:layout_marginTop="10dip" />
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
+                                    android:layout_marginTop="10dip"
                                     android:gravity="center_horizontal"
                                     android:orientation="vertical">
 

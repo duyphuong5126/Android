@@ -33,4 +33,62 @@
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
 
+    <string name="sample_1">Chicken</string>
+    <string name="sample_2">Vegetable</string>
+    <string name="sample_3">Fast food</string>
+    <string name="sample_4">Rice</string>
+    <string name="sample_5">Drink</string>
+    <string name="sample_6">Shirt</string>
+    <string name="sample_7">Shoe</string>
+    <string name="sample_8">Dress</string>
+    <string name="sample_9">Jacket</string>
+    <string name="sample_10">Pants</string>
+    <string name="sample_11">Copier</string>
+    <string name="sample_12">Book</string>
+    <string name="sample_13">Office supplies</string>
+    <string name="sample_14">Desktop computer</string>
+    <string name="sample_15">Laptop</string>
+    <string name="sample_16">Mobile phone</string>
+    <string name="sample_17">Watch</string>
+    <string name="sample_18">Mouse</string>
+    <string name="sample_19">Camera</string>
+    <string name="sample_20">USB</string>
+    <string name="sample_21">Headset</string>
+    <string name="sample_22">Lamp</string>
+    <string name="sample_23">Fan</string>
+    <string name="sample_24">TV</string>
+    <string name="sample_25">Gas</string>
+    <string name="sample_26">Patrol</string>
+    <string name="sample_27">Oil</string>
+    <string name="sample_28">Band Aid</string>
+    <string name="sample_29">Syringe</string>
+    <string name="sample_30">Drug</string>
+
+    <string name="welcome">Welcome, Username!</string>
+    <string name="sign_out">Sign Out!</string>
+
+    <string name="overview">OVERVIEW</string>
+    <string name="this_month_expense">THIS MONTH EXPENSE</string>
+    <string name="this_month_budget">THIS MONTH BUDGET</string>
+    <string name="add_bill_reminder">Add bill reminder</string>
+    <string name="add_transfer">Add transfer</string>
+    <string name="add_expense">Add expense</string>
+    <string name="add_income">Add income</string>
+
+    <string name="budget">Budget</string>
+    <string name="expenses">Expenses</string>
+    <string name="statistic">Statistic</string>
+    <string name="recommendation">Recommendation</string>
+
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="remember">Remember me</string>
+    <string name="email">Email</string>
+
+    <string name="cash">Cash</string>
+    <string name="credit_card">Credit card</string>
+    <string name="bank">Bank</string>
+    <string name="currency">Currency</string>
+
 </resources>

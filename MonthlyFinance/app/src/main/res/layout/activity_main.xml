@@ -65,7 +65,7 @@
                             android:layout_marginLeft="20dip"
                             android:layout_weight="1"
                             android:fontFamily="sans-serif-condensed"
-                            android:text="Welcome, Username!"
+                            android:text="@string/welcome"
                             android:textColor="#fff"
                             android:textSize="20sp"
                             android:textStyle="bold" />
@@ -93,7 +93,7 @@
                                     android:layout_marginRight="5dip"
                                     android:background="#3b5967"
                                     android:padding="5dip"
-                                    android:text="SIGN OUT"
+                                    android:text="@string/sign_out"
                                     android:textColor="#859eaa"
                                     android:textSize="12sp"
                                     android:textStyle="bold" />

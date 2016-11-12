@@ -9,7 +9,7 @@
     <string name="transport">Giao thông, vận chuyển</string>
     <string name="etc">Khác</string>
     <string name="dress">May mặc</string>
-    <string name="family">Chi phí gia đình</string>
+    <string name="family">Chi phí mProductCost đình</string>
 
     <string name="expense_fragment">Chi phí của bạn</string>
     <string name="expense_fragment_description">Các chi phí trong tháng</string>
@@ -32,5 +32,63 @@
 
     <string name="confirm">Xác nhận</string>
     <string name="cancel">Hủy</string>
+
+    <string name="sample_1">Thịt gà</string>
+    <string name="sample_2">Rau quả</string>
+    <string name="sample_3">Thức ăn nhanh</string>
+    <string name="sample_4">Gạo</string>
+    <string name="sample_5">Đồ uống</string>
+    <string name="sample_6">Áo</string>
+    <string name="sample_7">Giày</string>
+    <string name="sample_8">Váy, đầm</string>
+    <string name="sample_9">Áo khoác</string>
+    <string name="sample_10">Quần</string>
+    <string name="sample_11">Máy photo</string>
+    <string name="sample_12">Sách</string>
+    <string name="sample_13">Văn phòng phẩm</string>
+    <string name="sample_14">Máy tính để bàn</string>
+    <string name="sample_15">Máy tính xách tay</string>
+    <string name="sample_16">Điện thoại di động</string>
+    <string name="sample_17">Đồng hồ</string>
+    <string name="sample_18">Chuột máy tính</string>
+    <string name="sample_19">Máy ảnh</string>
+    <string name="sample_20">USB</string>
+    <string name="sample_21">Tai nghe</string>
+    <string name="sample_22">Đèn</string>
+    <string name="sample_23">Quạt máy</string>
+    <string name="sample_24">TV</string>
+    <string name="sample_25">Gas</string>
+    <string name="sample_26">Xăng</string>
+    <string name="sample_27">Dầu</string>
+    <string name="sample_28">Băng cá nhân</string>
+    <string name="sample_29">Kim tiêm</string>
+    <string name="sample_30">Thuốc</string>
+
+    <string name="welcome">Xin chào!</string>
+    <string name="sign_out">Đăng xuất!</string>
+
+    <string name="overview">TỔNG QUAN</string>
+    <string name="this_month_expense">CHI TIÊU THÁNG NÀY</string>
+    <string name="this_month_budget">TÀI CHÍNH TRONG THÁNG</string>
+    <string name="add_bill_reminder">Tạo lời nhắc hóa đơn</string>
+    <string name="add_transfer">Chuyển khoản</string>
+    <string name="add_expense">Thêm chi tiêu</string>
+    <string name="add_income">Thêm thu nhập</string>
+
+    <string name="budget">Tài Chính</string>
+    <string name="expenses">Chi Tiêu</string>
+    <string name="statistic">Thống Kê</string>
+    <string name="recommendation">Khuyến Nghị</string>
+
+    <string name="username">Tên đăng nhập</string>
+    <string name="password">Mật khẩu</string>
+    <string name="login">Đăng nhập</string>
+    <string name="remember">Ghi nhớ đăng nhập</string>
+
+    <string name="cash">Tiền mặt</string>
+    <string name="credit_card">Tài khoản tín dụng</string>
+    <string name="bank">Tài khoản tiết kiệm</string>
+    <string name="email">Email</string>
+    <string name="currency">Đơn vị tiền tệ</string>
 
 </resources>

@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -45,6 +46,7 @@ import com.huy.monthlyfinance.MyView.BasicAdapter;
 import com.huy.monthlyfinance.MyView.Item.ListItem.BoughtProduct;
 import com.huy.monthlyfinance.MyView.Item.ListItem.ExpensesItem;
 import com.huy.monthlyfinance.MyView.Item.ListItem.ProductDropdownItem;
+import com.huy.monthlyfinance.MyView.Item.ListItem.ProductImageItem;
 import com.huy.monthlyfinance.MyView.Item.ListItem.RadialItem;
 import com.huy.monthlyfinance.R;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
@@ -127,6 +129,11 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
     private boolean isFormOpen;
     private BasicAdapter<ProductDropdownItem> mDropdownAdapter;
 
+    private GridView mListImages;
+    private BasicAdapter<ProductImageItem> mImagesAdapter;
+    private ArrayList<ProductImageItem> mListProductsImage;
+    private FrameLayout mLayoutPickImages;
+
     @Override
     protected int getLayoutXML() {
         return R.layout.fragment_expense_management;
@@ -152,6 +159,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         mConcurrency = "$";
         mTotalCost = 0;
 
+        mLayoutPickImages = (FrameLayout) view.findViewById(R.id.layoutPickImage);
         mCurrentPercentages = (ProgressBar) view.findViewById(R.id.itemProgress);
         mTextTotalCost = (TextView) view.findViewById(R.id.textTotalCost);
         mTextGroupName = (TextView) view.findViewById(R.id.itemName);
@@ -162,10 +170,34 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         mEditProductCost.setText("");
         mEditProductUnit = (EditText) view.findViewById(R.id.edtProductUnit);
         mEditProductUnit.setText("");
+        mEditProductUnit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (!b) {
+                    scrollToView(mLayoutForm, mEditProductAmount);
+                }
+            }
+        });
         mEditProductAmount = (EditText) view.findViewById(R.id.edtProductAmount);
         mEditProductAmount.setText("");
+        mEditProductAmount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (!b) {
+                    scrollToView(mLayoutForm, mEditDate);
+                }
+            }
+        });
         mEditDate = (EditText) view.findViewById(R.id.edtProductDate);
         mEditDate.setText(mDate);
+        mEditDate.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (!b) {
+                    scrollToView(mLayoutForm, mListBoughtProducts);
+                }
+            }
+        });
         mImageProductIcon = (ImageView) view.findViewById(R.id.imageProductIcon);
         mTextRadialProduct = (TextView) view.findViewById(R.id.textGroupName);
         mLayoutPickDate = (CalendarView) view.findViewById(R.id.datePicker);
@@ -194,6 +226,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         view.findViewById(R.id.buttonLoadImage).setOnClickListener(this);
         view.findViewById(R.id.buttonConfirmExpenses).setOnClickListener(this);
         view.findViewById(R.id.buttonCancelExpenses).setOnClickListener(this);
+        view.findViewById(R.id.buttonCloseImages).setOnClickListener(this);
 
         mButtonAdd = (Button) view.findViewById(R.id.buttonAdd);
         mListBoughtProducts = (ListView) view.findViewById(R.id.listBoughtProducts);
@@ -380,36 +413,37 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
             mListProductExample = new ArrayList<>();
         }
         if (mListProductExample.isEmpty()) {
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.turkey), "Chicken"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.salad), "Vegetable"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.hamburguer), "Fast food"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.rice), "Rice"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.can), "Drink"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.shirt), "Shirt"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.shoe), "Shoes"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.dress), "Dress"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.jacket), "Jacket"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.copier), "Copier"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.pants), "Pants"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.bookshelf), "Book"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.writing_tool), "Office supplies"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.desktop_computer), "Desktop Computer"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.laptop), "Laptop"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.smartphone), "Mobile phone"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.smartwatch), "Watch"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.mouse), "Mouse"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.camera), "Camera"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.pendrive), "USB"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.headset), "Headset"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.desk_lamp), "Lamp"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.cooler), "Fan"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.television), "TV"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.gas_pipe), "Gas"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.gas_station), "Patrol"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.oil), "Oil"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.band_aid), "Band Aid"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.syringe), "Syringe"));
-            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.pills), "Drug"));
+            mListProductExample.add(
+                    new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.turkey), resources.getString(R.string.sample_1)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.salad), resources.getString(R.string.sample_2)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.hamburguer), resources.getString(R.string.sample_3)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.rice), resources.getString(R.string.sample_4)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.can), resources.getString(R.string.sample_5)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.shirt), resources.getString(R.string.sample_6)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.shoe), resources.getString(R.string.sample_7)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.dress), resources.getString(R.string.sample_8)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.jacket), resources.getString(R.string.sample_9)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.pants), resources.getString(R.string.sample_10)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.copier), resources.getString(R.string.sample_11)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.bookshelf), resources.getString(R.string.sample_12)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.writing_tool), resources.getString(R.string.sample_13)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.desktop_computer), resources.getString(R.string.sample_14)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.laptop), resources.getString(R.string.sample_15)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.smartphone), resources.getString(R.string.sample_16)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.smartwatch), resources.getString(R.string.sample_17)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.mouse), resources.getString(R.string.sample_18)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.camera), resources.getString(R.string.sample_19)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.pendrive), resources.getString(R.string.sample_20)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.headset), resources.getString(R.string.sample_21)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.desk_lamp), resources.getString(R.string.sample_22)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.cooler), resources.getString(R.string.sample_23)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.television), resources.getString(R.string.sample_24)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.gas_pipe), resources.getString(R.string.sample_25)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.gas_station), resources.getString(R.string.sample_26)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.oil), resources.getString(R.string.sample_27)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.band_aid), resources.getString(R.string.sample_28)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.syringe), resources.getString(R.string.sample_29)));
+            mListProductExample.add(new ProductDropdownItem(BitmapFactory.decodeResource(resources, R.drawable.pills), resources.getString(R.string.sample_30)));
         }
         mDropdownAdapter = new BasicAdapter<>(mListProductExample, R.layout.item_drop_down_1, inflater);
         mListProductExamples.setAdapter(mDropdownAdapter);
@@ -423,6 +457,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                 item.setFocused(!item.isFocused());
                 mEditProductCost.setText("");
                 mDropdownAdapter.notifyDataSetChanged();
+                scrollToView(mLayoutForm, mEditProductAmount);
             }
         });
         mListProductExamples.setOnTouchListener(new View.OnTouchListener() {
@@ -441,6 +476,69 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                 }
                 view.onTouchEvent(motionEvent);
                 return true;
+            }
+        });
+
+        if (mListProductsImage == null) {
+            mListProductsImage = new ArrayList<>();
+        }
+        if (mListProductsImage.isEmpty()) {
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.bed)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.bike)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.carousel)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.chest_of_drawers)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.dental_care)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.desk)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.dog_eating)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.electricity)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.glasses)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.milk)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.motorcycle)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.nurse)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.puzzle)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.refrigerator)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.salad_1)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.sandwich)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.soccer_ball_variant)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.socks)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.sunbed)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.tap)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.tea_cup)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.teddy_bear)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.toilet_paper)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.travel)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.underwear)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.vacuum_cleaner)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.washing_machine)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.wifi)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.wine_glasses)));
+            mListProductsImage.add(new ProductImageItem(BitmapFactory.decodeResource(resources, R.drawable.wristwatch)));
+        }
+        mImagesAdapter = new BasicAdapter<>(mListProductsImage, R.layout.item_image, inflater);
+        mListImages = (GridView) view.findViewById(R.id.gridImages);
+        mListImages.setAdapter(mImagesAdapter);
+        mListImages.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                mImageProductIcon.setImageBitmap(mListProductsImage.get(i).getBitmap());
+            }
+        });
+        mListImages.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                int action = motionEvent.getAction();
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        view.getParent().requestDisallowInterceptTouchEvent(true);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        view.getParent().requestDisallowInterceptTouchEvent(false);
+                        break;
+                    default:
+                        break;
+                }
+                view.onTouchEvent(motionEvent);
+                return false;
             }
         });
 
@@ -562,6 +660,14 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         return mLayoutSelectProduct.getVisibility() == View.VISIBLE;
     }
 
+    private void toggleLayoutImages(boolean visible) {
+        mLayoutPickImages.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    private boolean isLayoutImagesVisible() {
+        return mLayoutPickImages.getVisibility() == View.VISIBLE;
+    }
+
     private void toggleLayoutPickDate(boolean visible) {
         mLayoutSelectDate.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
@@ -624,6 +730,15 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         }
     }
 
+    private void scrollToView(final ScrollView scrollView, final View view) {
+        scrollView.post(new Runnable() {
+            @Override
+            public void run() {
+                scrollView.scrollTo(0, view.getTop());
+            }
+        });
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -633,6 +748,9 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                 } else {
                     mLayoutForm.setVisibility(View.GONE);
                 }
+                break;
+            case R.id.buttonCloseImages:
+                toggleLayoutImages(false);
                 break;
             case R.id.buttonLogo:
                 mLayoutInput.setVisibility(View.VISIBLE);
@@ -644,7 +762,8 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                 mLayoutForm.setVisibility(View.GONE);
                 break;
             case R.id.buttonSelectProduct:
-                toggleLayoutProducts(!isLayoutProductVisible());
+                toggleLayoutImages(false);
+                toggleLayoutProducts(true);
                 break;
             case R.id.buttonCloseProducts:
                 toggleLayoutProducts(false);
@@ -660,7 +779,8 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                 changeCurrentGroup();
                 break;
             case R.id.buttonLoadImage:
-                intentLoadImage();
+                toggleLayoutImages(true);
+                toggleLayoutProducts(false);
                 break;
             case R.id.buttonNextGroup:
                 mCurrentGroup++;
@@ -687,7 +807,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                 if (num_price > 0 && !name.isEmpty()) {
                     BoughtProduct product = new BoughtProduct(bitmap, name, unit, num_price, false);
                     boolean existed = false;
-                    if (mTotalCost + num_price> mCurrentCash) {
+                    if (mTotalCost + num_price > mCurrentCash) {
                         message = "Current total exceeds your cash limit";
                     } else {
                         for (int i = 0; i < mListProducts.size() && !existed; i++) {
@@ -725,6 +845,10 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
             default:
                 break;
         }
+    }
+
+    private void showListImage(boolean isShow) {
+
     }
 
     private void intentLoadImage() {
