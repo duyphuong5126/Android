@@ -21,6 +21,7 @@
     <string name="amount_hint">Amount of product</string>
     <string name="calculation_unit">Calculation unit</string>
     <string name="calculation_unit_hint">Unit</string>
+    <string name="account">Account</string>
     <string name="cost">Cost</string>
     <string name="cost_hint">Total for this product</string>
     <string name="date">Date</string>
@@ -90,5 +91,8 @@
     <string name="credit_card">Credit card</string>
     <string name="bank">Bank</string>
     <string name="currency">Currency</string>
+
+    <string name="budget_title">Your budget</string>
+    <string name="total_payable">TOTAL PAYABLE</string>
 
 </resources>

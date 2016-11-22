@@ -22,9 +22,8 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Context context = getApplicationContext();
+        /*Context context = getApplicationContext();
         Resources res = context.getResources();
-
 
         ProductGroupDAO mProductGroup = ProductGroupDAO.getInstance(context);
         ProductDAO mProducts = ProductDAO.getInstance(context);
@@ -49,7 +48,7 @@ public class MainApplication extends Application {
         products.add(new Product());
         if (mProducts.getAllProduct().isEmpty()) {
 
-        }
+        }*/
 
     }
 }

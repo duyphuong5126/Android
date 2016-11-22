@@ -13,6 +13,7 @@ import android.widget.ListView;
 
 import com.huy.monthlyfinance.Database.DAO.ProductDAO;
 import com.huy.monthlyfinance.Fragments.BaseFragment;
+import com.huy.monthlyfinance.Fragments.BudgetFragment;
 import com.huy.monthlyfinance.Fragments.ExpenseManagerFragment;
 import com.huy.monthlyfinance.Fragments.OverViewFragment;
 import com.huy.monthlyfinance.Listener.MainListener;
@@ -57,6 +58,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
         expenseManagerFragment.setListener(this);
         expenseManagerFragment.setNavListener(this);
         this.addFragment(expenseManagerFragment);
+        BudgetFragment budgetFragment = new BudgetFragment();
+        budgetFragment.setListener(this);
+        this.addFragment(budgetFragment);
 
         ListView mSideMenu = (ListView) findViewById(R.id.sideMenu);
         mMenuItems = new ArrayList<>();
@@ -114,21 +118,15 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
 
     @Override
     public void showFragment(Class c, Bundle data) {
-        if (c == ExpenseManagerFragment.class) {
-            ExpenseManagerFragment fragment = (ExpenseManagerFragment) mFragments.get(c.getName());
-            fragment.setArguments(data);
-            mManager.beginTransaction().replace(R.id.layoutFragmentsContainer, fragment, fragment.getClass().getName()).commit();
-        }
+        BaseFragment fragment = mFragments.get(c.getName());
+        fragment.setArguments(data);
+        mManager.beginTransaction().replace(R.id.layoutFragmentsContainer, fragment, fragment.getClass().getName()).commit();
     }
 
     @Override
     public void changeSideMenuColor(int color) {
         mLayoutTopSideMenu.setBackgroundColor(color);
         mImageAvatar.setColor(color);
-    }
-
-    protected void showFragment(String fragmentName) {
-        mManager.beginTransaction().replace(R.id.layoutFragmentsContainer, mFragments.get(fragmentName), fragmentName).commit();
     }
 
     @Override

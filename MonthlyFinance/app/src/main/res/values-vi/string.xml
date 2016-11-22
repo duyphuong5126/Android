@@ -21,6 +21,7 @@
     <string name="amount_hint">Số lượng của sản phẩm này</string>
     <string name="calculation_unit">Đơn vị tính</string>
     <string name="calculation_unit_hint">Đơn vị</string>
+    <string name="account">Tài khoản</string>
     <string name="cost">Đơn giá</string>
     <string name="cost_hint">Đơn giá của sản phẩm này</string>
     <string name="date">Ngày mua</string>
@@ -90,5 +91,8 @@
     <string name="bank">Tài khoản tiết kiệm</string>
     <string name="email">Email</string>
     <string name="currency">Đơn vị tiền tệ</string>
+
+    <string name="budget_title">Tài khoản</string>
+    <string name="total_payable">TOTAL PAYABLE</string>
 
 </resources>

@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        android:background="#fff"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/buttonBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#0000"
+                android:src="@mipmap/ic_arrow_back_black_24dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/budget_title"
+                android:textColor="#666"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/buttonMore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#0000"
+                android:src="@mipmap/ic_more_vert_black_24dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="10"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            android:background="#f75252"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/total_payable"
+                android:textColor="#fff"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dip"
+                android:gravity="center"
+                android:text="$ 500,000.20"
+                android:textColor="#fff"
+                android:textSize="23sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="3"
+            android:background="#fff">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <RadioGroup
+                    android:layout_width="match_parent"
+                    android:layout_height="50dip"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:layout_width="0dip"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/tab_host_bg"
+                        android:button="@android:color/transparent"
+                        android:checked="true"
+                        android:gravity="center"
+                        android:text="@string/cash"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <RadioButton
+                        android:layout_width="0dip"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/tab_host_bg"
+                        android:button="@android:color/transparent"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:text="@string/bank"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <RadioButton
+                        android:layout_width="0dip"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/tab_host_bg"
+                        android:button="@android:color/transparent"
+                        android:checked="false"
+                        android:gravity="center"
+                        android:text="@string/credit_card"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                </RadioGroup>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="5dip">
+
+                    <LinearLayout
+                        android:id="@+id/tabCash"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="visible">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dip"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dip"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center">
+
+                                <LinearLayout
+                                    android:layout_width="45dip"
+                                    android:layout_height="45dip"
+                                    android:background="@drawable/circle_dark_blue"
+                                    android:gravity="center">
+
+                                    <ImageView
+                                        android:id="@+id/imageCashIcon"
+                                        android:layout_width="25dip"
+                                        android:layout_height="25dip"
+                                        android:scaleType="fitXY"
+                                        android:src="@mipmap/ic_wallet_filled_money_tool_24dp" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="3"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
+
+                                    <TextView
+                                        android:id="@+id/itemCashTitle"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="match_parent"
+                                        android:ellipsize="end"
+                                        android:maxLines="1"
+                                        android:text="Cash"
+                                        android:textColor="#000"
+                                        android:textSize="19sp" />
+
+                                    <TextView
+                                        android:id="@+id/itemCashText1"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:ellipsize="end"
+                                        android:gravity="right"
+                                        android:maxLines="1"
+                                        android:text="$3000.05"
+                                        android:textColor="#3f51b5"
+                                        android:textSize="19sp" />
+                                </LinearLayout>
+
+                                <TextView
+                                    android:id="@+id/itemCashText2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="10dip"
+                                    android:layout_marginTop="5dip"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:text="Initial Balance: $700"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <FrameLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="15dip"
+                                    android:visibility="visible">
+
+                                    <ProgressBar
+                                        android:id="@+id/itemCashProgress"
+                                        style="?android:attr/progressBarStyleHorizontal"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="23dip"
+                                        android:max="100"
+                                        android:progress="30"
+                                        android:progressDrawable="@drawable/progress_style_6" />
+
+                                    <TextView
+                                        android:id="@+id/textCashProgress"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:ellipsize="end"
+                                        android:gravity="center"
+                                        android:maxLines="1"
+                                        android:text="Spent/ Budget: $50.00/$700.00" />
+                                </FrameLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="2dip"
+                                    android:layout_marginLeft="10dip"
+                                    android:background="@drawable/border_bottom_gray"
+                                    android:orientation="vertical" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/tabBank"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dip"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dip"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center">
+
+                                <LinearLayout
+                                    android:layout_width="45dip"
+                                    android:layout_height="45dip"
+                                    android:background="@drawable/circle_orange"
+                                    android:gravity="center">
+
+                                    <ImageView
+                                        android:id="@+id/imageBankIcon"
+                                        android:layout_width="25dip"
+                                        android:layout_height="25dip"
+                                        android:scaleType="fitXY"
+                                        android:src="@mipmap/ic_bank" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="3"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
+
+                                    <TextView
+                                        android:id="@+id/itemBankTitle"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="match_parent"
+                                        android:ellipsize="end"
+                                        android:maxLines="1"
+                                        android:text="@string/bank"
+                                        android:textColor="#000"
+                                        android:textSize="19sp" />
+
+                                    <TextView
+                                        android:id="@+id/itemBankText1"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:ellipsize="end"
+                                        android:gravity="right"
+                                        android:maxLines="1"
+                                        android:text="$3000.05"
+                                        android:textColor="#ff6d00"
+                                        android:textSize="19sp" />
+                                </LinearLayout>
+
+                                <TextView
+                                    android:id="@+id/itemBankText2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="10dip"
+                                    android:layout_marginTop="5dip"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:text="Initial Balance: $700"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <FrameLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="15dip"
+                                    android:visibility="visible">
+
+                                    <ProgressBar
+                                        android:id="@+id/itemBankProgress"
+                                        style="?android:attr/progressBarStyleHorizontal"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="23dip"
+                                        android:max="100"
+                                        android:progress="30"
+                                        android:progressDrawable="@drawable/progress_style_4" />
+
+                                    <TextView
+                                        android:id="@+id/textBankProgress"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:ellipsize="end"
+                                        android:gravity="center"
+                                        android:maxLines="1"
+                                        android:text="Spent/ Budget: $50.00/$700.00" />
+                                </FrameLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="2dip"
+                                    android:layout_marginLeft="10dip"
+                                    android:background="@drawable/border_bottom_gray"
+                                    android:orientation="vertical" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/tabCredit"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dip"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dip"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center">
+
+                                <LinearLayout
+                                    android:layout_width="45dip"
+                                    android:layout_height="45dip"
+                                    android:background="@drawable/circle_dark_red"
+                                    android:gravity="center">
+
+                                    <ImageView
+                                        android:id="@+id/imageCreditIcon"
+                                        android:layout_width="25dip"
+                                        android:layout_height="25dip"
+                                        android:scaleType="fitXY"
+                                        android:src="@mipmap/ic_credit_cards_24dp" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dip"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="3"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
+
+                                    <TextView
+                                        android:id="@+id/itemCreditTitle"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="match_parent"
+                                        android:ellipsize="end"
+                                        android:maxLines="1"
+                                        android:text="@string/credit_card"
+                                        android:textColor="#000"
+                                        android:textSize="19sp" />
+
+                                    <TextView
+                                        android:id="@+id/itemCreditText1"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:ellipsize="end"
+                                        android:gravity="right"
+                                        android:maxLines="1"
+                                        android:text="$3000.05"
+                                        android:textColor="#c51162"
+                                        android:textSize="19sp" />
+                                </LinearLayout>
+
+                                <TextView
+                                    android:id="@+id/itemCreditText2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="10dip"
+                                    android:layout_marginTop="5dip"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:text="Initial Balance: $700"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <FrameLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="15dip"
+                                    android:visibility="visible">
+
+                                    <ProgressBar
+                                        android:id="@+id/itemCreditProgress"
+                                        style="?android:attr/progressBarStyleHorizontal"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="23dip"
+                                        android:max="100"
+                                        android:progress="30"
+                                        android:progressDrawable="@drawable/progress_style_3" />
+
+                                    <TextView
+                                        android:id="@+id/textCreditProgress"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:ellipsize="end"
+                                        android:gravity="center"
+                                        android:maxLines="1"
+                                        android:text="Spent/ Budget: $50.00/$700.00" />
+                                </FrameLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="2dip"
+                                    android:layout_marginLeft="10dip"
+                                    android:background="@drawable/border_bottom_gray"
+                                    android:orientation="vertical" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </LinearLayout>
+
+</LinearLayout>
