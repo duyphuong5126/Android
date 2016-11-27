@@ -80,6 +80,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
                 if (mMenuItems.get(i).getTextName().equals(getString(R.string.expenses))) {
                     showFragment(ExpenseManagerFragment.class, null);
                 }
+                if (mMenuItems.get(i).getTextName().equals(getString(R.string.budget))) {
+                    showFragment(BudgetFragment.class, null);
+                }
                 mDrawer.closeDrawer(mLayoutSideMenu);
             }
         });

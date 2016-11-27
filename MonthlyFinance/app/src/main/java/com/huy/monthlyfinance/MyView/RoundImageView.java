@@ -26,6 +26,7 @@ public class RoundImageView extends ImageView {
 
     public void setColor(int Color) {
         this.mColor = Color;
+        invalidate();
     }
 
     @Override

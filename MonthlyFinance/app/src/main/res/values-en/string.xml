@@ -92,6 +92,9 @@
     <string name="bank">Bank</string>
     <string name="currency">Currency</string>
 
+    <string name="init_info">Please init your info</string>
+    <string name="init_balances">Init your balances</string>
+
     <string name="budget_title">Your budget</string>
     <string name="total_payable">TOTAL PAYABLE</string>
 

@@ -92,6 +92,9 @@
     <string name="email">Email</string>
     <string name="currency">Đơn vị tiền tệ</string>
 
+    <string name="init_info">Khởi tạo thông tin cá nhân</string>
+    <string name="init_balances">Khởi tạo các số dư</string>
+
     <string name="budget_title">Tài khoản</string>
     <string name="total_payable">TOTAL PAYABLE</string>
 
