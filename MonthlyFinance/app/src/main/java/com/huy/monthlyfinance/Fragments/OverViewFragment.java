@@ -189,6 +189,11 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
 
     }
 
+    @Override
+    protected boolean canGoBack() {
+        return false;
+    }
+
     private void addDataToChart(final ArrayList<String> xValues, final float[] yValuesData, PieChart chart,
                                 final String textOnNothingSelected, String chartTitle) {
         chart.setUsePercentValues(true);

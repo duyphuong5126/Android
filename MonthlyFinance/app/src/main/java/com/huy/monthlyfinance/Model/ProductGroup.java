@@ -34,12 +34,12 @@ public class ProductGroup extends BaseDTO{
         this.mProductGroupID = mProductGroupID;
     }
 
-    public String getGroupName() {
+    public String getGroupNameEN() {
         return mGroupNameEN;
     }
 
-    public void setGroupName(String mGroupName) {
-        this.mGroupNameEN = mGroupName;
+    public void setGroupNameEN(String mGroupNameEN) {
+        this.mGroupNameEN = mGroupNameEN;
     }
 
     public String getGroupImage() {

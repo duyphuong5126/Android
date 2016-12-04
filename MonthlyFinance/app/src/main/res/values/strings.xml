@@ -98,6 +98,9 @@
     <string name="budget_title">Your budget</string>
     <string name="total_payable">TOTAL PAYABLE</string>
 
+    <string name="usd">USD</string>
+    <string name="vnd">VND</string>
+
     <string-array name="currency">
         <item>USD</item>
         <item>VND</item>

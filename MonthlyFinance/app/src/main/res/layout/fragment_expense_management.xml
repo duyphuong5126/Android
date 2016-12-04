@@ -122,6 +122,7 @@
                 android:background="#fff">
 
                 <ScrollView
+                    android:id="@+id/layoutExpensesStatistic"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 

@@ -214,7 +214,7 @@
                         android:fontFamily="sans-serif-condensed"
                         android:gravity="bottom"
                         android:hint="@string/email"
-                        android:inputType="numberDecimal"
+                        android:inputType="textEmailAddress"
                         android:textColor="#fff"
                         android:textColorHint="#fff"
                         android:textSize="17sp"
@@ -253,6 +253,7 @@
                         android:fontFamily="sans-serif-condensed"
                         android:gravity="bottom"
                         android:hint="@string/currency"
+                        android:text="@string/vnd"
                         android:textColor="#fff"
                         android:textColorHint="#fff"
                         android:textSize="17sp"
@@ -290,8 +291,9 @@
 
                     <ImageView
                         android:layout_width="32dip"
-                        android:layout_height="32dip"
-                        android:src="@mipmap/ic_wallet_filled_money_tool_24dp" />
+                        android:layout_height="36dip"
+                        android:src="@mipmap/ic_wallet_filled_money_tool_24dp"
+                        android:paddingBottom="4dip"/>
 
                     <EditText
                         android:id="@+id/edtCash"
@@ -329,8 +331,9 @@
 
                     <ImageView
                         android:layout_width="32dip"
-                        android:layout_height="32dip"
-                        android:src="@mipmap/ic_bank" />
+                        android:layout_height="36dip"
+                        android:src="@mipmap/ic_bank"
+                        android:paddingBottom="4dip"/>
 
                     <EditText
                         android:id="@+id/edtBank"
@@ -368,8 +371,9 @@
 
                     <ImageView
                         android:layout_width="32dip"
-                        android:layout_height="32dip"
-                        android:src="@mipmap/ic_credit_cards_24dp" />
+                        android:layout_height="36dip"
+                        android:src="@mipmap/ic_credit_cards_24dp"
+                        android:paddingBottom="4dip"/>
 
                     <EditText
                         android:id="@+id/edtCreditCard"

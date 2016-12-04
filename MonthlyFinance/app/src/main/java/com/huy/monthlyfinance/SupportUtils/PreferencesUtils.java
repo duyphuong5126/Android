@@ -12,7 +12,8 @@ public class PreferencesUtils {
     private static SharedPreferences mPreferenceInstance;
     private static boolean isInitialized = false;
 
-    public static final String mCurrentUserName = "UserName";
+    public static final String CURRENT_EMAIL = "UserName";
+    public static final String CURRENCY = "Currency";
     public static final String isInfoInitialized = "InfoInitialized";
 
     public static void init(Context context) {

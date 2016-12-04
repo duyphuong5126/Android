@@ -4,15 +4,19 @@ import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
+import android.util.Log;
+
+import java.io.File;
 
 /**
  * Created by huy nguyen on 9/15/2016.
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
     // database version
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 2;
     //ten co so du lieu
-    private static final String DATABASE_NAME = "QuanLyTaiChinh.db";
+    public static final String DATABASE_NAME = "QuanLyTaiChinh.db";
 
     // tables
     public static final String tblProduct = "SanPham";
@@ -110,7 +114,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     public DatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context,
+                /*context.getExternalFilesDir(null).getAbsolutePath() + File.separator + */DATABASE_NAME,
+                null, DATABASE_VERSION);
+        Log.d("Account", CREATE_TABLE_ACCOUNT);
     }
 
     @Override
@@ -141,5 +148,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Recreate
         onCreate(db);
+    }
+
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        super.onDowngrade(db, oldVersion, newVersion);
     }
 }

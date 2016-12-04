@@ -14,6 +14,15 @@ import com.huy.monthlyfinance.Listener.MainListener;
  */
 public abstract class BaseFragment extends Fragment {
     protected MainListener mListener;
+    private static String mCurrent;
+
+    public static String getCurrent() {
+        return mCurrent;
+    }
+
+    public static void setCurrent(String Current) {
+        BaseFragment.mCurrent = Current;
+    }
 
     protected abstract int getLayoutXML();
     protected abstract void onPrepare();
@@ -48,4 +57,6 @@ public abstract class BaseFragment extends Fragment {
     public void setListener(MainListener Listener) {
         this.mListener = Listener;
     }
+
+    protected abstract boolean canGoBack();
 }

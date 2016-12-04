@@ -26,7 +26,7 @@ public class UserDAO extends BaseDAO{
     public boolean insertUser(User user) {
         mValues.clear();
         mValues.put(DatabaseHelper.userLoginName, user.getUserName());
-        mValues.put(DatabaseHelper.userPassword, user.getUserName());
+        mValues.put(DatabaseHelper.userPassword, user.getPassword());
         mValues.put(DatabaseHelper.userEmail, user.getEmail());
         return mWritableDatabase.insert(DatabaseHelper.tblUser, null, mValues) > 0;
     }
@@ -39,5 +39,24 @@ public class UserDAO extends BaseDAO{
         boolean result = cursor.moveToFirst();
         cursor.close();
         return result;
+    }
+
+    public int getUserId(String info) {
+        int id = -1;
+        String query = "select " + DatabaseHelper.userID + " from " + DatabaseHelper.tblUser +
+                " where " + DatabaseHelper.userLoginName + " = '" + info + "' or " +
+                DatabaseHelper.userEmail + " = '" + info + "'";
+        Cursor cursor = mReadableDatabase.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            do {
+                id = Integer.valueOf(cursor.getString(cursor.getColumnIndex(DatabaseHelper.userID)));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return id;
+    }
+
+    public void deleteAllUsers() {
+        mWritableDatabase.delete(DatabaseHelper.tblUser, null ,null);
     }
 }

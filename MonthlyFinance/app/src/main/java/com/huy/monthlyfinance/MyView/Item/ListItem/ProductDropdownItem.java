@@ -6,7 +6,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.huy.monthlyfinance.Model.Product;
 import com.huy.monthlyfinance.R;
+import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
 /**
  * Created by Phuong on 01/10/2016.
@@ -14,21 +16,21 @@ import com.huy.monthlyfinance.R;
 
 public class ProductDropdownItem extends BaseItem {
     private Bitmap mBitmap;
-    private String mName;
+    private Product mProduct;
     private boolean isFocused;
 
-    public ProductDropdownItem(Bitmap Bitmap, String Name) {
-        this.mBitmap = Bitmap;
-        this.mName = Name;
-        this.isFocused = false;
+    public ProductDropdownItem(Bitmap mBitmap, Product mProduct, boolean isFocused) {
+        this.mBitmap = mBitmap;
+        this.mProduct = mProduct;
+        this.isFocused = isFocused;
     }
 
     public Bitmap getBitmap() {
         return mBitmap;
     }
 
-    public String getName() {
-        return mName;
+    public Product getProduct() {
+        return mProduct;
     }
 
     @Override
@@ -36,7 +38,8 @@ public class ProductDropdownItem extends BaseItem {
         ImageView imageView = (ImageView) view.findViewById(R.id.imageIcon);
         imageView.setImageBitmap(mBitmap);
         TextView textView = (TextView) view.findViewById(R.id.textName);
-        textView.setText(mName);
+        textView.setText(SupportUtils.getCountryCode().toLowerCase().equals("en")?
+                mProduct.getProductNameEN() : mProduct.getProductNameVI());
         final ImageButton iconCheck = (ImageButton) view.findViewById(R.id.iconCheck);
         iconCheck.setVisibility(isFocused ? View.VISIBLE : View.GONE);
     }

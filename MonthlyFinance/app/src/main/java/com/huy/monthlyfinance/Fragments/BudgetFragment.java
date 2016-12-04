@@ -15,6 +15,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
 
+import com.huy.monthlyfinance.Listener.NavigationListener;
 import com.huy.monthlyfinance.MyView.BasicAdapter;
 import com.huy.monthlyfinance.MyView.Item.ListItem.TransferItem;
 import com.huy.monthlyfinance.R;
@@ -28,6 +29,7 @@ import java.util.Date;
  */
 
 public class BudgetFragment extends BaseFragment implements View.OnClickListener{
+    private NavigationListener mNavListener;
     private LinearLayout mLayoutAdd;
     private Animation mAnimationForward, mAnimationBackward;
     private Animation mAnimationRotateForward30, mAnimationRotateBackward30;
@@ -36,6 +38,8 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
     private ArrayList<TransferItem> mListTransfer;
     private BasicAdapter<TransferItem> mTransferAdapter;
     private ListView mListTransaction;
+
+    private LinearLayout mLayoutAddIncome;
 
     private ScrollView mMainScroll;
 
@@ -56,6 +60,11 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
     @Override
     protected void initUI(final View view) {
         mMainScroll = (ScrollView) view.findViewById(R.id.scrollBudget);
+        mLayoutAddIncome = (LinearLayout) view.findViewById(R.id.layoutAddIncome);
+        view.findViewById(R.id.layoutButtonAddIncome).setOnClickListener(this);
+        view.findViewById(R.id.layoutButtonAddTransfer).setOnClickListener(this);
+        view.findViewById(R.id.buttonBack).setOnClickListener(this);
+
         final ImageButton mButtonAddTransfer = (ImageButton) view.findViewById(R.id.buttonAddTransfer);
         final ImageButton mButtonAddCash = (ImageButton) view.findViewById(R.id.buttonAddCash);
         RadioGroup mTabHost = (RadioGroup) view.findViewById(R.id.tabHost);
@@ -174,8 +183,20 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
     }
 
     @Override
+    protected boolean canGoBack() {
+        return mLayoutAddIncome.getVisibility() != View.VISIBLE;
+    }
+
+    @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.buttonBack:
+                if (canGoBack()) {
+                    mNavListener.navBack();
+                } else {
+                    mLayoutAddIncome.setVisibility(View.GONE);
+                }
+                break;
             case R.id.buttonAdd:
             case R.id.layoutButtonAdd:
                 mLayoutAdd.startAnimation(mAnimationForward);
@@ -183,6 +204,16 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
             case R.id.layoutQuickAddSelect:
                 mLayoutAdd.startAnimation(mAnimationBackward);
                 break;
+            case R.id.layoutButtonAddIncome:
+                mLayoutAddIncome.setVisibility(View.VISIBLE);
+                mLayoutAdd.startAnimation(mAnimationBackward);
+                break;
+            case R.id.layoutButtonAddTransfer:
+                break;
         }
+    }
+
+    public void setNavListener(NavigationListener NavListener) {
+        this.mNavListener = NavListener;
     }
 }

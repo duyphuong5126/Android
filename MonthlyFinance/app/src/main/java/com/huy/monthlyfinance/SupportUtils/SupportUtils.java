@@ -1,10 +1,15 @@
 package com.huy.monthlyfinance.SupportUtils;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -12,6 +17,7 @@ import android.widget.ListView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by Phuong on 25/08/2016.
@@ -66,5 +72,40 @@ public class SupportUtils {
             cursor.close();
         }
         return uri.getPath();
+    }
+
+    public static float dip2Pixel(Context context, int dip) {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, context.getResources().getDisplayMetrics());
+    }
+
+    public static String getDeviceLanguage() {
+        return Locale.getDefault().getLanguage();
+    }
+
+    public static String getCountryCode() {
+        return Locale.getDefault().getCountry();
+    }
+
+    public static String getStringLocalized(Context context, String local, int id) {
+        Resources resources = context.getResources();
+        Configuration configuration = resources.getConfiguration();
+        Locale savedLocale =
+                new Locale(configuration.locale.getLanguage(), configuration.locale.getCountry(), configuration.locale.getVariant());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            configuration.setLocale(new Locale(local));
+        } else {
+            configuration.locale = new Locale(local);
+        }
+        resources.updateConfiguration(configuration, null);
+
+        String string = resources.getString(id);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            configuration.setLocale(savedLocale);
+        } else {
+            configuration.locale = savedLocale;
+        }
+        resources.updateConfiguration(configuration, null);
+        return string;
     }
 }

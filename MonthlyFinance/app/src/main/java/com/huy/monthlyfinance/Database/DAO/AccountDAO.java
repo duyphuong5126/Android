@@ -26,11 +26,15 @@ public class AccountDAO extends BaseDAO{
     public boolean insertAccount(Account account) {
         mValues.clear();
         mValues.put(DatabaseHelper.accountName, account.getAccountName());
-        mValues.put(DatabaseHelper.accountName, account.getAccountType());
-        mValues.put(DatabaseHelper.accountName, account.getCurrency());
-        mValues.put(DatabaseHelper.accountName, account.getCurrentBalance());
-        mValues.put(DatabaseHelper.accountName, account.getAccountName());
+        mValues.put(DatabaseHelper.accountType, account.getAccountType());
+        mValues.put(DatabaseHelper.accountCurrency, account.getCurrency());
+        mValues.put(DatabaseHelper.accountCurrentBalance, account.getCurrentBalance());
+        mValues.put(DatabaseHelper.accountInitBalance, account.getInitialBalance());
         return mWritableDatabase.insert(DatabaseHelper.tblAccount, null, mValues) > 0;
+    }
+
+    public void deleteAllAccounts() {
+        mWritableDatabase.delete(DatabaseHelper.tblAccount, null ,null);
     }
 
     public boolean isAccountDataAvailable() {

@@ -3,6 +3,7 @@ package com.huy.monthlyfinance;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -18,6 +19,7 @@ import com.huy.monthlyfinance.Fragments.ExpenseManagerFragment;
 import com.huy.monthlyfinance.Fragments.OverViewFragment;
 import com.huy.monthlyfinance.Listener.MainListener;
 import com.huy.monthlyfinance.Listener.NavigationListener;
+import com.huy.monthlyfinance.Model.Product;
 import com.huy.monthlyfinance.MyView.BasicAdapter;
 import com.huy.monthlyfinance.MyView.Item.ListItem.SideMenuItem;
 import com.huy.monthlyfinance.MyView.RoundImageView;
@@ -35,6 +37,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
     private BasicAdapter<SideMenuItem> mSideMenuAdapter;
     private LinearLayout mLayoutTopSideMenu;
     private RoundImageView mImageAvatar;
+
     // xu ly test thuat toan
     private ProductDAO mProductSource;
 
@@ -60,6 +63,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
         this.addFragment(expenseManagerFragment);
         BudgetFragment budgetFragment = new BudgetFragment();
         budgetFragment.setListener(this);
+        budgetFragment.setNavListener(this);
         this.addFragment(budgetFragment);
 
         ListView mSideMenu = (ListView) findViewById(R.id.sideMenu);
@@ -124,12 +128,26 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
         BaseFragment fragment = mFragments.get(c.getName());
         fragment.setArguments(data);
         mManager.beginTransaction().replace(R.id.layoutFragmentsContainer, fragment, fragment.getClass().getName()).commit();
+        BaseFragment.setCurrent(c.getName());
     }
 
     @Override
     public void changeSideMenuColor(int color) {
         mLayoutTopSideMenu.setBackgroundColor(color);
         mImageAvatar.setColor(color);
+    }
+
+    @Override
+    public ArrayList<Object> getData(Class c) {
+        if (Product.class.equals(c)) {
+
+        }
+        return null;
+    }
+
+    @Override
+    public Context getContext() {
+        return MainActivity.this;
     }
 
     @Override
@@ -140,5 +158,15 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
         mSideMenuAdapter.notifyDataSetChanged();
         OverViewFragment overViewFragment = (OverViewFragment) mFragments.get(OverViewFragment.class.getName());
         mManager.beginTransaction().replace(R.id.layoutFragmentsContainer, overViewFragment, overViewFragment.getClass().getName()).commit();
+        BaseFragment.setCurrent(OverViewFragment.class.getName());
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (BaseFragment.getCurrent().equals(OverViewFragment.class.getName())) {
+            super.onBackPressed();
+        } else {
+            navBack();
+        }
     }
 }
