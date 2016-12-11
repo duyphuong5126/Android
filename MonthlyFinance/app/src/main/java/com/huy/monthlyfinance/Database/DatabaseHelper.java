@@ -79,44 +79,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_TABLE_PRODUCT_GROUP =
             "create table " + tblProductGroup + "(" + productGroupID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" + ","
-            + productGroupNameEN + " TEXT NOT NULL" + "," + productGroupNameVI + " TEXT NOT NULL" + "," + productGroupImage + " TEXT" + ")";
+                    + productGroupNameEN + " TEXT NOT NULL" + "," + productGroupNameVI + " TEXT NOT NULL" + "," + productGroupImage + " TEXT" + ")";
 
     private static final String CREATE_TABLE_PRODUCT_DETAIL =
             "create table " + tblProductDetail + "(" + productDetailID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" + ","
-            + productCost + " INTEGER" + "," + productID + " INTEGER" + "," + expenseHistoryID + " INTEGER" + ","
+                    + productCost + " INTEGER" + "," + productID + " INTEGER" + "," + expenseHistoryID + " INTEGER" + ","
                     + productQuantity + " INTEGER ," + " FOREIGN KEY(" + productID + ") REFERENCES " + tblProduct
                     + "(" + productID + ")," + " FOREIGN KEY(" + expenseHistoryID + ") REFERENCES " + tblExpensesHistory
                     + "(" + expenseHistoryID + "))";
 
     private static final String CREATE_TABLE_ACCOUNT =
             "create table " + tblAccount + "(" + accountID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" + ","
-            + accountName + " TEXT NOT NULL" + "," + accountType + " TEXT NOT NULL" + "," + accountCurrency
-                    + accountInitBalance + " INTEGER" + "," + accountCurrentBalance + " INTEGER" + ","
-                    + " TEXT NOT NULL" + "," + "," + accountNote + " TEXT" + ","
-            + accountState + " TEXT" + "," + userID + " INTEGER ," + " FOREIGN KEY(" + userID + ") " +
+                    + accountName + " TEXT NOT NULL" + "," + accountType + " TEXT NOT NULL" + "," + accountCurrency + " TEXT NOT NULL" + ","
+                    + accountInitBalance + " INTEGER" + "," + accountCurrentBalance + " INTEGER" + "," + accountNote + " TEXT" + ","
+                    + accountState + " TEXT" + "," + userID + " INTEGER ," + " FOREIGN KEY(" + userID + ") " +
                     "REFERENCES " + tblUser + "(" + userID + "))";
 
     private static final String CREATE_TABLE_ACCOUNT_DETAIL =
             "create table " + tblAccountDetail + "(" + accountDetailID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" + ","
                     + expenseHistoryID + " INTEGER" + "," + accountID + " INTEGER" + "," + accountTransactionDate + " TEXT NOT NULL ,"
-                    + accountTotal + " INTEGER" + " FOREIGN KEY(" + accountID + ")" +
+                    + accountTotal + " REAL," + " FOREIGN KEY(" + accountID + ")" +
                     " REFERENCES " + tblAccount + "(" + accountID + "),"
                     + " FOREIGN KEY(" + expenseHistoryID + ") REFERENCES " + tblExpensesHistory + "(" + expenseHistoryID + "))";
 
     private static final String CREATE_TABLE_USER =
             "create table " + tblUser + "(" + userID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" + ","
-            + userLoginName + " TEXT NOT NULL" + "," + userPassword + " TEXT NOT NULL" + "," + userEmail + " TEXT NOT NULL" + ")";
+                    + userLoginName + " TEXT NOT NULL" + "," + userPassword + " TEXT " + "," + userEmail + " TEXT NOT NULL" + ")";
 
     private static final String CREATE_TABLE_EXPENSE_HISTORY =
             "create table " + tblExpensesHistory + "(" + expenseHistoryID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" + ","
-            + userID + " INTEGER" + "," + expenseDate + " TEXT NOT NULL" + "," + expenseTotalCost + " INTEGER ,"
+                    + userID + " INTEGER" + "," + expenseDate + " TEXT NOT NULL" + "," + expenseTotalCost + " INTEGER ,"
                     + " FOREIGN KEY(" + userID + ") REFERENCES " + tblUser + "(" + userID + "))";
 
 
     public DatabaseHelper(Context context) {
-        super(context,
-                /*context.getExternalFilesDir(null).getAbsolutePath() + File.separator + */DATABASE_NAME,
-                null, DATABASE_VERSION);
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
         Log.d("Account", CREATE_TABLE_ACCOUNT);
     }
 

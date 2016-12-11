@@ -12,6 +12,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.PieChart;
@@ -22,6 +23,8 @@ import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.huy.monthlyfinance.Database.DAO.AccountDAO;
+import com.huy.monthlyfinance.Model.Account;
 import com.huy.monthlyfinance.MyView.Item.ListItem.AccountItem;
 import com.huy.monthlyfinance.MyView.BasicAdapter;
 import com.huy.monthlyfinance.R;
@@ -39,6 +42,14 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
     private Animation mAnimationForward, mAnimationBackward;
     private Animation mAnimationRotateForward30, mAnimationRotateBackward30;
 
+    private ArrayList<Account> mListAccount;
+    private ArrayList<AccountItem> mAccountItems;
+
+    private TextView mBalanceTitle;
+    private TextView mBalanceValue;
+    private BasicAdapter<AccountItem> mAccountAdapter;
+    private ListView mListAccountItems;
+
     @Override
     protected int getLayoutXML() {
         return R.layout.fragment_over_view;
@@ -46,12 +57,49 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
 
     @Override
     protected void onPrepare() {
-
+        AccountDAO accountDAO = AccountDAO.getInstance(getActivity());
+        if (mListAccount == null) {
+            mListAccount = new ArrayList<>();
+        }
+        if (mListAccount.isEmpty()) {
+            mListAccount.addAll(accountDAO.getAllAccounts());
+        }
+        if (mAccountItems == null) {
+            mAccountItems = new ArrayList<>();
+        }
+        if (mAccountItems.isEmpty()) {
+            int[] colors = new int[]{Color.parseColor("#88c03f"), Color.parseColor("#88c03f"), Color.parseColor("#f74848")};
+            int[] mipmaps = new int[]{R.mipmap.ic_wallet_filled_money_tool_24dp, R.mipmap.ic_bank, R.mipmap.ic_credit_cards_24dp};
+            int[] drawables = new int[]{R.drawable.circle_dark_blue, R.drawable.circle_orange, R.drawable.circle_dark_red};
+            int count = 0;
+            for (Account account : mListAccount) {
+                int resIndex = 0;
+                String accountName = account.getAccountName();
+                String currency = account.getCurrency();
+                double currentBalance = account.getCurrentBalance();
+                double initBalance = account.getCurrentBalance();
+                String stringCurrentBalance = currency.toLowerCase().equals("usd") ? ("$" + currentBalance) : (currentBalance + " vnđ");
+                String stringInitBalance = currency.toLowerCase().equals("usd") ? ("$" + initBalance) : (initBalance + " vnđ");
+                if (accountName.equals(SupportUtils.getStringLocalized(getActivity(), "en", R.string.bank))) {
+                    resIndex = 1;
+                } else if (accountName.equals(SupportUtils.getStringLocalized(getActivity(), "en", R.string.credit_card))) {
+                    resIndex = 2;
+                }
+                mAccountItems.add(new AccountItem(drawables[resIndex], mipmaps[resIndex], 100, 40, colors[resIndex], accountName,
+                        stringCurrentBalance, "Initial Balance: " + stringInitBalance, "Spent/ Budget: $50.00/ $700.00", false,
+                        count == colors.length - 1
+                ));
+                count++;
+            }
+        }
     }
 
     @Override
-    protected void initUI(View view) {Activity activity = getActivity();
+    protected void initUI(View view) {
+        Activity activity = getActivity();
         Resources resources = activity.getResources();
+        mBalanceTitle = (TextView) view.findViewById(R.id.totalBalanceTitle);
+        mBalanceValue = (TextView) view.findViewById(R.id.totalBalanceValue);
         ImageButton mButtonOpenSideMenu = (ImageButton) view.findViewById(R.id.buttonOpenSideMenu);
         mButtonOpenSideMenu.setOnClickListener(this);
         ImageButton mButtonQuickAdd = (ImageButton) view.findViewById(R.id.buttonQuickAdd);
@@ -142,36 +190,7 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
             }
         });
 
-        final ListView mListAccountItems = (ListView) view.findViewById(R.id.listAccountItems);
-        final ArrayList<AccountItem> mAccountItems = new ArrayList<>();
-        final BasicAdapter<AccountItem> adapter = new BasicAdapter<>(mAccountItems, R.layout.item_account, getActivity().getLayoutInflater());
-        mListAccountItems.setAdapter(adapter);
-        mAccountItems.add(new AccountItem(
-                R.drawable.circle_dark_blue, R.mipmap.ic_wallet_filled_money_tool_24dp, 100, 40, Color.parseColor("#88c03f"),
-                resources.getString(R.string.cash), "$3000.05", "Initial Balance: $700", "Spent/ Budget: $50.00/ $700.00", false, true
-        ));
-        mAccountItems.add(new AccountItem(
-                R.drawable.circle_orange, R.mipmap.ic_bank, 200, 30, Color.parseColor("#88c03f"),
-                resources.getString(R.string.bank), "$1980.05", "Initial Balance: $2000", "Spent/ Budget: $50.00/ $700.00", false, true
-        ));
-        mAccountItems.add(new AccountItem(
-                R.drawable.circle_dark_red, R.mipmap.ic_credit_cards_24dp, 100, 70, Color.parseColor("#f74848"),
-                resources.getString(R.string.credit_card), "-$10.00", "Initial Balance: $100", "Spent/ Budget: $50.00/ $700.00", false, false
-        ));
-        /*mAccountItems.add(new AccountItem(
-                R.drawable.circle_light_green_1, R.mipmap.ic_more_horiz_white_24dp, 100, 70, Color.parseColor("#88c03f"),
-                "Non-USD Account", "$10.00", "1 Account", "Spent/ Budget: $50.00/ $700.00", false
-        ));*/
-        adapter.notifyDataSetChanged();
-        SupportUtils.setListViewHeight(mListAccountItems);
-        mListAccountItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mAccountItems.get(position).setFocused(!mAccountItems.get(position).isFocused());
-                adapter.notifyDataSetChanged();
-                SupportUtils.setListViewHeight(mListAccountItems);
-            }
-        });
+        mListAccountItems = (ListView) view.findViewById(R.id.listAccountItems);
     }
 
     @Override
@@ -186,7 +205,33 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
 
     @Override
     protected void fragmentReady(Bundle savedInstanceState) {
-
+        Resources resources = getActivity().getResources();
+        mAccountAdapter = new BasicAdapter<>(mAccountItems, R.layout.item_account, getActivity().getLayoutInflater());
+        mListAccountItems.setAdapter(mAccountAdapter);
+        mAccountAdapter.notifyDataSetChanged();
+        SupportUtils.setListViewHeight(mListAccountItems);
+        mListAccountItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mAccountItems.get(position).setFocused(!mAccountItems.get(position).isFocused());
+                mAccountAdapter.notifyDataSetChanged();
+                SupportUtils.setListViewHeight(mListAccountItems);
+            }
+        });
+        if (!mListAccount.isEmpty()) {
+            String currency = mListAccount.get(0).getCurrency();
+            String balanceTitle = resources.getString(R.string.balance_title)
+                    + " (" + currency + ")";
+            double totalBalance = 0;
+            for (Account account : mListAccount) {
+                totalBalance += account.getCurrentBalance();
+            }
+            StringBuilder builder = new StringBuilder("").append((int) totalBalance).append(" ").append(currency);
+            if (currency.toLowerCase().equals("vnd")) {
+                mBalanceValue.setText(builder.toString());
+            }
+            mBalanceTitle.setText(balanceTitle);
+        }
     }
 
     @Override

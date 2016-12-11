@@ -126,7 +126,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
     @Override
     public void showFragment(Class c, Bundle data) {
         BaseFragment fragment = mFragments.get(c.getName());
-        fragment.setArguments(data);
+        if (!c.getName().equals(BaseFragment.getCurrent())) {
+            fragment.setArguments(data);
+        }
         mManager.beginTransaction().replace(R.id.layoutFragmentsContainer, fragment, fragment.getClass().getName()).commit();
         BaseFragment.setCurrent(c.getName());
     }

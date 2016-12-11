@@ -1,6 +1,7 @@
 package com.huy.monthlyfinance.MyView.Item.ListItem;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
@@ -74,6 +75,6 @@ public class ExpensesItem extends BaseItem {
         ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.itemProgress);
         progressBar.setMax(mMax);
         progressBar.setProgress(mCurrent);
-        progressBar.setProgressDrawable(mContext.getResources().getDrawable(mProgressDrawable));
+        progressBar.setProgressDrawable(ContextCompat.getDrawable(mContext, mProgressDrawable));
     }
 }

@@ -7,20 +7,20 @@ package com.huy.monthlyfinance.Model;
 
 public class ExpensesHistory extends BaseDTO{
     private String mTransactionID;
-    private String mProductDetailID;
     private String mAccountID;
     private String mUserID;
     private String mTransactionDate;
     private double mTransactionCost;
 
-    public ExpensesHistory() {
-        super();
+    public ExpensesHistory(String TransactionID, String AccountID, String UserID, String TransactionDate, double TransactionCost) {
+        this.mTransactionID = TransactionID;
+        this.mAccountID = AccountID;
+        this.mUserID = UserID;
+        this.mTransactionDate = TransactionDate;
+        this.mTransactionCost = TransactionCost;
     }
 
-    public ExpensesHistory(String TransactionID, String ProductDetailID, String AccountID, String UserID, String TransactionDate, double TransactionCost) {
-        super();
-        this.mTransactionID = TransactionID;
-        this.mProductDetailID = ProductDetailID;
+    public ExpensesHistory(String AccountID, String UserID, String TransactionDate, double TransactionCost) {
         this.mAccountID = AccountID;
         this.mUserID = UserID;
         this.mTransactionDate = TransactionDate;
@@ -33,14 +33,6 @@ public class ExpensesHistory extends BaseDTO{
 
     public void setTransactionID(String mTransactionID) {
         this.mTransactionID = mTransactionID;
-    }
-
-    public String getProductDetailID() {
-        return mProductDetailID;
-    }
-
-    public void setProductDetailID(String mProductDetailID) {
-        this.mProductDetailID = mProductDetailID;
     }
 
     public String getAccountID() {

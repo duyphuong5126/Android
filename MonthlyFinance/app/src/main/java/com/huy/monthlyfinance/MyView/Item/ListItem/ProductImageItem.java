@@ -12,9 +12,11 @@ import com.huy.monthlyfinance.R;
 
 public class ProductImageItem extends BaseItem {
     private Bitmap mBitmap;
+    private String mDrawableName;
 
-    public ProductImageItem(Bitmap Bitmap) {
+    public ProductImageItem(Bitmap Bitmap, String drawableName) {
         this.mBitmap = Bitmap;
+        this.mDrawableName = drawableName;
     }
 
     @Override
@@ -25,5 +27,9 @@ public class ProductImageItem extends BaseItem {
 
     public Bitmap getBitmap() {
         return mBitmap;
+    }
+
+    public String getDrawableName() {
+        return mDrawableName;
     }
 }

@@ -42,6 +42,21 @@ public class ProductDAO extends BaseDAO {
         return result;
     }
 
+    public int getLatestProductId() {
+        String sql = "select " + DatabaseHelper.productID + " from " + DatabaseHelper.tblProduct
+                + " where " + DatabaseHelper.productID + " = ( select max(" + DatabaseHelper.productID + ")" +
+                " from " + DatabaseHelper.tblProduct +")";
+        int id = -1;
+        Cursor cursor = mReadableDatabase.rawQuery(sql, null);
+        if (cursor.moveToFirst()) {
+            do {
+                id = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.productID));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return id;
+    }
+
     //ham cap nhat san pham
     public int doUpdateTblProduct(Product product) {
         mValues.put(DatabaseHelper.productNameEN, product.getProductNameEN());
@@ -65,7 +80,7 @@ public class ProductDAO extends BaseDAO {
     public List<Product> getAllProduct() {
         List<Product> productList = new ArrayList<>();
         // Select All Query
-        String selectQuery = "select  * from " + DatabaseHelper.tblProduct;
+        String selectQuery = "select * from " + DatabaseHelper.tblProduct;
         Cursor cursor = mReadableDatabase.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             do {

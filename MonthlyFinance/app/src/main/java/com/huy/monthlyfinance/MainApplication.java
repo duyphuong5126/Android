@@ -4,9 +4,10 @@ import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
 
+import com.huy.monthlyfinance.Database.DAO.AccountDAO;
 import com.huy.monthlyfinance.Database.DAO.ProductDAO;
 import com.huy.monthlyfinance.Database.DAO.ProductGroupDAO;
-import com.huy.monthlyfinance.Database.DatabaseHelper;
+import com.huy.monthlyfinance.Model.Account;
 import com.huy.monthlyfinance.Model.Product;
 import com.huy.monthlyfinance.Model.ProductGroup;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 public class MainApplication extends Application {
     private ArrayList<ProductGroup> mProductGroups;
     private ArrayList<Product> mProducts;
+    private ArrayList<Account> mAccounts;
 
     private static MainApplication mInstance;
 
@@ -197,5 +199,15 @@ public class MainApplication extends Application {
 
     public ArrayList<Product> getProducts() {
         return mProducts;
+    }
+
+    public ArrayList<Account> getAccounts() {
+        if (mAccounts == null) {
+            mAccounts = new ArrayList<>();
+        }
+        if (mAccounts.isEmpty()) {
+            mAccounts.addAll(AccountDAO.getInstance(getApplicationContext()).getAllAccounts());
+        }
+        return mAccounts;
     }
 }

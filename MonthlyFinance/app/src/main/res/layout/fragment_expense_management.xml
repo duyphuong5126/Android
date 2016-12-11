@@ -266,7 +266,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#008593"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -922,7 +922,7 @@
                                         android:textColor="#000"
                                         android:textSize="17sp" />
 
-                                    <TextView
+                                    <EditText
                                         android:id="@+id/textTotalCost"
                                         android:layout_width="0dip"
                                         android:layout_height="match_parent"
@@ -930,9 +930,12 @@
                                         android:ellipsize="end"
                                         android:gravity="right|center_vertical"
                                         android:maxLines="1"
-                                        android:text="$0"
+                                        android:text=""
+                                        android:hint="$100"
+                                        android:inputType="numberDecimal"
                                         android:textColor="#000"
-                                        android:textSize="20sp" />
+                                        android:textSize="20sp"
+                                        android:background="#0000"/>
                                 </LinearLayout>
 
                                 <LinearLayout
@@ -1060,7 +1063,8 @@
                                         android:id="@+id/itemSelectCash"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:orientation="horizontal">
+                                        android:orientation="horizontal"
+                                        android:layout_marginBottom="5dip">
 
                                         <ImageView
                                             android:layout_width="30dip"
@@ -1074,7 +1078,34 @@
                                             android:text="@string/cash"
                                             android:layout_marginLeft="10dip"
                                             android:textSize="17sp"
-                                            android:textColor="#303F9F"
+                                            android:textStyle="bold"
+                                            android:textColor="#008593"
+                                            android:gravity="center_vertical"/>
+
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:id="@+id/itemSelectBank"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:orientation="horizontal"
+                                        android:layout_marginBottom="5dip">
+
+                                        <ImageView
+                                            android:layout_width="30dip"
+                                            android:layout_height="30dip"
+                                            android:src="@mipmap/ic_bank"
+                                            android:layout_marginLeft="10dip"
+                                            android:padding="5dip"
+                                            android:background="@drawable/circle_orange"/>
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:text="@string/bank"
+                                            android:layout_marginLeft="10dip"
+                                            android:textSize="17sp"
+                                            android:textColor="#008593"
                                             android:textStyle="bold"
                                             android:gravity="center_vertical"/>
 
@@ -1089,16 +1120,18 @@
                                         <ImageView
                                             android:layout_width="30dip"
                                             android:layout_height="30dip"
-                                            android:src="@mipmap/ic_bank"
-                                            android:layout_marginLeft="10dip"/>
+                                            android:src="@mipmap/ic_credit_cards_24dp"
+                                            android:layout_marginLeft="10dip"
+                                            android:padding="5dip"
+                                            android:background="@drawable/circle_dark_blue"/>
 
                                         <TextView
                                             android:layout_width="match_parent"
                                             android:layout_height="match_parent"
-                                            android:text="@string/bank"
+                                            android:text="@string/credit_card"
                                             android:layout_marginLeft="10dip"
                                             android:textSize="17sp"
-                                            android:textColor="#303F9F"
+                                            android:textColor="#008593"
                                             android:textStyle="bold"
                                             android:gravity="center_vertical"/>
 
@@ -1175,7 +1208,7 @@
                                     android:layout_height="match_parent"
                                     android:orientation="horizontal">
 
-                                    <EditText
+                                    <TextView
                                         android:id="@+id/edtProductDate"
                                         android:layout_width="0dip"
                                         android:layout_height="match_parent"
@@ -1185,7 +1218,9 @@
                                         android:hint="@string/date"
                                         android:textColor="#008593"
                                         android:textColorHint="#008593"
-                                        android:textSize="15sp" />
+                                        android:textSize="15sp"
+                                        android:gravity="center_vertical"
+                                        android:paddingLeft="3dip"/>
                                 </LinearLayout>
 
                             </LinearLayout>

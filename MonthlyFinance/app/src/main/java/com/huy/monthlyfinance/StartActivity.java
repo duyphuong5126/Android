@@ -38,7 +38,6 @@ public class StartActivity extends Activity implements View.OnClickListener{
         if (!PreferencesUtils.isInitialized()) {
             PreferencesUtils.init(context);
         }
-        PreferencesUtils.setValue(PreferencesUtils.isInfoInitialized, false);
         mAccountDataSource = AccountDAO.getInstance(context);
 
         mLayoutLogin = (LinearLayout) findViewById(R.id.layoutLogin);
@@ -118,12 +117,15 @@ public class StartActivity extends Activity implements View.OnClickListener{
                 PreferencesUtils.setValue(PreferencesUtils.CURRENCY, currency);
                 AccountDAO accountDAO = AccountDAO.getInstance(StartActivity.this);
                 if (userId >= 0) {
+                    String textCash = SupportUtils.getStringLocalized(StartActivity.this, "en", R.string.cash);
+                    String textBank = SupportUtils.getStringLocalized(StartActivity.this, "en", R.string.bank);
+                    String textCredit = SupportUtils.getStringLocalized(StartActivity.this, "en", R.string.credit_card);
                     boolean insertCash = accountDAO.insertAccount(
-                            new Account("cash", "cash", currency, cashBalance, cashBalance, "activated", String.valueOf(userId), true));
+                            new Account(textCash, textCash, currency, cashBalance, cashBalance, "activated", String.valueOf(userId), true));
                     boolean insertBank = accountDAO.insertAccount(
-                            new Account("bank", "bank", currency, bankBalance, bankBalance, "activated", String.valueOf(userId), true));
+                            new Account(textBank, textBank, currency, bankBalance, bankBalance, "activated", String.valueOf(userId), true));
                     boolean insertCredit = accountDAO.insertAccount(
-                            new Account("credit_card", "credit_card", currency, creditBalance, creditBalance, "activated", String.valueOf(userId), true));
+                            new Account(textCredit, textCredit, currency, creditBalance, creditBalance, "activated", String.valueOf(userId), true));
                     boolean success = insertCash && insertBank && insertCredit;
                     if (success) {
                         Toast.makeText(StartActivity.this, "Your info is saved", Toast.LENGTH_SHORT).show();

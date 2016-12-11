@@ -29,7 +29,7 @@
 
     <string name="add_product">Add to list products</string>
     <string name="all_product">All products</string>
-    <string name="total_cost">Total cost</string>
+    <string name="total_cost">Enter total cost:</string>
 
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>

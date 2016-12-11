@@ -38,7 +38,7 @@ public class ProductDropdownItem extends BaseItem {
         ImageView imageView = (ImageView) view.findViewById(R.id.imageIcon);
         imageView.setImageBitmap(mBitmap);
         TextView textView = (TextView) view.findViewById(R.id.textName);
-        textView.setText(SupportUtils.getCountryCode().toLowerCase().equals("en")?
+        textView.setText(SupportUtils.getDeviceLanguage().toLowerCase().contains("en")?
                 mProduct.getProductNameEN() : mProduct.getProductNameVI());
         final ImageButton iconCheck = (ImageButton) view.findViewById(R.id.iconCheck);
         iconCheck.setVisibility(isFocused ? View.VISIBLE : View.GONE);

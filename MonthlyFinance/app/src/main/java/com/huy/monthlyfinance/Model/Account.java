@@ -102,7 +102,7 @@ public class Account extends BaseDTO{
         this.mUserID = mUserID;
     }
 
-    public boolean isActiveStatus() {
+    public boolean isActive() {
         return mActiveStatus;
     }
 

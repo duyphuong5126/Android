@@ -6,22 +6,25 @@ package com.huy.monthlyfinance.Model;
  */
 
 public class ProductDetail extends BaseDTO {
-
     private String mProductDetailID;
-
     private String mProductID;
-
+    private String mTransactionID;
     private double mProductCost;
+    private int mProductQuantity;
 
-    public ProductDetail( ) {
-        super();
+    public ProductDetail(String mProductDetailID, String mProductID, String mTransactionID, double mProductCost, int mProductQuantity) {
+        this.mProductDetailID = mProductDetailID;
+        this.mProductID = mProductID;
+        this.mTransactionID = mTransactionID;
+        this.mProductCost = mProductCost;
+        this.mProductQuantity = mProductQuantity;
     }
 
-    public ProductDetail(String ProductDetailID, String ProductID, double ProductCost) {
-        super();
-        this.mProductDetailID = ProductDetailID;
-        this.mProductID = ProductID;
-        this.mProductCost = ProductCost;
+    public ProductDetail(String mProductID, String mTransactionID, double mProductCost, int mProductQuantity) {
+        this.mProductID = mProductID;
+        this.mTransactionID = mTransactionID;
+        this.mProductCost = mProductCost;
+        this.mProductQuantity = mProductQuantity;
     }
 
     public String getProductDetailID() {
@@ -46,5 +49,21 @@ public class ProductDetail extends BaseDTO {
 
     public void setProductCost(double mProductCost) {
         this.mProductCost = mProductCost;
+    }
+
+    public String getTransactionID() {
+        return mTransactionID;
+    }
+
+    public void setTransactionID(String mTransactionID) {
+        this.mTransactionID = mTransactionID;
+    }
+
+    public int getProductQuantity() {
+        return mProductQuantity;
+    }
+
+    public void setProductQuantity(int mProductQuantity) {
+        this.mProductQuantity = mProductQuantity;
     }
 }
