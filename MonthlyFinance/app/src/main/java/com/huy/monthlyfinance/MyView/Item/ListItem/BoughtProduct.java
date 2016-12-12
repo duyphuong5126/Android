@@ -30,7 +30,14 @@ public class BoughtProduct extends BaseItem {
         ImageView imageView = (ImageView) view.findViewById(R.id.imageIcon);
         imageView.setImageBitmap(mImage);
         TextView textName = (TextView) view.findViewById(R.id.textName);
-        textName.setText(mData.getProductNameEN());
+        String name = mData.getProductNameEN();
+        if (name == null) {
+            name = mData.getProductNameVI();
+        }
+        if (name.isEmpty()) {
+            name = mData.getProductNameVI();
+        }
+        textName.setText(name);
         TextView textPrice = (TextView) view.findViewById(R.id.textNumber);
         textPrice.setText(String.valueOf(mPrice));
         view.findViewById(R.id.iconNew).setVisibility(isNew ? View.VISIBLE : View.GONE);
@@ -38,8 +45,8 @@ public class BoughtProduct extends BaseItem {
 
     @Override
     public boolean equals(Object obj) {
-        BoughtProduct product = (BoughtProduct) obj;
-        if (product != null) {
+        if (obj.getClass().equals(BoughtProduct.class)) {
+            BoughtProduct product = (BoughtProduct) obj;
             return mData.getProductNameEN().equals(product.mData.getProductNameEN())
                     && mData.getUnitCalculation().equals(product.mData.getUnitCalculation());
         }
