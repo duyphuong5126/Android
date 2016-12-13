@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import com.huy.monthlyfinance.Model.Product;
 import com.huy.monthlyfinance.R;
+import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
 /**
  * Created by Phuong on 05/10/2016.
@@ -30,12 +31,24 @@ public class BoughtProduct extends BaseItem {
         ImageView imageView = (ImageView) view.findViewById(R.id.imageIcon);
         imageView.setImageBitmap(mImage);
         TextView textName = (TextView) view.findViewById(R.id.textName);
-        String name = mData.getProductNameEN();
-        if (name == null) {
+        String name = "";
+        String countryCode = SupportUtils.getCountryCode();
+        if (countryCode.toLowerCase().contains("us")) {
+            name = mData.getProductNameEN();
+            if (name == null) {
+                name = mData.getProductNameVI();
+            }
+            if (name.isEmpty()) {
+                name = mData.getProductNameVI();
+            }
+        } else {
             name = mData.getProductNameVI();
-        }
-        if (name.isEmpty()) {
-            name = mData.getProductNameVI();
+            if (name == null) {
+                name = mData.getProductNameEN();
+            }
+            if (name.isEmpty()) {
+                name = mData.getProductNameEN();
+            }
         }
         textName.setText(name);
         TextView textPrice = (TextView) view.findViewById(R.id.textNumber);

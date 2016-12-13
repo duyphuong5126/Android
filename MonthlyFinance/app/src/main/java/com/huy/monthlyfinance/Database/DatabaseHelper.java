@@ -108,8 +108,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_TABLE_EXPENSE_HISTORY =
             "create table " + tblExpensesHistory + "(" + expenseHistoryID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" + ","
-                    + userID + " INTEGER" + "," + expenseDate + " TEXT NOT NULL" + "," + expenseTotalCost + " INTEGER ,"
-                    + " FOREIGN KEY(" + userID + ") REFERENCES " + tblUser + "(" + userID + "))";
+                    + userID + " INTEGER" + "," + accountID + " INTEGER," + expenseDate + " TEXT NOT NULL" + "," + expenseTotalCost + " INTEGER ,"
+                    + " FOREIGN KEY(" + userID + ") REFERENCES " + tblUser + "(" + userID + ")," +
+                    " FOREIGN KEY(" + accountID + ") REFERENCES " + tblAccount + "(" + accountID + "))";
 
 
     public DatabaseHelper(Context context) {

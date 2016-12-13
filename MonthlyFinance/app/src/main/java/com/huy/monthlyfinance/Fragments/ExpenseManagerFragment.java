@@ -228,6 +228,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                         index++));
             }
         }
+        ExpensesHistoryDAO.getInstance(getActivity()).getListTransactions();
     }
 
     @Override
@@ -864,9 +865,8 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                 break;
             case R.id.buttonAdd:
                 String name = mEditProductName.getText().toString();
-                String nameEN = SupportUtils.getCountryCode().toLowerCase().contains("en") ? name : "";
+                String nameEN = SupportUtils.getCountryCode().toLowerCase().contains("us") ? name : "";
                 String nameVI = SupportUtils.getCountryCode().toLowerCase().contains("vi") ? name : "";
-                String price = mEditProductCost.getText().toString();
                 String unit = mEditProductUnit.getText().toString();
                 String group = mTextGroupName.getText().toString();
                 int groupID = ProductGroupDAO.getInstance(activity).getGroupIDByName(group);
