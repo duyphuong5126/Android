@@ -8,11 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.huy.monthlyfinance.Listener.MainListener;
+import com.huy.monthlyfinance.Listener.NavigationListener;
 
 /**
  * Created by Phuong on 25/08/2016.
  */
 public abstract class BaseFragment extends Fragment {
+    protected NavigationListener mNavListener;
     protected MainListener mListener;
     private static String mCurrent;
 
@@ -25,10 +27,15 @@ public abstract class BaseFragment extends Fragment {
     }
 
     protected abstract int getLayoutXML();
+
     protected abstract void onPrepare();
+
     protected abstract void initUI(View view);
+
     protected abstract void setStatusBarColor();
+
     protected abstract int getSideMenuColor();
+
     protected abstract void fragmentReady(Bundle savedInstanceState);
 
     @Nullable
@@ -54,8 +61,12 @@ public abstract class BaseFragment extends Fragment {
         this.fragmentReady(savedInstanceState);
     }
 
-    public void setListener(MainListener Listener) {
+    public final void setListener(MainListener Listener) {
         this.mListener = Listener;
+    }
+
+    public final void setNavListener(NavigationListener mNavListener) {
+        this.mNavListener = mNavListener;
     }
 
     protected abstract boolean canGoBack();

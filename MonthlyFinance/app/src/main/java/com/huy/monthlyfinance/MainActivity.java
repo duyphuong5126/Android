@@ -17,6 +17,7 @@ import com.huy.monthlyfinance.Fragments.BaseFragment;
 import com.huy.monthlyfinance.Fragments.BudgetFragment;
 import com.huy.monthlyfinance.Fragments.ExpenseManagerFragment;
 import com.huy.monthlyfinance.Fragments.OverViewFragment;
+import com.huy.monthlyfinance.Fragments.RecommendationFragment;
 import com.huy.monthlyfinance.Listener.MainListener;
 import com.huy.monthlyfinance.Listener.NavigationListener;
 import com.huy.monthlyfinance.Model.Product;
@@ -65,6 +66,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
         budgetFragment.setListener(this);
         budgetFragment.setNavListener(this);
         this.addFragment(budgetFragment);
+        RecommendationFragment recommendationFragment = new RecommendationFragment();
+        recommendationFragment.setListener(this);
+        this.addFragment(recommendationFragment);
 
         ListView mSideMenu = (ListView) findViewById(R.id.sideMenu);
         mMenuItems = new ArrayList<>();
@@ -86,6 +90,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
                 }
                 if (mMenuItems.get(i).getTextName().equals(getString(R.string.budget))) {
                     showFragment(BudgetFragment.class, null);
+                }
+                if (mMenuItems.get(i).getTextName().equals(getString(R.string.recommendation))) {
+                    showFragment(RecommendationFragment.class, null);
                 }
                 mDrawer.closeDrawer(mLayoutSideMenu);
             }

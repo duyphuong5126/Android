@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import com.huy.monthlyfinance.Database.DAO.AccountDAO;
 import com.huy.monthlyfinance.Database.DAO.ProductDAO;
 import com.huy.monthlyfinance.Database.DAO.ProductGroupDAO;
+import com.huy.monthlyfinance.Database.DatabaseHelper;
 import com.huy.monthlyfinance.Model.Account;
 import com.huy.monthlyfinance.Model.Product;
 import com.huy.monthlyfinance.Model.ProductGroup;

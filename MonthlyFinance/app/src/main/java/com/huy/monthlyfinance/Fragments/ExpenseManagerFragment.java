@@ -83,7 +83,6 @@ import static android.app.Activity.RESULT_OK;
 public class ExpenseManagerFragment extends BaseFragment implements View.OnClickListener {
     private static final int SELECT_IMAGE = 1;
 
-    private NavigationListener mNavListener;
     private FrameLayout mLayoutInput;
     private ScrollView mLayoutForm;
     private BasicAdapter<RadialItem> mListRadialAdapter;
@@ -278,6 +277,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                 } else {
                     mTotalCost = totalCost;
                     mCurrentPercentages.setProgress((int) mTotalCost);
+                    changePercentageProgressStyle();
                 }
             }
         });
@@ -650,10 +650,6 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         mButtonAdd.setOnClickListener(this);
     }
 
-    public void setNavListener(NavigationListener NavListener) {
-        this.mNavListener = NavListener;
-    }
-
     @Override
     protected boolean canGoBack() {
         return mLayoutForm.getVisibility() == View.GONE;
@@ -779,20 +775,24 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
     }
 
     private double getCurrentCash() {
-        return 1000;
+        double result = 0;
+        for (Account account : mListAccount) {
+            result += account.getCurrentBalance();
+        }
+        return result;
     }
 
     private void changePercentageProgressStyle() {
         Activity activity = getActivity();
-        double percent = mTotalCost / mCurrentBudget;
+        double percent = (double) mCurrentPercentages.getProgress() / mCurrentPercentages.getMax();
         if (percent <= 0.25) {
             mCurrentPercentages.setProgressDrawable(ContextCompat.getDrawable(activity, R.drawable.progress_style_1));
         } else if (percent <= 0.5) {
-            mCurrentPercentages.setProgressDrawable(ContextCompat.getDrawable(activity, R.drawable.progress_style_1));
+            mCurrentPercentages.setProgressDrawable(ContextCompat.getDrawable(activity, R.drawable.progress_style_11));
         } else if ((percent <= 0.75)) {
-            mCurrentPercentages.setProgressDrawable(ContextCompat.getDrawable(activity, R.drawable.progress_style_1));
+            mCurrentPercentages.setProgressDrawable(ContextCompat.getDrawable(activity, R.drawable.progress_style_4));
         } else {
-            mCurrentPercentages.setProgressDrawable(ContextCompat.getDrawable(activity, R.drawable.progress_style_1));
+            mCurrentPercentages.setProgressDrawable(ContextCompat.getDrawable(activity, R.drawable.progress_style_10));
         }
     }
 

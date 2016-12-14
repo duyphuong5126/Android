@@ -29,7 +29,6 @@ import java.util.Date;
  */
 
 public class BudgetFragment extends BaseFragment implements View.OnClickListener{
-    private NavigationListener mNavListener;
     private LinearLayout mLayoutAdd;
     private Animation mAnimationForward, mAnimationBackward;
     private Animation mAnimationRotateForward30, mAnimationRotateBackward30;
@@ -211,9 +210,5 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
             case R.id.layoutButtonAddTransfer:
                 break;
         }
-    }
-
-    public void setNavListener(NavigationListener NavListener) {
-        this.mNavListener = NavListener;
     }
 }

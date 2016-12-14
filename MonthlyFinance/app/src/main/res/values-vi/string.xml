@@ -98,6 +98,8 @@
     <string name="budget_title">Tài khoản</string>
     <string name="total_payable">TOTAL PAYABLE</string>
 
+    <string name="recommend">Khuyến nghị</string>
+
     <string name="balance_title">Số dư</string>
 
 </resources>

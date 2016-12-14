@@ -98,6 +98,8 @@
     <string name="budget_title">Your budget</string>
     <string name="total_payable">TOTAL PAYABLE</string>
 
+    <string name="recommend">Recommendation</string>
+
     <string name="balance_title">Total Balance</string>
 
 </resources>

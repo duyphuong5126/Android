@@ -38,6 +38,7 @@ public class StartActivity extends Activity implements View.OnClickListener{
         if (!PreferencesUtils.isInitialized()) {
             PreferencesUtils.init(context);
         }
+        //PreferencesUtils.setValue(PreferencesUtils.isInfoInitialized, false);
         mAccountDataSource = AccountDAO.getInstance(context);
 
         mLayoutLogin = (LinearLayout) findViewById(R.id.layoutLogin);
