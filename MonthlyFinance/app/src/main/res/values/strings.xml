@@ -100,6 +100,10 @@
 
     <string name="recommend">Recommendation</string>
 
+    <string name="enter_name">Enter a name</string>
+    <string name="bought_products">Bought products</string>
+    <string name="recommend_products">Recommended products</string>
+
     <string name="usd">USD</string>
     <string name="vnd">VND</string>
 

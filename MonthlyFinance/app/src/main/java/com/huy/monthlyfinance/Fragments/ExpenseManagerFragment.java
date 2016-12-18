@@ -258,10 +258,12 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         mLayoutPickImages = (FrameLayout) view.findViewById(R.id.layoutPickImage);
         mCurrentPercentages = (ProgressBar) view.findViewById(R.id.itemProgress);
         mTextTotalCost = (EditText) view.findViewById(R.id.textTotalCost);
+        final StringBuilder textTotal = new StringBuilder();
         mTextTotalCost.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+                textTotal.setLength(0);
+                textTotal.append(charSequence);
             }
 
             @Override
@@ -274,6 +276,16 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                 double totalCost = editable.toString().isEmpty() ? 0 : Double.valueOf(editable.toString());
                 if (totalCost > mCurrentBudget) {
                     Toast.makeText(activity, "Out of budget limit", Toast.LENGTH_SHORT).show();
+                    mTextTotalCost.removeTextChangedListener(this);
+                    mTextTotalCost.setText("");
+                    mTextTotalCost.setText(textTotal.toString());
+                    mTextTotalCost.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mTextTotalCost.setSelection(mTextTotalCost.getText().toString().length());
+                        }
+                    });
+                    mTextTotalCost.addTextChangedListener(this);
                 } else {
                     mTotalCost = totalCost;
                     mCurrentPercentages.setProgress((int) mTotalCost);
@@ -502,13 +514,20 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 ProductDropdownItem item = mListProductExample.get(i);
-                mEditProductName.setText(item.getProduct().getProductNameEN());
-                mProductBitmap = item.getBitmap();
-                mImageProductIcon.setImageBitmap(mProductBitmap);
-                mProductImageName = item.getProduct().getProductImage();
+                if (!item.isFocused()) {
+                    mEditProductName.setText(item.getProduct().getProductNameEN());
+                    mProductBitmap = item.getBitmap();
+                    mImageProductIcon.setImageBitmap(mProductBitmap);
+                    mProductImageName = item.getProduct().getProductImage();
+                    mEditProductCost.setText("");
+                } else {
+                    mEditProductName.setText("");
+                    mImageProductIcon.setImageResource(R.mipmap.ic_expense_green_1_24dp);
+                    mProductImageName = null;
+                    mEditProductCost.setText("");
+                }
                 item.setFocused(!item.isFocused());
-                mEditProductCost.setText("");
-                mDropdownAdapter.notifyDataSetChanged();
+                mBoughtProductsAdapter.notifyDataSetChanged();
                 scrollToView(mLayoutForm, mEditProductAmount);
             }
         });
@@ -757,7 +776,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         mListProducts.clear();
         mBoughtProductsAdapter.notifyDataSetChanged();
         mCurrentBudget = getCurrentCash();
-        mTextTotalCost.setText("$0");
+        mTextTotalCost.setText("0");
         mCurrentPercentages.setProgress(0);
         mCurrentGroup = 0;
         changeCurrentGroup();
@@ -873,13 +892,16 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                 Drawable drawable = mImageProductIcon.getDrawable();
                 Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
                 String message = null;
+
                 if (!name.isEmpty()) {
                     Product p = new Product(nameEN, nameVI, String.valueOf(groupID), unit, mProductImageName);
-                    if (isProductExisted(p)) {
+                    if (!isProductExisted(p)) {
                         if (ProductDAO.getInstance(activity).doInsertTblProduct(p)) {
-                            p.setProductGroupID(String.valueOf(ProductDAO.getInstance(activity).getLatestProductId()));
+                            p.setProductID(String.valueOf(ProductDAO.getInstance(activity).getLatestProductId()));
                             MainApplication.getInstance().getProducts().add(p);
                         }
+                    } else {
+                        p.setProductID(getProductID(p.getProductNameEN(), p.getProductNameVI()));
                     }
 
                     BoughtProduct product = new BoughtProduct(bitmap, 0, false, p);
@@ -913,9 +935,11 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                                             new ProductDetail(boughtProduct.getData().getProductID(), id, 0, 0));
                                 }
                             }
+
                         } else {
                             Toast.makeText(getActivity(), "An error occur", Toast.LENGTH_SHORT).show();
                         }
+                        mLayoutForm.setVisibility(View.GONE);
                     }
                 }
                 break;
@@ -1002,15 +1026,16 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         }
     }
 
-    private int insertProduct(Product product) {
-        int groupID = ProductGroupDAO.getInstance(getActivity()).getGroupIDByName(mTextGroupName.getText().toString());
-        if (groupID >= 0) {
-            ProductDAO productDAO = ProductDAO.getInstance(getActivity());
-            if (productDAO.doInsertTblProduct(product)) {
-                return productDAO.getLatestProductId();
+    private String getProductID(String nameEN, String nameVI) {
+        for (ProductDropdownItem productDropdownItem : mListProductExample) {
+            Product product = productDropdownItem.getProduct();
+            if (product != null) {
+                if (product.getProductNameEN().equals(nameEN) || product.getProductNameVI().equals(nameVI)) {
+                    return product.getProductID();
+                }
             }
         }
-        return -1;
+        return "";
     }
 
     private boolean isProductExisted(Product product) {

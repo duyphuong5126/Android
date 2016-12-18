@@ -101,4 +101,48 @@ public class ProductDAO extends BaseDAO {
         // return nhom san pham list
         return productList;
     }
+
+    private Product getProductById(String id) {
+        if (id == null) {
+            return null;
+        }
+        String query = "select * from " + DatabaseHelper.tblProduct + " where " +
+                DatabaseHelper.productID + " = " + id;
+        Cursor cursor = mReadableDatabase.rawQuery(query, null);
+        Product product = null;
+        if (cursor.moveToFirst()) {
+            String id1 = String.valueOf(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.productID)));
+            if (id1.equals(id)) {
+                product = new Product();
+                product.setProductID(id1);
+                product.setProductNameEN(cursor.getString(cursor.getColumnIndex(DatabaseHelper.productNameEN)));
+                product.setProductNameVI(cursor.getString(cursor.getColumnIndex(DatabaseHelper.productNameVI)));
+                product.setProductImage(cursor.getString(cursor.getColumnIndex(DatabaseHelper.productImage)));
+                product.setProductGroupID(String.valueOf(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.productGroupID))));
+                product.setUnitCalculation(cursor.getString(cursor.getColumnIndex(DatabaseHelper.productCalculationUnit)));
+            }
+        }
+        cursor.close();
+        return product;
+    }
+
+    public List<Product> getBoughtProducts() {
+        List<Product> productList = new ArrayList<>();
+        String query = "select distinct " + DatabaseHelper.productID + " from " + DatabaseHelper.tblProductDetail;
+        Cursor cursor = mReadableDatabase.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            do {
+                String id = String.valueOf(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.productID)));
+                Product product = getProductById(id);
+                if (product != null) {
+                    productList.add(product);
+                }
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+
+        mValues.clear();
+        // return nhom san pham list
+        return productList;
+    }
 }

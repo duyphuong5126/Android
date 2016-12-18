@@ -68,6 +68,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
         this.addFragment(budgetFragment);
         RecommendationFragment recommendationFragment = new RecommendationFragment();
         recommendationFragment.setListener(this);
+        recommendationFragment.setNavListener(this);
         this.addFragment(recommendationFragment);
 
         ListView mSideMenu = (ListView) findViewById(R.id.sideMenu);

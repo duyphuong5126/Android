@@ -18,6 +18,7 @@ public class ProductDropdownItem extends BaseItem {
     private Bitmap mBitmap;
     private Product mProduct;
     private boolean isFocused;
+    private ImageButton mIconCheck;
 
     public ProductDropdownItem(Bitmap mBitmap, Product mProduct, boolean isFocused) {
         this.mBitmap = mBitmap;
@@ -40,12 +41,16 @@ public class ProductDropdownItem extends BaseItem {
         TextView textView = (TextView) view.findViewById(R.id.textName);
         textView.setText(SupportUtils.getDeviceLanguage().toLowerCase().contains("en")?
                 mProduct.getProductNameEN() : mProduct.getProductNameVI());
-        final ImageButton iconCheck = (ImageButton) view.findViewById(R.id.iconCheck);
-        iconCheck.setVisibility(isFocused ? View.VISIBLE : View.GONE);
+        if (mIconCheck == null) {
+            mIconCheck = (ImageButton) view.findViewById(R.id.iconCheck);
+        }
     }
 
     public void setFocused(boolean focused) {
         isFocused = focused;
+        if (mIconCheck != null) {
+            mIconCheck.setVisibility(isFocused ? View.VISIBLE : View.GONE);
+        }
     }
 
     public boolean isFocused() {

@@ -5,6 +5,7 @@ import android.database.Cursor;
 
 import com.huy.monthlyfinance.Database.DatabaseHelper;
 import com.huy.monthlyfinance.Model.ProductGroup;
+import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,5 +96,21 @@ public class ProductGroupDAO extends BaseDAO {
         }
         cursor.close();
         return id;
+    }
+
+    public String getGroupNameByID(String id) {
+        String selectQuery = "select * from " + DatabaseHelper.tblProductGroup
+                + " where " + DatabaseHelper.productGroupID + " = " + id;
+        Cursor cursor = mReadableDatabase.rawQuery(selectQuery, null);
+        String nameEN = "";
+        String nameVI = "";
+        if (cursor.moveToFirst()) {
+            do {
+                nameEN = cursor.getString(cursor.getColumnIndex(DatabaseHelper.productGroupNameEN));
+                nameVI = cursor.getString(cursor.getColumnIndex(DatabaseHelper.productGroupNameVI));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return (SupportUtils.getCountryCode().toLowerCase().contains("us") ? nameEN : nameVI);
     }
 }
