@@ -44,6 +44,13 @@ public class ProductDropdownItem extends BaseItem {
         if (mIconCheck == null) {
             mIconCheck = (ImageButton) view.findViewById(R.id.iconCheck);
         }
+        mIconCheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isFocused = !isFocused;
+                mIconCheck.setVisibility(isFocused ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     public void setFocused(boolean focused) {

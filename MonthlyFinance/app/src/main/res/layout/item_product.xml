@@ -62,6 +62,21 @@
                 android:textStyle="bold" />
 
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginRight="5dip"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:id="@+id/iconCheck"
+                android:layout_width="25dip"
+                android:layout_height="25dip"
+                android:background="@drawable/circle_light_green_1"
+                android:src="@mipmap/ic_check_white_18dp"
+                android:visibility="gone" />
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

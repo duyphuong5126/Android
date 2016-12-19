@@ -883,36 +883,49 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                 }
                 break;
             case R.id.buttonAdd:
-                String name = mEditProductName.getText().toString();
-                String nameEN = SupportUtils.getCountryCode().toLowerCase().contains("us") ? name : "";
-                String nameVI = SupportUtils.getCountryCode().toLowerCase().contains("vi") ? name : "";
-                String unit = mEditProductUnit.getText().toString();
-                String group = mTextGroupName.getText().toString();
-                int groupID = ProductGroupDAO.getInstance(activity).getGroupIDByName(group);
-                Drawable drawable = mImageProductIcon.getDrawable();
-                Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
                 String message = null;
-
-                if (!name.isEmpty()) {
-                    Product p = new Product(nameEN, nameVI, String.valueOf(groupID), unit, mProductImageName);
-                    if (!isProductExisted(p)) {
-                        if (ProductDAO.getInstance(activity).doInsertTblProduct(p)) {
-                            p.setProductID(String.valueOf(ProductDAO.getInstance(activity).getLatestProductId()));
-                            MainApplication.getInstance().getProducts().add(p);
-                        }
-                    } else {
-                        p.setProductID(getProductID(p.getProductNameEN(), p.getProductNameVI()));
+                ArrayList<ProductDropdownItem> productDropdownItems = new ArrayList<>();
+                for (ProductDropdownItem productDropdownItem : mListProductExample) {
+                    if (productDropdownItem.isFocused()) {
+                        productDropdownItems.add(productDropdownItem);
                     }
+                }
+                if (productDropdownItems.isEmpty()) {
+                    String name = mEditProductName.getText().toString();
+                    if (!name.isEmpty()) {
+                        String nameEN = SupportUtils.getCountryCode().toLowerCase().contains("us") ? name : "";
+                        String nameVI = SupportUtils.getCountryCode().toLowerCase().contains("vi") ? name : "";
+                        String unit = mEditProductUnit.getText().toString();
+                        String group = mTextGroupName.getText().toString();
+                        int groupID = ProductGroupDAO.getInstance(activity).getGroupIDByName(group);
+                        Drawable drawable = mImageProductIcon.getDrawable();
+                        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
 
-                    BoughtProduct product = new BoughtProduct(bitmap, 0, false, p);
-                    mListProducts.add(product);
+                        Product p = new Product(nameEN, nameVI, String.valueOf(groupID), unit, mProductImageName);
+                        productDropdownItems.add(new ProductDropdownItem(bitmap, p, false));
+                    } else {
+                        message = "You're missing some information";
+                    }
+                    if (message != null) {
+                        Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+                    }
+                }
+                if (!productDropdownItems.isEmpty()) {
+                    for (ProductDropdownItem item : productDropdownItems) {
+                        Product p = item.getProduct();
+                        if (!isProductExisted(p)) {
+                            if (ProductDAO.getInstance(activity).doInsertTblProduct(p)) {
+                                p.setProductID(String.valueOf(ProductDAO.getInstance(activity).getLatestProductId()));
+                                MainApplication.getInstance().getProducts().add(p);
+                            }
+                        } else {
+                            p.setProductID(getProductID(p.getProductNameEN(), p.getProductNameVI()));
+                        }
+                        BoughtProduct product = new BoughtProduct(item.getBitmap(), 0, false, p);
+                        mListProducts.add(product);
+                    }
                     mBoughtProductsAdapter.notifyDataSetChanged();
                     SupportUtils.setListViewHeight(mListBoughtProducts);
-                } else {
-                    message = "You're missing some information";
-                }
-                if (message != null) {
-                    Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.buttonConfirmExpenses:

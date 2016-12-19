@@ -5,7 +5,10 @@ import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -28,6 +31,7 @@ import java.util.ArrayList;
 public class RecommendationFragment extends BaseFragment implements View.OnClickListener {
     private ArrayList<Product> mProducts;
     private ArrayList<BoughtProduct_1> mBoughtProducts;
+    private ArrayList<BoughtProduct_1> mBoughtProductsForSearch;
 
     private ListView mListBoughtProducts;
     private BasicAdapter<BoughtProduct_1> mBoughtProductAdapter;
@@ -59,9 +63,14 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
             for (Product product : mProducts) {
                 int resId = resources.getIdentifier(product.getProductImage(), "drawable", activity.getPackageName());
                 mBoughtProducts.add(new BoughtProduct_1(BitmapFactory.decodeResource(resources, resId),
-                        product, productGroupDAO.getGroupNameByID(product.getProductGroupID())));
+                        product, productGroupDAO.getGroupNameByID(product.getProductGroupID()), false));
             }
         }
+        if (mBoughtProductsForSearch == null) {
+            mBoughtProductsForSearch = new ArrayList<>();
+        }
+        mBoughtProductsForSearch.clear();
+        mBoughtProductsForSearch.addAll(mBoughtProducts);
     }
 
     @Override
@@ -88,10 +97,44 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
     @Override
     protected void fragmentReady(Bundle savedInstanceState) {
         Activity activity = getActivity();
-        mBoughtProductAdapter = new BasicAdapter<>(mBoughtProducts, R.layout.item_product, activity.getLayoutInflater());
+        mBoughtProductAdapter = new BasicAdapter<>(mBoughtProductsForSearch, R.layout.item_product, activity.getLayoutInflater());
         mListBoughtProducts.setAdapter(mBoughtProductAdapter);
         mBoughtProductAdapter.notifyDataSetChanged();
         SupportUtils.setListViewHeight(mListBoughtProducts);
+        mListBoughtProducts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                for (int id = 0; id < mBoughtProductsForSearch.size(); id++) {
+                    mBoughtProductsForSearch.get(id).setFocused(id == i);
+                }
+                mBoughtProductAdapter.notifyDataSetChanged();
+            }
+        });
+        mEdtName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                mBoughtProductsForSearch.clear();
+                mBoughtProductAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String name = editable.toString();
+                for (BoughtProduct_1 boughtProduct : mBoughtProducts) {
+                    Product product = boughtProduct.getItem();
+                    if (product.getProductNameEN().contains(name.replaceAll("[^\\x00-\\x7F]", "")) ||
+                            product.getProductNameVI().contains(name)) {
+                        mBoughtProductsForSearch.add(boughtProduct);
+                    }
+                }
+                mBoughtProductAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override

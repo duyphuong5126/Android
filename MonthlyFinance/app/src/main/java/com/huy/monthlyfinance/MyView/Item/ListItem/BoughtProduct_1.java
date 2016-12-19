@@ -19,14 +19,16 @@ public class BoughtProduct_1 extends BaseItem {
     private Bitmap mBitmap;
     private Product mItem;
     private String mGroup;
+    private boolean isFocused;
     private static final int[] mCircleDrawables = {R.drawable.circle_blue_1, R.drawable.circle_blue_2, R.drawable.circle_dark_blue,
             R.drawable.circle_dark_gray_1, R.drawable.circle_dark_gray_2, R.drawable.circle_light_green_1, R.drawable.circle_light_green_2,
             R.drawable.circle_dark_red, R.drawable.circle_orange, R.drawable.circle_pink_1, R.drawable.circle_gray};
 
-    public BoughtProduct_1(Bitmap bitmap, Product item, String group) {
+    public BoughtProduct_1(Bitmap bitmap, Product item, String group, boolean isFocused) {
         this.mBitmap = bitmap;
         this.mItem = item;
         this.mGroup = group;
+        this.isFocused = isFocused;
     }
 
     @Override
@@ -40,5 +42,26 @@ public class BoughtProduct_1 extends BaseItem {
         TextView txtGroup = (TextView) view.findViewById(R.id.txtGroup);
         txtName.setText(SupportUtils.getCountryCode().toLowerCase().contains("us") ? mItem.getProductNameEN() : mItem.getProductNameVI());
         txtGroup.setText(mGroup);
+        final ImageView imageView1 = (ImageView) view.findViewById(R.id.iconCheck);
+        imageView1.setVisibility(isFocused ? View.VISIBLE : View.GONE);
+        imageView1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isFocused = !isFocused;
+                imageView1.setVisibility(isFocused ? View.VISIBLE : View.GONE);
+            }
+        });
+    }
+
+    public boolean isFocused() {
+        return isFocused;
+    }
+
+    public void setFocused(boolean focused) {
+        isFocused = focused;
+    }
+
+    public Product getItem() {
+        return mItem;
     }
 }

@@ -106,7 +106,7 @@
                         android:fontFamily="sans-serif-smallcaps"
                         android:text="@string/bought_products"
                         android:textColor="#444"
-                        android:textSize="25sp"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
 
                     <ListView
