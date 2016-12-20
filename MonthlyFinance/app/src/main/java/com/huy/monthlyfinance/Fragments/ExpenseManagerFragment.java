@@ -47,12 +47,12 @@ import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.huy.monthlyfinance.Database.DAO.AccountDAO;
 import com.huy.monthlyfinance.Database.DAO.ExpensesHistoryDAO;
 import com.huy.monthlyfinance.Database.DAO.ProductDAO;
 import com.huy.monthlyfinance.Database.DAO.ProductDetailDAO;
 import com.huy.monthlyfinance.Database.DAO.ProductGroupDAO;
 import com.huy.monthlyfinance.Database.DAO.UserDAO;
-import com.huy.monthlyfinance.Listener.NavigationListener;
 import com.huy.monthlyfinance.MainApplication;
 import com.huy.monthlyfinance.Model.Account;
 import com.huy.monthlyfinance.Model.ExpensesHistory;
@@ -81,6 +81,7 @@ import static android.app.Activity.RESULT_OK;
  * Created by Phuong on 26/08/2016.
  */
 public class ExpenseManagerFragment extends BaseFragment implements View.OnClickListener {
+
     private static final int SELECT_IMAGE = 1;
 
     private FrameLayout mLayoutInput;
@@ -156,6 +157,8 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
     private TextView mTextAccount;
     private ArrayList<Account> mListAccount;
     private Account mSelectedAccount;
+
+    private TextView mTextCurrentBalances;
 
     @Override
     protected int getLayoutXML() {
@@ -242,6 +245,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         mConcurrency = "$";
         mTotalCost = 0;
 
+        mTextCurrentBalances = (TextView) view.findViewById(R.id.textCurrentBalances);
         mLayoutPickAccount = (FrameLayout) view.findViewById(R.id.layoutPickAccount);
         mTextAccount = (TextView) view.findViewById(R.id.txtAccount);
         mSelectedAccount = getAccount(SupportUtils.getStringLocalized(activity, "en", R.string.cash));
@@ -667,6 +671,14 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         });
         mLayoutExpensesStatistic.smoothScrollTo(0, (int) (mListExpensesDetail.getY() + SupportUtils.dip2Pixel(getActivity(), 20)));
         mButtonAdd.setOnClickListener(this);
+
+        StringBuilder builder = new StringBuilder();
+        for (Account account : mListAccount) {
+            if (!account.getAccountName().contains(SupportUtils.getStringLocalized(getActivity(), "en", R.string.bank))) {
+                builder.append(account.getAccountName()).append(": ").append(account.getCurrentBalance()).append(" ");
+            }
+        }
+        mTextCurrentBalances.setText(builder.toString());
     }
 
     @Override
@@ -827,6 +839,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
     @Override
     public void onClick(View view) {
         Activity activity = getActivity();
+        Resources resources = activity.getResources();
         switch (view.getId()) {
             case R.id.buttonBack:
                 if (canGoBack()) {
@@ -935,10 +948,11 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                     int userId = UserDAO.getInstance(activity).
                             getUserId(PreferencesUtils.getString(PreferencesUtils.CURRENT_EMAIL, ""));
                     if (!date.isEmpty() && userId >= 0) {
+                        message = "";
                         ExpensesHistory transaction =
                                 new ExpensesHistory(mSelectedAccount.getAccountID(), String.valueOf(userId), date, mTotalCost);
                         if (expensesHistoryDAO.insertTransaction(transaction)) {
-                            Toast.makeText(getActivity(), "Transaction's saved", Toast.LENGTH_SHORT).show();
+                            message = "Transaction's saved";
                             int transactionId = expensesHistoryDAO.getLatestTransactionID();
                             if (transactionId > 0) {
                                 String id = String.valueOf(transactionId);
@@ -948,10 +962,59 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                                             new ProductDetail(boughtProduct.getData().getProductID(), id, 0, 0));
                                 }
                             }
-
+                            String cost = mTextTotalCost.getText().toString();
+                            double totalCost = cost.isEmpty() ? 0 : Double.valueOf(cost);
+                            double cash = 0;
+                            double credit = 0;
+                            for (Account account : mListAccount) {
+                                if (account.getAccountName().contains(
+                                        SupportUtils.getStringLocalized(activity, "en", R.string.cash)) ||
+                                        account.getAccountName().contains(
+                                                SupportUtils.getStringLocalized(activity, "vi", R.string.cash))) {
+                                    cash = account.getCurrentBalance();
+                                }
+                                if (account.getAccountName().contains(
+                                        SupportUtils.getStringLocalized(activity, "en", R.string.credit_card)) ||
+                                        account.getAccountName().contains(
+                                                SupportUtils.getStringLocalized(activity, "vi", R.string.credit_card))) {
+                                    credit = account.getCurrentBalance();
+                                }
+                            }
+                            AccountDAO accountDAO = AccountDAO.getInstance(activity);
+                            if (cash > 0) {
+                                double newCash = (cash > totalCost) ? cash - totalCost : 0;
+                                double leftOver = (totalCost > cash) ? totalCost - cash : 0;
+                                accountDAO.updateAccount(SupportUtils.getStringLocalized(activity, "en", R.string.cash), newCash);
+                                if (leftOver > 0) {
+                                    double newCredit = (credit > leftOver) ? credit - leftOver : 0;
+                                    leftOver = (leftOver > credit) ? leftOver - credit : 0;
+                                    accountDAO.updateAccount(SupportUtils.getStringLocalized(activity, "en", R.string.credit_card), newCredit);
+                                    if (leftOver > 0) {
+                                        message = "Your cash and credit balance is not enough." +
+                                                " Please pay some money into them or transfer from bank";
+                                    } else {
+                                        message = "Your cash balance is not enough." +
+                                                " We had to use your credit account";
+                                    }
+                                } else {
+                                    message = "Your cash balance is up to date";
+                                }
+                            } else if (credit > 0) {
+                                double newCredit = (credit > totalCost) ? credit - totalCost : 0;
+                                double leftOver = (totalCost > credit) ? totalCost - credit : 0;
+                                accountDAO.updateAccount(SupportUtils.getStringLocalized(activity, "en", R.string.credit_card), newCredit);
+                                if (leftOver > 0) {
+                                    message = "Your cash and credit balance is not enough." +
+                                            " Please pay some money into them or transfer from bank";
+                                } else {
+                                    message = "Your cash balance is not enough." +
+                                            " We had to use your credit account";
+                                }
+                            }
                         } else {
-                            Toast.makeText(getActivity(), "An error occur", Toast.LENGTH_SHORT).show();
+                            message = "An error occur";
                         }
+                        Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
                         mLayoutForm.setVisibility(View.GONE);
                     }
                 }

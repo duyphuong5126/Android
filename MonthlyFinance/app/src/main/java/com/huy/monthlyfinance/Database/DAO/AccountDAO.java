@@ -75,4 +75,11 @@ public class AccountDAO extends BaseDAO{
         cursor.close();
         return accounts;
     }
+
+    public boolean updateAccount(String accountName, double value) {
+        mValues.clear();
+        mValues.put(DatabaseHelper.accountCurrentBalance, value);
+        return mWritableDatabase.update(DatabaseHelper.tblAccount, mValues,
+                DatabaseHelper.accountName + " = ?", new String[]{accountName}) > 0;
+    }
 }

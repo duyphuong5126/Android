@@ -14,7 +14,7 @@
         <LinearLayout
             android:layout_width="0dip"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:gravity="center_vertical"
             android:paddingTop="4dip"
             android:paddingBottom="4dip"
@@ -33,7 +33,7 @@
         <LinearLayout
             android:layout_width="0dip"
             android:layout_height="match_parent"
-            android:layout_weight="3"
+            android:layout_weight="5"
             android:gravity="center_vertical"
             android:orientation="vertical">
 
@@ -64,10 +64,11 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dip"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:layout_marginRight="5dip"
-            android:gravity="center_vertical">
+            android:gravity="center">
 
             <ImageButton
                 android:id="@+id/iconCheck"

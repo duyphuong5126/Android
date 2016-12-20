@@ -51,6 +51,7 @@ public class ProductDropdownItem extends BaseItem {
                 mIconCheck.setVisibility(isFocused ? View.VISIBLE : View.GONE);
             }
         });
+        mIconCheck.setVisibility(isFocused ? View.VISIBLE : View.GONE);
     }
 
     public void setFocused(boolean focused) {

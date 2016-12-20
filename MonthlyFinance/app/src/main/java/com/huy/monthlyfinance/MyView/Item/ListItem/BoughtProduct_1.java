@@ -9,6 +9,7 @@ import com.huy.monthlyfinance.Model.Product;
 import com.huy.monthlyfinance.R;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -24,6 +25,8 @@ public class BoughtProduct_1 extends BaseItem {
             R.drawable.circle_dark_gray_1, R.drawable.circle_dark_gray_2, R.drawable.circle_light_green_1, R.drawable.circle_light_green_2,
             R.drawable.circle_dark_red, R.drawable.circle_orange, R.drawable.circle_pink_1, R.drawable.circle_gray};
 
+    private static HashMap<String, Integer> mMapRes = new HashMap<>();
+
     public BoughtProduct_1(Bitmap bitmap, Product item, String group, boolean isFocused) {
         this.mBitmap = bitmap;
         this.mItem = item;
@@ -35,9 +38,20 @@ public class BoughtProduct_1 extends BaseItem {
     public void setView(View view) {
         ImageView imageView = (ImageView) view.findViewById(R.id.imgIcon);
         imageView.setImageBitmap(mBitmap);
-        int max = mCircleDrawables.length - 1;
-        Random random = new Random();
-        imageView.setBackgroundResource(mCircleDrawables[random.nextInt(max)]);
+
+        String productId = this.mItem.getProductID();
+        int resId = -1;
+        if (!mMapRes.containsKey(productId)) {
+            if (!mMapRes.containsKey(productId)) {
+                int max = mCircleDrawables.length - 1;
+                Random random = new Random();
+                resId = mCircleDrawables[random.nextInt(max)];
+                mMapRes.put(productId, resId);
+            }
+        } else {
+            resId = mMapRes.get(productId);
+        }
+        imageView.setBackgroundResource(resId);
         TextView txtName = (TextView) view.findViewById(R.id.txtName);
         TextView txtGroup = (TextView) view.findViewById(R.id.txtGroup);
         txtName.setText(SupportUtils.getCountryCode().toLowerCase().contains("us") ? mItem.getProductNameEN() : mItem.getProductNameVI());

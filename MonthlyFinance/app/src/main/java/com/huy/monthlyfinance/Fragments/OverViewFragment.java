@@ -77,7 +77,7 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
                 String accountName = account.getAccountName();
                 String currency = account.getCurrency();
                 double currentBalance = account.getCurrentBalance();
-                double initBalance = account.getCurrentBalance();
+                double initBalance = account.getInitialBalance();
                 String stringCurrentBalance = currency.toLowerCase().equals("usd") ? ("$" + currentBalance) : (currentBalance + " vnđ");
                 String stringInitBalance = currency.toLowerCase().equals("usd") ? ("$" + initBalance) : (initBalance + " vnđ");
                 if (accountName.equals(SupportUtils.getStringLocalized(getActivity(), "en", R.string.bank))) {

@@ -1301,16 +1301,31 @@
                             android:textSize="17sp"
                             android:textStyle="bold" />
 
-                        <ProgressBar
-                            android:id="@+id/itemProgress"
-                            style="?android:attr/progressBarStyleHorizontal"
+                        <FrameLayout
                             android:layout_width="match_parent"
-                            android:layout_height="15dip"
+                            android:layout_height="20dip"
                             android:layout_marginBottom="10dip"
-                            android:layout_marginTop="5dip"
-                            android:max="100"
-                            android:progress="30"
-                            android:progressDrawable="@drawable/progress_style_1" />
+                            android:layout_marginTop="5dip">
+
+                            <ProgressBar
+                                android:id="@+id/itemProgress"
+                                style="?android:attr/progressBarStyleHorizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:max="100"
+                                android:progress="30"
+                                android:progressDrawable="@drawable/progress_style_1" />
+
+                            <TextView
+                                android:id="@+id/textCurrentBalances"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text="Current"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                android:gravity="center"/>
+
+                        </FrameLayout>
                     </LinearLayout>
 
                     <LinearLayout
