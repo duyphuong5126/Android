@@ -10,7 +10,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
@@ -23,6 +23,7 @@ import com.huy.monthlyfinance.R;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by Phuong on 15/12/2016.
@@ -32,12 +33,16 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
     private ArrayList<Product> mProducts;
     private ArrayList<BoughtProduct_1> mBoughtProducts;
     private ArrayList<BoughtProduct_1> mBoughtProductsForSearch;
+    private ArrayList<BoughtProduct_1> mListRecommends;
 
     private ListView mListBoughtProducts;
+    private ListView mListRecommendation;
     private BasicAdapter<BoughtProduct_1> mBoughtProductAdapter;
+    private BasicAdapter<BoughtProduct_1> mRecommendAdapter;
     private EditText mEdtName;
     private EditText mEdtAccurate;
-    private LinearLayout mLayoutEditAccurate;
+    private FrameLayout mLayoutEditAccurate;
+    private LinearLayout mLayoutRecommend;
 
     @Override
     protected int getLayoutXML() {
@@ -71,17 +76,23 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
         }
         mBoughtProductsForSearch.clear();
         mBoughtProductsForSearch.addAll(mBoughtProducts);
+        if (mListRecommendation == null) {
+            mListRecommends = new ArrayList<>();
+        }
+        mListRecommends.clear();
     }
 
     @Override
     protected void initUI(View view) {
         mListBoughtProducts = (ListView) view.findViewById(R.id.listBoughtProducts);
+        mListRecommendation = (ListView) view.findViewById(R.id.listRecommendProducts);
         mEdtAccurate = (EditText) view.findViewById(R.id.edtAccurate);
         mEdtName = (EditText) view.findViewById(R.id.edtProduct);
         view.findViewById(R.id.buttonMore).setOnClickListener(this);
         view.findViewById(R.id.buttonBack).setOnClickListener(this);
         view.findViewById(R.id.buttonCloseAccurate).setOnClickListener(this);
-        mLayoutEditAccurate = (LinearLayout) view.findViewById(R.id.layoutEditAccurate);
+        mLayoutEditAccurate = (FrameLayout) view.findViewById(R.id.layoutEditAccurate);
+        mLayoutRecommend = (LinearLayout) view.findViewById(R.id.layoutRecommendResult);
     }
 
     @Override
@@ -106,10 +117,27 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 for (int id = 0; id < mBoughtProductsForSearch.size(); id++) {
                     mBoughtProductsForSearch.get(id).setFocused(id == i);
+                    if (mBoughtProductsForSearch.get(i).isFocused()) {
+                        ArrayList<BoughtProduct_1> listRecommend = recommend(mBoughtProductsForSearch.get(i), mBoughtProducts);
+                        if (!listRecommend.isEmpty()) {
+                            mListRecommends.clear();
+                            mListRecommends.addAll(listRecommend);
+                            mRecommendAdapter.notifyDataSetChanged();
+                            SupportUtils.setListViewHeight(mListRecommendation);
+                            mLayoutRecommend.setVisibility(View.VISIBLE);
+                        } else {
+                            mLayoutRecommend.setVisibility(View.GONE);
+                        }
+                    }
                 }
                 mBoughtProductAdapter.notifyDataSetChanged();
             }
         });
+
+        mRecommendAdapter = new BasicAdapter<>(mListRecommends, R.layout.item_product, activity.getLayoutInflater());
+        mListRecommendation.setAdapter(mRecommendAdapter);
+        mRecommendAdapter.notifyDataSetChanged();
+        SupportUtils.setListViewHeight(mListRecommendation);
         mEdtName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -159,5 +187,20 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
                 }
                 break;
         }
+    }
+
+    private ArrayList<BoughtProduct_1> recommend(BoughtProduct_1 product, ArrayList<BoughtProduct_1> source) {
+        ArrayList<BoughtProduct_1> products = new ArrayList<>();
+        if (source != null) {
+            Random random = new Random();
+            int max = random.nextInt(source.size() > 1 ? source.size() - 1 : 0);
+            int seed = max;
+            while (max > 0) {
+                int id = random.nextInt(seed);
+                products.add(source.get(id));
+                max--;
+            }
+        }
+        return products;
     }
 }

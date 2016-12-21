@@ -118,6 +118,7 @@
                         android:id="@+id/layoutRecommendResult"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="20dip"
                         android:orientation="vertical"
                         android:visibility="gone">
 
@@ -138,55 +139,107 @@
                             android:layout_height="wrap_content"
                             android:divider="@null" />
                     </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="30dip"/>
                 </LinearLayout>
 
             </LinearLayout>
         </ScrollView>
     </LinearLayout>
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/layoutEditAccurate"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#96000000"
-        android:orientation="vertical"
         android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dip"
-            android:layout_weight="1" />
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="1"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"/>
+
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="match_parent"
+                    android:layout_weight="4"
+                    android:gravity="center_vertical"/>
+
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center">
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="#0000"
+                        android:src="@mipmap/ic_more_vert_white_24dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="10"/>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dip"
-            android:layout_weight="22">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <FrameLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="0dip"
+                android:layout_weight="1" />
 
-                <LinearLayout
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="22">
+
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <View
-                        android:layout_width="0dip"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1" />
-
-                    <View
-                        android:layout_width="0dip"
-                        android:layout_height="match_parent"
-                        android:layout_weight="4" />
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                     <LinearLayout
-                        android:layout_width="0dip"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal">
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="0dip"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1" />
+
+                        <View
+                            android:layout_width="0dip"
+                            android:layout_height="match_parent"
+                            android:layout_weight="4" />
+
+                        <LinearLayout
+                            android:layout_width="0dip"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="center_horizontal">
 
                         <TextView
                             android:layout_width="30dip"
@@ -196,65 +249,76 @@
                             android:textSize="30sp" />
                     </LinearLayout>
 
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="300dip"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="25dip"
-                    android:background="@drawable/corner_radius_white"
-                    android:orientation="vertical"
-                    android:layout_marginRight="10dip"
-                    android:layout_gravity="right"
-                    android:paddingTop="20dip">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingLeft="10dip"
-                        android:paddingRight="10dip">
-
-                        <EditText
-                            android:id="@+id/edtAccurate"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="10dip"
-                            android:background="#0000"
-                            android:hint="Enter accurate"
-                            android:textSize="20sp"
-                            android:inputType="numberDecimal"/>
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="300dip"
                         android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical">
+                        android:layout_gravity="right"
+                        android:layout_marginRight="10dip"
+                        android:layout_marginTop="25dip"
+                        android:background="@drawable/corner_radius_white"
+                        android:orientation="vertical"
+                        android:paddingTop="20dip">
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="2dip"
-                            android:layout_marginBottom="5dip"
-                            android:layout_marginLeft="5dip"
-                            android:layout_marginRight="5dip"
-                            android:layout_marginTop="3dip"
-                            android:background="#008593" />
-
-                        <ImageView
-                            android:id="@+id/buttonCloseAccurate"
-                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="5dip"
-                            android:src="@mipmap/ic_x_green_1_24dp"
-                            android:padding="5dip"/>
+                            android:orientation="vertical"
+                            android:paddingLeft="10dip"
+                            android:paddingRight="10dip">
+
+                            <EditText
+                                android:id="@+id/edtAccurate"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dip"
+                                android:background="#0000"
+                                android:hint="Enter accurate"
+                                android:inputType="numberDecimal"
+                                android:textSize="20sp" />
+
+                            <EditText
+                                android:id="@+id/edtSupportLevel"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="15dip"
+                                android:background="#0000"
+                                android:hint="Enter support"
+                                android:inputType="numberDecimal"
+                                android:textSize="20sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="2dip"
+                                android:layout_marginBottom="5dip"
+                                android:layout_marginLeft="5dip"
+                                android:layout_marginRight="5dip"
+                                android:layout_marginTop="3dip"
+                                android:background="#008593" />
+
+                            <ImageView
+                                android:id="@+id/buttonCloseAccurate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="5dip"
+                                android:padding="5dip"
+                                android:src="@mipmap/ic_x_green_1_24dp" />
+                        </LinearLayout>
+
                     </LinearLayout>
 
-                </LinearLayout>
-
-            </FrameLayout>
+                </FrameLayout>
+            </LinearLayout>
         </LinearLayout>
 
-    </LinearLayout>
+    </FrameLayout>
 
 </FrameLayout>
