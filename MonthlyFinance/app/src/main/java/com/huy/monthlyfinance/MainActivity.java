@@ -54,22 +54,27 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
         mLayoutTopSideMenu = (LinearLayout) findViewById(R.id.layoutTopSideMenu);
         mImageAvatar = (RoundImageView) findViewById(R.id.imageAvatar);
 
+        MainApplication mainApplication = MainApplication.getInstance();
         mFragments = new TreeMap<>();
         OverViewFragment overViewFragment = new OverViewFragment();
         overViewFragment.setListener(this);
         this.addFragment(overViewFragment);
+        mainApplication.registerDataListener(overViewFragment);
         ExpenseManagerFragment expenseManagerFragment = new ExpenseManagerFragment();
         expenseManagerFragment.setListener(this);
         expenseManagerFragment.setNavListener(this);
         this.addFragment(expenseManagerFragment);
+        mainApplication.registerDataListener(expenseManagerFragment);
         BudgetFragment budgetFragment = new BudgetFragment();
         budgetFragment.setListener(this);
         budgetFragment.setNavListener(this);
         this.addFragment(budgetFragment);
+        mainApplication.registerDataListener(budgetFragment);
         RecommendationFragment recommendationFragment = new RecommendationFragment();
         recommendationFragment.setListener(this);
         recommendationFragment.setNavListener(this);
         this.addFragment(recommendationFragment);
+        mainApplication.registerDataListener(recommendationFragment);
 
         ListView mSideMenu = (ListView) findViewById(R.id.sideMenu);
         mMenuItems = new ArrayList<>();

@@ -8,6 +8,7 @@ import com.huy.monthlyfinance.Database.DAO.AccountDAO;
 import com.huy.monthlyfinance.Database.DAO.ProductDAO;
 import com.huy.monthlyfinance.Database.DAO.ProductGroupDAO;
 import com.huy.monthlyfinance.Database.DatabaseHelper;
+import com.huy.monthlyfinance.Listener.DataChangeListener;
 import com.huy.monthlyfinance.Model.Account;
 import com.huy.monthlyfinance.Model.Product;
 import com.huy.monthlyfinance.Model.ProductGroup;
@@ -23,6 +24,7 @@ public class MainApplication extends Application {
     private ArrayList<ProductGroup> mProductGroups;
     private ArrayList<Product> mProducts;
     private ArrayList<Account> mAccounts;
+    private ArrayList<DataChangeListener> mListeners;
 
     private static MainApplication mInstance;
 
@@ -36,6 +38,7 @@ public class MainApplication extends Application {
         if (mInstance == null) {
             mInstance = this;
         }
+
         Context context = getApplicationContext();
         Resources res = context.getResources();
         //context.deleteDatabase(DatabaseHelper.DATABASE_NAME);
@@ -192,6 +195,9 @@ public class MainApplication extends Application {
                     String.valueOf(mProductGroupDAO.getGroupIDByName(mProductGroups.get(1).getGroupNameEN())), "",
                     res.getResourceEntryName(R.drawable.pills)));
         }
+        if (mListeners == null) {
+            mListeners = new ArrayList<>();
+        }
     }
 
     public ArrayList<ProductGroup> getProductGroups() {
@@ -210,5 +216,33 @@ public class MainApplication extends Application {
             mAccounts.addAll(AccountDAO.getInstance(getApplicationContext()).getAllAccounts());
         }
         return mAccounts;
+    }
+
+    public void refreshAllData() {
+        Context context = getApplicationContext();
+        if (mProductGroups == null) {
+            mProductGroups = new ArrayList<>();
+        }
+        mProductGroups.clear();
+        mProductGroups.addAll(ProductGroupDAO.getInstance(context).getAllProductGroup());
+        if (mProducts == null) {
+            mProducts = new ArrayList<>();
+        }
+        mProducts.clear();
+        mProducts.addAll(ProductDAO.getInstance(context).getAllProduct());
+        if (mAccounts == null) {
+            mAccounts = new ArrayList<>();
+        }
+        mAccounts.clear();
+        mAccounts.addAll(AccountDAO.getInstance(context).getAllAccounts());
+        for (DataChangeListener listener : mListeners) {
+            listener.refreshData();
+        }
+    }
+
+    public void registerDataListener(DataChangeListener listener) {
+        if (listener != null) {
+            mListeners.add(listener);
+        }
     }
 }

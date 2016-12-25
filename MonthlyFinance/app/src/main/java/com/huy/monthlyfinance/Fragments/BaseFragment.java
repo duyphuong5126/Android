@@ -7,13 +7,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.huy.monthlyfinance.Listener.DataChangeListener;
 import com.huy.monthlyfinance.Listener.MainListener;
 import com.huy.monthlyfinance.Listener.NavigationListener;
 
 /**
  * Created by Phuong on 25/08/2016.
  */
-public abstract class BaseFragment extends Fragment {
+public abstract class BaseFragment extends Fragment implements DataChangeListener{
     protected NavigationListener mNavListener;
     protected MainListener mListener;
     private static String mCurrent;

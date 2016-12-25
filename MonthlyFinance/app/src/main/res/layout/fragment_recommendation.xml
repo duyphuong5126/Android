@@ -61,6 +61,7 @@
         </LinearLayout>
 
         <ScrollView
+            android:id="@+id/scrollRecommend"
             android:layout_width="match_parent"
             android:layout_height="0dip"
             android:layout_weight="10"
@@ -124,6 +125,7 @@
 
 
                         <TextView
+                            android:id="@+id/txtRecommend"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dip"
@@ -276,6 +278,7 @@
                                 android:background="#0000"
                                 android:hint="Enter accurate"
                                 android:inputType="numberDecimal"
+                                android:text="0.6"
                                 android:textSize="20sp" />
 
                             <EditText
@@ -286,6 +289,7 @@
                                 android:background="#0000"
                                 android:hint="Enter support"
                                 android:inputType="numberDecimal"
+                                android:text="0.4"
                                 android:textSize="20sp" />
                         </LinearLayout>
 

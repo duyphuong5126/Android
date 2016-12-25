@@ -1,6 +1,7 @@
 package com.huy.monthlyfinance.Fragments;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.huy.monthlyfinance.Database.DAO.AccountDAO;
+import com.huy.monthlyfinance.MainApplication;
 import com.huy.monthlyfinance.Model.Account;
 import com.huy.monthlyfinance.MyView.Item.ListItem.AccountItem;
 import com.huy.monthlyfinance.MyView.BasicAdapter;
@@ -57,41 +59,7 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
 
     @Override
     protected void onPrepare() {
-        AccountDAO accountDAO = AccountDAO.getInstance(getActivity());
-        if (mListAccount == null) {
-            mListAccount = new ArrayList<>();
-        }
-        if (mListAccount.isEmpty()) {
-            mListAccount.addAll(accountDAO.getAllAccounts());
-        }
-        if (mAccountItems == null) {
-            mAccountItems = new ArrayList<>();
-        }
-        if (mAccountItems.isEmpty()) {
-            int[] colors = new int[]{Color.parseColor("#88c03f"), Color.parseColor("#88c03f"), Color.parseColor("#f74848")};
-            int[] mipmaps = new int[]{R.mipmap.ic_wallet_filled_money_tool_24dp, R.mipmap.ic_bank, R.mipmap.ic_credit_cards_24dp};
-            int[] drawables = new int[]{R.drawable.circle_dark_blue, R.drawable.circle_orange, R.drawable.circle_dark_red};
-            int count = 0;
-            for (Account account : mListAccount) {
-                int resIndex = 0;
-                String accountName = account.getAccountName();
-                String currency = account.getCurrency();
-                double currentBalance = account.getCurrentBalance();
-                double initBalance = account.getInitialBalance();
-                String stringCurrentBalance = currency.toLowerCase().equals("usd") ? ("$" + currentBalance) : (currentBalance + " vnđ");
-                String stringInitBalance = currency.toLowerCase().equals("usd") ? ("$" + initBalance) : (initBalance + " vnđ");
-                if (accountName.equals(SupportUtils.getStringLocalized(getActivity(), "en", R.string.bank))) {
-                    resIndex = 1;
-                } else if (accountName.equals(SupportUtils.getStringLocalized(getActivity(), "en", R.string.credit_card))) {
-                    resIndex = 2;
-                }
-                mAccountItems.add(new AccountItem(drawables[resIndex], mipmaps[resIndex], 100, 40, colors[resIndex], accountName,
-                        stringCurrentBalance, "Initial Balance: " + stringInitBalance, "Spent/ Budget: $50.00/ $700.00", false,
-                        count == colors.length - 1
-                ));
-                count++;
-            }
-        }
+        setUpAccounts();
     }
 
     @Override
@@ -239,6 +207,44 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
         return false;
     }
 
+    private void setUpAccounts() {
+        AccountDAO accountDAO = AccountDAO.getInstance(getActivity());
+        if (mListAccount == null) {
+            mListAccount = new ArrayList<>();
+        }
+        if (mListAccount.isEmpty()) {
+            mListAccount.addAll(accountDAO.getAllAccounts());
+        }
+        if (mAccountItems == null) {
+            mAccountItems = new ArrayList<>();
+        }
+        if (mAccountItems.isEmpty()) {
+            int[] colors = new int[]{Color.parseColor("#88c03f"), Color.parseColor("#88c03f"), Color.parseColor("#f74848")};
+            int[] mipmaps = new int[]{R.mipmap.ic_wallet_filled_money_tool_24dp, R.mipmap.ic_bank, R.mipmap.ic_credit_cards_24dp};
+            int[] drawables = new int[]{R.drawable.circle_dark_blue, R.drawable.circle_orange, R.drawable.circle_dark_red};
+            int count = 0;
+            for (Account account : mListAccount) {
+                int resIndex = 0;
+                String accountName = account.getAccountName();
+                String currency = account.getCurrency();
+                double currentBalance = account.getCurrentBalance();
+                double initBalance = account.getInitialBalance();
+                String stringCurrentBalance = currency.toLowerCase().equals("usd") ? ("$" + currentBalance) : (currentBalance + " vnđ");
+                String stringInitBalance = currency.toLowerCase().equals("usd") ? ("$" + initBalance) : (initBalance + " vnđ");
+                if (accountName.equals(SupportUtils.getStringLocalized(getActivity(), "en", R.string.bank))) {
+                    resIndex = 1;
+                } else if (accountName.equals(SupportUtils.getStringLocalized(getActivity(), "en", R.string.credit_card))) {
+                    resIndex = 2;
+                }
+                mAccountItems.add(new AccountItem(drawables[resIndex], mipmaps[resIndex], 100, 40, colors[resIndex], accountName,
+                        stringCurrentBalance, "Initial Balance: " + stringInitBalance, "Spent/ Budget: $50.00/ $700.00", false,
+                        count == colors.length - 1
+                ));
+                count++;
+            }
+        }
+    }
+
     private void addDataToChart(final ArrayList<String> xValues, final float[] yValuesData, PieChart chart,
                                 final String textOnNothingSelected, String chartTitle) {
         chart.setUsePercentValues(true);
@@ -319,6 +325,46 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
                 break;
             default:
                 break;
+        }
+    }
+
+    @Override
+    public void refreshData() {
+        if (mListAccount == null) {
+            mListAccount = new ArrayList<>();
+        }
+        mListAccount.clear();
+        mListAccount.addAll(MainApplication.getInstance().getAccounts());
+        if (mAccountItems == null) {
+            mAccountItems = new ArrayList<>();
+        }
+        mAccountItems.clear();
+        int[] colors = new int[]{Color.parseColor("#88c03f"), Color.parseColor("#88c03f"), Color.parseColor("#f74848")};
+        int[] mipmaps = new int[]{R.mipmap.ic_wallet_filled_money_tool_24dp, R.mipmap.ic_bank, R.mipmap.ic_credit_cards_24dp};
+        int[] drawables = new int[]{R.drawable.circle_dark_blue, R.drawable.circle_orange, R.drawable.circle_dark_red};
+        int count = 0;
+        for (Account account : mListAccount) {
+            int resIndex = 0;
+            String accountName = account.getAccountName();
+            String currency = account.getCurrency();
+            double currentBalance = account.getCurrentBalance();
+            double initBalance = account.getInitialBalance();
+            String stringCurrentBalance = currency.toLowerCase().equals("usd") ? ("$" + currentBalance) : (currentBalance + " vnđ");
+            String stringInitBalance = currency.toLowerCase().equals("usd") ? ("$" + initBalance) : (initBalance + " vnđ");
+            Context context = getActivity();
+            if (context == null) {
+                context = MainApplication.getInstance().getApplicationContext();
+            }
+            if (accountName.equals(SupportUtils.getStringLocalized(context, "en", R.string.bank))) {
+                resIndex = 1;
+            } else if (accountName.equals(SupportUtils.getStringLocalized(context, "en", R.string.credit_card))) {
+                resIndex = 2;
+            }
+            mAccountItems.add(new AccountItem(drawables[resIndex], mipmaps[resIndex], 100, 40, colors[resIndex], accountName,
+                    stringCurrentBalance, "Initial Balance: " + stringInitBalance, "Spent/ Budget: $50.00/ $700.00", false,
+                    count == colors.length - 1
+            ));
+            count++;
         }
     }
 }

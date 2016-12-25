@@ -2,6 +2,7 @@ package com.huy.monthlyfinance.Fragments;
 
 import android.app.Activity;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -13,17 +14,23 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.huy.monthlyfinance.Database.DAO.ProductDAO;
+import com.huy.monthlyfinance.Database.DAO.ProductDetailDAO;
 import com.huy.monthlyfinance.Database.DAO.ProductGroupDAO;
 import com.huy.monthlyfinance.Model.Product;
 import com.huy.monthlyfinance.MyView.BasicAdapter;
 import com.huy.monthlyfinance.MyView.Item.ListItem.BoughtProduct_1;
+import com.huy.monthlyfinance.ProcessData.Apriori;
 import com.huy.monthlyfinance.R;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * Created by Phuong on 15/12/2016.
@@ -40,9 +47,12 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
     private BasicAdapter<BoughtProduct_1> mBoughtProductAdapter;
     private BasicAdapter<BoughtProduct_1> mRecommendAdapter;
     private EditText mEdtName;
-    private EditText mEdtAccurate;
+    private EditText mEdtAccurate, mEdtSupport;
     private FrameLayout mLayoutEditAccurate;
     private LinearLayout mLayoutRecommend;
+    private Apriori mApriori;
+    private ScrollView mScrollRecommend;
+    private TextView mTextRecommend;
 
     @Override
     protected int getLayoutXML() {
@@ -87,12 +97,15 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
         mListBoughtProducts = (ListView) view.findViewById(R.id.listBoughtProducts);
         mListRecommendation = (ListView) view.findViewById(R.id.listRecommendProducts);
         mEdtAccurate = (EditText) view.findViewById(R.id.edtAccurate);
+        mEdtSupport = (EditText) view.findViewById(R.id.edtSupportLevel);
         mEdtName = (EditText) view.findViewById(R.id.edtProduct);
         view.findViewById(R.id.buttonMore).setOnClickListener(this);
         view.findViewById(R.id.buttonBack).setOnClickListener(this);
         view.findViewById(R.id.buttonCloseAccurate).setOnClickListener(this);
         mLayoutEditAccurate = (FrameLayout) view.findViewById(R.id.layoutEditAccurate);
         mLayoutRecommend = (LinearLayout) view.findViewById(R.id.layoutRecommendResult);
+        mScrollRecommend = (ScrollView) view.findViewById(R.id.scrollRecommend);
+        mTextRecommend = (TextView) view.findViewById(R.id.txtRecommend);
     }
 
     @Override
@@ -107,7 +120,7 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
 
     @Override
     protected void fragmentReady(Bundle savedInstanceState) {
-        Activity activity = getActivity();
+        final Activity activity = getActivity();
         mBoughtProductAdapter = new BasicAdapter<>(mBoughtProductsForSearch, R.layout.item_product, activity.getLayoutInflater());
         mListBoughtProducts.setAdapter(mBoughtProductAdapter);
         mBoughtProductAdapter.notifyDataSetChanged();
@@ -117,20 +130,24 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 for (int id = 0; id < mBoughtProductsForSearch.size(); id++) {
                     mBoughtProductsForSearch.get(id).setFocused(id == i);
-                    if (mBoughtProductsForSearch.get(i).isFocused()) {
-                        ArrayList<BoughtProduct_1> listRecommend = recommend(mBoughtProductsForSearch.get(i), mBoughtProducts);
-                        if (!listRecommend.isEmpty()) {
-                            mListRecommends.clear();
-                            mListRecommends.addAll(listRecommend);
-                            mRecommendAdapter.notifyDataSetChanged();
-                            SupportUtils.setListViewHeight(mListRecommendation);
-                            mLayoutRecommend.setVisibility(View.VISIBLE);
-                        } else {
-                            mLayoutRecommend.setVisibility(View.GONE);
-                        }
-                    }
                 }
-                mBoughtProductAdapter.notifyDataSetChanged();
+                ArrayList<BoughtProduct_1> listRecommend = recommend(mBoughtProductsForSearch.get(i), mBoughtProducts);
+                if (!listRecommend.isEmpty()) {
+                    mListRecommends.clear();
+                    mListRecommends.addAll(listRecommend);
+                    mRecommendAdapter.notifyDataSetChanged();
+                    SupportUtils.setListViewHeight(mListRecommendation);
+                    mLayoutRecommend.setVisibility(View.VISIBLE);
+                    mBoughtProductAdapter.notifyDataSetChanged();
+                    mScrollRecommend.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mScrollRecommend.fullScroll(View.FOCUS_DOWN);
+                        }
+                    });
+                } else {
+                    mLayoutRecommend.setVisibility(View.GONE);
+                }
             }
         });
 
@@ -163,6 +180,48 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
                 mBoughtProductAdapter.notifyDataSetChanged();
             }
         });
+
+        TextWatcher accurateWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                double minSupport = mEdtSupport.getText().toString().isEmpty() ? 0 : Double.valueOf(mEdtSupport.getText().toString());
+                double minAccurate = mEdtAccurate.getText().toString().isEmpty() ? 0 : Double.valueOf(mEdtAccurate.getText().toString());
+                initAlgorithm(minSupport, minAccurate);
+            }
+        };
+
+        mEdtAccurate.addTextChangedListener(accurateWatcher);
+        mEdtSupport.addTextChangedListener(accurateWatcher);
+
+        double minSupport = mEdtSupport.getText().toString().isEmpty() ? 0 : Double.valueOf(mEdtSupport.getText().toString());
+        double minAccurate = mEdtAccurate.getText().toString().isEmpty() ? 0 : Double.valueOf(mEdtAccurate.getText().toString());
+        initAlgorithm(minSupport, minAccurate);
+    }
+
+    private void initAlgorithm(double minSupport, double minAccurate) {
+        final Activity activity = getActivity();
+        mApriori = Apriori.getInstance(minSupport, minAccurate).setExecuteListener(new Apriori.AprioriListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+            }
+        }).initialize(ProductDetailDAO.getInstance(activity).getAllDetails());
+        mApriori.execute();
     }
 
     @Override
@@ -191,7 +250,7 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
 
     private ArrayList<BoughtProduct_1> recommend(BoughtProduct_1 product, ArrayList<BoughtProduct_1> source) {
         ArrayList<BoughtProduct_1> products = new ArrayList<>();
-        if (source != null) {
+        /*if (source != null) {
             Random random = new Random();
             int max = random.nextInt(source.size() > 1 ? source.size() - 1 : 0);
             int seed = max;
@@ -200,7 +259,27 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
                 products.add(source.get(id));
                 max--;
             }
+        }*/
+        Activity activity = getActivity();
+        Resources resources = activity.getResources();
+        if (product != null && mApriori != null) {
+            Set<Integer> productIds = mApriori.generateFrequentAfterCF(Integer.valueOf(product.getItem().getProductID()));
+            if (productIds != null) {
+                for (int id : productIds) {
+                    Product p = ProductDAO.getInstance(activity).getAllProductById(id);
+                    int resId = resources.getIdentifier(p.getProductImage(), "drawable", activity.getPackageName());
+                    Bitmap bitmap = BitmapFactory.decodeResource(resources, resId);
+                    String group = ProductGroupDAO.getInstance(activity).getGroupNameByID(p.getProductGroupID());
+                    p.getProductImage();
+                    products.add(new BoughtProduct_1(bitmap, p, group, false));
+                }
+            }
         }
         return products;
+    }
+
+    @Override
+    public void refreshData() {
+
     }
 }

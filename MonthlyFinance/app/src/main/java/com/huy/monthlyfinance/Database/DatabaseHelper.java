@@ -83,7 +83,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_TABLE_PRODUCT_DETAIL =
             "create table " + tblProductDetail + "(" + productDetailID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" + ","
-                    + productCost + " INTEGER" + "," + productID + " INTEGER" + "," + expenseHistoryID + " INTEGER" + ","
+                    + productCost + " REAL" + "," + productID + " INTEGER" + "," + expenseHistoryID + " INTEGER" + ","
                     + productQuantity + " INTEGER ," + " FOREIGN KEY(" + productID + ") REFERENCES " + tblProduct
                     + "(" + productID + ")," + " FOREIGN KEY(" + expenseHistoryID + ") REFERENCES " + tblExpensesHistory
                     + "(" + expenseHistoryID + "))";

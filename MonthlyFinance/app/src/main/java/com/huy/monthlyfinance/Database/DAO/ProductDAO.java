@@ -101,6 +101,28 @@ public class ProductDAO extends BaseDAO {
         // return nhom san pham list
         return productList;
     }
+    // ham lay danh sach  san pham
+    public Product getAllProductById(int id) {
+        Product product = new Product();
+        // Select All Query
+        String selectQuery = "select * from " + DatabaseHelper.tblProduct + " where " + DatabaseHelper.productID + " = " + id;
+        Cursor cursor = mReadableDatabase.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                product.setProductID(String.valueOf(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.productID))));
+                product.setProductNameEN(cursor.getString(cursor.getColumnIndex(DatabaseHelper.productNameEN)));
+                product.setProductNameVI(cursor.getString(cursor.getColumnIndex(DatabaseHelper.productNameVI)));
+                product.setProductImage(cursor.getString(cursor.getColumnIndex(DatabaseHelper.productImage)));
+                product.setProductGroupID(String.valueOf(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.productGroupID))));
+                product.setUnitCalculation(cursor.getString(cursor.getColumnIndex(DatabaseHelper.productCalculationUnit)));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        mValues.clear();
+        // return nhom san pham list
+        return product;
+    }
 
     private Product getProductById(String id) {
         if (id == null) {

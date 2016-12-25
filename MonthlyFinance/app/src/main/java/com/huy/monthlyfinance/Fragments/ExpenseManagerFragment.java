@@ -948,7 +948,6 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                     int userId = UserDAO.getInstance(activity).
                             getUserId(PreferencesUtils.getString(PreferencesUtils.CURRENT_EMAIL, ""));
                     if (!date.isEmpty() && userId >= 0) {
-                        message = "";
                         ExpensesHistory transaction =
                                 new ExpensesHistory(mSelectedAccount.getAccountID(), String.valueOf(userId), date, mTotalCost);
                         if (expensesHistoryDAO.insertTransaction(transaction)) {
@@ -1011,6 +1010,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                                             " We had to use your credit account";
                                 }
                             }
+                            MainApplication.getInstance().refreshAllData();
                         } else {
                             message = "An error occur";
                         }
@@ -1146,5 +1146,10 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
             }
         }
         return null;
+    }
+
+    @Override
+    public void refreshData() {
+
     }
 }
