@@ -160,6 +160,8 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
 
     private TextView mTextCurrentBalances;
 
+    private ImageView mIconSelectCash, mIconSelectBank, mIconSelectCredit;
+
     @Override
     protected int getLayoutXML() {
         return R.layout.fragment_expense_management;
@@ -262,6 +264,9 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         mLayoutPickImages = (FrameLayout) view.findViewById(R.id.layoutPickImage);
         mCurrentPercentages = (ProgressBar) view.findViewById(R.id.itemProgress);
         mTextTotalCost = (EditText) view.findViewById(R.id.textTotalCost);
+        mIconSelectCash = (ImageView) view.findViewById(R.id.iconSelectCash);
+        mIconSelectBank = (ImageView) view.findViewById(R.id.iconSelectBank);
+        mIconSelectCredit = (ImageView) view.findViewById(R.id.iconSelectCredit);
         final StringBuilder textTotal = new StringBuilder();
         mTextTotalCost.addTextChangedListener(new TextWatcher() {
             @Override
@@ -839,7 +844,6 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
     @Override
     public void onClick(View view) {
         Activity activity = getActivity();
-        Resources resources = activity.getResources();
         switch (view.getId()) {
             case R.id.buttonBack:
                 if (canGoBack()) {
@@ -1034,18 +1038,27 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                 if (mSelectedAccount != null) {
                     mTextAccount.setText(mSelectedAccount.getAccountName());
                 }
+                mIconSelectCash.setVisibility(View.GONE);
+                mIconSelectCredit.setVisibility(View.GONE);
+                mIconSelectBank.setVisibility(View.VISIBLE);
                 break;
             case R.id.itemSelectCash:
                 mSelectedAccount = getAccount(SupportUtils.getStringLocalized(activity, "en", R.string.cash));
                 if (mSelectedAccount != null) {
                     mTextAccount.setText(mSelectedAccount.getAccountName());
                 }
+                mIconSelectCash.setVisibility(View.VISIBLE);
+                mIconSelectCredit.setVisibility(View.GONE);
+                mIconSelectBank.setVisibility(View.GONE);
                 break;
             case R.id.itemSelectCredit:
                 mSelectedAccount = getAccount(SupportUtils.getStringLocalized(activity, "en", R.string.credit_card));
                 if (mSelectedAccount != null) {
                     mTextAccount.setText(mSelectedAccount.getAccountName());
                 }
+                mIconSelectCash.setVisibility(View.GONE);
+                mIconSelectCredit.setVisibility(View.VISIBLE);
+                mIconSelectBank.setVisibility(View.GONE);
                 break;
             default:
                 break;
