@@ -163,13 +163,31 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dip"
-            android:layout_weight="3">
+            android:layout_weight="3"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
 
-            <ImageView
+            <TextView
+                android:id="@+id/txtBanner1"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="40dip"
-                android:src="@mipmap/ic_launcher" />
+                android:layout_height="wrap_content"
+                android:text="Monthly finance"
+                android:gravity="center"
+                android:textSize="35sp"
+                android:textColor="#fff"
+                android:textStyle="bold|italic"/>
+
+            <TextView
+                android:id="@+id/txtBanner2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="2016, Nguyen Van Huy"
+                android:gravity="center"
+                android:textSize="13sp"
+                android:textColor="#fff"
+                android:textStyle="bold|italic"
+                android:layout_marginTop="5dip"/>
+
         </LinearLayout>
 
         <LinearLayout

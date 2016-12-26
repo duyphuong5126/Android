@@ -178,10 +178,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
 
     @Override
     public void onBackPressed() {
-        if (BaseFragment.getCurrent().equals(OverViewFragment.class.getName())) {
-            super.onBackPressed();
-        } else {
-            navBack();
+        if (BaseFragment.getCurrent() != null) {
+            if (BaseFragment.getCurrent().equals(OverViewFragment.class.getName())) {
+                super.onBackPressed();
+            } else {
+                navBack();
+            }
         }
     }
 }
