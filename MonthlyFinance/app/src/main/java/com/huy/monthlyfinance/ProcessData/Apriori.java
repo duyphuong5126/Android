@@ -36,7 +36,7 @@ public class Apriori {
         mInstance.l.clear();
         mInstance.minConf = minConf;
         mInstance.minSupport = minSupport;
-        isInitialized = false;
+        mInstance.isInitialized = false;
         return mInstance;
     }
 
@@ -70,6 +70,7 @@ public class Apriori {
 
                     prune();
                     generateFrequentItemSets();
+                    isInitialized = false;
                 } else {
                     mInstance.mListener.onError("You must call .initialize(...).execute(...), not .execute(...)");
                 }
@@ -163,7 +164,9 @@ public class Apriori {
                 c.add(new Tuple(s, countSupport(s)));
             }
             prune();
-            toBeContinued = l.size() <= 1;
+            if(l.size() <= 1) {
+                toBeContinued = false;
+            }
             size++;
         }
         System.out.println("\n=+= FINAL LIST =+=");
@@ -254,6 +257,7 @@ public class Apriori {
                 m.put(list_no, temp);
             }
             temp.add(object);
+            m.put(list_no, temp);
         }
 //		Map<Integer, List <Integer>> m = new HashMap<>();
         /*Map<Integer, List <Integer>> m = new HashMap<>();

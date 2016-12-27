@@ -535,29 +535,6 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <LinearLayout
-                    android:id="@+id/layoutAddIncome"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#fff"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <com.github.mikephil.charting.charts.PieChart
-                        android:id="@+id/chartIncome"
-                        android:layout_width="250dip"
-                        android:layout_height="250dip"
-                        android:layout_marginTop="20dip" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
             </FrameLayout>
 
         </ScrollView>
@@ -688,9 +665,189 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/addIncomeArea"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#fff">
+            android:background="#fff"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingLeft="10dip"
+                android:paddingRight="10dip">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:gravity="center"
+                    android:text="@string/add_income"
+                    android:textColor="#8cc152"
+                    android:textSize="30sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/edtTotalIncome"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dip"
+                    android:background="#0000"
+                    android:hint="Enter your income"
+                    android:inputType="numberDecimal"
+                    android:textColor="#000"
+                    android:textColorHint="#666"
+                    android:textSize="20sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dip"
+                    android:layout_marginTop="3dip"
+                    android:background="#666" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dip"
+                android:orientation="vertical"
+                android:paddingLeft="10dip"
+                android:paddingRight="10dip">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ProgressBar
+                        android:id="@+id/progressShareCash"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:progressDrawable="@drawable/progress_style_6" />
+
+                    <EditText
+                        android:id="@+id/textShareCash"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
+                        android:gravity="center_vertical"
+                        android:hint="Enter amount of cash"
+                        android:paddingLeft="10dip"
+                        android:paddingRight="10dip"
+                        android:textColor="#000"
+                        android:textColorHint="#000"
+                        android:textSize="17sp"
+                        android:background="#0000"
+                        android:paddingTop="5dip"
+                        android:paddingBottom="5dip"/>
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dip">
+
+                    <ProgressBar
+                        android:id="@+id/progressShareBank"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:progressDrawable="@drawable/progress_style_4" />
+
+                    <EditText
+                        android:id="@+id/textShareBank"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
+                        android:gravity="center_vertical"
+                        android:hint="Enter amount of bank"
+                        android:paddingLeft="10dip"
+                        android:paddingRight="10dip"
+                        android:textColor="#000"
+                        android:textColorHint="#000"
+                        android:textSize="17sp"
+                        android:background="#0000"
+                        android:paddingTop="5dip"
+                        android:paddingBottom="5dip"/>
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dip">
+
+                    <ProgressBar
+                        android:id="@+id/progressShareCredit"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:progressDrawable="@drawable/progress_style_3" />
+
+                    <EditText
+                        android:id="@+id/textShareCredit"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
+                        android:gravity="center_vertical"
+                        android:hint="Enter amount of credit"
+                        android:paddingLeft="10dip"
+                        android:paddingRight="10dip"
+                        android:textColor="#000"
+                        android:textColorHint="#000"
+                        android:textSize="17sp"
+                        android:background="#0000"
+                        android:paddingTop="5dip"
+                        android:paddingBottom="5dip"/>
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dip"
+                    android:gravity="center">
+
+                    <Button
+                        android:id="@+id/incomeConfirm"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/button_1"
+                        android:paddingBottom="5dip"
+                        android:paddingLeft="20dip"
+                        android:paddingRight="20dip"
+                        android:paddingTop="5dip"
+                        android:text="@string/confirm"
+                        android:textSize="20sp"
+                        android:textColor="#fff"/>
+
+                    <Button
+                        android:id="@+id/incomeCancel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dip"
+                        android:background="@drawable/button_1"
+                        android:paddingBottom="5dip"
+                        android:paddingLeft="20dip"
+                        android:paddingRight="20dip"
+                        android:paddingTop="5dip"
+                        android:text="@string/cancel"
+                        android:textSize="20sp"
+                        android:textColor="#fff" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/addTransferArea"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#fff"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"

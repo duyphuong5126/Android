@@ -1,24 +1,27 @@
 package com.huy.monthlyfinance.Fragments;
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.SystemClock;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
-import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
+import android.widget.Toast;
 
-import com.huy.monthlyfinance.Listener.NavigationListener;
 import com.huy.monthlyfinance.MyView.BasicAdapter;
 import com.huy.monthlyfinance.MyView.Item.ListItem.TransferItem;
 import com.huy.monthlyfinance.R;
+import com.huy.monthlyfinance.SupportUtils.PreferencesUtils;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
 import java.util.ArrayList;
@@ -38,9 +41,14 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
     private BasicAdapter<TransferItem> mTransferAdapter;
     private ListView mListTransaction;
 
-    private LinearLayout mLayoutAddIncome;
-
     private ScrollView mMainScroll;
+
+    private LinearLayout mAddIncomeArea;
+
+    private String mCurrency;
+    private EditText mTotalIncome;
+    private double mIncome;
+    private static final int MIN_CURRENCY = 1000;
 
     @Override
     protected int getLayoutXML() {
@@ -54,15 +62,56 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
         mListTransfer.add(new TransferItem(50, "Cash", "Bank", 900, 800, new Date(System.currentTimeMillis())));
         mListTransfer.add(new TransferItem(10, "Credit", "Cash", 900, 850, new Date(System.currentTimeMillis())));
         mListTransfer.add(new TransferItem(40, "Credit", "Cash", 890, 860, new Date(System.currentTimeMillis())));
+
+        mCurrency = PreferencesUtils.getString(PreferencesUtils.CURRENCY, "VND");
+        mIncome = 0;
     }
 
     @Override
     protected void initUI(final View view) {
+        final Activity activity = getActivity();
         mMainScroll = (ScrollView) view.findViewById(R.id.scrollBudget);
-        mLayoutAddIncome = (LinearLayout) view.findViewById(R.id.layoutAddIncome);
         view.findViewById(R.id.layoutButtonAddIncome).setOnClickListener(this);
         view.findViewById(R.id.layoutButtonAddTransfer).setOnClickListener(this);
         view.findViewById(R.id.buttonBack).setOnClickListener(this);
+
+        mTotalIncome = (EditText) view.findViewById(R.id.edtTotalIncome);
+        mTotalIncome.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String totalIncome = editable.toString();
+                double income = totalIncome.isEmpty() ? 0 : Double.valueOf(totalIncome);
+                if (mCurrency.equals("VND")) {
+                    if (income / MIN_CURRENCY >= 1) {
+                        if (income % MIN_CURRENCY == 500 || income % MIN_CURRENCY == 0) {
+                            mIncome = income;
+                            Toast.makeText(activity, "Income: " + income, Toast.LENGTH_SHORT).show();
+                        } else {
+                            mTotalIncome.removeTextChangedListener(this);
+                            mTotalIncome.setText("");
+                            mTotalIncome.setText(String.valueOf(mIncome));
+                            mTotalIncome.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mTotalIncome.setSelection(mTotalIncome.getText().toString().length());
+                                }
+                            });
+                            mTotalIncome.addTextChangedListener(this);
+                        }
+                    }
+                }
+            }
+        });
 
         final ImageButton mButtonAddTransfer = (ImageButton) view.findViewById(R.id.buttonAddTransfer);
         final ImageButton mButtonAddCash = (ImageButton) view.findViewById(R.id.buttonAddCash);
@@ -163,6 +212,8 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
         mTransferAdapter = new BasicAdapter<>(mListTransfer, R.layout.item_transfer, inflater);
         mListTransaction = (ListView) view.findViewById(R.id.listTransaction);
         mListTransaction.setAdapter(mTransferAdapter);
+
+        mAddIncomeArea = (LinearLayout) view.findViewById(R.id.addIncomeArea);
     }
 
     @Override
@@ -183,7 +234,7 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
 
     @Override
     protected boolean canGoBack() {
-        return mLayoutAddIncome.getVisibility() != View.VISIBLE;
+        return mAddIncomeArea.getVisibility() != View.VISIBLE;
     }
 
     @Override
@@ -193,7 +244,7 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                 if (canGoBack()) {
                     mNavListener.navBack();
                 } else {
-                    mLayoutAddIncome.setVisibility(View.GONE);
+                    mAddIncomeArea.setVisibility(View.GONE);
                 }
                 break;
             case R.id.buttonAdd:
@@ -204,8 +255,8 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                 mLayoutAdd.startAnimation(mAnimationBackward);
                 break;
             case R.id.layoutButtonAddIncome:
-                mLayoutAddIncome.setVisibility(View.VISIBLE);
                 mLayoutAdd.startAnimation(mAnimationBackward);
+                mAddIncomeArea.setVisibility(View.VISIBLE);
                 break;
             case R.id.layoutButtonAddTransfer:
                 break;

@@ -102,9 +102,9 @@ public class StartActivity extends Activity implements View.OnClickListener{
         String bank = mEdtBank.getText().toString();
         String credit = mEdtCreditCard.getText().toString();
         if (!cash.isEmpty() && !bank.isEmpty() && ! credit.isEmpty()) {
-            int cashBalance = Integer.valueOf(cash);
-            int bankBalance = Integer.valueOf(bank);
-            int creditBalance = Integer.valueOf(credit);
+            double cashBalance = Double.valueOf(cash);
+            double bankBalance = Double.valueOf(bank);
+            double creditBalance = Double.valueOf(credit);
             int min = 1000;
             if (currency.equals("VND")) {
                 if (cashBalance / min < 1 || bankBalance / min < 1 || creditBalance / min < 1) {

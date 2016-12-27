@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -107,5 +108,10 @@ public class SupportUtils {
         }
         resources.updateConfiguration(configuration, null);
         return string;
+    }
+
+    public static String getNormalDoubleString(double number, String formatString) {
+        DecimalFormat format = new DecimalFormat(formatString);
+        return format.format(number);
     }
 }

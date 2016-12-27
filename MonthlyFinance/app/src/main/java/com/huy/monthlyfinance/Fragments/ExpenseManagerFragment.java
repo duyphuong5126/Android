@@ -680,7 +680,9 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         StringBuilder builder = new StringBuilder();
         for (Account account : mListAccount) {
             if (!account.getAccountName().contains(SupportUtils.getStringLocalized(getActivity(), "en", R.string.bank))) {
-                builder.append(account.getAccountName()).append(": ").append(account.getCurrentBalance()).append(" ");
+                builder.append(account.getAccountName()).append(": ")
+                        .append(SupportUtils.getNormalDoubleString((int) account.getCurrentBalance(), "#0,0000"))
+                        .append(" ");
             }
         }
         mTextCurrentBalances.setText(builder.toString());

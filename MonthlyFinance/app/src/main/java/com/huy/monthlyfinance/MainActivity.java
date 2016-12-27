@@ -106,6 +106,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
 
         mManager = getFragmentManager();
         mManager.beginTransaction().add(R.id.layoutFragmentsContainer, overViewFragment, overViewFragment.getClass().getName()).commit();
+        BaseFragment.setCurrent(overViewFragment.getClass().getName());
     }
 
     private void addFragment(BaseFragment fragment) {

@@ -65,8 +65,8 @@ public class AccountDAO extends BaseDAO{
                         cursor.getString(cursor.getColumnIndex(DatabaseHelper.accountName)),
                         cursor.getString(cursor.getColumnIndex(DatabaseHelper.accountType)),
                         cursor.getString(cursor.getColumnIndex(DatabaseHelper.accountCurrency)),
-                        cursor.getDouble(cursor.getColumnIndex(DatabaseHelper.accountInitBalance)),
-                        cursor.getDouble(cursor.getColumnIndex(DatabaseHelper.accountCurrentBalance)),
+                        Double.valueOf(cursor.getString(cursor.getColumnIndex(DatabaseHelper.accountInitBalance))),
+                        Double.valueOf(cursor.getString(cursor.getColumnIndex(DatabaseHelper.accountCurrentBalance))),
                         cursor.getString(cursor.getColumnIndex(DatabaseHelper.accountNote)),
                         cursor.getString(cursor.getColumnIndex(DatabaseHelper.userID)),
                         Boolean.valueOf(cursor.getString(cursor.getColumnIndex(DatabaseHelper.accountState)))));
