@@ -103,7 +103,9 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
 
         final ImageButton mButtonAddReminder = (ImageButton) view.findViewById(R.id.buttonAddReminder);
         final ImageButton mButtonAddTransfer = (ImageButton) view.findViewById(R.id.buttonAddTransfer);
+        mButtonAddTransfer.setOnClickListener(this);
         final ImageButton mButtonAddCash = (ImageButton) view.findViewById(R.id.buttonAddCash);
+        mButtonAddCash.setOnClickListener(this);
         final ImageButton mButtonAddExpense = (ImageButton) view.findViewById(R.id.buttonAddExpense);
         mButtonAddExpense.setOnClickListener(this);
 
@@ -326,6 +328,12 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
                 Bundle bundle = new Bundle();
                 bundle.putBoolean("isFormOpen", true);
                 mListener.showFragment(ExpenseManagerFragment.class, bundle);
+                break;
+            case R.id.layoutButtonAddIncome:
+            case R.id.buttonAddCash:
+                bundle = new Bundle();
+                bundle.putBoolean("isAddIncome", true);
+                mListener.showFragment(BudgetFragment.class, bundle);
                 break;
             default:
                 break;

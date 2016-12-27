@@ -670,7 +670,7 @@
             android:layout_height="match_parent"
             android:background="#fff"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -729,20 +729,37 @@
                         android:progressDrawable="@drawable/progress_style_6" />
 
                     <EditText
-                        android:id="@+id/textShareCash"
+                        android:id="@+id/edtShareCash"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="#0000"
                         android:fontFamily="sans-serif"
                         android:gravity="center_vertical"
                         android:hint="Enter amount of cash"
+                        android:inputType="number"
+                        android:paddingBottom="5dip"
                         android:paddingLeft="10dip"
                         android:paddingRight="10dip"
+                        android:paddingTop="5dip"
                         android:textColor="#000"
                         android:textColorHint="#000"
-                        android:textSize="17sp"
+                        android:textSize="17sp" />
+
+                    <TextView
+                        android:id="@+id/textShareCash"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:background="#0000"
+                        android:fontFamily="sans-serif"
+                        android:gravity="center_vertical|right"
+                        android:text="%"
+                        android:paddingBottom="5dip"
+                        android:paddingLeft="10dip"
+                        android:paddingRight="10dip"
                         android:paddingTop="5dip"
-                        android:paddingBottom="5dip"/>
+                        android:textColor="#000"
+                        android:textColorHint="#000"
+                        android:textSize="17sp" />
                 </FrameLayout>
 
                 <FrameLayout
@@ -758,20 +775,37 @@
                         android:progressDrawable="@drawable/progress_style_4" />
 
                     <EditText
-                        android:id="@+id/textShareBank"
+                        android:id="@+id/edtShareBank"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="#0000"
                         android:fontFamily="sans-serif"
                         android:gravity="center_vertical"
                         android:hint="Enter amount of bank"
+                        android:inputType="number"
+                        android:paddingBottom="5dip"
                         android:paddingLeft="10dip"
                         android:paddingRight="10dip"
+                        android:paddingTop="5dip"
                         android:textColor="#000"
                         android:textColorHint="#000"
-                        android:textSize="17sp"
+                        android:textSize="17sp" />
+
+                    <TextView
+                        android:id="@+id/textShareBank"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:background="#0000"
+                        android:fontFamily="sans-serif"
+                        android:gravity="center_vertical|right"
+                        android:text="%"
+                        android:paddingBottom="5dip"
+                        android:paddingLeft="10dip"
+                        android:paddingRight="10dip"
                         android:paddingTop="5dip"
-                        android:paddingBottom="5dip"/>
+                        android:textColor="#000"
+                        android:textColorHint="#000"
+                        android:textSize="17sp" />
                 </FrameLayout>
 
                 <FrameLayout
@@ -787,20 +821,37 @@
                         android:progressDrawable="@drawable/progress_style_3" />
 
                     <EditText
-                        android:id="@+id/textShareCredit"
+                        android:id="@+id/edtShareCredit"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="#0000"
                         android:fontFamily="sans-serif"
                         android:gravity="center_vertical"
                         android:hint="Enter amount of credit"
+                        android:inputType="number"
+                        android:paddingBottom="5dip"
                         android:paddingLeft="10dip"
                         android:paddingRight="10dip"
+                        android:paddingTop="5dip"
                         android:textColor="#000"
                         android:textColorHint="#000"
-                        android:textSize="17sp"
+                        android:textSize="17sp" />
+
+                    <TextView
+                        android:id="@+id/textShareCredit"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:background="#0000"
+                        android:fontFamily="sans-serif"
+                        android:gravity="center_vertical|right"
+                        android:text="%"
+                        android:paddingBottom="5dip"
+                        android:paddingLeft="10dip"
+                        android:paddingRight="10dip"
                         android:paddingTop="5dip"
-                        android:paddingBottom="5dip"/>
+                        android:textColor="#000"
+                        android:textColorHint="#000"
+                        android:textSize="17sp" />
                 </FrameLayout>
 
                 <LinearLayout
@@ -819,8 +870,8 @@
                         android:paddingRight="20dip"
                         android:paddingTop="5dip"
                         android:text="@string/confirm"
-                        android:textSize="20sp"
-                        android:textColor="#fff"/>
+                        android:textColor="#fff"
+                        android:textSize="20sp" />
 
                     <Button
                         android:id="@+id/incomeCancel"
@@ -833,8 +884,8 @@
                         android:paddingRight="20dip"
                         android:paddingTop="5dip"
                         android:text="@string/cancel"
-                        android:textSize="20sp"
-                        android:textColor="#fff" />
+                        android:textColor="#fff"
+                        android:textSize="20sp" />
 
                 </LinearLayout>
 
