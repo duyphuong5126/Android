@@ -3,6 +3,7 @@ package com.huy.monthlyfinance;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
@@ -96,6 +97,7 @@ public class StartActivity extends Activity implements View.OnClickListener{
     }
 
     private boolean doUpdateBalances() {
+        Resources resources = getResources();
         String email = mEdtEmail.getText().toString();
         String currency = mEdtCurrency.getText().toString();
         String cash = mEdtCash.getText().toString();
@@ -108,12 +110,12 @@ public class StartActivity extends Activity implements View.OnClickListener{
             int min = 1000;
             if (currency.equals("VND")) {
                 if (cashBalance / min < 1 || bankBalance / min < 1 || creditBalance / min < 1) {
-                    Toast.makeText(StartActivity.this, "Your balance(s) is lower than minimum limit", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(StartActivity.this, resources.getString(R.string.error_lower_than_minimum), Toast.LENGTH_SHORT).show();
                     return false;
                 } else if ((cashBalance % min != 500 && cashBalance % min != 0) ||
                         (bankBalance % min != 500 && bankBalance % min != 0) ||
                         (cashBalance % min != 500 && creditBalance % min != 0)){
-                    Toast.makeText(StartActivity.this, "Your balance(s) has invalid denominations", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(StartActivity.this, resources.getString(R.string.error_invalid_denominations), Toast.LENGTH_SHORT).show();
                     return false;
                 }
             }
@@ -136,9 +138,9 @@ public class StartActivity extends Activity implements View.OnClickListener{
                             new Account(textCredit, textCredit, currency, creditBalance, creditBalance, "activated", String.valueOf(userId), true));
                     boolean success = insertCash && insertBank && insertCredit;
                     if (success) {
-                        Toast.makeText(StartActivity.this, "Your info is saved", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(StartActivity.this, resources.getString(R.string.info_saved), Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(StartActivity.this, "Failed to store you data", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(StartActivity.this, resources.getString(R.string.info_save_failed), Toast.LENGTH_SHORT).show();
                         accountDAO.deleteAllAccounts();
                         userDAO.deleteAllUsers();
                     }

@@ -114,4 +114,9 @@ public class SupportUtils {
         DecimalFormat format = new DecimalFormat(formatString);
         return format.format(number);
     }
+
+    public static String formatDouble(double d, String format) {
+        DecimalFormat decimalFormat = new DecimalFormat(format);
+        return decimalFormat.format(d);
+    }
 }

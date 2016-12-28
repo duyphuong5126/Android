@@ -670,7 +670,7 @@
             android:layout_height="match_parent"
             android:background="#fff"
             android:orientation="vertical"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -695,7 +695,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dip"
                     android:background="#0000"
-                    android:hint="Enter your income"
+                    android:hint="@string/enter_income"
                     android:inputType="numberDecimal"
                     android:textColor="#000"
                     android:textColorHint="#666"
@@ -717,6 +717,16 @@
                 android:paddingLeft="10dip"
                 android:paddingRight="10dip">
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-smallcaps"
+                    android:gravity="center"
+                    android:text="@string/split"
+                    android:textColor="#8cc152"
+                    android:textSize="30sp"
+                    android:textStyle="bold" />
+
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -735,7 +745,7 @@
                         android:background="#0000"
                         android:fontFamily="sans-serif"
                         android:gravity="center_vertical"
-                        android:hint="Enter amount of cash"
+                        android:hint="@string/enter_amount_cash"
                         android:inputType="number"
                         android:paddingBottom="5dip"
                         android:paddingLeft="10dip"
@@ -781,7 +791,7 @@
                         android:background="#0000"
                         android:fontFamily="sans-serif"
                         android:gravity="center_vertical"
-                        android:hint="Enter amount of bank"
+                        android:hint="@string/enter_amount_bank"
                         android:inputType="number"
                         android:paddingBottom="5dip"
                         android:paddingLeft="10dip"
@@ -827,7 +837,7 @@
                         android:background="#0000"
                         android:fontFamily="sans-serif"
                         android:gravity="center_vertical"
-                        android:hint="Enter amount of credit"
+                        android:hint="@string/enter_amount_credit"
                         android:inputType="number"
                         android:paddingBottom="5dip"
                         android:paddingLeft="10dip"

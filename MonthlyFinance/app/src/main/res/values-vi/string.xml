@@ -104,6 +104,24 @@
     <string name="bought_products">Sản phẩm đã mua</string>
     <string name="recommend_products">Gợi ý cho bạn</string>
 
+    <string name="enter_income">Nhập số tiền</string>
+    <string name="enter_amount_cash">Nhập số tiền mặt</string>
+    <string name="enter_amount_bank">Nhập khoản tiết kiệm</string>
+    <string name="enter_amount_credit">Nhập khoản tín dụng</string>
+
+    <string name="split">Phân chia khoản thu nhập</string>
+
+    <string name="error_lower_than_minimum">Số dư thấp dưới mức tối thiểu</string>
+    <string name="error_higher_than_income">Số tiền vượt quá số thu nhập</string>
+    <string name="error_invalid_denominations">(Các) Số dư có mệnh giá không phù hợp</string>
+    <string name="error_out_of_budget_limit">Out of budget limit</string>
+    <string name="info_saved">Đã lưu thông tin</string>
+    <string name="info_save_failed">Lưu thông tin thất bại</string>
+    <string name="deleted">Đã xóa</string>
+    <string name="press_again">Nhấn 1 lần nữa để hiển thị form</string>
+    <string name="this_month_expense_chart">Biểu đồ chi tiêu trong tháng</string>
+    <string name="this_month_cash_chart">Biểu đồ dòng tiền trong tháng</string>
+
     <string name="balance_title">Số dư</string>
 
 </resources>

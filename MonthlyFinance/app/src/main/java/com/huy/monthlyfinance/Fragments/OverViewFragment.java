@@ -85,17 +85,15 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
         PieChart mMonthlyExpenseChart = (PieChart) view.findViewById(R.id.chartMonthExpense);
         PieChart mMonthlyCashFlowChart = (PieChart) view.findViewById(R.id.chartMonthCashFlow);
         addDataToChart(new ArrayList<>(Arrays.asList(mMonthExpense)), mMonthExpenseAmount, mMonthlyExpenseChart,
-                "This month expense chart", "Monthly Expenses");
+                resources.getString(R.string.this_month_expense_chart), "Monthly Expenses");
         addDataToChart(new ArrayList<>(Arrays.asList(mMonthCashFlow)), mMonthCashFlowAmount, mMonthlyCashFlowChart
-                , "This month cash flow chart", ""/*"Month Cash Flow"*/);
-        mAnimationRotateForward30 = new RotateAnimation(0.0f, 30.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
-                0.5f);
+                , resources.getString(R.string.this_month_cash_chart), ""/*"Month Cash Flow"*/);
+        mAnimationRotateForward30 = new RotateAnimation(0.0f, 30.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
         mAnimationRotateForward30.setDuration(1000);
         mAnimationRotateForward30.setRepeatCount(0);
         mAnimationRotateForward30.setRepeatMode(Animation.REVERSE);
         mAnimationRotateForward30.setFillAfter(true);
-        mAnimationRotateBackward30 = new RotateAnimation(0.0f, -30.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
-                0.5f);
+        mAnimationRotateBackward30 = new RotateAnimation(0.0f, -30.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
         mAnimationRotateBackward30.setDuration(1000);
         mAnimationRotateBackward30.setRepeatCount(0);
         mAnimationRotateBackward30.setRepeatMode(Animation.REVERSE);
@@ -197,7 +195,7 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
                 totalBalance += account.getCurrentBalance();
             }
             StringBuilder builder = new StringBuilder("")
-                    .append(SupportUtils.getNormalDoubleString((int) totalBalance, "#0,0000"))
+                    .append(SupportUtils.getNormalDoubleString((int) totalBalance, "#0,000"))
                     .append(" ").append(currency);
             if (currency.toLowerCase().equals("vnd")) {
                 mBalanceValue.setText(builder.toString());
@@ -233,8 +231,8 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
                 String currency = account.getCurrency();
                 int currentBalance = (int) account.getCurrentBalance();
                 int initBalance = (int) account.getInitialBalance();
-                String current = SupportUtils.getNormalDoubleString(currentBalance, "#0,0000");
-                String init = SupportUtils.getNormalDoubleString(initBalance, "#0,0000");
+                String current = SupportUtils.getNormalDoubleString(currentBalance, "#0,000");
+                String init = SupportUtils.getNormalDoubleString(initBalance, "#0,000");
                 String stringCurrentBalance = currency.toLowerCase().equals("usd") ? ("$" + current) : (current + " vnđ");
                 String stringInitBalance = currency.toLowerCase().equals("usd") ? ("$" + init) : (init + " vnđ");
                 if (accountName.equals(SupportUtils.getStringLocalized(getActivity(), "en", R.string.bank))) {
@@ -361,8 +359,8 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
             String currency = account.getCurrency();
             double currentBalance = account.getCurrentBalance();
             double initBalance = account.getInitialBalance();
-            String current = SupportUtils.getNormalDoubleString(currentBalance, "#0,0000");
-            String init = SupportUtils.getNormalDoubleString(initBalance, "#0,0000");
+            String current = SupportUtils.getNormalDoubleString(currentBalance, "#0,000");
+            String init = SupportUtils.getNormalDoubleString(initBalance, "#0,000");
             String stringCurrentBalance = currency.toLowerCase().equals("usd") ? ("$" + current) : (current + " vnđ");
             String stringInitBalance = currency.toLowerCase().equals("usd") ? ("$" + init) : (init + " vnđ");
             Context context = getActivity();

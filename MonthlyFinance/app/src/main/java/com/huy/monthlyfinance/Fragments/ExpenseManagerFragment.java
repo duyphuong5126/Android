@@ -174,7 +174,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
             isFormOpen = bundle.getBoolean("isFormOpen");
         }
         final Context context = mListener.getContext();
-        Resources resources = context.getResources();
+        final Resources resources = context.getResources();
 
         mListAccount = MainApplication.getInstance().getAccounts();
         if (mListAccount != null) {
@@ -215,7 +215,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                     if (isFormOpen) {
                         toggleForm(true);
                     } else {
-                        Toast.makeText(context, "Press again to access form", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, resources.getString(R.string.press_again), Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -238,6 +238,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
     @Override
     protected void initUI(View view) {
         final Activity activity = getActivity();
+        final Resources resources = activity.getResources();
         LayoutInflater inflater = activity.getLayoutInflater();
 
         mDate = SupportUtils.formatDate(SupportUtils.milliSec2Date(System.currentTimeMillis()), "dd/MM/yyyy");
@@ -284,7 +285,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
             public void afterTextChanged(Editable editable) {
                 double totalCost = editable.toString().isEmpty() ? 0 : Double.valueOf(editable.toString());
                 if (totalCost > mCurrentBudget) {
-                    Toast.makeText(activity, "Out of budget limit", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, resources.getString(R.string.error_out_of_budget_limit), Toast.LENGTH_SHORT).show();
                     mTextTotalCost.removeTextChangedListener(this);
                     mTextTotalCost.setText("");
                     mTextTotalCost.setText(textTotal.toString());
@@ -374,7 +375,6 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         mLayoutForm = (ScrollView) view.findViewById(R.id.layoutForm);
         mLayoutForm.setOnClickListener(this);
 
-        Resources resources = activity.getResources();
         mListExpense = (RadialListView) view.findViewById(R.id.listExpenses);
         mLayoutInput = (FrameLayout) view.findViewById(R.id.layoutInput);
         mLayoutInput.setOnClickListener(this);
@@ -628,6 +628,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
 
     @Override
     protected void fragmentReady(Bundle savedInstanceState) {
+        final Resources resources = getResources();
         mCurrentBudget = getCurrentCash();
         mCurrentPercentages.setMax((int) mCurrentBudget);
         mCurrentPercentages.setProgress(0);
@@ -661,7 +662,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                                 mListProducts.remove(position);
                                 mBoughtProductsAdapter.notifyDataSetChanged();
                                 SupportUtils.setListViewHeight(mListBoughtProducts);
-                                Toast.makeText(activity, "Deleted", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(activity, resources.getString(R.string.deleted), Toast.LENGTH_SHORT).show();
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -681,7 +682,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         for (Account account : mListAccount) {
             if (!account.getAccountName().contains(SupportUtils.getStringLocalized(getActivity(), "en", R.string.bank))) {
                 builder.append(account.getAccountName()).append(": ")
-                        .append(SupportUtils.getNormalDoubleString((int) account.getCurrentBalance(), "#0,0000"))
+                        .append(SupportUtils.getNormalDoubleString((int) account.getCurrentBalance(), "#0,000"))
                         .append(" ");
             }
         }

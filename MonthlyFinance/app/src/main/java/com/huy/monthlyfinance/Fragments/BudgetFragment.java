@@ -2,6 +2,7 @@ package com.huy.monthlyfinance.Fragments;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -21,6 +22,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.huy.monthlyfinance.Database.DAO.AccountDAO;
+import com.huy.monthlyfinance.MainApplication;
+import com.huy.monthlyfinance.Model.Account;
 import com.huy.monthlyfinance.MyView.BasicAdapter;
 import com.huy.monthlyfinance.MyView.Item.ListItem.TransferItem;
 import com.huy.monthlyfinance.R;
@@ -85,6 +89,7 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
     @Override
     protected void initUI(final View view) {
         final Activity activity = getActivity();
+        final Resources resources = activity.getResources();
         mMainScroll = (ScrollView) view.findViewById(R.id.scrollBudget);
         view.findViewById(R.id.layoutButtonAddIncome).setOnClickListener(this);
         view.findViewById(R.id.layoutButtonAddTransfer).setOnClickListener(this);
@@ -126,9 +131,12 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                             mProgressBank.setProgress(0);
                             mProgressCredit.setProgress(0);
                             mProgressCash.setProgress(0);
-                            mEdtCash.setText("0");
-                            mEdtBank.setText("0");
-                            mEdtCredit.setText("0");
+                            mEdtCash.setText("");
+                            mEdtBank.setText("");
+                            mEdtCredit.setText("");
+                            mTextCredit.setText("");
+                            mTextBank.setText("");
+                            mTextCash.setText("");
                         } else {
                             mTotalIncome.removeTextChangedListener(this);
                             mTotalIncome.setText("");
@@ -167,26 +175,24 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                 if (mCurrency.equals("VND")) {
                     if (cash / MIN_CURRENCY >= 1) {
                         if (cash % MIN_CURRENCY == 500 || cash % MIN_CURRENCY == 0) {
-                            if (cash <= mIncome) {
-                                if (cash <= mIncome) {
-                                    mShareCash = cash;
-                                    Toast.makeText(activity, "Share cash: " + cash, Toast.LENGTH_SHORT).show();
-                                    mProgressCash.setProgress((int) mShareCash);
-                                    double percent = (mShareCash / mIncome) * 100;
-                                    mTextCash.setText(percent + "%");
-                                } else {
-                                    Toast.makeText(activity, "This amount must be lower than total income", Toast.LENGTH_SHORT).show();
-                                    mEdtCash.removeTextChangedListener(this);
-                                    mEdtCash.setText("");
-                                    mEdtCash.setText(String.valueOf(mShareCash));
-                                    mEdtCash.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            mEdtCash.setSelection(mEdtCash.getText().toString().length());
-                                        }
-                                    });
-                                    mEdtCash.addTextChangedListener(this);
-                                }
+                            if (isCorrectDivision()) {
+                                mShareCash = cash;
+                                Toast.makeText(activity, "Share cash: " + SupportUtils.getNormalDoubleString(cash, "#0,000"), Toast.LENGTH_SHORT).show();
+                                mProgressCash.setProgress((int) mShareCash);
+                                double percent = (mShareCash / mIncome) * 100;
+                                mTextCash.setText(SupportUtils.formatDouble(percent, "#.00") + "%");
+                            } else {
+                                Toast.makeText(activity, resources.getString(R.string.error_higher_than_income), Toast.LENGTH_SHORT).show();
+                                mEdtCash.removeTextChangedListener(this);
+                                mEdtCash.setText("");
+                                mEdtCash.setText(String.valueOf(mShareCash));
+                                mEdtCash.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mEdtCash.setSelection(mEdtCash.getText().toString().length());
+                                    }
+                                });
+                                mEdtCash.addTextChangedListener(this);
                             }
                         } else {
                             mEdtCash.removeTextChangedListener(this);
@@ -223,14 +229,14 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                 if (mCurrency.equals("VND")) {
                     if (bank / MIN_CURRENCY >= 1) {
                         if (bank % MIN_CURRENCY == 500 || bank % MIN_CURRENCY == 0) {
-                            if (bank <= mIncome) {
+                            if (isCorrectDivision()) {
                                 mShareBank = bank;
-                                Toast.makeText(activity, "Share bank: " + bank, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(activity, "Share bank: " + SupportUtils.getNormalDoubleString(bank, "#0,000"), Toast.LENGTH_SHORT).show();
                                 mProgressBank.setProgress((int) mShareBank);
                                 double percent = (mShareBank / mIncome) * 100;
-                                mTextCash.setText(percent + "%");
+                                mTextBank.setText(SupportUtils.formatDouble(percent, "#.00") + "%");
                             } else {
-                                Toast.makeText(activity, "This amount must be lower than total income", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(activity, resources.getString(R.string.error_higher_than_income), Toast.LENGTH_SHORT).show();
                                 mEdtBank.removeTextChangedListener(this);
                                 mEdtBank.setText("");
                                 mEdtBank.setText(String.valueOf(mShareBank));
@@ -277,14 +283,14 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                 if (mCurrency.equals("VND")) {
                     if (credit / MIN_CURRENCY >= 1) {
                         if (credit % MIN_CURRENCY == 500 || credit % MIN_CURRENCY == 0) {
-                            if (credit <= mIncome) {
+                            if (isCorrectDivision()) {
                                 mShareCredit = credit;
-                                Toast.makeText(activity, "Share credit: " + credit, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(activity, "Share credit: " + SupportUtils.getNormalDoubleString(credit, "#0,000"), Toast.LENGTH_SHORT).show();
                                 mProgressCredit.setProgress((int) mShareCredit);
                                 double percent = (mShareCredit / mIncome) * 100;
-                                mTextCash.setText(percent + "%");
+                                mTextCredit.setText(SupportUtils.formatDouble(percent, "#.00") + "%");
                             } else {
-                                Toast.makeText(activity, "This amount must be lower than total income", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(activity, resources.getString(R.string.error_higher_than_income), Toast.LENGTH_SHORT).show();
                                 mEdtCredit.removeTextChangedListener(this);
                                 mEdtCredit.setText("");
                                 mEdtCredit.setText(String.valueOf(mShareCredit));
@@ -317,6 +323,8 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
         mButtonAddTransfer.setOnClickListener(this);
         final ImageButton mButtonAddCash = (ImageButton) view.findViewById(R.id.buttonAddCash);
         mButtonAddCash.setOnClickListener(this);
+        view.findViewById(R.id.incomeConfirm).setOnClickListener(this);
+        view.findViewById(R.id.incomeCancel).setOnClickListener(this);
         RadioGroup mTabHost = (RadioGroup) view.findViewById(R.id.tabHost);
         final RadioButton buttonTabCash = (RadioButton) view.findViewById(R.id.buttonTabCash);
         final RadioButton buttonTabBank = (RadioButton) view.findViewById(R.id.buttonTabBank);
@@ -449,6 +457,9 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
 
     @Override
     public void onClick(View view) {
+        Activity activity = getActivity();
+        Resources resources = activity.getResources();
+        MainApplication mainApplication = MainApplication.getInstance();
         switch (view.getId()) {
             case R.id.buttonBack:
                 if (canGoBack()) {
@@ -472,6 +483,60 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
             case R.id.layoutButtonAddTransfer:
             case R.id.buttonAddTransfer:
                 break;
+            case R.id.incomeConfirm:
+                if (isCorrectDivision()) {
+                    String cash = mEdtCash.getText().toString();
+                    String credit = mEdtCredit.getText().toString();
+                    String bank = mEdtBank.getText().toString();
+                    double cashAmount = cash.isEmpty() ? 0 : Double.valueOf(cash);
+                    double bankAmount = bank.isEmpty() ? 0 : Double.valueOf(bank);
+                    double creditAmount = credit.isEmpty() ? 0 : Double.valueOf(credit);
+                    ArrayList<Account> accounts = mainApplication.getAccounts();
+                    String cashLocal = SupportUtils.getStringLocalized(activity, "en", R.string.cash);
+                    String bankLocal = SupportUtils.getStringLocalized(activity, "en", R.string.bank);
+                    String creditLocal = SupportUtils.getStringLocalized(activity, "en", R.string.credit_card);
+                    AccountDAO accountDAO = AccountDAO.getInstance(activity);
+                    if (accountDAO != null) {
+                        boolean cashUpdated = false, bankUpdated = false, creditUpdated = false;
+                        for (Account account : accounts) {
+                            if (account.getAccountName().contains(cashLocal)) {
+                                double newCash = account.getCurrentBalance() + cashAmount;
+                                cashUpdated = accountDAO.updateAccount(cashLocal, newCash);
+                            } else if (account.getAccountName().contains(bankLocal)) {
+                                double newBank = account.getCurrentBalance() + bankAmount;
+                                bankUpdated = accountDAO.updateAccount(bankLocal, newBank);
+                            } else {
+                                double newCredit = account.getCurrentBalance() + creditAmount;
+                                creditUpdated = accountDAO.updateAccount(creditLocal, newCredit);
+                            }
+                        }
+                        if (cashUpdated && bankUpdated && creditUpdated) {
+                            Toast.makeText(activity, resources.getString(R.string.info_saved), Toast.LENGTH_SHORT).show();
+                            mainApplication.refreshAllData();
+                            mAddIncomeArea.setVisibility(View.GONE);
+                        } else {
+                            Toast.makeText(activity, resources.getString(R.string.info_save_failed), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                }
+                break;
+            case R.id.incomeCancel:
+                mProgressBank.setMax(0);
+                mProgressCredit.setMax(0);
+                mProgressCash.setMax(0);
+                mProgressBank.setProgress(0);
+                mProgressCredit.setProgress(0);
+                mProgressCash.setProgress(0);
+                mEdtCash.setText("");
+                mEdtBank.setText("");
+                mEdtCredit.setText("");
+                mTextCredit.setText("");
+                mTextBank.setText("");
+                mTextCash.setText("");
+                break;
+            default:
+                break;
         }
     }
 
@@ -480,4 +545,15 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
 
     }
 
+    private boolean isCorrectDivision() {
+        String cash = mEdtCash.getText().toString();
+        String credit = mEdtCredit.getText().toString();
+        String bank = mEdtBank.getText().toString();
+        String income = mTotalIncome.getText().toString();
+        double cashAmount = cash.isEmpty() ? 0 : Double.valueOf(cash);
+        double bankAmount = bank.isEmpty() ? 0 : Double.valueOf(bank);
+        double creditAmount = credit.isEmpty() ? 0 : Double.valueOf(credit);
+        double incomeAmount = cash.isEmpty() ? 0 : Double.valueOf(income);
+        return (cashAmount + bankAmount + creditAmount) <= incomeAmount;
+    }
 }

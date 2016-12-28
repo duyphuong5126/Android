@@ -104,6 +104,24 @@
     <string name="bought_products">Bought products</string>
     <string name="recommend_products">Recommended for you</string>
 
+    <string name="enter_income">Enter your income</string>
+    <string name="enter_amount_cash">Enter cash amount</string>
+    <string name="enter_amount_bank">Enter bank amount</string>
+    <string name="enter_amount_credit">Enter credit amount</string>
+
+    <string name="error_lower_than_minimum">Your balance(s) is lower than minimum limit</string>
+    <string name="error_higher_than_income">This amount must be lower than total income</string>
+    <string name="error_invalid_denominations">Your balance(s) has invalid denominations</string>
+    <string name="error_out_of_budget_limit">Out of budget limit</string>
+    <string name="info_saved">Your info is saved</string>
+    <string name="info_save_failed">Failed to store you data</string>
+    <string name="deleted">Deleted</string>
+    <string name="press_again">Press again to access form</string>
+    <string name="this_month_expense_chart">This month expense chart</string>
+    <string name="this_month_cash_chart">This month cash flow chart</string>
+
+    <string name="split">Split this income</string>
+
     <string name="usd">USD</string>
     <string name="vnd">VND</string>
 
