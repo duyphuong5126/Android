@@ -121,6 +121,13 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
     @Override
     protected void fragmentReady(Bundle savedInstanceState) {
         final Activity activity = getActivity();
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            boolean openFormSupport = bundle.getBoolean("isOpenSupportForm");
+            if (openFormSupport) {
+                mLayoutEditAccurate.setVisibility(View.VISIBLE);
+            }
+        }
         mBoughtProductAdapter = new BasicAdapter<>(mBoughtProductsForSearch, R.layout.item_product, activity.getLayoutInflater());
         mListBoughtProducts.setAdapter(mBoughtProductAdapter);
         mBoughtProductAdapter.notifyDataSetChanged();

@@ -64,6 +64,11 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
 
     private boolean isAddIncome, isAddTransfer;
 
+    private ArrayList<Account> mListAccounts;
+    private double mTotalPayable;
+
+    private TextView mTextCurrentBank, mTextInitBank, mTextCurrentCash, mTextInitCash, mTextCurrentCredit, mTextInitCredit, mTextTotalPayable;
+
     @Override
     protected int getLayoutXML() {
         return R.layout.fragment_budget;
@@ -72,10 +77,10 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
     @Override
     protected void onPrepare() {
         mListTransfer = new ArrayList<>();
-        mListTransfer.add(new TransferItem(100, "Cash", "Bank", 1000, 700, new Date(System.currentTimeMillis())));
+        /*mListTransfer.add(new TransferItem(100, "Cash", "Bank", 1000, 700, new Date(System.currentTimeMillis())));
         mListTransfer.add(new TransferItem(50, "Cash", "Bank", 900, 800, new Date(System.currentTimeMillis())));
         mListTransfer.add(new TransferItem(10, "Credit", "Cash", 900, 850, new Date(System.currentTimeMillis())));
-        mListTransfer.add(new TransferItem(40, "Credit", "Cash", 890, 860, new Date(System.currentTimeMillis())));
+        mListTransfer.add(new TransferItem(40, "Credit", "Cash", 890, 860, new Date(System.currentTimeMillis())));*/
 
         mCurrency = PreferencesUtils.getString(PreferencesUtils.CURRENCY, "VND");
         mTotal = mIncome = mShareBank = mShareCash = mShareCredit = 0;
@@ -84,8 +89,22 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
             isAddIncome = bundle.getBoolean("isAddIncome");
             isAddTransfer = bundle.getBoolean("isAddTransfer");
         }
+
+        mTotalPayable = 0;
+        if (mListAccounts == null) {
+            mListAccounts = new ArrayList<>();
+        }
+        if (mListAccounts.isEmpty()) {
+            mListAccounts.addAll(MainApplication.getInstance().getAccounts());
+        }
+        if (!mListAccounts.isEmpty()) {
+            for (Account account : mListAccounts) {
+                mTotalPayable += account.getCurrentBalance();
+            }
+        }
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void initUI(final View view) {
         final Activity activity = getActivity();
@@ -95,6 +114,13 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
         view.findViewById(R.id.layoutButtonAddTransfer).setOnClickListener(this);
         view.findViewById(R.id.buttonBack).setOnClickListener(this);
 
+        mTextCurrentBank = (TextView) view.findViewById(R.id.itemBankText1);
+        mTextInitBank = (TextView) view.findViewById(R.id.itemBankText2);
+        mTextCurrentCash = (TextView) view.findViewById(R.id.itemCashText1);
+        mTextInitCash = (TextView) view.findViewById(R.id.itemCashText2);
+        mTextCurrentCredit = (TextView) view.findViewById(R.id.itemCreditText1);
+        mTextInitCredit = (TextView) view.findViewById(R.id.itemCreditText2);
+        mTextTotalPayable = (TextView) view.findViewById(R.id.textTotalPlayable);
         mProgressBank = (ProgressBar) view.findViewById(R.id.progressShareBank);
         mProgressCash = (ProgressBar) view.findViewById(R.id.progressShareCash);
         mProgressCredit = (ProgressBar) view.findViewById(R.id.progressShareCredit);
@@ -425,6 +451,47 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
 
         mAddIncomeArea = (LinearLayout) view.findViewById(R.id.addIncomeArea);
         mAddTransferArea = (LinearLayout) view.findViewById(R.id.addTransferArea);
+
+        String totalPayable = SupportUtils.getNormalDoubleString(mTotalPayable, "#0,000");
+        String currency = PreferencesUtils.getString(PreferencesUtils.CURRENCY, "VND");
+        if (currency.contains("VND")) {
+            mTextTotalPayable.setText(totalPayable + " VNĐ");
+        } else {
+            mTextTotalPayable.setText("$" + totalPayable);
+        }
+        for (Account account : mListAccounts) {
+            if (account.getAccountName().contains(SupportUtils.getStringLocalized(activity, "en", R.string.cash))) {
+                String currentCash = SupportUtils.getNormalDoubleString(account.getCurrentBalance(), "#0,000");
+                String initCash = SupportUtils.getNormalDoubleString(account.getInitialBalance(), "#0,000");
+                if (currency.contains("VND")) {
+                    mTextCurrentCash.setText(currentCash + " VNĐ");
+                    mTextInitCash.setText(initCash + " VNĐ");
+                } else {
+                    mTextCurrentCash.setText("$" + currentCash);
+                    mTextInitCash.setText("$" + initCash);
+                }
+            } else if (account.getAccountName().contains(SupportUtils.getStringLocalized(activity, "en", R.string.credit_card))) {
+                String currentCredit = SupportUtils.getNormalDoubleString(account.getCurrentBalance(), "#0,000");
+                String initCredit = SupportUtils.getNormalDoubleString(account.getInitialBalance(), "#0,000");
+                if (currency.contains("VND")) {
+                    mTextCurrentCredit.setText(currentCredit + " VNĐ");
+                    mTextInitCredit.setText(initCredit + " VNĐ");
+                } else {
+                    mTextCurrentCredit.setText("$" + currentCredit);
+                    mTextInitCredit.setText("$" + initCredit);
+                }
+            } else {
+                String currentBank = SupportUtils.getNormalDoubleString(account.getCurrentBalance(), "#0,000");
+                String initBank = SupportUtils.getNormalDoubleString(account.getInitialBalance(), "#0,000");
+                if (currency.contains("VND")) {
+                    mTextCurrentBank.setText(currentBank + " VNĐ");
+                    mTextInitBank.setText(initBank + " VNĐ");
+                } else {
+                    mTextCurrentBank.setText("$" + currentBank);
+                    mTextInitBank.setText("$" + initBank);
+                }
+            }
+        }
     }
 
     @Override
@@ -542,7 +609,11 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
 
     @Override
     public void refreshData() {
-
+        if (mListAccounts == null) {
+            mListAccounts = new ArrayList<>();
+        }
+        mListAccounts.clear();
+        mListAccounts.addAll(MainApplication.getInstance().getAccounts());
     }
 
     private boolean isCorrectDivision() {

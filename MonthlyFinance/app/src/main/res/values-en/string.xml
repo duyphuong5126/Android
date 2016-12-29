@@ -122,6 +122,18 @@
     <string name="this_month_expense_chart">This month expense chart</string>
     <string name="this_month_cash_chart">This month cash flow chart</string>
 
+    <string name="supp_title">The support of X with respect to T is defined as the proportion of transactions T in all transactions which contains item set X.</string>
+    <string name="mean">It means:</string>
+    <string name="supp_contain">Number of transactions contain X</string>
+    <string name="all_transactions">Number of completed transactions</string>
+
+    <string name="conf_title_1">Confidence is an indication of how often the rule has been found to be true.</string>
+    <string name="conf_title_2">The confidence of a rule, X => Y, with respect to a set of transactions T, is the proportion of the transactions that contains X which also contains Y</string>
+
+    <string name="enter_and_cont">I knew and will help to enter this values</string>
+
+    <string name="support_us">Support us</string>
+
     <string name="balance_title">Total Balance</string>
 
 </resources>

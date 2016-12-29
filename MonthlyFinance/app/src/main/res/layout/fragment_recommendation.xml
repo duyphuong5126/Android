@@ -270,22 +270,40 @@
                             android:paddingLeft="10dip"
                             android:paddingRight="10dip">
 
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Enter confidence"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:textColor="#444"
+                                android:fontFamily="sans-serif-smallcaps"/>
+
                             <EditText
                                 android:id="@+id/edtAccurate"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="5dip"
                                 android:background="#0000"
-                                android:hint="Enter confidence"
+                                android:hint="Confidence"
                                 android:inputType="numberDecimal"
                                 android:text="0.6"
                                 android:textSize="20sp" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Enter support"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:textColor="#444"
+                                android:fontFamily="sans-serif-smallcaps"
+                                android:layout_marginTop="15dip"/>
 
                             <EditText
                                 android:id="@+id/edtSupportLevel"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="15dip"
                                 android:background="#0000"
                                 android:hint="Enter support"
                                 android:inputType="numberDecimal"

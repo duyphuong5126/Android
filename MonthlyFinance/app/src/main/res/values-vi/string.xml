@@ -122,6 +122,18 @@
     <string name="this_month_expense_chart">Biểu đồ chi tiêu trong tháng</string>
     <string name="this_month_cash_chart">Biểu đồ dòng tiền trong tháng</string>
 
+    <string name="supp_title">Độ hỗ trợ của tập sản phẩm X là mật độ xuất hiện X trên các hoá đơn đã mua.</string>
+    <string name="mean">Nghĩa là:</string>
+    <string name="supp_contain">Số lượng hóa đơn có mua X</string>
+    <string name="all_transactions">Tổng số hóa đơn đã mua</string>
+
+    <string name="conf_title_1">Độ tin cậy của một quy luật là mức độ xảy ra quy luật đó.</string>
+    <string name="conf_title_2">Độ tin cậy của một luật, nếu mua X thì mua Y, là xác suất để một hóa đơn có mua X thì cũng mua Y</string>
+
+    <string name="enter_and_cont">Tôi hiểu và sẽ nhập các giá trị này</string>
+
+    <string name="support_us">Hỗ trợ</string>
+
     <string name="balance_title">Số dư</string>
 
 </resources>

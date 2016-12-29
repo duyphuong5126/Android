@@ -2,12 +2,14 @@ package com.huy.monthlyfinance;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -98,7 +100,20 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
                     showFragment(BudgetFragment.class, null);
                 }
                 if (mMenuItems.get(i).getTextName().equals(getString(R.string.recommendation))) {
-                    showFragment(RecommendationFragment.class, null);
+                    final Dialog dialog = new Dialog(MainActivity.this, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    View view1 = getLayoutInflater().inflate(R.layout.layout_supp_conf, null);
+                    dialog.setContentView(view1);
+                    view1.findViewById(R.id.cont_and_enter).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Bundle bundle = new Bundle();
+                            bundle.putBoolean("isOpenSupportForm", true);
+                            showFragment(RecommendationFragment.class, bundle);
+                            dialog.dismiss();
+                        }
+                    });
+                    dialog.show();
                 }
                 mDrawer.closeDrawer(mLayoutSideMenu);
             }
