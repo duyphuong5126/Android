@@ -9,7 +9,7 @@
     <string name="transport">Giao thông, vận chuyển</string>
     <string name="etc">Khác</string>
     <string name="dress">May mặc</string>
-    <string name="family">Chi phí mProductCost đình</string>
+    <string name="family">Chi phí gia đình</string>
 
     <string name="expense_fragment">Chi phí của bạn</string>
     <string name="expense_fragment_description">Các chi phí trong tháng</string>
@@ -30,6 +30,7 @@
     <string name="add_product">Thêm sản phẩm</string>
     <string name="all_product">Tất cả sản phẩm</string>
     <string name="total_cost">Tổng chi phí</string>
+    <string name="total_expense_this_month">Tổng chi tiêu trong tháng</string>
 
     <string name="confirm">Xác nhận</string>
     <string name="cancel">Hủy</string>
@@ -94,9 +95,10 @@
 
     <string name="init_info">Khởi tạo thông tin cá nhân</string>
     <string name="init_balances">Khởi tạo các số dư</string>
+    <string name="init_balance">Số dư khởi điểm</string>
 
     <string name="budget_title">Tài khoản</string>
-    <string name="total_payable">TOTAL PAYABLE</string>
+    <string name="total_payable">TỔNG SỐ TIỀN CÓ THỂ CHI TIÊU</string>
 
     <string name="recommend">Khuyến nghị</string>
 
@@ -104,23 +106,39 @@
     <string name="bought_products">Sản phẩm đã mua</string>
     <string name="recommend_products">Gợi ý cho bạn</string>
 
+    <string name="edit_conf">Nhập độ tin cậy</string>
+    <string name="conf">Độ tin cậy</string>
+    <string name="edit_supp">Nhập độ hỗ trợ</string>
+    <string name="supp">Độ hỗ trợ</string>
+
     <string name="enter_income">Nhập số tiền</string>
     <string name="enter_amount_cash">Nhập số tiền mặt</string>
     <string name="enter_amount_bank">Nhập khoản tiết kiệm</string>
     <string name="enter_amount_credit">Nhập khoản tín dụng</string>
+    <string name="enter_amount_transfer">Số tiền cần chuyển</string>
+    <string name="source">Nguồn</string>
+    <string name="target">Đích</string>
+
+    <string name="selected_item">Tài khoản này đã được chọn</string>
 
     <string name="split">Phân chia khoản thu nhập</string>
 
     <string name="error_lower_than_minimum">Số dư thấp dưới mức tối thiểu</string>
     <string name="error_higher_than_income">Số tiền vượt quá số thu nhập</string>
+    <string name="error_higher_than_max">Số tiền vượt quá số dư nguồn</string>
     <string name="error_invalid_denominations">(Các) Số dư có mệnh giá không phù hợp</string>
     <string name="error_out_of_budget_limit">Out of budget limit</string>
+    <string name="error_empty_bought_products">Bạn chưa mua một sản phẩm nào</string>
+    <string name="error_logcat">Bạn gặp phải lỗi. Hãy xem trong logcat</string>
     <string name="info_saved">Đã lưu thông tin</string>
     <string name="info_save_failed">Lưu thông tin thất bại</string>
     <string name="deleted">Đã xóa</string>
     <string name="press_again">Nhấn 1 lần nữa để hiển thị form</string>
     <string name="this_month_expense_chart">Biểu đồ chi tiêu trong tháng</string>
     <string name="this_month_cash_chart">Biểu đồ dòng tiền trong tháng</string>
+    <string name="error_not_pick_account">Bạn chưa chọn tài khoản nguồn hoặc đích</string>
+
+    <string name="done_init_algorithm">Đã chuẩn bị xong dữ liệu khuyến nghị</string>
 
     <string name="supp_title">Độ hỗ trợ của tập sản phẩm X là mật độ xuất hiện X trên các hoá đơn đã mua.</string>
     <string name="mean">Nghĩa là:</string>
@@ -134,6 +152,7 @@
 
     <string name="support_us">Hỗ trợ</string>
 
+    <string name="account_title">TÀI KHOẢN (LOẠI TIỀN TỆ: )</string>
     <string name="balance_title">Số dư</string>
 
 </resources>

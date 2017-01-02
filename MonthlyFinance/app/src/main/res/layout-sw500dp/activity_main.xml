@@ -7,19 +7,51 @@
     android:animateLayoutChanges="true"
     tools:context="com.huy.monthlyfinance.MainActivity">
 
-    <LinearLayout
-        android:id="@+id/layoutFragmentsContainer"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" />
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/layoutFragmentsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"/>
+
+        <LinearLayout
+            android:id="@+id/layoutProgress"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:orientation="vertical">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="10"
+                android:gravity="center"
+                android:background="#96000000">
+
+                <ProgressBar
+                    android:layout_width="50dip"
+                    android:layout_height="50dip" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/layoutSideMenu"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_gravity="start"
         android:background="#fff"
-        android:orientation="vertical"
-        android:layout_gravity="start">
+        android:orientation="vertical">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -30,7 +62,7 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <LinearLayout
+                <FrameLayout
                     android:id="@+id/layoutTopSideMenu"
                     android:layout_width="match_parent"
                     android:layout_height="0dip"
@@ -39,7 +71,7 @@
                     android:orientation="horizontal">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center_vertical"
                         android:orientation="vertical">
@@ -60,7 +92,8 @@
                         </LinearLayout>
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:id="@+id/textUser"
+                            android:layout_width="match_parent"
                             android:layout_height="0dip"
                             android:layout_marginLeft="20dip"
                             android:layout_weight="1"
@@ -96,7 +129,8 @@
                                     android:text="@string/sign_out"
                                     android:textColor="#859eaa"
                                     android:textSize="17sp"
-                                    android:textStyle="bold" />
+                                    android:textStyle="bold"
+                                    android:visibility="gone"/>
                             </LinearLayout>
                         </LinearLayout>
 
@@ -106,7 +140,7 @@
                             android:layout_weight="1" />
 
                     </LinearLayout>
-                </LinearLayout>
+                </FrameLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -122,7 +156,7 @@
                         android:id="@+id/sideMenu"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:divider="@null"/>
+                        android:divider="@null" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -146,15 +180,15 @@
                         android:layout_height="80dip"
                         android:layout_marginRight="10dip"
                         android:background="@drawable/circle_dark_blue"
-                        android:src="@mipmap/ic_edit_white_24dp"
+                        android:padding="15dip"
                         android:scaleType="fitXY"
-                        android:padding="15dip"/>
+                        android:src="@mipmap/ic_edit_white_24dp" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dip"
-                    android:layout_weight="7"/>
+                    android:layout_weight="7" />
             </LinearLayout>
         </FrameLayout>
 

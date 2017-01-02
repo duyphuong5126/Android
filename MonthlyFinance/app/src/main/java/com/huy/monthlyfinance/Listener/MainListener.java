@@ -15,6 +15,7 @@ public interface MainListener {
     void setStatusBarColor(int color);
     void showFragment(Class c, Bundle bundle);
     void changeSideMenuColor(int color);
+    void toggleProgress(boolean isShow);
 
     ArrayList<Object> getData(Class c);
     Context getContext();

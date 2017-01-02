@@ -30,6 +30,7 @@
     <string name="add_product">Add to list products</string>
     <string name="all_product">All products</string>
     <string name="total_cost">Enter total cost:</string>
+    <string name="total_expense_this_month">Total expenses this month</string>
 
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
@@ -94,6 +95,7 @@
 
     <string name="init_info">Please init your info</string>
     <string name="init_balances">Init your balances</string>
+    <string name="init_balance">Initial balance</string>
 
     <string name="budget_title">Your budget</string>
     <string name="total_payable">TOTAL PAYABLE</string>
@@ -104,21 +106,37 @@
     <string name="bought_products">Bought products</string>
     <string name="recommend_products">Recommended for you</string>
 
+    <string name="edit_conf">Edit confidence</string>
+    <string name="conf">Confidence</string>
+    <string name="edit_supp">Edit support</string>
+    <string name="supp">Support</string>
+
     <string name="enter_income">Enter your income</string>
     <string name="enter_amount_cash">Enter cash amount</string>
     <string name="enter_amount_bank">Enter bank amount</string>
     <string name="enter_amount_credit">Enter credit amount</string>
+    <string name="enter_amount_transfer">Amount need to be transferred</string>
+    <string name="source">Source</string>
+    <string name="target">Target</string>
+
+    <string name="selected_item">This account is selected</string>
 
     <string name="error_lower_than_minimum">Your balance(s) is lower than minimum limit</string>
     <string name="error_higher_than_income">This amount must be lower than total income</string>
+    <string name="error_higher_than_max">This amount must be lower than max source</string>
     <string name="error_invalid_denominations">Your balance(s) has invalid denominations</string>
     <string name="error_out_of_budget_limit">Out of budget limit</string>
+    <string name="error_empty_bought_products">You haven\'t bought any product</string>
+    <string name="error_logcat">You have an error. Please see it in logcat</string>
     <string name="info_saved">Your info is saved</string>
     <string name="info_save_failed">Failed to store you data</string>
     <string name="deleted">Deleted</string>
     <string name="press_again">Press again to access form</string>
     <string name="this_month_expense_chart">This month expense chart</string>
     <string name="this_month_cash_chart">This month cash flow chart</string>
+    <string name="error_not_pick_account">You\'re missing source or target account</string>
+
+    <string name="done_init_algorithm">Done set up recommendation</string>
 
     <string name="supp_title">The support of X with respect to T is defined as the proportion of transactions T in all transactions which contains item set X.</string>
     <string name="mean">It means:</string>
@@ -133,6 +151,9 @@
     <string name="support_us">Support us</string>
 
     <string name="split">Split this income</string>
+
+    <string name="account_title">ACCOUNT (DEFAULT CURRENCY: )</string>
+    <string name="balance_title">Total Balance</string>
 
     <string name="usd">USD</string>
     <string name="vnd">VND</string>

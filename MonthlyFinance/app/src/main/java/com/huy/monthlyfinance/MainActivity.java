@@ -5,16 +5,18 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
-import com.huy.monthlyfinance.Database.DAO.ProductDAO;
 import com.huy.monthlyfinance.Fragments.BaseFragment;
 import com.huy.monthlyfinance.Fragments.BudgetFragment;
 import com.huy.monthlyfinance.Fragments.ExpenseManagerFragment;
@@ -22,10 +24,10 @@ import com.huy.monthlyfinance.Fragments.OverViewFragment;
 import com.huy.monthlyfinance.Fragments.RecommendationFragment;
 import com.huy.monthlyfinance.Listener.MainListener;
 import com.huy.monthlyfinance.Listener.NavigationListener;
-import com.huy.monthlyfinance.Model.Product;
 import com.huy.monthlyfinance.MyView.BasicAdapter;
 import com.huy.monthlyfinance.MyView.Item.ListItem.SideMenuItem;
 import com.huy.monthlyfinance.MyView.RoundImageView;
+import com.huy.monthlyfinance.SupportUtils.PreferencesUtils;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
 import java.util.ArrayList;
@@ -38,23 +40,25 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
     private FragmentManager mManager;
     private ArrayList<SideMenuItem> mMenuItems;
     private BasicAdapter<SideMenuItem> mSideMenuAdapter;
-    private LinearLayout mLayoutTopSideMenu;
+    private FrameLayout mLayoutTopSideMenu;
     private RoundImageView mImageAvatar;
-
-    // xu ly test thuat toan
-    private ProductDAO mProductSource;
+    private LinearLayout mLayoutProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mProductSource = ProductDAO.getInstance(this.getApplicationContext());
+        Resources resources = getResources();
+        TextView textUser = (TextView) findViewById(R.id.textUser);
+        textUser.setText(PreferencesUtils.getString(PreferencesUtils.CURRENT_EMAIL, resources.getString(R.string.welcome)));
 
         mDrawer = (DrawerLayout) findViewById(R.id.mainLayout);
         mLayoutSideMenu = (LinearLayout) findViewById(R.id.layoutSideMenu);
-        mLayoutTopSideMenu = (LinearLayout) findViewById(R.id.layoutTopSideMenu);
+        mLayoutTopSideMenu = (FrameLayout) findViewById(R.id.layoutTopSideMenu);
         mImageAvatar = (RoundImageView) findViewById(R.id.imageAvatar);
+
+        mLayoutProgress = (LinearLayout) findViewById(R.id.layoutProgress);
 
         MainApplication mainApplication = MainApplication.getInstance();
         mFragments = new TreeMap<>();
@@ -169,10 +173,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
     }
 
     @Override
-    public ArrayList<Object> getData(Class c) {
-        if (Product.class.equals(c)) {
-
+    public void toggleProgress(boolean isShow) {
+        if (mLayoutProgress != null) {
+            mLayoutProgress.setVisibility(isShow ? View.VISIBLE : View.GONE);
         }
+    }
+
+    @Override
+    public ArrayList<Object> getData(Class c) {
         return null;
     }
 

@@ -1,9 +1,13 @@
 package com.huy.monthlyfinance.ProcessData;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 
+import com.huy.monthlyfinance.MainApplication;
 import com.huy.monthlyfinance.Model.ProductDetail;
+import com.huy.monthlyfinance.R;
 
 import java.util.*;
 
@@ -17,6 +21,10 @@ public class Apriori {
     private double minSupport;
     private double minConf;
     private Set<Integer> candidate_set_one;
+
+    public boolean isInitialized() {
+        return isInitialized;
+    }
 
     private static boolean isInitialized;
 
@@ -36,7 +44,7 @@ public class Apriori {
         mInstance.l.clear();
         mInstance.minConf = minConf;
         mInstance.minSupport = minSupport;
-        mInstance.isInitialized = false;
+        isInitialized = false;
         return mInstance;
     }
 
@@ -45,9 +53,15 @@ public class Apriori {
     }
 
     public void execute() {
-        new AsyncTask<Void, Void, Void>() {
+        new AsyncTask<Void, Void, Boolean>() {
             @Override
-            protected Void doInBackground(Void... voids) {
+            protected void onPreExecute() {
+                super.onPreExecute();
+                mListener.onBegin();
+            }
+
+            @Override
+            protected Boolean doInBackground(Void... voids) {
                 if (isInitialized) {
                     int i, j;
 //		Set<Integer> candidate_set = new HashSet<>();
@@ -71,10 +85,19 @@ public class Apriori {
                     prune();
                     generateFrequentItemSets();
                     isInitialized = false;
+                    return true;
                 } else {
                     mInstance.mListener.onError("You must call .initialize(...).execute(...), not .execute(...)");
                 }
-                return null;
+                return false;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean success) {
+                super.onPostExecute(success);
+                if (success) {
+                    mListener.onSuccess();
+                }
             }
         }.execute();
     }
@@ -82,6 +105,7 @@ public class Apriori {
     private AprioriListener mListener;
 
     public interface AprioriListener {
+        void onBegin();
         void onSuccess();
         void onError(String message);
     }
@@ -245,6 +269,16 @@ public class Apriori {
     }
 
     public Apriori initialize(List<ProductDetail> productDetails) {
+        Context context = MainApplication.getInstance().getApplicationContext();
+        Resources resources = context.getResources();
+        if (productDetails == null) {
+            mListener.onError(resources.getString(R.string.error_empty_bought_products));
+            return null;
+        }
+        if (productDetails.isEmpty()) {
+            mListener.onError(resources.getString(R.string.error_empty_bought_products));
+            return null;
+        }
         @SuppressLint("UseSparseArrays")
         Map<Integer, List<Integer>> m = new HashMap<>();
         List<Integer> temp;

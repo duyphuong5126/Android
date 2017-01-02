@@ -16,6 +16,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import java.text.DecimalFormat;
+import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -118,5 +119,9 @@ public class SupportUtils {
     public static String formatDouble(double d, String format) {
         DecimalFormat decimalFormat = new DecimalFormat(format);
         return decimalFormat.format(d);
+    }
+
+    public static String unicode2NonUnicode(String unicodeString) {
+        return Normalizer.normalize(unicodeString, Normalizer.Form.NFD);
     }
 }

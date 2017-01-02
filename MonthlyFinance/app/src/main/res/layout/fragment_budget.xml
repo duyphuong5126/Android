@@ -212,7 +212,7 @@
                                                 android:layout_height="match_parent"
                                                 android:ellipsize="end"
                                                 android:maxLines="1"
-                                                android:text="Cash"
+                                                android:text="@string/cash"
                                                 android:textColor="#000"
                                                 android:textSize="19sp" />
 
@@ -683,7 +683,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-smallcaps"
+                    android:fontFamily="sans-serif-condensed"
                     android:gravity="center"
                     android:text="@string/add_income"
                     android:textColor="#8cc152"
@@ -721,7 +721,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-smallcaps"
+                    android:fontFamily="sans-serif-condensed"
                     android:gravity="center"
                     android:text="@string/split"
                     android:textColor="#8cc152"
@@ -763,11 +763,11 @@
                         android:background="#0000"
                         android:fontFamily="sans-serif"
                         android:gravity="center_vertical|right"
-                        android:text="%"
                         android:paddingBottom="5dip"
                         android:paddingLeft="10dip"
                         android:paddingRight="10dip"
                         android:paddingTop="5dip"
+                        android:text="%"
                         android:textColor="#000"
                         android:textColorHint="#000"
                         android:textSize="17sp" />
@@ -809,11 +809,11 @@
                         android:background="#0000"
                         android:fontFamily="sans-serif"
                         android:gravity="center_vertical|right"
-                        android:text="%"
                         android:paddingBottom="5dip"
                         android:paddingLeft="10dip"
                         android:paddingRight="10dip"
                         android:paddingTop="5dip"
+                        android:text="%"
                         android:textColor="#000"
                         android:textColorHint="#000"
                         android:textSize="17sp" />
@@ -855,11 +855,11 @@
                         android:background="#0000"
                         android:fontFamily="sans-serif"
                         android:gravity="center_vertical|right"
-                        android:text="%"
                         android:paddingBottom="5dip"
                         android:paddingLeft="10dip"
                         android:paddingRight="10dip"
                         android:paddingTop="5dip"
+                        android:text="%"
                         android:textColor="#000"
                         android:textColorHint="#000"
                         android:textSize="17sp" />
@@ -882,7 +882,7 @@
                         android:paddingTop="5dip"
                         android:text="@string/confirm"
                         android:textColor="#fff"
-                        android:textSize="20sp" />
+                        android:textSize="17sp" />
 
                     <Button
                         android:id="@+id/incomeCancel"
@@ -896,7 +896,7 @@
                         android:paddingTop="5dip"
                         android:text="@string/cancel"
                         android:textColor="#fff"
-                        android:textSize="20sp" />
+                        android:textSize="17sp" />
 
                 </LinearLayout>
 
@@ -904,7 +904,7 @@
 
         </LinearLayout>
 
-        <LinearLayout
+        <ScrollView
             android:id="@+id/addTransferArea"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -913,11 +913,611 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal">
+
+                    <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/chartBudget"
+                        android:layout_width="300dip"
+                        android:layout_height="300dip" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layoutTransferSource"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/textSourceTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dip"
+                            android:background="#0000"
+                            android:fontFamily="sans-serif-condensed"
+                            android:maxLines="1"
+                            android:paddingLeft="20dip"
+                            android:text="@string/source"
+                            android:textColor="#1eb1fc"
+                            android:textSize="25sp" />
+
+                        <TextView
+                            android:id="@+id/textSourceSelector"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="right"
+                            android:layout_marginRight="10dip"
+                            android:background="#0000"
+                            android:fontFamily="sans-serif-condensed"
+                            android:paddingLeft="20dip"
+                            android:text="▼"
+                            android:textColor="#1eb1fc"
+                            android:textSize="25sp" />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/layoutPickAccountSource"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="right">
+
+                            <TextView
+                                android:layout_width="30dip"
+                                android:layout_height="30dip"
+                                android:layout_marginRight="8dip"
+                                android:text="▲"
+                                android:textColor="#bbb"
+                                android:textSize="30sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dip"
+                            android:layout_marginRight="10dip"
+                            android:layout_marginTop="25dip"
+                            android:background="@drawable/corner_radius_gray_4"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="5dip"
+                                android:layout_marginTop="10dip"
+                                android:orientation="vertical">
+
+                                <FrameLayout
+                                    android:id="@+id/itemSelectCashSource"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="5dip"
+                                    android:layout_marginTop="5dip"
+                                    android:orientation="horizontal">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:layout_width="30dip"
+                                            android:layout_height="30dip"
+                                            android:layout_marginLeft="10dip"
+                                            android:src="@mipmap/ic_cash_24dp" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="match_parent"
+                                            android:layout_marginLeft="10dip"
+                                            android:gravity="center_vertical"
+                                            android:text="@string/cash"
+                                            android:textColor="#008593"
+                                            android:textSize="17sp"
+                                            android:textStyle="bold" />
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:gravity="center_vertical|right"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:id="@+id/iconSelectCashSource"
+                                            android:layout_width="25dip"
+                                            android:layout_height="25dip"
+                                            android:layout_marginRight="5dip"
+                                            android:background="@drawable/circle_light_green_1"
+                                            android:src="@mipmap/ic_check_white_18dp"
+                                            android:visibility="gone" />
+                                    </LinearLayout>
+
+                                </FrameLayout>
+
+                                <FrameLayout
+                                    android:id="@+id/itemSelectBankSource"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="5dip"
+                                    android:layout_marginTop="5dip">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:layout_width="30dip"
+                                            android:layout_height="30dip"
+                                            android:layout_marginLeft="10dip"
+                                            android:background="@drawable/circle_orange"
+                                            android:padding="5dip"
+                                            android:src="@mipmap/ic_bank" />
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:layout_marginLeft="10dip"
+                                            android:gravity="center_vertical"
+                                            android:text="@string/bank"
+                                            android:textColor="#008593"
+                                            android:textSize="17sp"
+                                            android:textStyle="bold" />
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:gravity="center_vertical|right"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:id="@+id/iconSelectBankSource"
+                                            android:layout_width="25dip"
+                                            android:layout_height="25dip"
+                                            android:layout_marginRight="5dip"
+                                            android:background="@drawable/circle_light_green_1"
+                                            android:src="@mipmap/ic_check_white_18dp"
+                                            android:visibility="gone" />
+                                    </LinearLayout>
+
+                                </FrameLayout>
+
+                                <FrameLayout
+                                    android:id="@+id/itemSelectCreditSource"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dip">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:layout_width="30dip"
+                                            android:layout_height="30dip"
+                                            android:layout_marginLeft="10dip"
+                                            android:background="@drawable/circle_dark_blue"
+                                            android:padding="5dip"
+                                            android:src="@mipmap/ic_credit_cards_24dp" />
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:layout_marginLeft="10dip"
+                                            android:gravity="center_vertical"
+                                            android:text="@string/credit_card"
+                                            android:textColor="#008593"
+                                            android:textSize="17sp"
+                                            android:textStyle="bold" />
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:gravity="center_vertical|right"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:id="@+id/iconSelectCreditSource"
+                                            android:layout_width="25dip"
+                                            android:layout_height="25dip"
+                                            android:layout_marginRight="5dip"
+                                            android:background="@drawable/circle_light_green_1"
+                                            android:src="@mipmap/ic_check_white_18dp"
+                                            android:visibility="gone" />
+                                    </LinearLayout>
+
+                                </FrameLayout>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="2dip"
+                                    android:layout_marginBottom="5dip"
+                                    android:layout_marginLeft="5dip"
+                                    android:layout_marginRight="5dip"
+                                    android:layout_marginTop="3dip"
+                                    android:background="#008593" />
+
+                                <ImageView
+                                    android:id="@+id/buttonCloseAccountSource"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="5dip"
+                                    android:src="@mipmap/ic_x_green_1_24dp" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dip"
+                        android:paddingLeft="10dip"
+                        android:paddingRight="10dip">
+
+                        <ProgressBar
+                            android:id="@+id/progressSource"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:progressDrawable="@drawable/progress_style_1" />
+
+                        <EditText
+                            android:id="@+id/edtSource"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="#0000"
+                            android:fontFamily="sans-serif"
+                            android:gravity="center_vertical"
+                            android:hint="@string/enter_amount_transfer"
+                            android:inputType="number"
+                            android:paddingBottom="5dip"
+                            android:paddingLeft="10dip"
+                            android:paddingRight="10dip"
+                            android:paddingTop="5dip"
+                            android:textColor="#000"
+                            android:textColorHint="#000"
+                            android:textSize="17sp" />
+
+                        <TextView
+                            android:id="@+id/textSourcePercent"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="#0000"
+                            android:fontFamily="sans-serif"
+                            android:gravity="center_vertical|right"
+                            android:paddingBottom="5dip"
+                            android:paddingLeft="10dip"
+                            android:paddingRight="10dip"
+                            android:paddingTop="5dip"
+                            android:text="%"
+                            android:textColor="#000"
+                            android:textColorHint="#000"
+                            android:textSize="17sp" />
+                    </FrameLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layoutTransferTarget"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dip"
+                    android:orientation="vertical">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/textTargetTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dip"
+                            android:background="#0000"
+                            android:fontFamily="sans-serif-condensed"
+                            android:maxLines="1"
+                            android:paddingLeft="20dip"
+                            android:text="@string/target"
+                            android:textColor="#1eb1fc"
+                            android:textSize="25sp" />
+
+                        <TextView
+                            android:id="@+id/textTargetSelector"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="right"
+                            android:layout_marginRight="10dip"
+                            android:background="#0000"
+                            android:fontFamily="sans-serif-condensed"
+                            android:paddingLeft="20dip"
+                            android:text="▼"
+                            android:textColor="#1eb1fc"
+                            android:textSize="25sp" />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/layoutPickAccountTarget"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="right">
+
+                            <TextView
+                                android:layout_width="30dip"
+                                android:layout_height="30dip"
+                                android:layout_marginRight="8dip"
+                                android:text="▲"
+                                android:textColor="#bbb"
+                                android:textSize="30sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dip"
+                            android:layout_marginRight="10dip"
+                            android:layout_marginTop="25dip"
+                            android:background="@drawable/corner_radius_gray_4"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="5dip"
+                                android:layout_marginTop="10dip"
+                                android:orientation="vertical">
+
+                                <FrameLayout
+                                    android:id="@+id/itemSelectCashTarget"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="5dip"
+                                    android:layout_marginTop="5dip"
+                                    android:orientation="horizontal">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:layout_width="30dip"
+                                            android:layout_height="30dip"
+                                            android:layout_marginLeft="10dip"
+                                            android:src="@mipmap/ic_cash_24dp" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="match_parent"
+                                            android:layout_marginLeft="10dip"
+                                            android:gravity="center_vertical"
+                                            android:text="@string/cash"
+                                            android:textColor="#008593"
+                                            android:textSize="17sp"
+                                            android:textStyle="bold" />
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:gravity="center_vertical|right"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:id="@+id/iconSelectCashTarget"
+                                            android:layout_width="25dip"
+                                            android:layout_height="25dip"
+                                            android:layout_marginRight="5dip"
+                                            android:background="@drawable/circle_light_green_1"
+                                            android:src="@mipmap/ic_check_white_18dp"
+                                            android:visibility="gone" />
+                                    </LinearLayout>
+
+                                </FrameLayout>
+
+                                <FrameLayout
+                                    android:id="@+id/itemSelectBankTarget"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="5dip"
+                                    android:layout_marginTop="5dip">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:layout_width="30dip"
+                                            android:layout_height="30dip"
+                                            android:layout_marginLeft="10dip"
+                                            android:background="@drawable/circle_orange"
+                                            android:padding="5dip"
+                                            android:src="@mipmap/ic_bank" />
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:layout_marginLeft="10dip"
+                                            android:gravity="center_vertical"
+                                            android:text="@string/bank"
+                                            android:textColor="#008593"
+                                            android:textSize="17sp"
+                                            android:textStyle="bold" />
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:gravity="center_vertical|right"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:id="@+id/iconSelectBankTarget"
+                                            android:layout_width="25dip"
+                                            android:layout_height="25dip"
+                                            android:layout_marginRight="5dip"
+                                            android:background="@drawable/circle_light_green_1"
+                                            android:src="@mipmap/ic_check_white_18dp"
+                                            android:visibility="gone" />
+                                    </LinearLayout>
+
+                                </FrameLayout>
+
+                                <FrameLayout
+                                    android:id="@+id/itemSelectCreditTarget"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dip">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:layout_width="30dip"
+                                            android:layout_height="30dip"
+                                            android:layout_marginLeft="10dip"
+                                            android:background="@drawable/circle_dark_blue"
+                                            android:padding="5dip"
+                                            android:src="@mipmap/ic_credit_cards_24dp" />
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:layout_marginLeft="10dip"
+                                            android:gravity="center_vertical"
+                                            android:text="@string/credit_card"
+                                            android:textColor="#008593"
+                                            android:textSize="17sp"
+                                            android:textStyle="bold" />
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:gravity="center_vertical|right"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:id="@+id/iconSelectCreditTarget"
+                                            android:layout_width="25dip"
+                                            android:layout_height="25dip"
+                                            android:layout_marginRight="5dip"
+                                            android:background="@drawable/circle_light_green_1"
+                                            android:src="@mipmap/ic_check_white_18dp"
+                                            android:visibility="gone" />
+                                    </LinearLayout>
+
+                                </FrameLayout>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="2dip"
+                                    android:layout_marginBottom="5dip"
+                                    android:layout_marginLeft="5dip"
+                                    android:layout_marginRight="5dip"
+                                    android:layout_marginTop="3dip"
+                                    android:background="#008593" />
+
+                                <ImageView
+                                    android:id="@+id/buttonCloseAccountTarget"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="5dip"
+                                    android:src="@mipmap/ic_x_green_1_24dp" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </FrameLayout>
+
+                </LinearLayout>
+
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dip"
+                    android:layout_marginBottom="10dip"
+                    android:gravity="center">
+
+                    <Button
+                        android:id="@+id/transferConfirm"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/button_1"
+                        android:paddingBottom="5dip"
+                        android:paddingLeft="20dip"
+                        android:paddingRight="20dip"
+                        android:paddingTop="5dip"
+                        android:text="@string/confirm"
+                        android:textColor="#fff"
+                        android:textSize="17sp" />
+
+                    <Button
+                        android:id="@+id/transferCancel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dip"
+                        android:background="@drawable/button_1"
+                        android:paddingBottom="5dip"
+                        android:paddingLeft="20dip"
+                        android:paddingRight="20dip"
+                        android:paddingTop="5dip"
+                        android:text="@string/cancel"
+                        android:textColor="#fff"
+                        android:textSize="17sp" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
-        </LinearLayout>
+        </ScrollView>
     </FrameLayout>
 
 </LinearLayout>

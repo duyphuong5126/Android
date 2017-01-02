@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -102,6 +103,7 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
         view.findViewById(R.id.buttonMore).setOnClickListener(this);
         view.findViewById(R.id.buttonBack).setOnClickListener(this);
         view.findViewById(R.id.buttonCloseAccurate).setOnClickListener(this);
+        view.findViewById(R.id.buttonRefresh).setOnClickListener(this);
         mLayoutEditAccurate = (FrameLayout) view.findViewById(R.id.layoutEditAccurate);
         mLayoutRecommend = (LinearLayout) view.findViewById(R.id.layoutRecommendResult);
         mScrollRecommend = (ScrollView) view.findViewById(R.id.scrollRecommend);
@@ -176,11 +178,13 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
 
             @Override
             public void afterTextChanged(Editable editable) {
-                String name = editable.toString();
+                String name = SupportUtils.unicode2NonUnicode(editable.toString()).replaceAll("[^\\x00-\\x7F]", "");
                 for (BoughtProduct_1 boughtProduct : mBoughtProducts) {
                     Product product = boughtProduct.getItem();
-                    if (product.getProductNameEN().contains(name.replaceAll("[^\\x00-\\x7F]", "")) ||
-                            product.getProductNameVI().contains(name)) {
+                    String nameViNonUnicode = SupportUtils.unicode2NonUnicode(product.getProductNameVI());
+                    nameViNonUnicode = nameViNonUnicode.replaceAll("[^\\x00-\\x7F]", "");
+                    if (product.getProductNameEN().toUpperCase().contains(name.toUpperCase()) ||
+                            nameViNonUnicode.toUpperCase().contains(name.toUpperCase())) {
                         mBoughtProductsForSearch.add(boughtProduct);
                     }
                 }
@@ -217,18 +221,26 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
 
     private void initAlgorithm(double minSupport, double minAccurate) {
         final Activity activity = getActivity();
+        final Resources resources = activity.getResources();
         mApriori = Apriori.getInstance(minSupport, minAccurate).setExecuteListener(new Apriori.AprioriListener() {
             @Override
-            public void onSuccess() {
+            public void onBegin() {
+                mListener.toggleProgress(true);
+            }
 
+            @Override
+            public void onSuccess() {
+                Toast.makeText(activity, resources.getString(R.string.done_init_algorithm), Toast.LENGTH_SHORT).show();
+                mListener.toggleProgress(false);
             }
 
             @Override
             public void onError(String message) {
-                Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+                mListener.toggleProgress(false);
+                Toast.makeText(activity, resources.getString(R.string.error_logcat), Toast.LENGTH_SHORT).show();
+                Log.d("Apriori error", message);
             }
         }).initialize(ProductDetailDAO.getInstance(activity).getAllDetails());
-        mApriori.execute();
     }
 
     @Override
@@ -251,6 +263,15 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
                 } else {
                     mLayoutEditAccurate.setVisibility(View.GONE);
                 }
+                break;
+            case R.id.buttonRefresh:
+                if (mApriori.isInitialized()) {
+                    mApriori.execute();
+                } else {
+
+                }
+                break;
+            default:
                 break;
         }
     }

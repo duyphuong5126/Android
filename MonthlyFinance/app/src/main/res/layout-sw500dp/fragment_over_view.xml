@@ -62,6 +62,7 @@
         android:background="#ddd">
 
         <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/layoutRefresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 

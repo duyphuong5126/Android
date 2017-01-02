@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
@@ -30,10 +31,12 @@ import com.huy.monthlyfinance.Model.Account;
 import com.huy.monthlyfinance.MyView.Item.ListItem.AccountItem;
 import com.huy.monthlyfinance.MyView.BasicAdapter;
 import com.huy.monthlyfinance.R;
+import com.huy.monthlyfinance.SupportUtils.PreferencesUtils;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.ResourceBundle;
 
 /**
  * Created by Phuong on 25/08/2016.
@@ -47,6 +50,7 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
     private ArrayList<Account> mListAccount;
     private ArrayList<AccountItem> mAccountItems;
 
+    private TextView mTextAccountTitle;
     private TextView mBalanceTitle;
     private TextView mBalanceValue;
     private BasicAdapter<AccountItem> mAccountAdapter;
@@ -64,8 +68,9 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
 
     @Override
     protected void initUI(View view) {
-        Activity activity = getActivity();
+        final Activity activity = getActivity();
         Resources resources = activity.getResources();
+        mTextAccountTitle = (TextView) view.findViewById(R.id.textAccountTitle);
         mBalanceTitle = (TextView) view.findViewById(R.id.totalBalanceTitle);
         mBalanceValue = (TextView) view.findViewById(R.id.totalBalanceValue);
         ImageButton mButtonOpenSideMenu = (ImageButton) view.findViewById(R.id.buttonOpenSideMenu);
@@ -81,7 +86,7 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
                 resources.getString(R.string.dress), resources.getString(R.string.transport),
                 resources.getString(R.string.home), resources.getString(R.string.family), resources.getString(R.string.etc)};
         float[] mMonthCashFlowAmount = {37.5f, 62.5f};
-        String[] mMonthCashFlow = {"Cash", "Expense"};
+        String[] mMonthCashFlow = {resources.getString(R.string.cash), resources.getString(R.string.expense)};
         PieChart mMonthlyExpenseChart = (PieChart) view.findViewById(R.id.chartMonthExpense);
         PieChart mMonthlyCashFlowChart = (PieChart) view.findViewById(R.id.chartMonthCashFlow);
         addDataToChart(new ArrayList<>(Arrays.asList(mMonthExpense)), mMonthExpenseAmount, mMonthlyExpenseChart,
@@ -106,6 +111,8 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
         mButtonAddCash.setOnClickListener(this);
         final ImageButton mButtonAddExpense = (ImageButton) view.findViewById(R.id.buttonAddExpense);
         mButtonAddExpense.setOnClickListener(this);
+        view.findViewById(R.id.layoutButtonAddIncome).setOnClickListener(this);
+        view.findViewById(R.id.layoutButtonAddTransfer).setOnClickListener(this);
 
         mAnimationForward = new RotateAnimation(0.0f, 45.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
                 0.5f);
@@ -159,6 +166,30 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
         });
 
         mListAccountItems = (ListView) view.findViewById(R.id.listAccountItems);
+
+        final SwipeRefreshLayout refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.layoutRefresh);
+        refreshLayout.setDistanceToTriggerSync(50);
+        refreshLayout.setColorSchemeColors(Color.parseColor("#009688"), Color.parseColor("#009688"), Color.parseColor("#4052b5"));
+        refreshLayout.setSize(SwipeRefreshLayout.LARGE);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshLayout.setRefreshing(true);
+                refreshLayout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        MainApplication.getInstance().refreshAllData();
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                refreshLayout.setRefreshing(false);
+                                Toast.makeText(activity, "Refreshed", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }, 2000);
+            }
+        });
     }
 
     @Override
@@ -186,6 +217,9 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
                 SupportUtils.setListViewHeight(mListAccountItems);
             }
         });
+        String account_title = resources.getString(R.string.account_title);
+        account_title = account_title.replace(")", PreferencesUtils.getString(PreferencesUtils.CURRENCY, "VND") + ")");
+        mTextAccountTitle.setText(account_title);
         if (!mListAccount.isEmpty()) {
             String currency = mListAccount.get(0).getCurrency();
             String balanceTitle = resources.getString(R.string.balance_title)
@@ -210,6 +244,7 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
     }
 
     private void setUpAccounts() {
+        Resources resources = getActivity().getResources();
         AccountDAO accountDAO = AccountDAO.getInstance(getActivity());
         if (mListAccount == null) {
             mListAccount = new ArrayList<>();
@@ -237,11 +272,18 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
                 String stringInitBalance = currency.toLowerCase().equals("usd") ? ("$" + init) : (init + " vnđ");
                 if (accountName.equals(SupportUtils.getStringLocalized(getActivity(), "en", R.string.bank))) {
                     resIndex = 1;
+                    accountName = resources.getString(R.string.bank);
                 } else if (accountName.equals(SupportUtils.getStringLocalized(getActivity(), "en", R.string.credit_card))) {
                     resIndex = 2;
+                    accountName = resources.getString(R.string.credit_card);
+                } else {
+                    accountName = resources.getString(R.string.cash);
+                }
+                if (accountName.contains("Tài khoản")) {
+                    accountName = accountName.replace("Tài khoản", "TK");
                 }
                 mAccountItems.add(new AccountItem(drawables[resIndex], mipmaps[resIndex], 100, 40, colors[resIndex], accountName,
-                        stringCurrentBalance, "Initial Balance: " + stringInitBalance, "Spent/ Budget: $50.00/ $700.00", false,
+                        stringCurrentBalance, resources.getString(R.string.init_balance) + ": " + stringInitBalance, "Spent/ Budget: $50.00/ $700.00", false,
                         count == colors.length - 1
                 ));
                 count++;
@@ -331,6 +373,14 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
             case R.id.buttonAddCash:
                 bundle = new Bundle();
                 bundle.putBoolean("isAddIncome", true);
+                bundle.putBoolean("isAddTransfer", false);
+                mListener.showFragment(BudgetFragment.class, bundle);
+                break;
+            case R.id.layoutButtonAddTransfer:
+            case R.id.buttonAddTransfer:
+                bundle = new Bundle();
+                bundle.putBoolean("isAddIncome", false);
+                bundle.putBoolean("isAddTransfer", true);
                 mListener.showFragment(BudgetFragment.class, bundle);
                 break;
             default:
@@ -340,6 +390,7 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
 
     @Override
     public void refreshData() {
+        Resources resources = MainApplication.getInstance().getResources();
         if (mListAccount == null) {
             mListAccount = new ArrayList<>();
         }
@@ -373,7 +424,7 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
                 resIndex = 2;
             }
             mAccountItems.add(new AccountItem(drawables[resIndex], mipmaps[resIndex], 100, 40, colors[resIndex], accountName,
-                    stringCurrentBalance, "Initial Balance: " + stringInitBalance, "Spent/ Budget: $50.00/ $700.00", false,
+                    stringCurrentBalance, resources.getString(R.string.init_balance) + ": " + stringInitBalance, "Spent/ Budget: $50.00/ $700.00", false,
                     count == colors.length - 1
             ));
             count++;

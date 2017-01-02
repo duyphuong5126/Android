@@ -62,6 +62,7 @@
         android:background="#ddd">
 
         <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/layoutRefresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -84,6 +85,7 @@
                         android:orientation="vertical">
 
                         <TextView
+                            android:id="@+id/textAccountTitle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@drawable/gray_top_corner_radius"
@@ -118,7 +120,7 @@
                                         android:layout_width="0dip"
                                         android:layout_height="match_parent"
                                         android:layout_weight="3"
-                                        android:text="Total Balance (USD):"
+                                        android:text="@string/balance_title"
                                         android:textColor="#000"
                                         android:textSize="17sp" />
 
@@ -297,6 +299,7 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/layoutButtonAddTransfer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="15dip">
@@ -338,6 +341,7 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/layoutButtonAddIncome"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="15dip">

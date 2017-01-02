@@ -2,17 +2,22 @@ package com.huy.monthlyfinance.Fragments;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -22,6 +27,14 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.huy.monthlyfinance.Database.DAO.AccountDAO;
 import com.huy.monthlyfinance.MainApplication;
 import com.huy.monthlyfinance.Model.Account;
@@ -33,6 +46,8 @@ import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Phuong on 19/11/2016.
@@ -50,7 +65,8 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
 
     private ScrollView mMainScroll;
 
-    private LinearLayout mAddIncomeArea, mAddTransferArea;
+    private LinearLayout mAddIncomeArea;
+    private ScrollView mAddTransferArea;
 
     private String mCurrency;
     private EditText mTotalIncome;
@@ -69,6 +85,29 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
 
     private TextView mTextCurrentBank, mTextInitBank, mTextCurrentCash, mTextInitCash, mTextCurrentCredit, mTextInitCredit, mTextTotalPayable;
 
+    private PieChart mChartBudget;
+    private TextView mTextSource, mTextTarget;
+    private FrameLayout mLayoutSelectSource, mLayoutSelectTarget;
+    private ProgressBar mProgressSource;
+    private EditText mEdtSource;
+    private TextView mTextSourcePercent;
+
+    private static final String CASH = "CASH";
+    private static final String BANK = "BANK";
+    private static final String CREDIT = "CREDIT";
+
+    private HashMap<String, String> mMapAccountSelector;
+
+    private String mSourceTitle;
+    private String mTargetTitle;
+    private String mSource;
+    private String mTarget;
+    private double mMaxSource;
+    private double mAmountSource;
+
+    private ImageView mIconSelectBankSource, mIconSelectCashSource, mIconSelectCreditSource;
+    private ImageView mIconSelectBankTarget, mIconSelectCashTarget, mIconSelectCreditTarget;
+
     @Override
     protected int getLayoutXML() {
         return R.layout.fragment_budget;
@@ -76,6 +115,7 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
 
     @Override
     protected void onPrepare() {
+        Resources resources = getActivity().getResources();
         mListTransfer = new ArrayList<>();
         /*mListTransfer.add(new TransferItem(100, "Cash", "Bank", 1000, 700, new Date(System.currentTimeMillis())));
         mListTransfer.add(new TransferItem(50, "Cash", "Bank", 900, 800, new Date(System.currentTimeMillis())));
@@ -90,18 +130,31 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
             isAddTransfer = bundle.getBoolean("isAddTransfer");
         }
 
-        mTotalPayable = 0;
         if (mListAccounts == null) {
             mListAccounts = new ArrayList<>();
         }
         if (mListAccounts.isEmpty()) {
             mListAccounts.addAll(MainApplication.getInstance().getAccounts());
         }
+        mTotalPayable = 0;
         if (!mListAccounts.isEmpty()) {
             for (Account account : mListAccounts) {
-                mTotalPayable += account.getCurrentBalance();
+                if (!account.getAccountName().toUpperCase().contains(
+                        SupportUtils.getStringLocalized(getActivity(), "en", R.string.bank).toUpperCase())) {
+                    mTotalPayable += account.getCurrentBalance();
+                }
             }
         }
+
+        mMaxSource = 0;
+        mAmountSource = 0;
+
+        mSourceTitle = resources.getString(R.string.source);
+        mTargetTitle = resources.getString(R.string.target);
+        mMapAccountSelector = new HashMap<>();
+        mMapAccountSelector.put(CASH, "");
+        mMapAccountSelector.put(BANK, "");
+        mMapAccountSelector.put(CREDIT, "");
     }
 
     @SuppressLint("SetTextI18n")
@@ -113,6 +166,7 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
         view.findViewById(R.id.layoutButtonAddIncome).setOnClickListener(this);
         view.findViewById(R.id.layoutButtonAddTransfer).setOnClickListener(this);
         view.findViewById(R.id.buttonBack).setOnClickListener(this);
+        mChartBudget = (PieChart) view.findViewById(R.id.chartBudget);
 
         mTextCurrentBank = (TextView) view.findViewById(R.id.itemBankText1);
         mTextInitBank = (TextView) view.findViewById(R.id.itemBankText2);
@@ -148,33 +202,19 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                 double income = totalIncome.isEmpty() ? 0 : Double.valueOf(totalIncome);
                 if (mCurrency.equals("VND")) {
                     if (income / MIN_CURRENCY >= 1) {
-                        if (income % MIN_CURRENCY == 500 || income % MIN_CURRENCY == 0) {
-                            mIncome = income;
-                            Toast.makeText(activity, "Income: " + income, Toast.LENGTH_SHORT).show();
-                            mProgressBank.setMax((int) mIncome);
-                            mProgressCredit.setMax((int) mIncome);
-                            mProgressCash.setMax((int) mIncome);
-                            mProgressBank.setProgress(0);
-                            mProgressCredit.setProgress(0);
-                            mProgressCash.setProgress(0);
-                            mEdtCash.setText("");
-                            mEdtBank.setText("");
-                            mEdtCredit.setText("");
-                            mTextCredit.setText("");
-                            mTextBank.setText("");
-                            mTextCash.setText("");
-                        } else {
-                            mTotalIncome.removeTextChangedListener(this);
-                            mTotalIncome.setText("");
-                            mTotalIncome.setText(String.valueOf(mIncome));
-                            mTotalIncome.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mTotalIncome.setSelection(mTotalIncome.getText().toString().length());
-                                }
-                            });
-                            mTotalIncome.addTextChangedListener(this);
-                        }
+                        mIncome = income;
+                        mProgressBank.setMax((int) mIncome);
+                        mProgressCredit.setMax((int) mIncome);
+                        mProgressCash.setMax((int) mIncome);
+                        mProgressBank.setProgress(0);
+                        mProgressCredit.setProgress(0);
+                        mProgressCash.setProgress(0);
+                        mEdtCash.setText("");
+                        mEdtBank.setText("");
+                        mEdtCredit.setText("");
+                        mTextCredit.setText("");
+                        mTextBank.setText("");
+                        mTextCash.setText("");
                     }
                 }
             }
@@ -200,27 +240,13 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                 double cash = totalCash.isEmpty() ? 0 : Double.valueOf(totalCash);
                 if (mCurrency.equals("VND")) {
                     if (cash / MIN_CURRENCY >= 1) {
-                        if (cash % MIN_CURRENCY == 500 || cash % MIN_CURRENCY == 0) {
-                            if (isCorrectDivision()) {
-                                mShareCash = cash;
-                                Toast.makeText(activity, "Share cash: " + SupportUtils.getNormalDoubleString(cash, "#0,000"), Toast.LENGTH_SHORT).show();
-                                mProgressCash.setProgress((int) mShareCash);
-                                double percent = (mShareCash / mIncome) * 100;
-                                mTextCash.setText(SupportUtils.formatDouble(percent, "#.00") + "%");
-                            } else {
-                                Toast.makeText(activity, resources.getString(R.string.error_higher_than_income), Toast.LENGTH_SHORT).show();
-                                mEdtCash.removeTextChangedListener(this);
-                                mEdtCash.setText("");
-                                mEdtCash.setText(String.valueOf(mShareCash));
-                                mEdtCash.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mEdtCash.setSelection(mEdtCash.getText().toString().length());
-                                    }
-                                });
-                                mEdtCash.addTextChangedListener(this);
-                            }
+                        if (isCorrectDivision()) {
+                            mShareCash = cash;
+                            mProgressCash.setProgress((int) mShareCash);
+                            double percent = (mShareCash / mIncome) * 100;
+                            mTextCash.setText(SupportUtils.formatDouble(percent, "#.00") + "%");
                         } else {
+                            Toast.makeText(activity, resources.getString(R.string.error_higher_than_income), Toast.LENGTH_SHORT).show();
                             mEdtCash.removeTextChangedListener(this);
                             mEdtCash.setText("");
                             mEdtCash.setText(String.valueOf(mShareCash));
@@ -232,6 +258,9 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                             });
                             mEdtCash.addTextChangedListener(this);
                         }
+                    } else {
+                        mTextCash.setText("%");
+                        mProgressCash.setProgress(0);
                     }
                 }
             }
@@ -254,27 +283,13 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                 double bank = totalBank.isEmpty() ? 0 : Double.valueOf(totalBank);
                 if (mCurrency.equals("VND")) {
                     if (bank / MIN_CURRENCY >= 1) {
-                        if (bank % MIN_CURRENCY == 500 || bank % MIN_CURRENCY == 0) {
-                            if (isCorrectDivision()) {
-                                mShareBank = bank;
-                                Toast.makeText(activity, "Share bank: " + SupportUtils.getNormalDoubleString(bank, "#0,000"), Toast.LENGTH_SHORT).show();
-                                mProgressBank.setProgress((int) mShareBank);
-                                double percent = (mShareBank / mIncome) * 100;
-                                mTextBank.setText(SupportUtils.formatDouble(percent, "#.00") + "%");
-                            } else {
-                                Toast.makeText(activity, resources.getString(R.string.error_higher_than_income), Toast.LENGTH_SHORT).show();
-                                mEdtBank.removeTextChangedListener(this);
-                                mEdtBank.setText("");
-                                mEdtBank.setText(String.valueOf(mShareBank));
-                                mEdtBank.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mEdtBank.setSelection(mEdtBank.getText().toString().length());
-                                    }
-                                });
-                                mEdtBank.addTextChangedListener(this);
-                            }
+                        if (isCorrectDivision()) {
+                            mShareBank = bank;
+                            mProgressBank.setProgress((int) mShareBank);
+                            double percent = (mShareBank / mIncome) * 100;
+                            mTextBank.setText(SupportUtils.formatDouble(percent, "#.00") + "%");
                         } else {
+                            Toast.makeText(activity, resources.getString(R.string.error_higher_than_income), Toast.LENGTH_SHORT).show();
                             mEdtBank.removeTextChangedListener(this);
                             mEdtBank.setText("");
                             mEdtBank.setText(String.valueOf(mShareBank));
@@ -286,6 +301,9 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                             });
                             mEdtBank.addTextChangedListener(this);
                         }
+                    } else {
+                        mTextBank.setText("%");
+                        mProgressBank.setProgress(0);
                     }
                 }
             }
@@ -308,27 +326,13 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                 double credit = totalCredit.isEmpty() ? 0 : Double.valueOf(totalCredit);
                 if (mCurrency.equals("VND")) {
                     if (credit / MIN_CURRENCY >= 1) {
-                        if (credit % MIN_CURRENCY == 500 || credit % MIN_CURRENCY == 0) {
-                            if (isCorrectDivision()) {
-                                mShareCredit = credit;
-                                Toast.makeText(activity, "Share credit: " + SupportUtils.getNormalDoubleString(credit, "#0,000"), Toast.LENGTH_SHORT).show();
-                                mProgressCredit.setProgress((int) mShareCredit);
-                                double percent = (mShareCredit / mIncome) * 100;
-                                mTextCredit.setText(SupportUtils.formatDouble(percent, "#.00") + "%");
-                            } else {
-                                Toast.makeText(activity, resources.getString(R.string.error_higher_than_income), Toast.LENGTH_SHORT).show();
-                                mEdtCredit.removeTextChangedListener(this);
-                                mEdtCredit.setText("");
-                                mEdtCredit.setText(String.valueOf(mShareCredit));
-                                mEdtCredit.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mEdtCredit.setSelection(mEdtCredit.getText().toString().length());
-                                    }
-                                });
-                                mEdtCredit.addTextChangedListener(this);
-                            }
+                        if (isCorrectDivision()) {
+                            mShareCredit = credit;
+                            mProgressCredit.setProgress((int) mShareCredit);
+                            double percent = (mShareCredit / mIncome) * 100;
+                            mTextCredit.setText(SupportUtils.formatDouble(percent, "#.00") + "%");
                         } else {
+                            Toast.makeText(activity, resources.getString(R.string.error_higher_than_income), Toast.LENGTH_SHORT).show();
                             mEdtCredit.removeTextChangedListener(this);
                             mEdtCredit.setText("");
                             mEdtCredit.setText(String.valueOf(mShareCredit));
@@ -340,11 +344,82 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                             });
                             mEdtCredit.addTextChangedListener(this);
                         }
+                    } else {
+                        mTextCredit.setText("%");
+                        mProgressCredit.setProgress(0);
                     }
                 }
             }
         });
 
+        mLayoutSelectSource = (FrameLayout) view.findViewById(R.id.layoutPickAccountSource);
+        mLayoutSelectTarget = (FrameLayout) view.findViewById(R.id.layoutPickAccountTarget);
+        view.findViewById(R.id.textSourceSelector).setOnClickListener(this);
+        view.findViewById(R.id.textTargetSelector).setOnClickListener(this);
+        view.findViewById(R.id.buttonCloseAccountSource).setOnClickListener(this);
+        view.findViewById(R.id.buttonCloseAccountTarget).setOnClickListener(this);
+        view.findViewById(R.id.transferConfirm).setOnClickListener(this);
+        view.findViewById(R.id.transferCancel).setOnClickListener(this);
+
+        mTextSourcePercent = (TextView) view.findViewById(R.id.textSourcePercent);
+        mTextSource = (TextView) view.findViewById(R.id.textSourceTitle);
+        mTextTarget = (TextView) view.findViewById(R.id.textTargetTitle);
+        mProgressSource = (ProgressBar) view.findViewById(R.id.progressSource);
+        mEdtSource = (EditText) view.findViewById(R.id.edtSource);
+        mEdtSource.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String totalCash = editable.toString();
+                double amount = totalCash.isEmpty() ? 0 : Double.valueOf(totalCash);
+                if (mCurrency.equals("VND")) {
+                    if (amount / MIN_CURRENCY >= 1) {
+                        if (amount <= mMaxSource) {
+                            mAmountSource = amount;
+                            double percent = (mAmountSource / mMaxSource) * 100;
+                            mTextSourcePercent.setText(SupportUtils.formatDouble(percent, "#.00") + "%");
+                            mProgressSource.setProgress((int) mAmountSource);
+                            changePercentageProgressStyle(mProgressSource);
+                        } else {
+                            Toast.makeText(activity, resources.getString(R.string.error_higher_than_max), Toast.LENGTH_SHORT).show();
+                            mEdtSource.removeTextChangedListener(this);
+                            mEdtSource.setText("");
+                            mEdtSource.setText(String.valueOf(mAmountSource));
+                            mEdtSource.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mEdtSource.setSelection(mEdtSource.getText().toString().length());
+                                }
+                            });
+                            mEdtSource.addTextChangedListener(this);
+                        }
+                    }
+                }
+            }
+        });
+
+        view.findViewById(R.id.itemSelectBankSource).setOnClickListener(this);
+        mIconSelectBankSource = (ImageView) view.findViewById(R.id.iconSelectBankSource);
+        view.findViewById(R.id.itemSelectCashSource).setOnClickListener(this);
+        mIconSelectCashSource = (ImageView) view.findViewById(R.id.iconSelectCashSource);
+        view.findViewById(R.id.itemSelectCreditSource).setOnClickListener(this);
+        mIconSelectCreditSource = (ImageView) view.findViewById(R.id.iconSelectCreditSource);
+        view.findViewById(R.id.itemSelectBankTarget).setOnClickListener(this);
+        mIconSelectBankTarget = (ImageView) view.findViewById(R.id.iconSelectBankTarget);
+        view.findViewById(R.id.itemSelectCashTarget).setOnClickListener(this);
+        mIconSelectCashTarget = (ImageView) view.findViewById(R.id.iconSelectCashTarget);
+        view.findViewById(R.id.itemSelectCreditTarget).setOnClickListener(this);
+        mIconSelectCreditTarget = (ImageView) view.findViewById(R.id.iconSelectCreditTarget);
         final ImageButton mButtonAddTransfer = (ImageButton) view.findViewById(R.id.buttonAddTransfer);
         mButtonAddTransfer.setOnClickListener(this);
         final ImageButton mButtonAddCash = (ImageButton) view.findViewById(R.id.buttonAddCash);
@@ -450,48 +525,9 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
         mListTransaction.setAdapter(mTransferAdapter);
 
         mAddIncomeArea = (LinearLayout) view.findViewById(R.id.addIncomeArea);
-        mAddTransferArea = (LinearLayout) view.findViewById(R.id.addTransferArea);
+        mAddTransferArea = (ScrollView) view.findViewById(R.id.addTransferArea);
 
-        String totalPayable = SupportUtils.getNormalDoubleString(mTotalPayable, "#0,000");
-        String currency = PreferencesUtils.getString(PreferencesUtils.CURRENCY, "VND");
-        if (currency.contains("VND")) {
-            mTextTotalPayable.setText(totalPayable + " VNĐ");
-        } else {
-            mTextTotalPayable.setText("$" + totalPayable);
-        }
-        for (Account account : mListAccounts) {
-            if (account.getAccountName().contains(SupportUtils.getStringLocalized(activity, "en", R.string.cash))) {
-                String currentCash = SupportUtils.getNormalDoubleString(account.getCurrentBalance(), "#0,000");
-                String initCash = SupportUtils.getNormalDoubleString(account.getInitialBalance(), "#0,000");
-                if (currency.contains("VND")) {
-                    mTextCurrentCash.setText(currentCash + " VNĐ");
-                    mTextInitCash.setText(initCash + " VNĐ");
-                } else {
-                    mTextCurrentCash.setText("$" + currentCash);
-                    mTextInitCash.setText("$" + initCash);
-                }
-            } else if (account.getAccountName().contains(SupportUtils.getStringLocalized(activity, "en", R.string.credit_card))) {
-                String currentCredit = SupportUtils.getNormalDoubleString(account.getCurrentBalance(), "#0,000");
-                String initCredit = SupportUtils.getNormalDoubleString(account.getInitialBalance(), "#0,000");
-                if (currency.contains("VND")) {
-                    mTextCurrentCredit.setText(currentCredit + " VNĐ");
-                    mTextInitCredit.setText(initCredit + " VNĐ");
-                } else {
-                    mTextCurrentCredit.setText("$" + currentCredit);
-                    mTextInitCredit.setText("$" + initCredit);
-                }
-            } else {
-                String currentBank = SupportUtils.getNormalDoubleString(account.getCurrentBalance(), "#0,000");
-                String initBank = SupportUtils.getNormalDoubleString(account.getInitialBalance(), "#0,000");
-                if (currency.contains("VND")) {
-                    mTextCurrentBank.setText(currentBank + " VNĐ");
-                    mTextInitBank.setText(initBank + " VNĐ");
-                } else {
-                    mTextCurrentBank.setText("$" + currentBank);
-                    mTextInitBank.setText("$" + initBank);
-                }
-            }
-        }
+        updateAccount();
     }
 
     @Override
@@ -506,6 +542,8 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
 
     @Override
     protected void fragmentReady(Bundle savedInstanceState) {
+        Activity activity = getActivity();
+        Resources resources = activity.getResources();
         SupportUtils.setListViewHeight(mListTransaction);
         mMainScroll.smoothScrollTo(0, 0);
         if (isAddIncome) {
@@ -515,11 +553,28 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
             mAddIncomeArea.setVisibility(View.GONE);
             mAddTransferArea.setVisibility(View.VISIBLE);
         }
+
+        if (!mListAccounts.isEmpty()) {
+            ArrayList<String> listNames = new ArrayList<>();
+            ArrayList<Float> listValues = new ArrayList<>();
+            for (Account account : mListAccounts) {
+                String name = account.getAccountName();
+                if (name.contains(SupportUtils.getStringLocalized(activity, "en", R.string.cash))) {
+                    listNames.add(resources.getString(R.string.cash));
+                } else if (name.contains(SupportUtils.getStringLocalized(activity, "en", R.string.bank))) {
+                    listNames.add(resources.getString(R.string.cash));
+                } else {
+                    listNames.add(resources.getString(R.string.credit_card));
+                }
+                listValues.add((float) account.getCurrentBalance());
+            }
+            addDataToChart(listNames, listValues, mChartBudget, "Chart budget", "Current budget");
+        }
     }
 
     @Override
     protected boolean canGoBack() {
-        return mAddIncomeArea.getVisibility() != View.VISIBLE;
+        return (mAddIncomeArea.getVisibility() != View.VISIBLE && mAddTransferArea.getVisibility() != View.VISIBLE);
     }
 
     @Override
@@ -527,12 +582,14 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
         Activity activity = getActivity();
         Resources resources = activity.getResources();
         MainApplication mainApplication = MainApplication.getInstance();
+        String selectedItem = resources.getString(R.string.selected_item);
         switch (view.getId()) {
             case R.id.buttonBack:
                 if (canGoBack()) {
                     mNavListener.navBack();
                 } else {
                     mAddIncomeArea.setVisibility(View.GONE);
+                    mAddTransferArea.setVisibility(View.GONE);
                 }
                 break;
             case R.id.buttonAdd:
@@ -546,9 +603,13 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
             case R.id.buttonAddCash:
                 mLayoutAdd.startAnimation(mAnimationBackward);
                 mAddIncomeArea.setVisibility(View.VISIBLE);
+                mAddTransferArea.setVisibility(View.GONE);
                 break;
             case R.id.layoutButtonAddTransfer:
             case R.id.buttonAddTransfer:
+                mLayoutAdd.startAnimation(mAnimationBackward);
+                mAddIncomeArea.setVisibility(View.GONE);
+                mAddTransferArea.setVisibility(View.VISIBLE);
                 break;
             case R.id.incomeConfirm:
                 if (isCorrectDivision()) {
@@ -601,6 +662,213 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                 mTextCredit.setText("");
                 mTextBank.setText("");
                 mTextCash.setText("");
+                mIncome = 0;
+                mShareBank = 0;
+                mShareCash = 0;
+                mShareCredit = 0;
+                mTotalIncome.setText("");
+                break;
+            case R.id.textSourceSelector:
+                mLayoutSelectSource.setVisibility(View.VISIBLE);
+                break;
+            case R.id.textTargetSelector:
+                mLayoutSelectTarget.setVisibility(View.VISIBLE);
+                break;
+            case R.id.buttonCloseAccountSource:
+                mLayoutSelectSource.setVisibility(View.GONE);
+                break;
+            case R.id.buttonCloseAccountTarget:
+                mLayoutSelectTarget.setVisibility(View.GONE);
+                break;
+            case R.id.itemSelectBankSource:
+                if (mMapAccountSelector.get(BANK).equals(mTargetTitle)) {
+                    Toast.makeText(activity, selectedItem, Toast.LENGTH_SHORT).show();
+                    mMapAccountSelector.put(BANK, "");
+                } else {
+                    mSource = BANK;
+                    mMapAccountSelector.put(BANK, mSourceTitle);
+                    mIconSelectBankSource.setVisibility(View.VISIBLE);
+                    mIconSelectBankTarget.setVisibility(View.GONE);
+                    mIconSelectCashSource.setVisibility(View.GONE);
+                    mIconSelectCreditSource.setVisibility(View.GONE);
+                    mTextSource.setText(mSourceTitle + ": " + resources.getString(R.string.bank));
+                    boolean progressApplied = false;
+                    for (int i = 0; i < mListAccounts.size() && !progressApplied; i++) {
+                        Account account = mListAccounts.get(i);
+                        if (account.getAccountName().toLowerCase().equals(BANK.toLowerCase())) {
+                            mMaxSource = account.getCurrentBalance();
+                            mProgressSource.setMax((int) mMaxSource);
+                            progressApplied = true;
+                        }
+                    }
+                }
+                break;
+            case R.id.itemSelectCashSource:
+                if (mMapAccountSelector.get(CASH).equals(mTargetTitle)) {
+                    Toast.makeText(activity, selectedItem, Toast.LENGTH_SHORT).show();
+                    mMapAccountSelector.put(CASH, "");
+                } else {
+                    mSource = CASH;
+                    mMapAccountSelector.put(CASH, mSourceTitle);
+                    mIconSelectCashSource.setVisibility(View.VISIBLE);
+                    mIconSelectCashTarget.setVisibility(View.GONE);
+                    mIconSelectBankSource.setVisibility(View.GONE);
+                    mIconSelectCreditSource.setVisibility(View.GONE);
+                    mTextSource.setText(mSourceTitle + ": " + resources.getString(R.string.cash));
+                    boolean progressApplied = false;
+                    for (int i = 0; i < mListAccounts.size() && !progressApplied; i++) {
+                        Account account = mListAccounts.get(i);
+                        if (account.getAccountName().toLowerCase().equals(CASH.toLowerCase())) {
+                            mMaxSource = account.getCurrentBalance();
+                            mProgressSource.setMax((int) mMaxSource);
+                            progressApplied = true;
+                        }
+                    }
+                }
+                break;
+            case R.id.itemSelectCreditSource:
+                if (mMapAccountSelector.get(CREDIT).equals(mTargetTitle)) {
+                    Toast.makeText(activity, selectedItem, Toast.LENGTH_SHORT).show();
+                    mMapAccountSelector.put(CREDIT, "");
+                } else {
+                    mSource = CREDIT;
+                    mMapAccountSelector.put(CREDIT, mSourceTitle);
+                    mIconSelectCreditSource.setVisibility(View.VISIBLE);
+                    mIconSelectCreditTarget.setVisibility(View.GONE);
+                    mIconSelectCashSource.setVisibility(View.GONE);
+                    mIconSelectBankSource.setVisibility(View.GONE);
+                    mTextSource.setText(mSourceTitle + ": " + resources.getString(R.string.credit_card));
+                    boolean progressApplied = false;
+                    for (int i = 0; i < mListAccounts.size() && !progressApplied; i++) {
+                        Account account = mListAccounts.get(i);
+                        if (account.getAccountName().toLowerCase().equals(CREDIT.toLowerCase())) {
+                            mMaxSource = account.getCurrentBalance();
+                            mProgressSource.setMax((int) mMaxSource);
+                            progressApplied = true;
+                        }
+                    }
+                }
+                break;
+            case R.id.itemSelectBankTarget:
+                if (mMapAccountSelector.get(BANK).equals(mSourceTitle)) {
+                    Toast.makeText(activity, selectedItem, Toast.LENGTH_SHORT).show();
+                    mMapAccountSelector.put(BANK, "");
+                } else {
+                    mTarget = BANK;
+                    mMapAccountSelector.put(BANK, mTargetTitle);
+                    mIconSelectBankTarget.setVisibility(View.VISIBLE);
+                    mIconSelectBankSource.setVisibility(View.GONE);
+                    mIconSelectCashTarget.setVisibility(View.GONE);
+                    mIconSelectCreditTarget.setVisibility(View.GONE);
+                    mTextTarget.setText(mTargetTitle + ": " + resources.getString(R.string.bank));
+                }
+                break;
+            case R.id.itemSelectCashTarget:
+                if (mMapAccountSelector.get(CASH).equals(mSourceTitle)) {
+                    Toast.makeText(activity, selectedItem, Toast.LENGTH_SHORT).show();
+                    mMapAccountSelector.put(CASH, "");
+                } else {
+                    mSource = CASH;
+                    mMapAccountSelector.put(CASH, mTargetTitle);
+                    mIconSelectCashTarget.setVisibility(View.VISIBLE);
+                    mIconSelectCashSource.setVisibility(View.GONE);
+                    mIconSelectBankTarget.setVisibility(View.GONE);
+                    mIconSelectCreditTarget.setVisibility(View.GONE);
+                    mTextTarget.setText(mTargetTitle + ": " + resources.getString(R.string.cash));
+                }
+                break;
+            case R.id.itemSelectCreditTarget:
+                if (mMapAccountSelector.get(CREDIT).equals(mSourceTitle)) {
+                    Toast.makeText(activity, selectedItem, Toast.LENGTH_SHORT).show();
+                    mMapAccountSelector.put(CREDIT, "");
+                } else {
+                    mSource = CREDIT;
+                    mMapAccountSelector.put(CREDIT, mTargetTitle);
+                    mIconSelectCreditTarget.setVisibility(View.VISIBLE);
+                    mIconSelectCreditSource.setVisibility(View.GONE);
+                    mIconSelectCashTarget.setVisibility(View.GONE);
+                    mIconSelectBankTarget.setVisibility(View.GONE);
+                    mTextTarget.setText(mTargetTitle + ": " + resources.getString(R.string.credit_card));
+                }
+                break;
+            case R.id.transferConfirm:
+                String source = "";
+                String target = "";
+                double oldSourceBalance = 0, newSourceBalance = 0;
+                double oldTargetBalance = 0, newTargetBalance = 0;
+                for (Map.Entry<String, String> entry : mMapAccountSelector.entrySet()) {
+                    if (entry.getValue().toUpperCase().contains(mSourceTitle.toUpperCase())) {
+                        if (entry.getKey().toUpperCase().contains(BANK)) {
+                            source = SupportUtils.getStringLocalized(activity, "en", R.string.bank);
+                        } else if (entry.getKey().toUpperCase().contains(CASH)) {
+                            source = SupportUtils.getStringLocalized(activity, "en", R.string.cash);
+                        } else {
+                            source = SupportUtils.getStringLocalized(activity, "en", R.string.credit_card);
+                        }
+                    }
+
+                    if (entry.getValue().toUpperCase().contains(mTargetTitle.toUpperCase())) {
+                        if (entry.getKey().toUpperCase().contains(BANK)) {
+                            target = SupportUtils.getStringLocalized(activity, "en", R.string.bank);
+                        } else if (entry.getKey().toUpperCase().contains(CASH)) {
+                            target = SupportUtils.getStringLocalized(activity, "en", R.string.cash);
+                        } else {
+                            target = SupportUtils.getStringLocalized(activity, "en", R.string.credit_card);
+                        }
+                    }
+                }
+                if (!source.isEmpty() && !target.isEmpty()) {
+                    for (Account account : mListAccounts) {
+                        if (account.getAccountName().toUpperCase().contains(source.toUpperCase())) {
+                            oldSourceBalance = account.getCurrentBalance();
+                            newSourceBalance = oldSourceBalance - mAmountSource;
+                        }
+                        if (account.getAccountName().toUpperCase().contains(target.toUpperCase())) {
+                            oldTargetBalance = account.getCurrentBalance();
+                            newTargetBalance = oldTargetBalance + mAmountSource;
+                        }
+                    }
+                    AccountDAO accountDAO = AccountDAO.getInstance(activity);
+                    if (accountDAO != null) {
+                        Log.d("Amount", "" + mAmountSource);
+                        Log.d("Source", source + ", old: " + oldSourceBalance + ", new: " + newSourceBalance);
+                        Log.d("Target", target + ", old: " + oldTargetBalance + ", new: " + newTargetBalance);
+                        boolean updateSource = accountDAO.updateAccount(source, newSourceBalance);
+                        boolean updateTarget = accountDAO.updateAccount(target, newTargetBalance);
+                        if (updateSource && updateTarget) {
+                            Toast.makeText(activity, resources.getString(R.string.info_saved), Toast.LENGTH_SHORT).show();
+                            mainApplication.refreshAllData();
+                            mAddTransferArea.setVisibility(View.GONE);
+                        } else {
+                            Toast.makeText(activity, resources.getString(R.string.info_save_failed), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                } else {
+                    Toast.makeText(activity, resources.getString(R.string.error_not_pick_account), Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case R.id.transferCancel:
+                mEdtSource.setText("");
+                mProgressSource.setProgress(0);
+                mProgressSource.setMax(0);
+                changePercentageProgressStyle(mProgressSource);
+                mTextSource.setText(mSourceTitle);
+                mTextTarget.setText(mTargetTitle);
+                mTextSourcePercent.setText("%");
+                mMaxSource = 0;
+                mAmountSource = 0;
+                mMapAccountSelector.clear();
+                mMapAccountSelector.put(BANK, "");
+                mMapAccountSelector.put(CASH, "");
+                mMapAccountSelector.put(CREDIT, "");
+                mIconSelectBankSource.setVisibility(View.GONE);
+                mIconSelectCashSource.setVisibility(View.GONE);
+                mIconSelectCreditSource.setVisibility(View.GONE);
+                mIconSelectBankTarget.setVisibility(View.GONE);
+                mIconSelectCashTarget.setVisibility(View.GONE);
+                mIconSelectCreditTarget.setVisibility(View.GONE);
+                mLayoutSelectTarget.setVisibility(View.GONE);
+                mLayoutSelectSource.setVisibility(View.GONE);
                 break;
             default:
                 break;
@@ -614,17 +882,152 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
         }
         mListAccounts.clear();
         mListAccounts.addAll(MainApplication.getInstance().getAccounts());
+
+        updateAccount();
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void updateAccount() {
+        Context context = MainApplication.getInstance().getApplicationContext();
+        mTotalPayable = 0;
+        if (!mListAccounts.isEmpty()) {
+            for (Account account : mListAccounts) {
+                if (!account.getAccountName().toUpperCase().contains(
+                        SupportUtils.getStringLocalized(context, "en", R.string.bank).toUpperCase())) {
+                    mTotalPayable += account.getCurrentBalance();
+                }
+            }
+        }
+        String totalPayable = SupportUtils.getNormalDoubleString(mTotalPayable, "#0,000");
+        String currency = PreferencesUtils.getString(PreferencesUtils.CURRENCY, "VND");
+        if (mTextTotalPayable != null) {
+            if (currency.contains("VND")) {
+                mTextTotalPayable.setText(totalPayable + " VNĐ");
+            } else {
+                mTextTotalPayable.setText("$" + totalPayable);
+            }
+        }
+        if (mTextCurrentBank != null && mTextInitBank != null &&
+                mTextCurrentCash != null && mTextInitCash != null &&
+                mTextCurrentCredit != null && mTextInitCredit != null) {
+            for (Account account : mListAccounts) {
+                if (account.getAccountName().contains(SupportUtils.getStringLocalized(context, "en", R.string.cash))) {
+                    String currentCash = SupportUtils.getNormalDoubleString(account.getCurrentBalance(), "#0,000");
+                    String initCash = SupportUtils.getNormalDoubleString(account.getInitialBalance(), "#0,000");
+                    if (currency.contains("VND")) {
+                        mTextCurrentCash.setText(currentCash + " VNĐ");
+                        mTextInitCash.setText(initCash + " VNĐ");
+                    } else {
+                        mTextCurrentCash.setText("$" + currentCash);
+                        mTextInitCash.setText("$" + initCash);
+                    }
+                } else if (account.getAccountName().contains(SupportUtils.getStringLocalized(context, "en", R.string.credit_card))) {
+                    String currentCredit = SupportUtils.getNormalDoubleString(account.getCurrentBalance(), "#0,000");
+                    String initCredit = SupportUtils.getNormalDoubleString(account.getInitialBalance(), "#0,000");
+                    if (currency.contains("VND")) {
+                        mTextCurrentCredit.setText(currentCredit + " VNĐ");
+                        mTextInitCredit.setText(initCredit + " VNĐ");
+                    } else {
+                        mTextCurrentCredit.setText("$" + currentCredit);
+                        mTextInitCredit.setText("$" + initCredit);
+                    }
+                } else {
+                    String currentBank = SupportUtils.getNormalDoubleString(account.getCurrentBalance(), "#0,000");
+                    String initBank = SupportUtils.getNormalDoubleString(account.getInitialBalance(), "#0,000");
+                    if (currency.contains("VND")) {
+                        mTextCurrentBank.setText(currentBank + " VNĐ");
+                        mTextInitBank.setText(initBank + " VNĐ");
+                    } else {
+                        mTextCurrentBank.setText("$" + currentBank);
+                        mTextInitBank.setText("$" + initBank);
+                    }
+                }
+            }
+        }
     }
 
     private boolean isCorrectDivision() {
         String cash = mEdtCash.getText().toString();
         String credit = mEdtCredit.getText().toString();
         String bank = mEdtBank.getText().toString();
-        String income = mTotalIncome.getText().toString();
         double cashAmount = cash.isEmpty() ? 0 : Double.valueOf(cash);
         double bankAmount = bank.isEmpty() ? 0 : Double.valueOf(bank);
         double creditAmount = credit.isEmpty() ? 0 : Double.valueOf(credit);
-        double incomeAmount = cash.isEmpty() ? 0 : Double.valueOf(income);
-        return (cashAmount + bankAmount + creditAmount) <= incomeAmount;
+        return (cashAmount + bankAmount + creditAmount) <= mIncome;
+    }
+
+    private void addDataToChart(final ArrayList<String> xValues, final ArrayList<Float> yValuesData, PieChart chart,
+                                final String textOnNothingSelected, String chartTitle) {
+        chart.setUsePercentValues(true);
+        chart.setDescription("");
+        chart.setDrawHoleEnabled(true);
+        chart.setHoleColorTransparent(true);
+        chart.setHoleRadius(7);
+        chart.setTransparentCircleRadius(10);
+        chart.setRotationAngle(0);
+        chart.setRotationEnabled(true);
+        ArrayList<Entry> yValues = new ArrayList<>();
+        for (int i = 0; i < yValuesData.size(); i++) {
+            yValues.add(new Entry(yValuesData.get(i), i));
+        }
+
+        PieDataSet pieDataSet = new PieDataSet(yValues, chartTitle);
+        pieDataSet.setSliceSpace(3);
+        pieDataSet.setSelectionShift(5);
+
+        ArrayList<Integer> colors = new ArrayList<>();
+        for (int c : ColorTemplate.VORDIPLOM_COLORS) {
+            colors.add(c);
+        }
+        for (int c : ColorTemplate.JOYFUL_COLORS) {
+            colors.add(c);
+        }
+        for (int c : ColorTemplate.COLORFUL_COLORS) {
+            colors.add(c);
+        }
+        for (int c : ColorTemplate.LIBERTY_COLORS) {
+            colors.add(c);
+        }
+        for (int c : ColorTemplate.PASTEL_COLORS) {
+            colors.add(c);
+        }
+
+        colors.add(ColorTemplate.getHoloBlue());
+        pieDataSet.setColors(colors);
+
+        PieData pieData = new PieData(xValues, pieDataSet);
+        pieData.setValueFormatter(new PercentFormatter());
+        pieData.setValueTextSize(11f);
+        pieData.setValueTextColor(Color.BLACK);
+
+        chart.setData(pieData);
+        chart.highlightValue(null);
+        chart.invalidate();
+
+        chart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
+                Toast.makeText(getActivity(), xValues.get(e.getXIndex()) + ": " + e.getVal(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected() {
+                Toast.makeText(getActivity(), textOnNothingSelected, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void changePercentageProgressStyle(ProgressBar mCurrentPercentages) {
+        Activity activity = getActivity();
+        double percent = (double) mCurrentPercentages.getProgress() / mCurrentPercentages.getMax();
+        if (percent <= 0.25) {
+            mCurrentPercentages.setProgressDrawable(ContextCompat.getDrawable(activity, R.drawable.progress_style_1));
+        } else if (percent <= 0.5) {
+            mCurrentPercentages.setProgressDrawable(ContextCompat.getDrawable(activity, R.drawable.progress_style_11));
+        } else if ((percent <= 0.75)) {
+            mCurrentPercentages.setProgressDrawable(ContextCompat.getDrawable(activity, R.drawable.progress_style_4));
+        } else {
+            mCurrentPercentages.setProgressDrawable(ContextCompat.getDrawable(activity, R.drawable.progress_style_10));
+        }
     }
 }
