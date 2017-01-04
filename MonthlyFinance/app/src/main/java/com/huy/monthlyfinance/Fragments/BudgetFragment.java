@@ -71,7 +71,6 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
     private String mCurrency;
     private EditText mTotalIncome;
     private double mIncome;
-    private static final int MIN_CURRENCY = 1000;
 
     private ProgressBar mProgressCash, mProgressBank, mProgressCredit;
     private EditText mEdtBank, mEdtCash, mEdtCredit;
@@ -201,7 +200,7 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                 String totalIncome = editable.toString();
                 double income = totalIncome.isEmpty() ? 0 : Double.valueOf(totalIncome);
                 if (mCurrency.equals("VND")) {
-                    if (income / MIN_CURRENCY >= 1) {
+                    if (income / SupportUtils.MIN_CURRENCY >= 1) {
                         mIncome = income;
                         mProgressBank.setMax((int) mIncome);
                         mProgressCredit.setMax((int) mIncome);
@@ -239,7 +238,7 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                 String totalCash = editable.toString();
                 double cash = totalCash.isEmpty() ? 0 : Double.valueOf(totalCash);
                 if (mCurrency.equals("VND")) {
-                    if (cash / MIN_CURRENCY >= 1) {
+                    if (cash / SupportUtils.MIN_CURRENCY >= 1) {
                         if (isCorrectDivision()) {
                             mShareCash = cash;
                             mProgressCash.setProgress((int) mShareCash);
@@ -282,7 +281,7 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                 String totalBank = editable.toString();
                 double bank = totalBank.isEmpty() ? 0 : Double.valueOf(totalBank);
                 if (mCurrency.equals("VND")) {
-                    if (bank / MIN_CURRENCY >= 1) {
+                    if (bank / SupportUtils.MIN_CURRENCY >= 1) {
                         if (isCorrectDivision()) {
                             mShareBank = bank;
                             mProgressBank.setProgress((int) mShareBank);
@@ -325,7 +324,7 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                 String totalCredit = editable.toString();
                 double credit = totalCredit.isEmpty() ? 0 : Double.valueOf(totalCredit);
                 if (mCurrency.equals("VND")) {
-                    if (credit / MIN_CURRENCY >= 1) {
+                    if (credit / SupportUtils.MIN_CURRENCY >= 1) {
                         if (isCorrectDivision()) {
                             mShareCredit = credit;
                             mProgressCredit.setProgress((int) mShareCredit);
@@ -383,7 +382,7 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                 String totalCash = editable.toString();
                 double amount = totalCash.isEmpty() ? 0 : Double.valueOf(totalCash);
                 if (mCurrency.equals("VND")) {
-                    if (amount / MIN_CURRENCY >= 1) {
+                    if (amount / SupportUtils.MIN_CURRENCY >= 1) {
                         if (amount <= mMaxSource) {
                             mAmountSource = amount;
                             double percent = (mAmountSource / mMaxSource) * 100;

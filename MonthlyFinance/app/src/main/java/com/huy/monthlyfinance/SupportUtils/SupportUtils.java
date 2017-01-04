@@ -26,6 +26,7 @@ import java.util.Locale;
  */
 public class SupportUtils {
     private static final boolean IS_LOLLIPOP = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+    public static final int MIN_CURRENCY = 1000;
 
     public static void setListViewHeight(ListView listView) {
         ListAdapter listAdapter = listView.getAdapter();

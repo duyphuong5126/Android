@@ -32,40 +32,58 @@
             android:text="@string/sample_1"
             android:textColor="#008593"
             android:textSize="17sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:paddingRight="2dip"
+            android:paddingLeft="3dip"/>
 
     </LinearLayout>
 
-    <LinearLayout
+    <EditText
+        android:id="@+id/textNumber"
+        android:layout_width="0dip"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:layout_marginLeft="5dip"
+        android:layout_marginRight="10dip"
+        android:gravity="right|center_vertical"
+        android:text="0"
+        android:textColor="#008593"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:inputType="numberDecimal"
+        android:maxLines="1"
+        android:background="#0000"
+        android:paddingLeft="3dip"/>
+
+    <FrameLayout
         android:layout_width="wrap_content"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:id="@+id/textNumber"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="5dip"
-            android:layout_marginRight="10dip"
-            android:gravity="center"
-            android:text="10"
-            android:textColor="#008593"
-            android:textSize="17sp"
-            android:textStyle="bold" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="36dip"
-        android:layout_height="36dip"
-        android:layout_marginRight="5dip">
+        android:layout_height="wrap_content">
 
         <ImageButton
             android:id="@+id/iconNew"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="36dip"
+            android:layout_height="36dip"
+            android:layout_marginRight="5dip"
             android:background="@drawable/circle_blue_1"
             android:src="@mipmap/ic_new_releases_white_18dp"
             android:visibility="gone" />
-    </LinearLayout>
+
+        <TextView
+            android:id="@+id/textCurrency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:layout_marginLeft="5dip"
+            android:layout_marginRight="10dip"
+            android:gravity="right|center_vertical"
+            android:text="@string/vnd"
+            android:textColor="#008593"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:background="#0000"
+            android:paddingLeft="3dip"/>
+
+    </FrameLayout>
 
 </LinearLayout>

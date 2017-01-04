@@ -1,12 +1,17 @@
 package com.huy.monthlyfinance.MyView.Item.ListItem;
 
 import android.graphics.Bitmap;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.huy.monthlyfinance.Model.Product;
 import com.huy.monthlyfinance.R;
+import com.huy.monthlyfinance.SupportUtils.PreferencesUtils;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
 /**
@@ -27,11 +32,12 @@ public class BoughtProduct extends BaseItem {
     }
 
     @Override
-    public void setView(View view) {
+    public void setView(final View view) {
         ImageView imageView = (ImageView) view.findViewById(R.id.imageIcon);
         imageView.setImageBitmap(mImage);
         TextView textName = (TextView) view.findViewById(R.id.textName);
-        String name = "";
+        TextView textCurrency = (TextView) view.findViewById(R.id.textCurrency);
+        String name;
         String countryCode = SupportUtils.getCountryCode();
         if (countryCode.toLowerCase().contains("us")) {
             name = mData.getProductNameEN();
@@ -51,8 +57,32 @@ public class BoughtProduct extends BaseItem {
             }
         }
         textName.setText(name);
-        TextView textPrice = (TextView) view.findViewById(R.id.textNumber);
-        textPrice.setText(String.valueOf(mPrice));
+        final String mCurrency = PreferencesUtils.getString(PreferencesUtils.CURRENCY, "VND");
+        textCurrency.setText(mCurrency);
+        final EditText textPrice = (EditText) view.findViewById(R.id.textNumber);
+        textPrice.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String textCost = editable.toString();
+                double cost = textCost.isEmpty() ? 0 : Double.valueOf(textCost);
+                if (mCurrency.equals("VND")) {
+                    if (cost / SupportUtils.MIN_CURRENCY >= 1) {
+                        mPrice = cost;
+                        Log.d("Cost", "" + cost);
+                    }
+                }
+            }
+        });
         view.findViewById(R.id.iconNew).setVisibility(isNew ? View.VISIBLE : View.GONE);
     }
 

@@ -265,10 +265,10 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
                 }
                 break;
             case R.id.buttonRefresh:
-                if (mApriori.isInitialized()) {
-                    mApriori.execute();
-                } else {
-
+                if (mApriori != null) {
+                    if (mApriori.isInitialized()) {
+                        mApriori.execute();
+                    }
                 }
                 break;
             default:

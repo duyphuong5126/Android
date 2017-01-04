@@ -914,7 +914,11 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                 ArrayList<ProductDropdownItem> productDropdownItems = new ArrayList<>();
                 for (ProductDropdownItem productDropdownItem : mListProductExample) {
                     if (productDropdownItem.isFocused()) {
-                        productDropdownItems.add(productDropdownItem);
+                        BoughtProduct boughtProduct = new BoughtProduct(
+                                productDropdownItem.getBitmap(), 0, false, productDropdownItem.getProduct());
+                        if (!mListProducts.contains(boughtProduct)) {
+                            productDropdownItems.add(productDropdownItem);
+                        }
                     }
                 }
                 if (productDropdownItems.isEmpty()) {
@@ -929,7 +933,12 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                         Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
 
                         Product p = new Product(nameEN, nameVI, String.valueOf(groupID), unit, mProductImageName);
-                        productDropdownItems.add(new ProductDropdownItem(bitmap, p, false));
+
+                        BoughtProduct boughtProduct = new BoughtProduct(bitmap, 0, false, p);
+                        if (!mListProducts.contains(boughtProduct)) {
+                            ProductDropdownItem item = new ProductDropdownItem(bitmap, p, false);
+                            productDropdownItems.add(item);
+                        }
                     } else {
                         message = "You're missing some information";
                     }
@@ -942,6 +951,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                         Product p = item.getProduct();
                         if (!isProductExisted(p)) {
                             if (ProductDAO.getInstance(activity).doInsertTblProduct(p)) {
+                                mListProductExample.add(item);
                                 p.setProductID(String.valueOf(ProductDAO.getInstance(activity).getLatestProductId()));
                                 MainApplication.getInstance().getProducts().add(p);
                             }
@@ -972,7 +982,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                                 ProductDetailDAO productDetailDAO = ProductDetailDAO.getInstance(activity);
                                 for (BoughtProduct boughtProduct : mListProducts) {
                                     productDetailDAO.insertProductDetail(
-                                            new ProductDetail(boughtProduct.getData().getProductID(), id, 0, 0));
+                                            new ProductDetail(boughtProduct.getData().getProductID(), id, boughtProduct.getPrice(), 0));
                                 }
                             }
                             String cost = mTextTotalCost.getText().toString();
