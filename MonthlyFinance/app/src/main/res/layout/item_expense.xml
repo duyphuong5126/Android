@@ -21,7 +21,7 @@
     <LinearLayout
         android:layout_width="0dip"
         android:layout_height="wrap_content"
-        android:layout_weight="3"
+        android:layout_weight="4"
         android:orientation="vertical">
 
         <LinearLayout
@@ -37,12 +37,12 @@
                     android:id="@+id/textField1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
                     android:text="Food ($ 350)"
                     android:textColor="#555"
                     android:textSize="15sp"
-                    android:textStyle="bold"
-                    android:singleLine="true"
-                    android:ellipsize="end"/>
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <LinearLayout
@@ -54,25 +54,41 @@
                     android:id="@+id/textField2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:ellipsize="end"
                     android:gravity="right"
+                    android:maxLines="1"
                     android:text="$ 550"
                     android:textColor="#555"
-                    android:textSize="13sp"
-                    android:singleLine="true"
-                    android:ellipsize="end"/>
+                    android:textSize="13sp" />
             </LinearLayout>
         </LinearLayout>
 
-        <ProgressBar
-            android:id="@+id/itemProgress"
-            style="?android:attr/progressBarStyleHorizontal"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="15dip"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="10dip"
-            android:layout_marginTop="5dip"
-            android:max="100"
-            android:progress="30"
-            android:progressDrawable="@drawable/progress_style_1" />
+            android:layout_marginTop="5dip">
+
+            <ProgressBar
+                android:id="@+id/itemProgress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="20dip"
+                android:max="100"
+                android:progress="30"
+                android:progressDrawable="@drawable/progress_style_1" />
+
+            <TextView
+                android:id="@+id/text3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dip"
+                android:text="Most sale"
+                android:textColor="#fff"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:gravity="center_vertical"/>
+        </FrameLayout>
     </LinearLayout>
 
 </LinearLayout>

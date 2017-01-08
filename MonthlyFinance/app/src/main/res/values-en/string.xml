@@ -155,4 +155,6 @@
     <string name="account_title">ACCOUNT (DEFAULT CURRENCY: )</string>
     <string name="balance_title">Total Balance</string>
 
+    <string name="most_sale">Most sale</string>
+
 </resources>

@@ -19,6 +19,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -66,6 +67,7 @@ import com.huy.monthlyfinance.MyView.Item.ListItem.ProductDropdownItem;
 import com.huy.monthlyfinance.MyView.Item.ListItem.ProductImageItem;
 import com.huy.monthlyfinance.MyView.Item.ListItem.RadialItem;
 import com.huy.monthlyfinance.R;
+import com.huy.monthlyfinance.SupportUtils.NameValuePair;
 import com.huy.monthlyfinance.SupportUtils.PreferencesUtils;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 import com.kulik.radial.RadialListView;
@@ -73,6 +75,8 @@ import com.kulik.radial.RadialListView;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import static android.app.Activity.RESULT_OK;
@@ -102,7 +106,6 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
     private FrameLayout mLayoutSelectProduct;
     private FrameLayout mLayoutSelectUnit;
     private FrameLayout mLayoutSelectDate;
-    private float[] mMonthExpensePercentages;
     private ArrayList<String> mMonthExpense;
     private String[] mExpenses;
     private PieChart mPieChart;
@@ -162,6 +165,8 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
 
     private ImageView mIconSelectCash, mIconSelectBank, mIconSelectCredit;
     private GridView mListImages;
+    private HashMap<String, Float> mMapExpenses;
+    private HashMap<NameValuePair<String, String>, Double> mMapExpenseDetails;
 
     @Override
     protected int getLayoutXML() {
@@ -170,6 +175,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
 
     @Override
     protected void onPrepare() {
+        mListener.toggleProgress(true);
         mDate = SupportUtils.formatDate(SupportUtils.milliSec2Date(System.currentTimeMillis()), "dd/MM/yyyy");
 
         mCurrentGroup = 0;
@@ -246,7 +252,6 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
     @Override
     protected void initUI(View view) {
         final Activity activity = getActivity();
-        LayoutInflater inflater = activity.getLayoutInflater();
 
         mTextCurrentBalances = (TextView) view.findViewById(R.id.textCurrentBalances);
         mLayoutPickAccount = (FrameLayout) view.findViewById(R.id.layoutPickAccount);
@@ -568,9 +573,6 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         mBarChart.getLegend().setTextColor(Color.WHITE);
         mBarChart.animateY(1500);
 
-        if (mMonthExpensePercentages == null) {
-            mMonthExpensePercentages = new float[]{10.5f, 20f, 10f, 5.5f, 14f, 5f, 10f, 10f, 15f};
-        }
         if (mMonthExpense == null) {
             mMonthExpense = new ArrayList<>();
         }
@@ -586,8 +588,21 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                     Color.parseColor("#ff6d00"), Color.parseColor("#f74848"), Color.parseColor("#1eb1fc"),
                     Color.parseColor("#6a7f99"), Color.parseColor("#666666"), Color.parseColor("#94d4d4"),};
         }
-        addDataToChart(mMonthExpense, mMonthExpensePercentages, mPieChart, "This month expenses", "Expenses", mPieChartColors,
-                resources.getString(R.string.total_expense_this_month) + ": " + "800 USD");
+        setUpExpenseChart();
+        float[] mMonthExpenseAmount = new float[mMapExpenses.size()];
+        ArrayList<String> mMonthExpense = new ArrayList<>(mMapExpenses.size());
+        int index = 0;
+        int total = 0;
+        for (Map.Entry<String, Float> entry : mMapExpenses.entrySet()) {
+            mMonthExpense.add(entry.getKey());
+            mMonthExpenseAmount[index] = entry.getValue();
+            total += mMonthExpenseAmount[index];
+            index++;
+        }
+        String currency = PreferencesUtils.getString(PreferencesUtils.CURRENCY, "VND");
+        String title = currency.toLowerCase().contains("vnd") ? (total + " VND") : (currency + " " + total);
+        addDataToChart(mMonthExpense, mMonthExpenseAmount, mPieChart, "This month expenses", "Expenses", mPieChartColors,
+                resources.getString(R.string.total_expense_this_month) + ": \n" + title);
 
         if (mListExpenses == null) {
             mListExpenses = new ArrayList<>();
@@ -616,7 +631,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                     R.drawable.progress_style_7, R.drawable.progress_style_8, R.drawable.progress_style_9};
         }
         if (mListExpenses.isEmpty()) {
-            writeFakeData(mListExpenses, mExpenses, mExpenseDrawables, mExpenseImages, mExpenseProgressDrawables);
+            writeExpenseDetailsData(mListExpenses, mExpenses, mExpenseDrawables, mExpenseImages, mExpenseProgressDrawables);
         }
 
         mRadialAdapter = new BasicAdapter<>(mListExpenses, R.layout.item_expense, inflater);
@@ -694,6 +709,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         if (mListUnit.isEmpty()) {
 
         }
+        mListener.toggleProgress(false);
     }
 
     @Override
@@ -701,17 +717,128 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         return mLayoutForm.getVisibility() == View.GONE;
     }
 
-    private void writeFakeData(ArrayList<ExpensesItem> listExpenses, String[] expenses,
-                               int[] drawables, int[] images, int[] progressDrawables) {
-        if (drawables.length != images.length || drawables.length != expenses.length) {
+    private void setUpExpenseChart() {
+        MainApplication application = MainApplication.getInstance();
+        ArrayList<ProductGroup> productGroups = application.getProductGroups();
+        ArrayList<ProductDetail> productDetails = application.getProductDetails();
+        ArrayList<Product> products = application.getProducts();
+        HashMap<String, Double> expenseByGroup = new HashMap<>();
+        for (ProductGroup group : productGroups) {
+            expenseByGroup.put(group.getProductGroupID(), 0.d);
+        }
+        for (Product product : products) {
+            String groupId = product.getProductGroupID();
+            String productId = product.getProductID();
+            if (expenseByGroup.containsKey(groupId)) {
+                double currentGroupExpense = expenseByGroup.get(product.getProductGroupID());
+                for (ProductDetail productDetail : productDetails) {
+                    if (productDetail.getProductID().equals(productId)) {
+                        currentGroupExpense += productDetail.getProductCost();
+                    }
+                }
+                expenseByGroup.put(groupId, currentGroupExpense);
+            }
+        }
+
+        if (mMapExpenses == null) {
+            mMapExpenses = new HashMap<>();
+        }
+        mMapExpenses.clear();
+        if (mMapExpenseDetails == null) {
+            mMapExpenseDetails = new HashMap<>();
+        }
+        mMapExpenseDetails.clear();
+        for (Map.Entry<String, Double> entry : expenseByGroup.entrySet()) {
+            String groupId = entry.getKey();
+            double expense = entry.getValue();
+            Log.d("Data", "group: " + groupId + ", expense: " + expense);
+            String groupName = "";
+            String country = SupportUtils.getCountryCode();
+            for (int i = 0; i < productGroups.size() && groupName.isEmpty(); i++) {
+                ProductGroup group = productGroups.get(i);
+                if (group.getProductGroupID().equals(groupId)) {
+                    groupName = country.toLowerCase().contains("us") ? group.getGroupNameEN() : group.getGroupNameVI();
+                }
+            }
+            mMapExpenses.put(groupName, (float) expense);
+
+            double maxInGroup = Double.MIN_VALUE;
+            String productId = "";
+            if (!productDetails.isEmpty()) {
+                ArrayList<String> productIds = new ArrayList<>();
+                for (Product product : products) {
+                    if (product.getProductGroupID().equals(groupId)) {
+                        productIds.add(product.getProductID());
+                    }
+                }
+                if (!productIds.isEmpty()) {
+                    for (ProductDetail productDetail : productDetails) {
+                        if (productDetail.getProductCost() > maxInGroup && productIds.contains(productDetail.getProductID())) {
+                            productId = productDetail.getProductID();
+                            maxInGroup = productDetail.getProductCost();
+                        }
+                    }
+                }
+            }
+            mMapExpenseDetails.put(new NameValuePair<>(groupId, productId), maxInGroup);
+        }
+    }
+
+    private void writeExpenseDetailsData(ArrayList<ExpensesItem> listExpenses, String[] expenses,
+                                         int[] drawables, int[] images, int[] progressDrawables) {
+        Resources resources = MainApplication.getInstance().getResources();
+        String mostSale = resources.getString(R.string.most_sale);
+        if (drawables.length != images.length || drawables.length != expenses.length
+                || mMapExpenseDetails == null || mMapExpenses == null) {
             return;
         }
-        Random random = new Random();
-        for (int i = 0; i < expenses.length; i++) {
-            int max = random.nextInt(950) + 50;
-            int current = max - random.nextInt(max);
-            listExpenses.add(new ExpensesItem(getActivity(), expenses[i] + "($ " + current + ")", "$ " + max, max, current,
-                    images[i], drawables[i], progressDrawables[i]));
+
+        String country = SupportUtils.getCountryCode();
+        HashMap<String, String> mapExpenseTitle = new HashMap<>();
+        for (Map.Entry<NameValuePair<String, String>, Double> entry : mMapExpenseDetails.entrySet()) {
+            NameValuePair<String, String> key = entry.getKey();
+            for (ProductGroup productGroup : MainApplication.getInstance().getProductGroups()) {
+                if (productGroup.getProductGroupID().equals(key.getKey())) {
+                    mapExpenseTitle.put(key.getKey(),
+                            country.toLowerCase().contains("us") ? productGroup.getGroupNameEN() : productGroup.getGroupNameVI());
+                }
+            }
+        }
+
+        ArrayList<Product> products = MainApplication.getInstance().getProducts();
+        for (Map.Entry<NameValuePair<String, String>, Double> entry : mMapExpenseDetails.entrySet()) {
+            NameValuePair<String, String> key = entry.getKey();
+            String productName = "";
+            for (int i = 0; i < products.size() && productName.isEmpty(); i++) {
+                if (products.get(i).getProductID().equals(key.getValue())) {
+                    productName = country.toLowerCase().contains("us") ?
+                            products.get(i).getProductNameEN() : products.get(i).getProductNameVI();
+                }
+            }
+            double current = entry.getValue() == Double.MIN_VALUE ? 0 : entry.getValue();
+            double max = 0;
+            String nameKey = mapExpenseTitle.get(key.getKey());
+            if (mMapExpenses.containsKey(nameKey)) {
+                max = mMapExpenses.get(nameKey);
+            }
+            int index = 0;
+            for (int i = 0; i < expenses.length; i++) {
+                if (expenses[i].toLowerCase().contains(mapExpenseTitle.get(key.getKey()).toLowerCase())) {
+                    index = i;
+                }
+            }
+            String currency = PreferencesUtils.getString(PreferencesUtils.CURRENCY, "vnd");
+            String title = "";
+            if (current > 0) {
+                String textCurrent = SupportUtils.getNormalDoubleString(current, "#0,000");
+                title = mostSale + ": " + productName + " " +
+                        (currency.toLowerCase().contains("vnd") ? "(" + textCurrent + " vnđ)" : "($ " + textCurrent + ")");
+            }
+            String textMax = max > 0 ? SupportUtils.getNormalDoubleString(max, "#0,000") : "0";
+            String maxTitle = currency.toLowerCase().contains("vnd") ? (textMax + " vnđ") : ("$ " + textMax);
+
+            listExpenses.add(new ExpensesItem(getActivity(), mapExpenseTitle.get(key.getKey()), maxTitle, title, (int) max, (int) current,
+                    images[index], drawables[index], progressDrawables[index]));
         }
     }
 
@@ -1183,6 +1310,32 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
 
     @Override
     public void refreshData() {
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        Resources resources = MainApplication.getInstance().getResources();
+        setUpExpenseChart();
+        float[] mMonthExpenseAmount = new float[mMapExpenses.size()];
+        ArrayList<String> mMonthExpense = new ArrayList<>(mMapExpenses.size());
+        int index = 0;
+        int total = 0;
+        for (Map.Entry<String, Float> entry : mMapExpenses.entrySet()) {
+            mMonthExpense.add(entry.getKey());
+            mMonthExpenseAmount[index] = entry.getValue();
+            total += mMonthExpenseAmount[index];
+            index++;
+        }
+        mPieChart.clear();
+        String currency = PreferencesUtils.getString(PreferencesUtils.CURRENCY, "VND");
+        String title = currency.toLowerCase().contains("vnd") ? (total + " VND") : (currency + " " + total);
+        addDataToChart(mMonthExpense, mMonthExpenseAmount, mPieChart, "This month expenses", "Expenses", mPieChartColors,
+                resources.getString(R.string.total_expense_this_month) + ": \n" + title);
 
+        if (mListExpenses == null) {
+            mListExpenses = new ArrayList<>();
+            mRadialAdapter = new BasicAdapter<>(mListExpenses, R.layout.item_expense, inflater);
+            mListExpensesDetail.setAdapter(mRadialAdapter);
+        }
+        mListExpenses.clear();
+        writeExpenseDetailsData(mListExpenses, mExpenses, mExpenseDrawables, mExpenseImages, mExpenseProgressDrawables);
+        mRadialAdapter.notifyDataSetChanged();
     }
 }

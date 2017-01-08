@@ -6,11 +6,13 @@ import android.content.res.Resources;
 
 import com.huy.monthlyfinance.Database.DAO.AccountDAO;
 import com.huy.monthlyfinance.Database.DAO.ProductDAO;
+import com.huy.monthlyfinance.Database.DAO.ProductDetailDAO;
 import com.huy.monthlyfinance.Database.DAO.ProductGroupDAO;
 import com.huy.monthlyfinance.Database.DatabaseHelper;
 import com.huy.monthlyfinance.Listener.DataChangeListener;
 import com.huy.monthlyfinance.Model.Account;
 import com.huy.monthlyfinance.Model.Product;
+import com.huy.monthlyfinance.Model.ProductDetail;
 import com.huy.monthlyfinance.Model.ProductGroup;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
@@ -25,6 +27,7 @@ public class MainApplication extends Application {
     private ArrayList<Product> mProducts;
     private ArrayList<Account> mAccounts;
     private ArrayList<DataChangeListener> mListeners;
+    private ArrayList<ProductDetail> mProductDetails;
 
     private static MainApplication mInstance;
 
@@ -67,6 +70,8 @@ public class MainApplication extends Application {
             boolean result = true;
             for (int i = 0; i < mProductGroups.size() && result; i++) {
                 result = mProductGroupDAO.insertProductGroup(mProductGroups.get(i));
+                int id = mProductGroupDAO.getGroupIDByName(mProductGroups.get(i).getGroupNameEN());
+                mProductGroups.get(i).setProductGroupID(String.valueOf(id));
             }
         }
 
@@ -218,6 +223,16 @@ public class MainApplication extends Application {
         return mAccounts;
     }
 
+    public ArrayList<ProductDetail> getProductDetails() {
+        if (mProductDetails == null) {
+            mProductDetails = new ArrayList<>();
+        }
+        if (mProductDetails.isEmpty()) {
+            mProductDetails.addAll(ProductDetailDAO.getInstance(getApplicationContext()).getAllDetails());
+        }
+        return mProductDetails;
+    }
+
     public void refreshAllData() {
         Context context = getApplicationContext();
         if (mProductGroups == null) {
@@ -235,6 +250,11 @@ public class MainApplication extends Application {
         }
         mAccounts.clear();
         mAccounts.addAll(AccountDAO.getInstance(context).getAllAccounts());
+        if (mProductDetails == null) {
+            mProductDetails = new ArrayList<>();
+        }
+        mProductDetails.clear();
+        mProductDetails.addAll(ProductDetailDAO.getInstance(getApplicationContext()).getAllDetails());
         for (DataChangeListener listener : mListeners) {
             listener.refreshData();
         }

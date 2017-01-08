@@ -52,11 +52,11 @@
                 android:gravity="center">
 
                 <ImageButton
-                    android:id="@+id/buttonMore"
+                    android:id="@+id/buttonRefresh"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="#0000"
-                    android:src="@mipmap/ic_more_vert_white_24dp" />
+                    android:src="@mipmap/ic_sync_white_24dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -66,11 +66,11 @@
                 android:gravity="center">
 
                 <ImageButton
-                    android:id="@+id/buttonRefresh"
+                    android:id="@+id/buttonMore"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="#0000"
-                    android:src="@mipmap/ic_sync_white_24dp" />
+                    android:src="@mipmap/ic_more_vert_white_24dp" />
             </LinearLayout>
         </LinearLayout>
 

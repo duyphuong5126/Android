@@ -21,10 +21,12 @@ public class ExpensesItem extends BaseItem {
     private int mDrawable;
     private int mProgressDrawable;
     private static Context mContext;
+    private String mText3;
 
-    public ExpensesItem(Context context, String Text1, String Text2, int Max, int Current, int Image, int Drawable, int ProgressDrawable) {
+    public ExpensesItem(Context context, String Text1, String Text2, String Text3, int Max, int Current, int Image, int Drawable, int ProgressDrawable) {
         this.mText1 = Text1;
         this.mText2 = Text2;
+        this.mText3 = Text3;
         this.mMax = Max;
         this.mCurrent = Current;
         this.mImage = Image;
@@ -72,6 +74,8 @@ public class ExpensesItem extends BaseItem {
         field1.setText(mText1);
         TextView field2 = (TextView) view.findViewById(R.id.textField2);
         field2.setText(mText2);
+        TextView field3 = (TextView) view.findViewById(R.id.text3);
+        field3.setText(mText3);
         ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.itemProgress);
         progressBar.setMax(mMax);
         progressBar.setProgress(mCurrent);

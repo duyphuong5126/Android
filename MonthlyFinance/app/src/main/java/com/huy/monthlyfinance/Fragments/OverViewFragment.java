@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
@@ -28,6 +29,9 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import com.huy.monthlyfinance.Database.DAO.AccountDAO;
 import com.huy.monthlyfinance.MainApplication;
 import com.huy.monthlyfinance.Model.Account;
+import com.huy.monthlyfinance.Model.Product;
+import com.huy.monthlyfinance.Model.ProductDetail;
+import com.huy.monthlyfinance.Model.ProductGroup;
 import com.huy.monthlyfinance.MyView.Item.ListItem.AccountItem;
 import com.huy.monthlyfinance.MyView.BasicAdapter;
 import com.huy.monthlyfinance.R;
@@ -36,12 +40,14 @@ import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
  * Created by Phuong on 25/08/2016.
  */
-public class OverViewFragment extends BaseFragment implements View.OnClickListener{
+public class OverViewFragment extends BaseFragment implements View.OnClickListener {
     private FrameLayout mLayoutQuickAdd;
     private LinearLayout mLayoutQuickAddSelect;
     private Animation mAnimationForward, mAnimationBackward;
@@ -55,6 +61,7 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
     private TextView mBalanceValue;
     private BasicAdapter<AccountItem> mAccountAdapter;
     private ListView mListAccountItems;
+    private PieChart mMonthlyExpenseChart;
 
     @Override
     protected int getLayoutXML() {
@@ -80,17 +87,11 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
         mLayoutQuickAddSelect = (LinearLayout) view.findViewById(R.id.layoutQuickAddSelect);
         mLayoutQuickAddSelect.setOnClickListener(this);
         mLayoutQuickAdd = (FrameLayout) view.findViewById(R.id.layoutQuickAdd);
-        float[] mMonthExpenseAmount = {10.5f, 20f, 10f, 5.5f, 14f, 5f, 10f, 10f, 15f};
-        String[] mMonthExpense = {resources.getString(R.string.bill), resources.getString(R.string.health),
-                resources.getString(R.string.entertainment), resources.getString(R.string.food),
-                resources.getString(R.string.dress), resources.getString(R.string.transport),
-                resources.getString(R.string.home), resources.getString(R.string.family), resources.getString(R.string.etc)};
+
         float[] mMonthCashFlowAmount = {37.5f, 62.5f};
         String[] mMonthCashFlow = {resources.getString(R.string.cash), resources.getString(R.string.expense)};
-        PieChart mMonthlyExpenseChart = (PieChart) view.findViewById(R.id.chartMonthExpense);
+        mMonthlyExpenseChart = (PieChart) view.findViewById(R.id.chartMonthExpense);
         PieChart mMonthlyCashFlowChart = (PieChart) view.findViewById(R.id.chartMonthCashFlow);
-        addDataToChart(new ArrayList<>(Arrays.asList(mMonthExpense)), mMonthExpenseAmount, mMonthlyExpenseChart,
-                resources.getString(R.string.this_month_expense_chart), "Monthly Expenses");
         addDataToChart(new ArrayList<>(Arrays.asList(mMonthCashFlow)), mMonthCashFlowAmount, mMonthlyCashFlowChart
                 , resources.getString(R.string.this_month_cash_chart), ""/*"Month Cash Flow"*/);
         mAnimationRotateForward30 = new RotateAnimation(0.0f, 30.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
@@ -236,6 +237,7 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
             }
             mBalanceTitle.setText(balanceTitle);
         }
+        setUpExpenseChart();
     }
 
     @Override
@@ -289,6 +291,63 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
                 count++;
             }
         }
+    }
+
+    private void setUpExpenseChart() {
+        MainApplication application = MainApplication.getInstance();
+        ArrayList<ProductGroup> productGroups = application.getProductGroups();
+        HashMap<String, Double> expenseByGroup = new HashMap<>();
+        for (ProductGroup group : productGroups) {
+            expenseByGroup.put(group.getProductGroupID(), 0.d);
+        }
+        for (Product product : application.getProducts()) {
+            String groupId = product.getProductGroupID();
+            String productId = product.getProductID();
+            if (expenseByGroup.containsKey(groupId)) {
+                double currentGroupExpense = expenseByGroup.get(product.getProductGroupID());
+                for (ProductDetail productDetail : application.getProductDetails()) {
+                    if (productDetail.getProductID().equals(productId)) {
+                        currentGroupExpense += productDetail.getProductCost();
+                    }
+                }
+                expenseByGroup.put(groupId, currentGroupExpense);
+            }
+        }
+
+        HashMap<String, Float> mapExpense = new HashMap<>();
+        for (Map.Entry<String, Double> entry : expenseByGroup.entrySet()) {
+            String groupId = entry.getKey();
+            double expense = entry.getValue();
+            Log.d("Data", "group: " + groupId + ", expense: " + expense);
+            String groupName = "";
+            String country = SupportUtils.getCountryCode();
+            for (int i = 0; i < productGroups.size() && groupName.isEmpty(); i++) {
+                ProductGroup group = productGroups.get(i);
+                if (group.getProductGroupID().equals(groupId)) {
+                    groupName = country.contains("vi") ? group.getGroupNameVI() : group.getGroupNameEN();
+                }
+            }
+            mapExpense.put(groupName, (float) expense);
+        }
+        int size = 0;
+        for (Map.Entry<String, Float> entry : mapExpense.entrySet()) {
+            if (entry.getValue() > 0) {
+                size++;
+            }
+        }
+        float[] mMonthExpenseAmount = new float[size];
+        String[] mMonthExpense = new String[size];
+        int index = 0;
+        for (Map.Entry<String, Float> entry : mapExpense.entrySet()) {
+            if (entry.getValue() > 0) {
+                mMonthExpense[index] = entry.getKey();
+                mMonthExpenseAmount[index] = entry.getValue();
+                index++;
+            }
+        }
+        Resources resources = MainApplication.getInstance().getResources();
+        addDataToChart(new ArrayList<>(Arrays.asList(mMonthExpense)), mMonthExpenseAmount, mMonthlyExpenseChart,
+                resources.getString(R.string.this_month_expense_chart), "Monthly Expenses");
     }
 
     private void addDataToChart(final ArrayList<String> xValues, final float[] yValuesData, PieChart chart,
@@ -429,5 +488,7 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
             ));
             count++;
         }
+
+        setUpExpenseChart();
     }
 }
