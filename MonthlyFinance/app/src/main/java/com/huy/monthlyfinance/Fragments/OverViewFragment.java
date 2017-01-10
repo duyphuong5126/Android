@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
@@ -62,6 +63,7 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
     private BasicAdapter<AccountItem> mAccountAdapter;
     private ListView mListAccountItems;
     private PieChart mMonthlyExpenseChart;
+    private SwipeRefreshLayout mRefreshLayout;
 
     @Override
     protected int getLayoutXML() {
@@ -70,7 +72,26 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
 
     @Override
     protected void onPrepare() {
-        setUpAccounts();
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                mListener.toggleProgress(true);
+            }
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                setUpAccounts();
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                mListener.toggleProgress(false);
+            }
+        }.execute();
     }
 
     @Override
@@ -87,6 +108,7 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
         mLayoutQuickAddSelect = (LinearLayout) view.findViewById(R.id.layoutQuickAddSelect);
         mLayoutQuickAddSelect.setOnClickListener(this);
         mLayoutQuickAdd = (FrameLayout) view.findViewById(R.id.layoutQuickAdd);
+        view.findViewById(R.id.buttonRefresh).setOnClickListener(this);
 
         float[] mMonthCashFlowAmount = {37.5f, 62.5f};
         String[] mMonthCashFlow = {resources.getString(R.string.cash), resources.getString(R.string.expense)};
@@ -168,22 +190,22 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
 
         mListAccountItems = (ListView) view.findViewById(R.id.listAccountItems);
 
-        final SwipeRefreshLayout refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.layoutRefresh);
-        refreshLayout.setDistanceToTriggerSync(50);
-        refreshLayout.setColorSchemeColors(Color.parseColor("#009688"), Color.parseColor("#009688"), Color.parseColor("#4052b5"));
-        refreshLayout.setSize(SwipeRefreshLayout.LARGE);
-        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        mRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.layoutRefresh);
+        mRefreshLayout.setDistanceToTriggerSync(50);
+        mRefreshLayout.setColorSchemeColors(Color.parseColor("#009688"), Color.parseColor("#009688"), Color.parseColor("#4052b5"));
+        mRefreshLayout.setSize(SwipeRefreshLayout.LARGE);
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshLayout.setRefreshing(true);
-                refreshLayout.postDelayed(new Runnable() {
+                mRefreshLayout.setRefreshing(true);
+                mRefreshLayout.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         MainApplication.getInstance().refreshAllData();
                         activity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                refreshLayout.setRefreshing(false);
+                                mRefreshLayout.setRefreshing(false);
                                 Toast.makeText(activity, "Refreshed", Toast.LENGTH_SHORT).show();
                             }
                         });
@@ -413,6 +435,7 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
 
     @Override
     public void onClick(View view) {
+        final Activity activity = getActivity();
         switch (view.getId()) {
             case R.id.buttonQuickAdd:
                 mLayoutQuickAdd.startAnimation(mAnimationForward);
@@ -441,6 +464,27 @@ public class OverViewFragment extends BaseFragment implements View.OnClickListen
                 bundle.putBoolean("isAddIncome", false);
                 bundle.putBoolean("isAddTransfer", true);
                 mListener.showFragment(BudgetFragment.class, bundle);
+                break;
+            case R.id.buttonRefresh:
+                mRefreshLayout.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mRefreshLayout.setRefreshing(true);
+                        mRefreshLayout.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                MainApplication.getInstance().refreshAllData();
+                                activity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mRefreshLayout.setRefreshing(false);
+                                        Toast.makeText(activity, "Refreshed", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        }, 2000);
+                    }
+                });
                 break;
             default:
                 break;

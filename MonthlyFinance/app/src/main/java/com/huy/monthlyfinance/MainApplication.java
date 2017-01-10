@@ -3,6 +3,8 @@ package com.huy.monthlyfinance;
 import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import com.huy.monthlyfinance.Database.DAO.AccountDAO;
 import com.huy.monthlyfinance.Database.DAO.ProductDAO;
@@ -14,9 +16,12 @@ import com.huy.monthlyfinance.Model.Account;
 import com.huy.monthlyfinance.Model.Product;
 import com.huy.monthlyfinance.Model.ProductDetail;
 import com.huy.monthlyfinance.Model.ProductGroup;
+import com.huy.monthlyfinance.MyView.Item.ListItem.ProductDropdownItem;
+import com.huy.monthlyfinance.MyView.Item.ListItem.ProductImageItem;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Phuong on 07/11/2016.
@@ -28,6 +33,9 @@ public class MainApplication extends Application {
     private ArrayList<Account> mAccounts;
     private ArrayList<DataChangeListener> mListeners;
     private ArrayList<ProductDetail> mProductDetails;
+    private ArrayList<ProductImageItem> mListProductsImage;
+    private ArrayList<ProductDropdownItem> mListProductExample;
+    private HashMap<String, Bitmap> mRadialBitmap;
 
     private static MainApplication mInstance;
 
@@ -73,6 +81,14 @@ public class MainApplication extends Application {
                 int id = mProductGroupDAO.getGroupIDByName(mProductGroups.get(i).getGroupNameEN());
                 mProductGroups.get(i).setProductGroupID(String.valueOf(id));
             }
+        }
+
+        mRadialBitmap = new HashMap<>();
+        Resources resources = getResources();
+        for (ProductGroup productGroup : mProductGroups) {
+            String groupName = productGroup.getGroupImage();
+            int resId = resources.getIdentifier(groupName, "drawable", context.getPackageName());
+            mRadialBitmap.put(groupName, BitmapFactory.decodeResource(resources, resId));
         }
 
         ProductDAO mProductDAO = ProductDAO.getInstance(context);
@@ -233,6 +249,30 @@ public class MainApplication extends Application {
         return mProductDetails;
     }
 
+    public ArrayList<ProductImageItem> getListProductsImage() {
+        if (mListProductsImage == null) {
+            mListProductsImage = new ArrayList<>();
+        }
+        if (mListProductsImage.isEmpty()) {
+            Resources resources = getResources();
+            int[] drawables = {R.drawable.bike, R.drawable.carousel, R.drawable.chest_of_drawers, R.drawable.dental_care,
+                    R.drawable.desk, R.drawable.dog_eating, R.drawable.electricity, R.drawable.glasses,
+                    R.drawable.milk, R.drawable.motorcycle, R.drawable.nurse, R.drawable.puzzle,
+                    R.drawable.refrigerator, R.drawable.salad_1, R.drawable.sandwich, R.drawable.soccer_ball_variant,
+                    R.drawable.socks, R.drawable.sunbed, R.drawable.tap, R.drawable.tea_cup, R.drawable.toilet_paper,
+                    R.drawable.travel, R.drawable.underwear, R.drawable.vacuum_cleaner, R.drawable.washing_machine,
+                    R.drawable.wifi, R.drawable.wine_glasses, R.drawable.wristwatch
+            };
+            for (int drawable : drawables) {
+                mListProductsImage.add(new ProductImageItem(
+                        BitmapFactory.decodeResource(resources, drawable),
+                        resources.getResourceEntryName(drawable)
+                ));
+            }
+        }
+        return mListProductsImage;
+    }
+
     public void refreshAllData() {
         Context context = getApplicationContext();
         if (mProductGroups == null) {
@@ -264,5 +304,28 @@ public class MainApplication extends Application {
         if (listener != null) {
             mListeners.add(listener);
         }
+    }
+
+    public ArrayList<ProductDropdownItem> getListProductExample() {
+        if (mListProductExample == null) {
+            mListProductExample = new ArrayList<>();
+        }
+        if (mListProductExample.isEmpty()) {
+            Context context = getApplicationContext();
+            Resources resources = getResources();
+            ArrayList<Product> products = MainApplication.getInstance().getProducts();
+            if (!products.isEmpty()) {
+                for (Product product : products) {
+                    int resId = resources.getIdentifier(product.getProductImage(), "drawable", context.getPackageName());
+                    mListProductExample.add(
+                            new ProductDropdownItem(BitmapFactory.decodeResource(resources, resId), product, false));
+                }
+            }
+        }
+        return mListProductExample;
+    }
+
+    public Bitmap getRadialBitmap(String group) {
+        return mRadialBitmap.get(group);
     }
 }

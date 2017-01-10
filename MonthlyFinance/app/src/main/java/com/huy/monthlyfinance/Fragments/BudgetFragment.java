@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
@@ -114,46 +115,66 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
 
     @Override
     protected void onPrepare() {
-        Resources resources = getActivity().getResources();
-        mListTransfer = new ArrayList<>();
-        /*mListTransfer.add(new TransferItem(100, "Cash", "Bank", 1000, 700, new Date(System.currentTimeMillis())));
-        mListTransfer.add(new TransferItem(50, "Cash", "Bank", 900, 800, new Date(System.currentTimeMillis())));
-        mListTransfer.add(new TransferItem(10, "Credit", "Cash", 900, 850, new Date(System.currentTimeMillis())));
-        mListTransfer.add(new TransferItem(40, "Credit", "Cash", 890, 860, new Date(System.currentTimeMillis())));*/
+        final Resources resources = getActivity().getResources();
 
-        mCurrency = PreferencesUtils.getString(PreferencesUtils.CURRENCY, "VND");
-        mTotal = mIncome = mShareBank = mShareCash = mShareCredit = 0;
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-            isAddIncome = bundle.getBoolean("isAddIncome");
-            isAddTransfer = bundle.getBoolean("isAddTransfer");
-        }
-
-        if (mListAccounts == null) {
-            mListAccounts = new ArrayList<>();
-        }
-        if (mListAccounts.isEmpty()) {
-            mListAccounts.addAll(MainApplication.getInstance().getAccounts());
-        }
-        mTotalPayable = 0;
-        if (!mListAccounts.isEmpty()) {
-            for (Account account : mListAccounts) {
-                if (!account.getAccountName().toUpperCase().contains(
-                        SupportUtils.getStringLocalized(getActivity(), "en", R.string.bank).toUpperCase())) {
-                    mTotalPayable += account.getCurrentBalance();
-                }
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                mListener.toggleProgress(true);
             }
-        }
 
-        mMaxSource = 0;
-        mAmountSource = 0;
+            @Override
+            protected Void doInBackground(Void... voids) {
 
-        mSourceTitle = resources.getString(R.string.source);
-        mTargetTitle = resources.getString(R.string.target);
-        mMapAccountSelector = new HashMap<>();
-        mMapAccountSelector.put(CASH, "");
-        mMapAccountSelector.put(BANK, "");
-        mMapAccountSelector.put(CREDIT, "");
+                mListTransfer = new ArrayList<>();
+                /*mListTransfer.add(new TransferItem(100, "Cash", "Bank", 1000, 700, new Date(System.currentTimeMillis())));
+                mListTransfer.add(new TransferItem(50, "Cash", "Bank", 900, 800, new Date(System.currentTimeMillis())));
+                mListTransfer.add(new TransferItem(10, "Credit", "Cash", 900, 850, new Date(System.currentTimeMillis())));
+                mListTransfer.add(new TransferItem(40, "Credit", "Cash", 890, 860, new Date(System.currentTimeMillis())));*/
+
+                mCurrency = PreferencesUtils.getString(PreferencesUtils.CURRENCY, "VND");
+                mTotal = mIncome = mShareBank = mShareCash = mShareCredit = 0;
+                Bundle bundle = getArguments();
+                if (bundle != null) {
+                    isAddIncome = bundle.getBoolean("isAddIncome");
+                    isAddTransfer = bundle.getBoolean("isAddTransfer");
+                }
+
+                if (mListAccounts == null) {
+                    mListAccounts = new ArrayList<>();
+                }
+                if (mListAccounts.isEmpty()) {
+                    mListAccounts.addAll(MainApplication.getInstance().getAccounts());
+                }
+                mTotalPayable = 0;
+                if (!mListAccounts.isEmpty()) {
+                    for (Account account : mListAccounts) {
+                        if (!account.getAccountName().toUpperCase().contains(
+                                SupportUtils.getStringLocalized(getActivity(), "en", R.string.bank).toUpperCase())) {
+                            mTotalPayable += account.getCurrentBalance();
+                        }
+                    }
+                }
+
+                mMaxSource = 0;
+                mAmountSource = 0;
+
+                mSourceTitle = resources.getString(R.string.source);
+                mTargetTitle = resources.getString(R.string.target);
+                mMapAccountSelector = new HashMap<>();
+                mMapAccountSelector.put(CASH, "");
+                mMapAccountSelector.put(BANK, "");
+                mMapAccountSelector.put(CREDIT, "");
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                mListener.toggleProgress(false);
+            }
+        }.execute();
     }
 
     @SuppressLint("SetTextI18n")
@@ -694,7 +715,7 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                     boolean progressApplied = false;
                     for (int i = 0; i < mListAccounts.size() && !progressApplied; i++) {
                         Account account = mListAccounts.get(i);
-                        if (account.getAccountName().toLowerCase().equals(BANK.toLowerCase())) {
+                        if (account.getAccountName().toLowerCase().contains(BANK.toLowerCase())) {
                             mMaxSource = account.getCurrentBalance();
                             mProgressSource.setMax((int) mMaxSource);
                             progressApplied = true;
@@ -717,7 +738,7 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                     boolean progressApplied = false;
                     for (int i = 0; i < mListAccounts.size() && !progressApplied; i++) {
                         Account account = mListAccounts.get(i);
-                        if (account.getAccountName().toLowerCase().equals(CASH.toLowerCase())) {
+                        if (account.getAccountName().toLowerCase().contains(CASH.toLowerCase())) {
                             mMaxSource = account.getCurrentBalance();
                             mProgressSource.setMax((int) mMaxSource);
                             progressApplied = true;
@@ -740,7 +761,7 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                     boolean progressApplied = false;
                     for (int i = 0; i < mListAccounts.size() && !progressApplied; i++) {
                         Account account = mListAccounts.get(i);
-                        if (account.getAccountName().toLowerCase().equals(CREDIT.toLowerCase())) {
+                        if (account.getAccountName().toLowerCase().contains(CREDIT.toLowerCase())) {
                             mMaxSource = account.getCurrentBalance();
                             mProgressSource.setMax((int) mMaxSource);
                             progressApplied = true;

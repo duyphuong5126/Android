@@ -15,6 +15,7 @@ public class PreferencesUtils {
     public static final String CURRENT_EMAIL = "UserName";
     public static final String CURRENCY = "Currency";
     public static final String isInfoInitialized = "InfoInitialized";
+    public static final String AVATAR = "Avatar";
 
     public static void init(Context context) {
         if (mPreferenceInstance == null) {

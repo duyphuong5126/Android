@@ -5,9 +5,15 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.view.Window;
@@ -30,6 +36,12 @@ import com.huy.monthlyfinance.MyView.RoundImageView;
 import com.huy.monthlyfinance.SupportUtils.PreferencesUtils;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
@@ -43,6 +55,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
     private FrameLayout mLayoutTopSideMenu;
     private RoundImageView mImageAvatar;
     private LinearLayout mLayoutProgress;
+
+    private static final int SELECT_IMAGE = 1;
+    private Uri mCapturedImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,9 +138,58 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
             }
         });
 
+        findViewById(R.id.buttonEditAvatar).setOnClickListener(this);
+
+        String path = PreferencesUtils.getString(PreferencesUtils.AVATAR, "");
+        if (!path.isEmpty()) {
+            Bitmap mAvatar;
+            mAvatar = BitmapFactory.decodeFile(path);
+            if (mAvatar != null) {
+                mImageAvatar.setImageBitmap(mAvatar);
+            }
+        }
+
         mManager = getFragmentManager();
         mManager.beginTransaction().add(R.id.layoutFragmentsContainer, overViewFragment, overViewFragment.getClass().getName()).commit();
         BaseFragment.setCurrent(overViewFragment.getClass().getName());
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case SELECT_IMAGE:
+                    boolean isFromCamera;
+                    if (data == null) {
+                        isFromCamera = true;
+                    } else {
+                        if (data.getAction() == null) {
+                            isFromCamera = true;
+                        } else {
+                            isFromCamera = data.getAction().equals(MediaStore.ACTION_IMAGE_CAPTURE);
+                        }
+                    }
+
+                    String path;
+                    if (isFromCamera) {
+                        path = SupportUtils.getPath(mCapturedImage, MainActivity.this);
+                    } else {
+                        path = SupportUtils.getPath(data.getData(), MainActivity.this);
+                    }
+                    if (path != null) {
+                        Bitmap mAvatar;
+                        mAvatar = BitmapFactory.decodeFile(path);
+                        if (mAvatar != null) {
+                            PreferencesUtils.setValue(PreferencesUtils.AVATAR, path);
+                            mImageAvatar.setImageBitmap(mAvatar);
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     private void addFragment(BaseFragment fragment) {
@@ -136,7 +200,13 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
 
     @Override
     public void onClick(View v) {
-
+        switch (v.getId()) {
+            case R.id.buttonEditAvatar:
+                intentLoadImage();
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
@@ -208,6 +278,28 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
             } else {
                 navBack();
             }
+        }
+    }
+
+    private void intentLoadImage() {
+        Intent intentPick = new Intent();
+        intentPick.setType("image/*");
+        intentPick.setAction(Intent.ACTION_GET_CONTENT);
+
+        File root = new File(Environment.getExternalStorageDirectory() + File.separator + "Captured" + File.separator);
+        if (!root.exists()) {
+            root.mkdirs();
+        } else {
+            String name = "Captured_" + System.nanoTime();
+            File dir = new File(root, name);
+            mCapturedImage = Uri.fromFile(dir);
+
+            Intent intentTakePhoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            intentTakePhoto.putExtra(MediaStore.EXTRA_OUTPUT, mCapturedImage);
+
+            Intent intentChooser = Intent.createChooser(intentPick, "Select a source");
+            intentChooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{intentTakePhoto});
+            startActivityForResult(intentChooser, SELECT_IMAGE);
         }
     }
 }

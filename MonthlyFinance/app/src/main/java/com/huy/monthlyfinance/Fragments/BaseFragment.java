@@ -1,6 +1,7 @@
 package com.huy.monthlyfinance.Fragments;
 
 import android.app.Fragment;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -43,6 +44,24 @@ public abstract class BaseFragment extends Fragment implements DataChangeListene
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         onPrepare();
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                mListener.toggleProgress(true);
+            }
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                mListener.toggleProgress(false);
+            }
+        }.execute();
         return inflater.inflate(getLayoutXML(), container, false);
     }
 

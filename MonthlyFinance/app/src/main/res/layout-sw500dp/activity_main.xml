@@ -176,6 +176,7 @@
                     android:gravity="center_vertical|right">
 
                     <ImageButton
+                        android:id="@+id/buttonEditAvatar"
                         android:layout_width="80dip"
                         android:layout_height="80dip"
                         android:layout_marginRight="10dip"
