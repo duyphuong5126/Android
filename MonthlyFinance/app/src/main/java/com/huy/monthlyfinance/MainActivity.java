@@ -1,5 +1,6 @@
 package com.huy.monthlyfinance;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Dialog;
@@ -37,11 +38,6 @@ import com.huy.monthlyfinance.SupportUtils.PreferencesUtils;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
@@ -121,6 +117,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Main
                 if (mMenuItems.get(i).getTextName().equals(getString(R.string.recommendation))) {
                     final Dialog dialog = new Dialog(MainActivity.this, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
                     dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    @SuppressLint("InflateParams")
                     View view1 = getLayoutInflater().inflate(R.layout.layout_supp_conf, null);
                     dialog.setContentView(view1);
                     view1.findViewById(R.id.cont_and_enter).setOnClickListener(new View.OnClickListener() {

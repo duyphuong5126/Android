@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,9 +22,6 @@ import com.huy.monthlyfinance.SupportUtils.PreferencesUtils;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
 public class StartActivity extends Activity implements View.OnClickListener{
-    private LinearLayout mLayoutLogin;
-    private LinearLayout mLayoutInitInfo;
-    private AccountDAO mAccountDataSource;
     private EditText mEdtCash;
     private EditText mEdtBank;
     private EditText mEdtCreditCard;
@@ -42,10 +38,6 @@ public class StartActivity extends Activity implements View.OnClickListener{
             PreferencesUtils.init(context);
         }
         //PreferencesUtils.setValue(PreferencesUtils.isInfoInitialized, false);
-        mAccountDataSource = AccountDAO.getInstance(context);
-
-        mLayoutLogin = (LinearLayout) findViewById(R.id.layoutLogin);
-        mLayoutInitInfo = (LinearLayout) findViewById(R.id.layoutInitInfo);
 
         mEdtCash = (EditText) findViewById(R.id.edtCash);
         mEdtBank = (EditText) findViewById(R.id.edtBank);

@@ -46,7 +46,6 @@ import com.huy.monthlyfinance.SupportUtils.PreferencesUtils;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -269,7 +268,7 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                             Toast.makeText(activity, resources.getString(R.string.error_higher_than_income), Toast.LENGTH_SHORT).show();
                             mEdtCash.removeTextChangedListener(this);
                             mEdtCash.setText("");
-                            mEdtCash.setText(String.valueOf(mShareCash));
+                            mEdtCash.setText(SupportUtils.getNormalDoubleString(mShareCash, "#000"));
                             mEdtCash.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -312,7 +311,7 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                             Toast.makeText(activity, resources.getString(R.string.error_higher_than_income), Toast.LENGTH_SHORT).show();
                             mEdtBank.removeTextChangedListener(this);
                             mEdtBank.setText("");
-                            mEdtBank.setText(String.valueOf(mShareBank));
+                            mEdtBank.setText(SupportUtils.getNormalDoubleString(mShareBank, "#000"));
                             mEdtBank.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -355,7 +354,7 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                             Toast.makeText(activity, resources.getString(R.string.error_higher_than_income), Toast.LENGTH_SHORT).show();
                             mEdtCredit.removeTextChangedListener(this);
                             mEdtCredit.setText("");
-                            mEdtCredit.setText(String.valueOf(mShareCredit));
+                            mEdtCredit.setText(SupportUtils.getNormalDoubleString(mShareCredit, "#000"));
                             mEdtCredit.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -414,7 +413,7 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                             Toast.makeText(activity, resources.getString(R.string.error_higher_than_max), Toast.LENGTH_SHORT).show();
                             mEdtSource.removeTextChangedListener(this);
                             mEdtSource.setText("");
-                            mEdtSource.setText(String.valueOf(mAmountSource));
+                            mEdtSource.setText(SupportUtils.getNormalDoubleString(mAmountSource, "#000"));
                             mEdtSource.post(new Runnable() {
                                 @Override
                                 public void run() {

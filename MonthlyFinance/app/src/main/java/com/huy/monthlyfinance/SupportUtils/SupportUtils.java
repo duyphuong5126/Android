@@ -1,6 +1,6 @@
 package com.huy.monthlyfinance.SupportUtils;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
-import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +51,7 @@ public class SupportUtils {
     }
 
     public static String formatDate(Date date, String format) {
+        @SuppressLint("SimpleDateFormat")
         SimpleDateFormat formatter = new SimpleDateFormat(format);
         return formatter.format(date);
     }

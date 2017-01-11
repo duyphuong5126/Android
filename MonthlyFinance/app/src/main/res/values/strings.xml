@@ -121,6 +121,9 @@
 
     <string name="selected_item">This account is selected</string>
 
+    <string name="transaction_saved">Transaction\'s saved</string>
+
+    <string name="error">An error occur</string>
     <string name="error_lower_than_minimum">Your balance(s) is lower than minimum limit</string>
     <string name="error_higher_than_income">This amount must be lower than total income</string>
     <string name="error_higher_than_max">This amount must be lower than max source</string>
@@ -128,6 +131,10 @@
     <string name="error_out_of_budget_limit">Out of budget limit</string>
     <string name="error_empty_bought_products">You haven\'t bought any product</string>
     <string name="error_logcat">You have an error. Please see it in logcat</string>
+    <string name="error_not_enough_budget">Your cash and credit balance is not enough. Please pay some money into them or transfer from bank</string>
+    <string name="error_not_enough_cash">Your cash balance is not enough. We had to use your credit account</string>
+    <string name="error_missing_info">You\'re missing some information</string>
+    <string name="cash_updated">Your cash balance is up to date</string>
     <string name="info_saved">Your info is saved</string>
     <string name="info_save_failed">Failed to store you data</string>
     <string name="deleted">Deleted</string>

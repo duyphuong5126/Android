@@ -123,6 +123,10 @@
 
     <string name="split">Phân chia khoản thu nhập</string>
 
+
+    <string name="transaction_saved">Đã lưu thông tin giao dịch</string>
+
+    <string name="error">Có lỗi xảy ra</string>
     <string name="error_lower_than_minimum">Số dư thấp dưới mức tối thiểu</string>
     <string name="error_higher_than_income">Số tiền vượt quá số thu nhập</string>
     <string name="error_higher_than_max">Số tiền vượt quá số dư nguồn</string>
@@ -130,6 +134,10 @@
     <string name="error_out_of_budget_limit">Out of budget limit</string>
     <string name="error_empty_bought_products">Bạn chưa mua một sản phẩm nào</string>
     <string name="error_logcat">Bạn gặp phải lỗi. Hãy xem trong logcat</string>
+    <string name="error_not_enough_budget">Số dư tiền mặt và tín dụng không đủ. Vui lòng thêm một khoản tiền hoặc chuyển khoản từ tai khoản tiết kiệm (nếu có thể)</string>
+    <string name="error_not_enough_cash">Tiền mặt của bạn không đủ. Ứng dụng sẽ trừ vào tài khoản tín dụng</string>
+    <string name="error_missing_info">Bạn thiếu một số thông tin</string>
+    <string name="cash_updated">Số dư tiền mặt đã đuợc cập nhật</string>
     <string name="info_saved">Đã lưu thông tin</string>
     <string name="info_save_failed">Lưu thông tin thất bại</string>
     <string name="deleted">Đã xóa</string>

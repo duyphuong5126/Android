@@ -4,18 +4,14 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
@@ -73,7 +69,6 @@ import com.huy.monthlyfinance.SupportUtils.PreferencesUtils;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 import com.kulik.radial.RadialListView;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -918,24 +913,12 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         mLayoutSelectProduct.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
-    private boolean isLayoutProductVisible() {
-        return mLayoutSelectProduct.getVisibility() == View.VISIBLE;
-    }
-
     private void toggleLayoutImages(boolean visible) {
         mLayoutPickImages.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
-    private boolean isLayoutImagesVisible() {
-        return mLayoutPickImages.getVisibility() == View.VISIBLE;
-    }
-
     private void toggleLayoutPickDate(boolean visible) {
         mLayoutSelectDate.setVisibility(visible ? View.VISIBLE : View.GONE);
-    }
-
-    private boolean isLayoutPickDateVisible() {
-        return mLayoutSelectDate.getVisibility() == View.VISIBLE;
     }
 
     private void changeCurrentGroup() {
@@ -967,12 +950,6 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         }
         mDropdownAdapter.notifyDataSetChanged();
         mLayoutPickDate.setDate(System.currentTimeMillis());
-    }
-
-    private void storeData() {
-        //mListProducts contains all bought products that are added on form. Store all of them into database
-        //mTotalCost is the total of all bought products
-        //mCurrentBudget is the current cash that not include the mTotalCost. Do mCurrentBudget -= mTotalCost and store it
     }
 
     private double getCurrentCash() {
@@ -1009,6 +986,13 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
     @Override
     public void onClick(View view) {
         Activity activity = getActivity();
+        Resources resources = activity.getResources();
+        final String error_not_enough_budget = resources.getString(R.string.error_not_enough_budget);
+        final String error_not_enough_cash = resources.getString(R.string.error_not_enough_cash);
+        final String cash_updated = resources.getString(R.string.cash_updated);
+        final String error = resources.getString(R.string.error);
+        final String transSaved = resources.getString(R.string.transaction_saved);
+        final String missing_info = resources.getString(R.string.error_missing_info);
         switch (view.getId()) {
             case R.id.buttonBack:
                 if (canGoBack()) {
@@ -1096,7 +1080,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                             productDropdownItems.add(item);
                         }
                     } else {
-                        message = "You're missing some information";
+                        message = missing_info;
                     }
                     if (message != null) {
                         Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
@@ -1151,16 +1135,14 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                             double newCredit = (credit > leftOver) ? credit - leftOver : 0;
                             leftOver = (leftOver > credit) ? leftOver - credit : 0;
                             if (leftOver > 0) {
-                                message = "Your cash and credit balance is not enough." +
-                                        " Please pay some money into them or transfer from bank";
+                                message = error_not_enough_budget;
                             } else {
-                                message = "Your cash balance is not enough." +
-                                        " We had to use your credit account";
+                                message = error_not_enough_cash;
                                 accountDAO.updateAccount(SupportUtils.getStringLocalized(activity, "en", R.string.credit_card), newCredit);
                                 enough = true;
                             }
                         } else {
-                            message = "Your cash balance is up to date";
+                            message = cash_updated;
                             enough = true;
                         }
                         if (enough) {
@@ -1170,17 +1152,14 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                         double newCredit = (credit > totalCost) ? credit - totalCost : 0;
                         double leftOver = (totalCost > credit) ? totalCost - credit : 0;
                         if (leftOver > 0) {
-                            message = "Your cash and credit balance is not enough." +
-                                    " Please pay some money into them or transfer from bank";
+                            message = error_not_enough_budget;
                         } else {
-                            message = "Your cash balance is not enough." +
-                                    " We had to use your credit account";
+                            message = error_not_enough_cash;
                             accountDAO.updateAccount(SupportUtils.getStringLocalized(activity, "en", R.string.credit_card), newCredit);
                             enough = true;
                         }
                     } else {
-                        message = "Your cash and credit balance is not enough." +
-                                " Please pay some money into them or transfer from bank";
+                        message = error_not_enough_budget;
                     }
                     Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
                     if (enough) {
@@ -1192,7 +1171,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                             ExpensesHistory transaction =
                                     new ExpensesHistory(mSelectedAccount.getAccountID(), String.valueOf(userId), date, mTotalCost);
                             if (expensesHistoryDAO.insertTransaction(transaction)) {
-                                message = "Transaction's saved";
+                                message = transSaved;
                                 int transactionId = expensesHistoryDAO.getLatestTransactionID();
                                 if (transactionId > 0) {
                                     String id = String.valueOf(transactionId);
@@ -1205,7 +1184,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                                 mLayoutForm.setVisibility(View.GONE);
                                 MainApplication.getInstance().refreshAllData();
                             } else {
-                                message = "An error occur";
+                                message = error;
                             }
                         }
                     }
@@ -1252,10 +1231,6 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
             default:
                 break;
         }
-    }
-
-    private void showListImage(boolean isShow) {
-
     }
 
     private String getProductID(String nameEN, String nameVI) {

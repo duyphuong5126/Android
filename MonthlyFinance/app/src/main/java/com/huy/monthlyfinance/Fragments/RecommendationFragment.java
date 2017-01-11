@@ -30,7 +30,6 @@ import com.huy.monthlyfinance.R;
 import com.huy.monthlyfinance.SupportUtils.SupportUtils;
 
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.Set;
 
 /**
@@ -278,16 +277,6 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
 
     private ArrayList<BoughtProduct_1> recommend(BoughtProduct_1 product, ArrayList<BoughtProduct_1> source) {
         ArrayList<BoughtProduct_1> products = new ArrayList<>();
-        /*if (source != null) {
-            Random random = new Random();
-            int max = random.nextInt(source.size() > 1 ? source.size() - 1 : 0);
-            int seed = max;
-            while (max > 0) {
-                int id = random.nextInt(seed);
-                products.add(source.get(id));
-                max--;
-            }
-        }*/
         Activity activity = getActivity();
         Resources resources = activity.getResources();
         if (product != null && mApriori != null) {
