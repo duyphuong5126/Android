@@ -32,11 +32,11 @@ public class ProductDetailDAO extends BaseDAO {
         mValues.put(DatabaseHelper.expenseHistoryID, productDetail.getTransactionID());
         mValues.put(DatabaseHelper.productCost, productDetail.getProductCost());
         mValues.put(DatabaseHelper.productQuantity, productDetail.getProductQuantity());
-        return mWritableDatabase.insert(DatabaseHelper.tblProductDetail, null, mValues) > 0;
+        return mWritableDatabase.insert(DatabaseHelper.tblExpenseDetail, null, mValues) > 0;
     }
 
     public ArrayList<ProductDetail> getAllDetails() {
-        String query = "select * from " + DatabaseHelper.tblProductDetail;
+        String query = "select * from " + DatabaseHelper.tblExpenseDetail;
         Cursor cursor = mReadableDatabase.rawQuery(query, null);
         ArrayList<ProductDetail> productDetails = new ArrayList<>();
         if (cursor.moveToFirst()) {

@@ -298,6 +298,20 @@ public class MainApplication extends Application {
         for (DataChangeListener listener : mListeners) {
             listener.refreshData();
         }
+
+        if (mListProductExample == null) {
+            mListProductExample = new ArrayList<>();
+        }
+        mListProductExample.clear();
+        Resources resources = getResources();
+        ArrayList<Product> products = MainApplication.getInstance().getProducts();
+        if (!products.isEmpty()) {
+            for (Product product : products) {
+                int resId = resources.getIdentifier(product.getProductImage(), "drawable", context.getPackageName());
+                mListProductExample.add(
+                        new ProductDropdownItem(BitmapFactory.decodeResource(resources, resId), product, false));
+            }
+        }
     }
 
     public void registerDataListener(DataChangeListener listener) {

@@ -28,7 +28,6 @@ public class ExpensesHistoryDAO extends BaseDAO {
         mValues.clear();
         mValues.put(DatabaseHelper.expenseDate, history.getTransactionDate());
         mValues.put(DatabaseHelper.expenseTotalCost, history.getTransactionCost());
-        mValues.put(DatabaseHelper.accountID, history.getAccountID());
         mValues.put(DatabaseHelper.userID, history.getUserID());
         return mWritableDatabase.insert(DatabaseHelper.tblExpensesHistory, null, mValues) > 0;
     }
@@ -55,7 +54,6 @@ public class ExpensesHistoryDAO extends BaseDAO {
         if (cursor.moveToFirst()) {
             do {
                 list.add(new ExpensesHistory(cursor.getString(cursor.getColumnIndex(DatabaseHelper.expenseHistoryID)),
-                        cursor.getString(cursor.getColumnIndex(DatabaseHelper.accountID)),
                         cursor.getString(cursor.getColumnIndex(DatabaseHelper.userID)),
                         cursor.getString(cursor.getColumnIndex(DatabaseHelper.expenseDate)),
                         cursor.getDouble(cursor.getColumnIndex(DatabaseHelper.expenseTotalCost))));

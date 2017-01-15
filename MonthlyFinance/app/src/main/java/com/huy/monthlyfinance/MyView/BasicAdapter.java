@@ -29,7 +29,7 @@ public class BasicAdapter<T extends BaseItem> extends BaseAdapter{
     }
 
     @Override
-    public Object getItem(int i) {
+    public T getItem(int i) {
         return mList.get(i);
     }
 

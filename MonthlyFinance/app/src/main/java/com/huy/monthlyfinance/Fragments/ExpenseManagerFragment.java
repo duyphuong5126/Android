@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CalendarView;
@@ -117,12 +118,11 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
     private ListView mListBoughtProducts;
 
     private EditText mEditProductName;
-    private EditText mEditProductCost;
     private EditText mEditProductUnit;
-    private EditText mEditProductAmount;
     private TextView mEditDate;
     private ImageView mImageProductIcon;
     private int mCurrentGroup;
+    private String mCurrentGroupID;
 
     private EditText mTextTotalCost;
     private double mTotalCost;
@@ -156,6 +156,10 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
     private GridView mListImages;
     private HashMap<String, Float> mMapExpenses;
     private HashMap<NameValuePair<String, String>, Double> mMapExpenseDetails;
+
+    private ArrayList<ProductDropdownItem> mListProductExampleAll;
+    private ArrayList<ProductDropdownItem> mListProductExample;
+    private ArrayList<ProductDropdownItem> mListProductExampleSelected;
 
     @Override
     protected int getLayoutXML() {
@@ -204,8 +208,12 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                         public void onClick(Bundle data) {
                             if (data != null) {
                                 isFormOpen = data.getBoolean("isFormOpen");
-                                mTextRadialProduct.setText(data.getString("itemSelected"));
+                                String groupName = data.getString("itemSelected");
+                                mTextRadialProduct.setText(groupName);
+                                updateGroupID(groupName);
                                 mCurrentGroup = data.getInt("pos");
+                                mDropdownAdapter.notifyDataSetChanged();
+                                SupportUtils.setListViewHeight(mListProductExamples);
                             }
                             changeCurrentGroup();
                             if (isFormOpen) {
@@ -228,6 +236,13 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                                 mainApplication.getRadialBitmap(productGroup.getGroupImage()), index++));
                     }
                 }
+                mListProductExampleAll = MainApplication.getInstance().getListProductExample();
+                if (mListProductExample == null) {
+                    mListProductExample = new ArrayList<>();
+                }
+                if (mListProductExampleSelected == null) {
+                    mListProductExampleSelected = new ArrayList<>();
+                }
                 ExpensesHistoryDAO.getInstance(getActivity()).getListTransactions();
                 return null;
             }
@@ -238,7 +253,6 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                 mListener.toggleProgress(false);
             }
         }.execute();
-
     }
 
     @Override
@@ -269,28 +283,8 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         mImageGroup = (ImageView) view.findViewById(R.id.itemIcon);
         mEditProductName = (EditText) view.findViewById(R.id.edtProductName);
         mEditProductName.setText("");
-        mEditProductCost = (EditText) view.findViewById(R.id.edtProductCost);
-        mEditProductCost.setText("");
         mEditProductUnit = (EditText) view.findViewById(R.id.edtProductUnit);
         mEditProductUnit.setText("");
-        mEditProductUnit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                if (!b) {
-                    scrollToView(mLayoutForm, mEditProductAmount);
-                }
-            }
-        });
-        mEditProductAmount = (EditText) view.findViewById(R.id.edtProductAmount);
-        mEditProductAmount.setText("");
-        mEditProductAmount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                if (!b) {
-                    scrollToView(mLayoutForm, mEditDate);
-                }
-            }
-        });
         mEditDate = (TextView) view.findViewById(R.id.edtProductDate);
         mEditDate.setText(mDate);
         mEditDate.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -439,7 +433,6 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                         mProductBitmap = product.getImage();
                         mProductImageName = product.getData().getProductImage();
                         mImageProductIcon.setImageBitmap(mProductBitmap);
-                        mEditProductCost.setText(String.valueOf(product.getPrice()));
                         mLayoutForm.scrollTo(0, 0);
                     }
                 });
@@ -448,21 +441,39 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                         final int position = i;
                         final Activity activity = getActivity();
+
                         AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity)
                                 .setTitle("Do you want to delete this item?")
                                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
+                                        final Product boughtProduct = mListProducts.get(position).getData();
+                                        for (ProductDropdownItem item : mListProductExampleAll) {
+                                            Product product = item.getProduct();
+                                            String name1VI = boughtProduct.getProductNameVI().toLowerCase();
+                                            String name2VI = product.getProductNameVI().toLowerCase();
+                                            String name1EN = boughtProduct.getProductNameEN().toLowerCase();
+                                            String name2EN = product.getProductNameEN().toLowerCase();
+                                            if (boughtProduct.getProductGroupID().equals(product.getProductGroupID()) &&
+                                                    (name1EN.contains(name2EN) || name1EN.contains(name2VI)
+                                                            ||name1VI.contains(name2EN) || name1VI.contains(name2VI))) {
+                                                item.setFocused(false);
+                                                if (mDropdownAdapter != null) {
+                                                    mDropdownAdapter.notifyDataSetChanged();
+                                                }
+                                            }
+                                        }
                                         mListProducts.remove(position);
                                         mBoughtProductsAdapter.notifyDataSetChanged();
                                         SupportUtils.setListViewHeight(mListBoughtProducts);
                                         Toast.makeText(activity, resources.getString(R.string.deleted), Toast.LENGTH_SHORT).show();
+                                        dialogInterface.dismiss();
                                     }
                                 })
                                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
-
+                                        dialogInterface.dismiss();
                                     }
                                 });
                         alertDialog.create().show();
@@ -704,9 +715,9 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                     }
                 });
 
-                final ArrayList<ProductDropdownItem> mListProductExample = MainApplication.getInstance().getListProductExample();
                 mDropdownAdapter = new BasicAdapter<>(mListProductExample, R.layout.item_drop_down_1, inflater);
                 mListProductExamples.setAdapter(mDropdownAdapter);
+                SupportUtils.setListViewHeight(mListProductExamples);
                 mListProductExamples.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -716,16 +727,17 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                             mProductBitmap = item.getBitmap();
                             mImageProductIcon.setImageBitmap(mProductBitmap);
                             mProductImageName = item.getProduct().getProductImage();
-                            mEditProductCost.setText("");
+
+                            if (!mListProductExampleSelected.contains(item)) {
+                                mListProductExampleSelected.add(item);
+                            }
                         } else {
                             mEditProductName.setText("");
                             mImageProductIcon.setImageResource(R.mipmap.ic_expense_green_1_24dp);
                             mProductImageName = null;
-                            mEditProductCost.setText("");
                         }
                         item.setFocused(!item.isFocused());
                         mBoughtProductsAdapter.notifyDataSetChanged();
-                        scrollToView(mLayoutForm, mEditProductAmount);
                     }
                 });
 
@@ -922,19 +934,47 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
     }
 
     private void changeCurrentGroup() {
-        mTextGroupName.setText(mRadialItems.get(mCurrentGroup).getText());
+        String groupName = mRadialItems.get(mCurrentGroup).getText();
+        mTextGroupName.setText(groupName);
         mImageGroup.setImageBitmap(mExpenseBitmap[mCurrentGroup]);
+        updateGroupID(groupName);
+        if (mDropdownAdapter != null) {
+            mDropdownAdapter.notifyDataSetChanged();
+            SupportUtils.setListViewHeight(mListProductExamples);
+        }
     }
 
     private void toggleForm(boolean open) {
         mLayoutForm.setVisibility(open ? View.VISIBLE : View.GONE);
     }
 
+    private void updateGroupID(String groupName) {
+        for (ProductGroup group : MainApplication.getInstance().getProductGroups()) {
+            String name = groupName.toLowerCase();
+            if (group.getGroupNameEN().toLowerCase().contains(name) ||
+                    group.getGroupNameVI().toLowerCase().contains(name)) {
+                mCurrentGroupID = group.getProductGroupID();
+            }
+        }
+        mListProductExample.clear();
+        if (mCurrentGroupID != null) {
+            for (ProductDropdownItem item : mListProductExampleAll) {
+                if (item != null) {
+                    Product product = item.getProduct();
+                    if (product != null) {
+                        String group = product.getProductGroupID();
+                        if (group.equals(mCurrentGroupID)) {
+                            mListProductExample.add(item);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private void clearForm() {
         mEditDate.setText("");
-        mEditProductCost.setText("");
         mEditProductName.setText("");
-        mEditProductAmount.setText("");
         mEditProductUnit.setText("");
         mImageProductIcon.setImageResource(R.mipmap.ic_expense_green_1_24dp);
         mListProducts.clear();
@@ -949,6 +989,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
             item.setFocused(false);
         }
         mDropdownAdapter.notifyDataSetChanged();
+        SupportUtils.setListViewHeight(mListProductExamples);
         mLayoutPickDate.setDate(System.currentTimeMillis());
     }
 
@@ -1051,8 +1092,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
             case R.id.buttonAdd:
                 String message = null;
                 ArrayList<ProductDropdownItem> productDropdownItems = new ArrayList<>();
-                ArrayList<ProductDropdownItem> mListProductExample = MainApplication.getInstance().getListProductExample();
-                for (ProductDropdownItem productDropdownItem : mListProductExample) {
+                for (ProductDropdownItem productDropdownItem : mListProductExampleSelected) {
                     if (productDropdownItem.isFocused()) {
                         BoughtProduct boughtProduct = new BoughtProduct(
                                 productDropdownItem.getBitmap(), 0, false, productDropdownItem.getProduct());
@@ -1169,7 +1209,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                                 getUserId(PreferencesUtils.getString(PreferencesUtils.CURRENT_EMAIL, ""));
                         if (!date.isEmpty() && userId >= 0) {
                             ExpensesHistory transaction =
-                                    new ExpensesHistory(mSelectedAccount.getAccountID(), String.valueOf(userId), date, mTotalCost);
+                                    new ExpensesHistory(String.valueOf(userId), date, mTotalCost);
                             if (expensesHistoryDAO.insertTransaction(transaction)) {
                                 message = transSaved;
                                 int transactionId = expensesHistoryDAO.getLatestTransactionID();
@@ -1276,9 +1316,17 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
         return null;
     }
 
+    private void updateBoughtProducts(ProductDropdownItem item) {
+
+    }
+
     @Override
     public void refreshData() {
         Resources resources = MainApplication.getInstance().getResources();
+        if (mListProductExampleSelected == null) {
+            mListProductExampleSelected = new ArrayList<>();
+        }
+        mListProductExampleSelected.clear();
         setUpExpenseChart();
         float[] mMonthExpenseAmount = new float[mMapExpenses.size()];
         ArrayList<String> mMonthExpense = new ArrayList<>(mMapExpenses.size());

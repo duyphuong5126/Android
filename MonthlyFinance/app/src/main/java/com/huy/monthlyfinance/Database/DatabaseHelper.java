@@ -6,8 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import java.io.File;
-
 /**
  * Created by huy nguyen on 9/15/2016.
  */
@@ -20,11 +18,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // tables
     public static final String tblProduct = "SanPham";
     public static final String tblProductGroup = "NhomSanPham";
-    public static final String tblProductDetail = "ChiTietSanPham";
     public static final String tblAccount = "TaiKhoan";
-    public static final String tblAccountDetail = "ChiTietTaiKhoan";
     public static final String tblUser = "NguoiDung";
-    public static final String tblExpensesHistory = "LichSuChiTieu";
+    public static final String tblExpensesHistory = "HoaDon";
+    public static final String tblExpenseDetail = "ChiTietHoaDon";
 
     // Product table
     public static final String productID = "MaSanPham";
@@ -53,10 +50,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String accountInitBalance = "SoDuDau";
     public static final String accountCurrentBalance = "SoDuHienTai";
 
-    public static final String accountDetailID = "MaChiTietTaiKhoan";
-    public static final String accountTransactionDate = "NgayGiaoDich";
-    public static final String accountTotal = "TongTien";
-
     //User table
     public static final String userLoginName = "TenDangNhap";
     public static final String userPassword = "MatKhau";
@@ -80,8 +73,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "create table " + tblProductGroup + "(" + productGroupID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" + ","
                     + productGroupNameEN + " TEXT NOT NULL" + "," + productGroupNameVI + " TEXT NOT NULL" + "," + productGroupImage + " TEXT" + ")";
 
-    private static final String CREATE_TABLE_PRODUCT_DETAIL =
-            "create table " + tblProductDetail + "(" + productDetailID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" + ","
+    private static final String CREATE_TABLE_EXPENSE_HISTORY =
+            "create table " + tblExpensesHistory + "(" + expenseHistoryID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" + ","
+                    + userID + " INTEGER" + "," + accountID + " INTEGER," + expenseDate + " TEXT NOT NULL" + "," + expenseTotalCost + " INTEGER,"
+                    + " FOREIGN KEY(" + userID + ") REFERENCES " + tblUser + "(" + userID + ")," +
+                    " FOREIGN KEY(" + accountID + ") REFERENCES " + tblAccount + "(" + accountID + "))";
+
+    private static final String CREATE_TABLE_EXPENSE_DETAIL =
+            "create table " + tblExpenseDetail + "(" + productDetailID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" + ","
                     + productCost + " REAL" + "," + productID + " INTEGER" + "," + expenseHistoryID + " INTEGER" + ","
                     + productQuantity + " INTEGER ," + " FOREIGN KEY(" + productID + ") REFERENCES " + tblProduct
                     + "(" + productID + ")," + " FOREIGN KEY(" + expenseHistoryID + ") REFERENCES " + tblExpensesHistory
@@ -94,22 +93,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     + accountState + " TEXT" + "," + userID + " INTEGER ," + " FOREIGN KEY(" + userID + ") " +
                     "REFERENCES " + tblUser + "(" + userID + "))";
 
-    private static final String CREATE_TABLE_ACCOUNT_DETAIL =
-            "create table " + tblAccountDetail + "(" + accountDetailID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" + ","
-                    + expenseHistoryID + " INTEGER" + "," + accountID + " INTEGER" + "," + accountTransactionDate + " TEXT NOT NULL ,"
-                    + accountTotal + " REAL," + " FOREIGN KEY(" + accountID + ")" +
-                    " REFERENCES " + tblAccount + "(" + accountID + "),"
-                    + " FOREIGN KEY(" + expenseHistoryID + ") REFERENCES " + tblExpensesHistory + "(" + expenseHistoryID + "))";
-
     private static final String CREATE_TABLE_USER =
             "create table " + tblUser + "(" + userID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" + ","
                     + userLoginName + " TEXT NOT NULL" + "," + userPassword + " TEXT " + "," + userEmail + " TEXT NOT NULL" + ")";
-
-    private static final String CREATE_TABLE_EXPENSE_HISTORY =
-            "create table " + tblExpensesHistory + "(" + expenseHistoryID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL" + ","
-                    + userID + " INTEGER" + "," + accountID + " INTEGER," + expenseDate + " TEXT NOT NULL" + "," + expenseTotalCost + " INTEGER,"
-                    + " FOREIGN KEY(" + userID + ") REFERENCES " + tblUser + "(" + userID + ")," +
-                    " FOREIGN KEY(" + accountID + ") REFERENCES " + tblAccount + "(" + accountID + "))";
 
 
     public DatabaseHelper(Context context) {
@@ -122,10 +108,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             db.execSQL(CREATE_TABLE_PRODUCT_GROUP);
             db.execSQL(CREATE_TABLE_PRODUCT);
-            db.execSQL(CREATE_TABLE_PRODUCT_DETAIL);
+            db.execSQL(CREATE_TABLE_EXPENSE_DETAIL);
             db.execSQL(CREATE_TABLE_USER);
             db.execSQL(CREATE_TABLE_ACCOUNT);
-            db.execSQL(CREATE_TABLE_ACCOUNT_DETAIL);
             db.execSQL(CREATE_TABLE_EXPENSE_HISTORY);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -137,9 +122,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Drop table
         db.execSQL("DROP TABLE IF EXISTS " + tblProduct);
         db.execSQL("DROP TABLE IF EXISTS " + tblProductGroup);
-        db.execSQL("DROP TABLE IF EXISTS " + tblProductDetail);
+        db.execSQL("DROP TABLE IF EXISTS " + tblExpenseDetail);
         db.execSQL("DROP TABLE IF EXISTS " + tblAccount);
-        db.execSQL("DROP TABLE IF EXISTS " + tblAccountDetail);
         db.execSQL("DROP TABLE IF EXISTS " + tblUser);
         db.execSQL("DROP TABLE IF EXISTS " + tblExpensesHistory);
 

@@ -46,7 +46,7 @@ public class RadialItem extends BaseItem {
                 View viewParent = view.getRootView();
                 viewParent.invalidate();
                 Bundle bundle = new Bundle();
-                bundle.putString("itemSelected", getData());
+                bundle.putString("itemSelected", mText);
                 if (!isFocused) {
                     isFocused = true;
                 } else {
@@ -72,9 +72,5 @@ public class RadialItem extends BaseItem {
 
     public String getText() {
         return mText;
-    }
-
-    private String getData() {
-        return mText.replace(" ", "\n");
     }
 }

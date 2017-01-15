@@ -150,7 +150,7 @@ public class ProductDAO extends BaseDAO {
 
     public List<Product> getBoughtProducts() {
         List<Product> productList = new ArrayList<>();
-        String query = "select distinct " + DatabaseHelper.productID + " from " + DatabaseHelper.tblProductDetail;
+        String query = "select distinct " + DatabaseHelper.productID + " from " + DatabaseHelper.tblExpenseDetail;
         Cursor cursor = mReadableDatabase.rawQuery(query, null);
         if (cursor.moveToFirst()) {
             do {
