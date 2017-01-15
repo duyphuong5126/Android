@@ -8,9 +8,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -26,6 +28,11 @@ import java.util.Locale;
 public class SupportUtils {
     private static final boolean IS_LOLLIPOP = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     public static final int MIN_CURRENCY = 1000;
+
+    public static float dipToPixels(Context context, float dipValue) {
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics);
+    }
 
     public static void setListViewHeight(ListView listView) {
         ListAdapter listAdapter = listView.getAdapter();
@@ -48,6 +55,22 @@ public class SupportUtils {
         params.height = resultHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         listView.setLayoutParams(params);
         listView.requestLayout();
+    }
+
+    public static void setGridViewHeight(GridView gridView, int columns, int itemHeight) {
+        ListAdapter listAdapter = gridView.getAdapter();
+        int resultHeight = 0;
+        ViewGroup.LayoutParams params;
+        if (listAdapter == null) {
+            return;
+        }
+        for (int i = 0; i < listAdapter.getCount(); i+= columns) {
+            resultHeight += itemHeight;
+        }
+        params = gridView.getLayoutParams();
+        params.height = resultHeight + listAdapter.getCount();
+        gridView.setLayoutParams(params);
+        gridView.requestLayout();
     }
 
     public static String formatDate(Date date, String format) {

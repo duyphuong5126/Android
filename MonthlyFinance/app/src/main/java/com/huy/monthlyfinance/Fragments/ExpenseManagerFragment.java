@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -64,6 +65,7 @@ import com.huy.monthlyfinance.MyView.Item.ListItem.ExpensesItem;
 import com.huy.monthlyfinance.MyView.Item.ListItem.ProductDropdownItem;
 import com.huy.monthlyfinance.MyView.Item.ListItem.ProductImageItem;
 import com.huy.monthlyfinance.MyView.Item.ListItem.RadialItem;
+import com.huy.monthlyfinance.ProductGroupActivity;
 import com.huy.monthlyfinance.R;
 import com.huy.monthlyfinance.SupportUtils.NameValuePair;
 import com.huy.monthlyfinance.SupportUtils.PreferencesUtils;
@@ -314,6 +316,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
             }
         });
 
+        view.findViewById(R.id.buttonAddGroup).setOnClickListener(this);
         view.findViewById(R.id.buttonBack).setOnClickListener(this);
         view.findViewById(R.id.buttonLogo).setOnClickListener(this);
         view.findViewById(R.id.buttonCloseProducts).setOnClickListener(this);
@@ -1267,6 +1270,10 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                 mIconSelectCash.setVisibility(View.GONE);
                 mIconSelectCredit.setVisibility(View.VISIBLE);
                 mIconSelectBank.setVisibility(View.GONE);
+                break;
+            case R.id.buttonAddGroup:
+                Intent intent = new Intent(activity, ProductGroupActivity.class);
+                startActivity(intent);
                 break;
             default:
                 break;

@@ -264,6 +264,7 @@
                 android:layout_height="match_parent">
 
                 <ImageView
+                    android:id="@+id/buttonAddGroup"
                     android:layout_width="70dip"
                     android:layout_height="70dip"
                     android:src="@drawable/add"
@@ -497,7 +498,7 @@
                             android:id="@+id/layoutPickProduct"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:visibility="visible">
+                            android:visibility="gone">
 
                             <LinearLayout
                                 android:layout_width="match_parent"

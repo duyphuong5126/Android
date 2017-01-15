@@ -75,7 +75,7 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
     private ProgressBar mProgressCash, mProgressBank, mProgressCredit;
     private EditText mEdtBank, mEdtCash, mEdtCredit;
     private TextView mTextBank, mTextCash, mTextCredit;
-    private double mShareBank, mShareCash, mShareCredit, mTotal;
+    private double mShareBank, mShareCash, mShareCredit;
 
     private boolean isAddIncome, isAddTransfer;
 
@@ -133,7 +133,7 @@ public class BudgetFragment extends BaseFragment implements View.OnClickListener
                 mListTransfer.add(new TransferItem(40, "Credit", "Cash", 890, 860, new Date(System.currentTimeMillis())));*/
 
                 mCurrency = PreferencesUtils.getString(PreferencesUtils.CURRENCY, "VND");
-                mTotal = mIncome = mShareBank = mShareCash = mShareCredit = 0;
+                mIncome = mShareBank = mShareCash = mShareCredit = 0;
                 Bundle bundle = getArguments();
                 if (bundle != null) {
                     isAddIncome = bundle.getBoolean("isAddIncome");

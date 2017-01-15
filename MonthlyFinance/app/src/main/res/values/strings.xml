@@ -82,6 +82,8 @@
     <string name="statistic">Statistic</string>
     <string name="recommendation">Recommendation</string>
 
+    <string name="product_group">Product Group</string>
+
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="login">Login</string>
@@ -105,6 +107,10 @@
     <string name="enter_name">Enter a name</string>
     <string name="bought_products">Bought products</string>
     <string name="recommend_products">Recommended for you</string>
+
+    <string name="pick_image">Pick an image</string>
+
+    <string name="no_recommend">No product to recommend</string>
 
     <string name="edit_conf">Edit confidence</string>
     <string name="conf">Confidence</string>

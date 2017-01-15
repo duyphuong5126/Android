@@ -82,6 +82,8 @@
     <string name="statistic">Thống Kê</string>
     <string name="recommendation">Khuyến Nghị</string>
 
+    <string name="product_group">Nhóm sản phẩm</string>
+
     <string name="username">Tên đăng nhập</string>
     <string name="password">Mật khẩu</string>
     <string name="login">Đăng nhập</string>
@@ -118,6 +120,10 @@
     <string name="enter_amount_transfer">Số tiền cần chuyển</string>
     <string name="source">Nguồn</string>
     <string name="target">Đích</string>
+
+    <string name="pick_image">Chọn hình ảnh</string>
+
+    <string name="no_recommend">Không có sản phẩm nào được đề xuất</string>
 
     <string name="selected_item">Tài khoản này đã được chọn</string>
 
