@@ -740,6 +740,7 @@ public class ExpenseManagerFragment extends BaseFragment implements View.OnClick
                             mProductImageName = null;
                         }
                         item.setFocused(!item.isFocused());
+                        mDropdownAdapter.notifyDataSetChanged();
                         mBoughtProductsAdapter.notifyDataSetChanged();
                     }
                 });

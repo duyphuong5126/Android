@@ -26,16 +26,6 @@ public class ProductDropdownItem extends BaseItem {
         this.isFocused = isFocused;
     }
 
-    public void setListener(OnSelectListener mListener) {
-        this.mListener = mListener;
-    }
-
-    public interface OnSelectListener {
-        void onSelect(ProductDropdownItem item);
-    }
-
-    private OnSelectListener mListener;
-
     public Bitmap getBitmap() {
         return mBitmap;
     }
@@ -60,10 +50,6 @@ public class ProductDropdownItem extends BaseItem {
                 if (!isFocused) {
                     mIconCheck.setVisibility(View.VISIBLE);
                     isFocused = true;
-
-                    if (mListener != null) {
-                        mListener.onSelect(getThis());
-                    }
                 }
             }
         });
