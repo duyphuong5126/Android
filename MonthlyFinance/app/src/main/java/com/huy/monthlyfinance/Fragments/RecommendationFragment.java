@@ -154,6 +154,7 @@ public class RecommendationFragment extends BaseFragment implements View.OnClick
                         }
                     });
                 } else {
+                    Toast.makeText(activity, activity.getResources().getString(R.string.no_recommend), Toast.LENGTH_SHORT).show();
                     mLayoutRecommend.setVisibility(View.GONE);
                 }
             }
