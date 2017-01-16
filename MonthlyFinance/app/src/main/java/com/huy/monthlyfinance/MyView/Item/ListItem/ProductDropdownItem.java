@@ -41,9 +41,7 @@ public class ProductDropdownItem extends BaseItem {
         TextView textView = (TextView) view.findViewById(R.id.textName);
         textView.setText(SupportUtils.getDeviceLanguage().toLowerCase().contains("en")?
                 mProduct.getProductNameEN() : mProduct.getProductNameVI());
-        if (mIconCheck == null) {
-            mIconCheck = (ImageButton) view.findViewById(R.id.iconCheck);
-        }
+        mIconCheck = (ImageButton) view.findViewById(R.id.iconCheck);
         mIconCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -244,7 +244,7 @@
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
                                             android:layout_marginBottom="15dip"
-                                            android:visibility="gone">
+                                            android:visibility="visible">
 
                                             <ProgressBar
                                                 android:id="@+id/itemCashProgress"
@@ -358,7 +358,7 @@
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
                                             android:layout_marginBottom="15dip"
-                                            android:visibility="gone">
+                                            android:visibility="visible">
 
                                             <ProgressBar
                                                 android:id="@+id/itemBankProgress"
@@ -472,7 +472,7 @@
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
                                             android:layout_marginBottom="15dip"
-                                            android:visibility="gone">
+                                            android:visibility="visible">
 
                                             <ProgressBar
                                                 android:id="@+id/itemCreditProgress"
