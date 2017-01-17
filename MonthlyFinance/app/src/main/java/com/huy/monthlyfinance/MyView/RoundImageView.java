@@ -1,5 +1,6 @@
 package com.huy.monthlyfinance.MyView;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -18,8 +19,10 @@ import android.widget.ImageView;
  */
 public class RoundImageView extends ImageView {
     private int mColor;
+    private static Bitmap mBitmap;
     public RoundImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        @SuppressLint("Recycle")
         TypedArray typedArray = context.obtainStyledAttributes(attrs, new int[] {android.R.attr.background});
         mColor = typedArray.getColor(0, Color.TRANSPARENT);
     }
@@ -33,11 +36,13 @@ public class RoundImageView extends ImageView {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         if (getDrawable() == null || getWidth() == 0 || getHeight() == 0) return;
-        Bitmap drawable = ((BitmapDrawable) getDrawable()).getBitmap();
-        Bitmap src = drawable.copy(Bitmap.Config.ARGB_8888, true);
-        Bitmap roundedBitmap = RoundImageView.getRoundedBitmap(src, (getWidth() >= getHeight()) ? getHeight() : getWidth());
+        if (mBitmap == null) {
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) getDrawable();
+            Bitmap drawable = bitmapDrawable.getBitmap().copy(Bitmap.Config.ARGB_8888, true);
+            mBitmap = RoundImageView.getRoundedBitmap(drawable, (getWidth() >= getHeight()) ? getHeight() : getWidth());
+        }
         canvas.drawColor(mColor);
-        canvas.drawBitmap(roundedBitmap, (getWidth() - roundedBitmap.getWidth()) / 2, (getHeight() - roundedBitmap.getHeight()) / 2, null);
+        canvas.drawBitmap(mBitmap, (getWidth() - mBitmap.getWidth()) / 2, (getHeight() - mBitmap.getHeight()) / 2, null);
     }
 
     @Override

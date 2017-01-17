@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 
 import com.huy.monthlyfinance.Database.DAO.AccountDAO;
 import com.huy.monthlyfinance.Database.DAO.ProductDAO;
@@ -274,44 +275,56 @@ public class MainApplication extends Application {
     }
 
     public void refreshAllData() {
-        Context context = getApplicationContext();
-        if (mProductGroups == null) {
-            mProductGroups = new ArrayList<>();
-        }
-        mProductGroups.clear();
-        mProductGroups.addAll(ProductGroupDAO.getInstance(context).getAllProductGroup());
-        if (mProducts == null) {
-            mProducts = new ArrayList<>();
-        }
-        mProducts.clear();
-        mProducts.addAll(ProductDAO.getInstance(context).getAllProduct());
-        if (mAccounts == null) {
-            mAccounts = new ArrayList<>();
-        }
-        mAccounts.clear();
-        mAccounts.addAll(AccountDAO.getInstance(context).getAllAccounts());
-        if (mProductDetails == null) {
-            mProductDetails = new ArrayList<>();
-        }
-        mProductDetails.clear();
-        mProductDetails.addAll(ProductDetailDAO.getInstance(getApplicationContext()).getAllDetails());
-        for (DataChangeListener listener : mListeners) {
-            listener.refreshData();
-        }
+        final Context context = getApplicationContext();
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                if (mProductGroups == null) {
+                    mProductGroups = new ArrayList<>();
+                }
+                mProductGroups.clear();
+                mProductGroups.addAll(ProductGroupDAO.getInstance(context).getAllProductGroup());
+                if (mProducts == null) {
+                    mProducts = new ArrayList<>();
+                }
+                mProducts.clear();
+                mProducts.addAll(ProductDAO.getInstance(context).getAllProduct());
+                if (mAccounts == null) {
+                    mAccounts = new ArrayList<>();
+                }
+                mAccounts.clear();
+                mAccounts.addAll(AccountDAO.getInstance(context).getAllAccounts());
+                if (mProductDetails == null) {
+                    mProductDetails = new ArrayList<>();
+                }
+                mProductDetails.clear();
+                mProductDetails.addAll(ProductDetailDAO.getInstance(getApplicationContext()).getAllDetails());
 
-        if (mListProductExample == null) {
-            mListProductExample = new ArrayList<>();
-        }
-        mListProductExample.clear();
-        Resources resources = getResources();
-        ArrayList<Product> products = MainApplication.getInstance().getProducts();
-        if (!products.isEmpty()) {
-            for (Product product : products) {
-                int resId = resources.getIdentifier(product.getProductImage(), "drawable", context.getPackageName());
-                mListProductExample.add(
-                        new ProductDropdownItem(BitmapFactory.decodeResource(resources, resId), product, false));
+                if (mListProductExample == null) {
+                    mListProductExample = new ArrayList<>();
+                }
+                mListProductExample.clear();
+                Resources resources = getResources();
+                ArrayList<Product> products = MainApplication.getInstance().getProducts();
+                if (!products.isEmpty()) {
+                    for (Product product : products) {
+                        int resId = resources.getIdentifier(product.getProductImage(), "drawable", context.getPackageName());
+                        mListProductExample.add(
+                                new ProductDropdownItem(BitmapFactory.decodeResource(resources, resId), product, false));
+                    }
+                }
+                return null;
             }
-        }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+
+                for (DataChangeListener listener : mListeners) {
+                    listener.refreshData();
+                }
+            }
+        }.execute();
     }
 
     public void registerDataListener(DataChangeListener listener) {
