@@ -57,7 +57,7 @@ public class MainApplication extends Application {
         ProductGroupDAO mProductGroupDAO = ProductGroupDAO.getInstance(context);
         mProductGroups = new ArrayList<>();
         mProductGroups.addAll(mProductGroupDAO.getAllProductGroup());
-        if (mProductGroupDAO.getAllProductGroup().isEmpty()) {
+        if (mProductGroups.isEmpty()) {
             mProductGroups.add(new ProductGroup(SupportUtils.getStringLocalized(context, "en", R.string.bill),
                     SupportUtils.getStringLocalized(context, "vi", R.string.bill), res.getResourceEntryName(R.drawable.receipt)));
             mProductGroups.add(new ProductGroup(SupportUtils.getStringLocalized(context, "en", R.string.health),
