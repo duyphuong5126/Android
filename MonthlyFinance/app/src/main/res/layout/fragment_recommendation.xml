@@ -291,7 +291,7 @@
                                 android:textSize="20sp"
                                 android:textStyle="bold"
                                 android:textColor="#444"
-                                android:fontFamily="sans-serif-smallcaps"/>
+                                android:fontFamily="sans-serif-condensed"/>
 
                             <EditText
                                 android:id="@+id/edtAccurate"
@@ -311,7 +311,7 @@
                                 android:textSize="20sp"
                                 android:textStyle="bold"
                                 android:textColor="#444"
-                                android:fontFamily="sans-serif-smallcaps"
+                                android:fontFamily="sans-serif-condensed"
                                 android:layout_marginTop="15dip"/>
 
                             <EditText

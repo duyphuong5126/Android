@@ -203,7 +203,7 @@
                 android:textSize="20sp"
                 android:textColor="#fff"
                 android:textStyle="bold"
-                android:fontFamily="sans-serif-smallcaps"
+                android:fontFamily="sans-serif-condensed"
                 android:layout_marginLeft="10dip"/>
 
             <LinearLayout
@@ -291,7 +291,7 @@
                 android:textSize="20sp"
                 android:textColor="#fff"
                 android:textStyle="bold"
-                android:fontFamily="sans-serif-smallcaps"
+                android:fontFamily="sans-serif-condensed"
                 android:layout_marginLeft="10dip"/>
 
             <LinearLayout

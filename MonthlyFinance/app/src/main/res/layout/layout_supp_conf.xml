@@ -23,7 +23,7 @@
                 android:textSize="25sp"
                 android:textStyle="bold"
                 android:padding="10dip"
-                android:fontFamily="sans-serif-smallcaps"/>
+                android:fontFamily="sans-serif-condensed"/>
 
             <View
                 android:layout_width="match_parent"
