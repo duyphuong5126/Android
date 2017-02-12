@@ -73,19 +73,21 @@ public class NoteDataDAO extends BaseDAO {
         }
     }
 
-    public int getIDByUri(Uri uri) {
+    private int getIDByUri(Uri uri) {
         Cursor cursor = mActivity.getContentResolver().query(uri, null, null, null, ApplicationStorage.NoteTable.TITLE);
         int currentID = 0;
-        if (cursor.moveToFirst()) {
-            do {
-                currentID = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.ID)));
-            } while (cursor.moveToNext());
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    currentID = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.ID)));
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
         }
-        cursor.close();
         return currentID;
     }
 
-    public void insertNoteDetails(final int note_id, final NewNoteFragment.CreateNoteCallback callback) {
+    private void insertNoteDetails(final int note_id, final NewNoteFragment.CreateNoteCallback callback) {
         final Handler handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -113,7 +115,7 @@ public class NoteDataDAO extends BaseDAO {
                                     note_id, noteText.getType(), noteText.getContent());
                         }
                     } else {
-                        String resultPath = "";
+                        String resultPath;
                         switch (noteDataLine.typeIdentify()) {
                             case DataConstant.TYPE_IMAGE:
                                 realItems++;
@@ -156,7 +158,7 @@ public class NoteDataDAO extends BaseDAO {
         runnable.run();
     }
 
-    public int insertNoteDetails(int noteID, String type, String content) {
+    private int insertNoteDetails(int noteID, String type, String content) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(ApplicationStorage.NoteDetailsTable.NOTE_ID, String.valueOf(noteID));
         contentValues.put(ApplicationStorage.NoteDetailsTable.TYPE, type);
@@ -190,76 +192,81 @@ public class NoteDataDAO extends BaseDAO {
         user_id[0] = ApplicationSharedData.getUserID();
         Cursor cursor = this.mActivity.getContentResolver().query(uriNote, null, ApplicationStorage.NoteTable.USER_ID + " = ?", user_id,
                 "strftime('%Y-%m-%d', " + ApplicationStorage.NoteTable.DATE_MODIFIED + ") ASC");
-        ArrayList<NoteSummary> listNoteSummary = new ArrayList<NoteSummary>();
-        if (cursor.moveToFirst()) {
-            do {
-                NoteSummary noteSummary = new NoteSummary(
-                        Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteTable.ID))),
-                        cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteTable.TITLE)),
-                        cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteTable.CREATE_AT)),
-                        cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteTable.DATE_MODIFIED))
-                );
-                noteSummary.setUploaded(Boolean.valueOf(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteTable.UPLOADED))));
-                noteSummary.setScheduled(Boolean.valueOf(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteTable.SCHEDULED))));
-                listNoteSummary.add(noteSummary);
-            } while (cursor.moveToNext());
+        ArrayList<NoteSummary> listNoteSummary = new ArrayList<>();
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    NoteSummary noteSummary = new NoteSummary(
+                            Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteTable.ID))),
+                            cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteTable.TITLE)),
+                            cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteTable.CREATE_AT)),
+                            cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteTable.DATE_MODIFIED))
+                    );
+                    noteSummary.setUploaded(Boolean.valueOf(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteTable.UPLOADED))));
+                    noteSummary.setScheduled(Boolean.valueOf(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteTable.SCHEDULED))));
+                    listNoteSummary.add(noteSummary);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
         }
         return listNoteSummary;
     }
 
     public ArrayList<NoteDataLine> loadNoteDetails(int noteID) {
-        ArrayList<NoteDataLine> listNoteLine = new ArrayList<NoteDataLine>();
+        ArrayList<NoteDataLine> listNoteLine = new ArrayList<>();
         Cursor cursor = mContentResolver.query(Uri.parse(uriNoteDetails + "/note_id/" + noteID), null, null, null, null);
-        if (cursor.moveToFirst()) {
-            do {
-                switch (cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.TYPE))) {
-                    case DataConstant.TYPE_TEXT:
-                        NoteText noteText = new NoteText(
-                                Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.NOTE_ID))),
-                                cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.TYPE)),
-                                cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.CONTENT)),
-                                Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.NOTE_ID)))
-                        );
-                        noteText.setContentIndex(Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.ID))));
-                        listNoteLine.add(noteText);
-                        break;
-                    case DataConstant.TYPE_IMAGE:
-                        NoteImage noteImage = new NoteImage(
-                                SupportUtils.getNameFromPath(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.CONTENT))),
-                                cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.TYPE)),
-                                cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.CONTENT)),
-                                Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.NOTE_ID)))
-                        );
-                        noteImage.setContentIndex(Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.ID))));
-                        listNoteLine.add(noteImage);
-                        break;
-                    case DataConstant.TYPE_VIDEOCLIP:
-                        NoteVideoClip noteVideoClip = new NoteVideoClip(
-                                SupportUtils.getNameFromPath(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.CONTENT))),
-                                cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.CONTENT)),
-                                0,
-                                cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.TYPE)),
-                                Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.NOTE_ID)))
-                        );
-                        noteVideoClip.setContentIndex(Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.ID))));
-                        listNoteLine.add(noteVideoClip);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    switch (cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.TYPE))) {
+                        case DataConstant.TYPE_TEXT:
+                            NoteText noteText = new NoteText(
+                                    Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.NOTE_ID))),
+                                    cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.TYPE)),
+                                    cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.CONTENT)),
+                                    Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.NOTE_ID)))
+                            );
+                            noteText.setContentIndex(Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.ID))));
+                            listNoteLine.add(noteText);
+                            break;
+                        case DataConstant.TYPE_IMAGE:
+                            NoteImage noteImage = new NoteImage(
+                                    SupportUtils.getNameFromPath(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.CONTENT))),
+                                    cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.TYPE)),
+                                    cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.CONTENT)),
+                                    Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.NOTE_ID)))
+                            );
+                            noteImage.setContentIndex(Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.ID))));
+                            listNoteLine.add(noteImage);
+                            break;
+                        case DataConstant.TYPE_VIDEOCLIP:
+                            NoteVideoClip noteVideoClip = new NoteVideoClip(
+                                    SupportUtils.getNameFromPath(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.CONTENT))),
+                                    cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.CONTENT)),
+                                    0,
+                                    cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.TYPE)),
+                                    Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.NOTE_ID)))
+                            );
+                            noteVideoClip.setContentIndex(Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.ID))));
+                            listNoteLine.add(noteVideoClip);
 
-                        break;
-                    case DataConstant.TYPE_VOICE:
-                        NoteVoice noteVoice = new NoteVoice(
-                                SupportUtils.getNameFromPath(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.CONTENT))),
-                                cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.CONTENT)),
-                                0,
-                                cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.TYPE)),
-                                Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.NOTE_ID)))
-                        );
-                        noteVoice.setContentIndex(Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.ID))));
-                        listNoteLine.add(noteVoice);
-                        break;
-                }
-            } while (cursor.moveToNext());
+                            break;
+                        case DataConstant.TYPE_VOICE:
+                            NoteVoice noteVoice = new NoteVoice(
+                                    SupportUtils.getNameFromPath(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.CONTENT))),
+                                    cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.CONTENT)),
+                                    0,
+                                    cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.TYPE)),
+                                    Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.NOTE_ID)))
+                            );
+                            noteVoice.setContentIndex(Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteDetailsTable.ID))));
+                            listNoteLine.add(noteVoice);
+                            break;
+                    }
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
         }
-        cursor.close();
         return listNoteLine;
     }
 
@@ -272,7 +279,7 @@ public class NoteDataDAO extends BaseDAO {
         return false;
     }
 
-    public boolean deleteNoteDetails(int noteID) {
+    private boolean deleteNoteDetails(int noteID) {
         String uriNoteDetails =
                 ApplicationStorage.getNoteDetailsUri() + "/note_id/" + noteID;
         int result = mContentResolver.delete(Uri.parse(uriNoteDetails), null, null);

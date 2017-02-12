@@ -11,8 +11,6 @@ import android.widget.VideoView;
 
 
 public class MediaPlayerActivity extends Activity {
-    private String mMediaPath;
-    private VideoView mVideoView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,11 +18,11 @@ public class MediaPlayerActivity extends Activity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         Intent caller = getIntent();
         Bundle bundle = caller.getBundleExtra("MediaInfor");
-        this.mMediaPath = bundle.getString("MediaPath");
-        this.mVideoView = (VideoView) findViewById(R.id.viewMediaPlayer);
-        this.mVideoView.setVideoPath(this.mMediaPath);
-        this.mVideoView.setMediaController(new MediaController(this));
-        this.mVideoView.start();
+        String mMediaPath = bundle.getString("MediaPath");
+        VideoView mVideoView = (VideoView) findViewById(R.id.viewMediaPlayer);
+        mVideoView.setVideoPath(mMediaPath);
+        mVideoView.setMediaController(new MediaController(this));
+        mVideoView.start();
     }
 
 

@@ -51,21 +51,23 @@ public class NoteReminderDAO extends BaseDAO {
         if (dateSpecified != null && !dateSpecified.equals("")) {
             uri = ApplicationStorage.getNoteRemindersUri() + "/reminder_time/" + dateSpecified;
         }
-        ArrayList<NoteReminder> noteReminders = new ArrayList<NoteReminder>();
+        ArrayList<NoteReminder> noteReminders = new ArrayList<>();
         Cursor cursor = this.mContentResolver.query
                 (Uri.parse(uri), null, ApplicationStorage.NoteReminderTable.USER_ID + " = ?", user_id, null);
-        if (cursor.moveToFirst()) {
-            do {
-                NoteReminder noteReminder = new NoteReminder();
-                noteReminder.setReminderID(Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteReminderTable.ID))));
-                noteReminder.setNoteId(Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteReminderTable.NOTE_ID))));
-                noteReminder.setContent(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteReminderTable.CONTENT)));
-                noteReminder.setTimeComplete(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteReminderTable.TIME)));
-                noteReminder.setVoice(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteReminderTable.REMIND_VOICE)));
-                noteReminders.add(noteReminder);
-            } while (cursor.moveToNext());
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    NoteReminder noteReminder = new NoteReminder();
+                    noteReminder.setReminderID(Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteReminderTable.ID))));
+                    noteReminder.setNoteId(Integer.parseInt(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteReminderTable.NOTE_ID))));
+                    noteReminder.setContent(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteReminderTable.CONTENT)));
+                    noteReminder.setTimeComplete(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteReminderTable.TIME)));
+                    noteReminder.setVoice(cursor.getString(cursor.getColumnIndex(ApplicationStorage.NoteReminderTable.REMIND_VOICE)));
+                    noteReminders.add(noteReminder);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
         }
-        cursor.close();
         return noteReminders;
     }
 

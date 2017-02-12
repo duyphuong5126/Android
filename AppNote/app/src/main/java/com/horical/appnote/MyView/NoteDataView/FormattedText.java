@@ -63,7 +63,7 @@ public class FormattedText {
         return result;
     }
 
-    public boolean matchEdittext(int id) {
+    public boolean matchEditText(int id) {
         return mEditText.getId() == id;
     }
 

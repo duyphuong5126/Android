@@ -14,7 +14,7 @@ import com.horical.appnote.Supports.MediaUtils;
  */
 public class MediaChooserDialog extends Dialog implements LinearLayout.OnClickListener {
 
-    public static enum KindOfPlayer{
+    public enum KindOfPlayer{
         DEFAULT_PLAYER, MEDIA_APPLICATION
     }
 
@@ -27,7 +27,6 @@ public class MediaChooserDialog extends Dialog implements LinearLayout.OnClickLi
     }
 
     private String mMediaPath;
-    private LinearLayout mChooseApplication, mChooseDefault;
 
     private MediaCallback callback;
     public MediaChooserDialog(Context context) {
@@ -38,14 +37,14 @@ public class MediaChooserDialog extends Dialog implements LinearLayout.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_media_chooser);
-        mChooseApplication = (LinearLayout) findViewById(R.id.chooseApplications);
+        LinearLayout mChooseApplication = (LinearLayout) findViewById(R.id.chooseApplications);
         mChooseApplication.setOnClickListener(this);
-        mChooseDefault = (LinearLayout) findViewById(R.id.chooseDefault);
+        LinearLayout mChooseDefault = (LinearLayout) findViewById(R.id.chooseDefault);
         mChooseDefault.setOnClickListener(this);
     }
 
     public interface MediaCallback{
-        public void OpenMedia(KindOfPlayer kindOfPlayer, String path);
+        void OpenMedia(KindOfPlayer kindOfPlayer, String path);
     }
 
     public void setMediaCallback(MediaCallback mediaCallback){

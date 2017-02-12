@@ -15,18 +15,16 @@ import com.horical.appnote.Supports.LanguageUtils;
 /**
  * Created by trandu on 12/08/2015.
  */
-public class TimePickerDialog extends Dialog implements View.OnClickListener {
+class TimePickerDialog extends Dialog implements View.OnClickListener {
 
     private TimePicker mTimePicker;
-    private Button mCancelButton;
-    private Button mOKButton;
     private Callback mCallback;
 
     public TimePickerDialog(Activity context) {
         super(context);
     }
 
-    public TimePickerDialog(Context context, int theme) {
+    TimePickerDialog(Context context, int theme) {
         super(context, theme);
     }
 
@@ -42,10 +40,10 @@ public class TimePickerDialog extends Dialog implements View.OnClickListener {
         init();
     }
 
-    public void init() {
+    private void init() {
         mTimePicker = (TimePicker) findViewById(R.id.timePicker);
-        mCancelButton = (Button) findViewById(R.id.btn_cancel);
-        mOKButton = (Button) findViewById(R.id.btn_ok);
+        Button mCancelButton = (Button) findViewById(R.id.btn_cancel);
+        Button mOKButton = (Button) findViewById(R.id.btn_ok);
         mCancelButton.setOnClickListener(this);
         mOKButton.setOnClickListener(this);
     }

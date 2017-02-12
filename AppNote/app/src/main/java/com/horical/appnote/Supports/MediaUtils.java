@@ -1,5 +1,6 @@
 package com.horical.appnote.Supports;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -15,13 +16,11 @@ public abstract class MediaUtils {
 
     private static Map<String, ImageButton> listPlayMediaButton;
 
-    public static Map<String, ImageButton> listRemoveViewButton;
-
+    @SuppressLint("StaticFieldLeak")
     private static Activity activity;
 
     public static void setActivity(Activity activity) {
-        MediaUtils.listPlayMediaButton = new HashMap<String, ImageButton>();
-        MediaUtils.listRemoveViewButton = new HashMap<String, ImageButton>();
+        MediaUtils.listPlayMediaButton = new HashMap<>();
         MediaUtils.activity = activity;
     }
 

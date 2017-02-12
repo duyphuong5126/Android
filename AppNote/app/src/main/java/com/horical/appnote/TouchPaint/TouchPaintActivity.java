@@ -1,6 +1,8 @@
 package com.horical.appnote.TouchPaint;
 
 import com.horical.appnote.R;
+
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
@@ -42,9 +44,7 @@ public class TouchPaintActivity extends Activity implements SeekBar.OnSeekBarCha
     private LinearLayout drawerTool;
 
     private ArrayList<ImageButton> listImageButton;
-    private ArrayList<Button> listButton;
 
-    private AlertDialog.Builder alertBuilderChangeColor;
     private AlertDialog alertChangeColor;
 
     private ColorPicker colorPicker;
@@ -66,13 +66,14 @@ public class TouchPaintActivity extends Activity implements SeekBar.OnSeekBarCha
         Listener = listener;
     }
 
+    @SuppressLint("InflateParams")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_touchpaint);
 
-        listImageButton = new ArrayList<ImageButton>();
-        listButton = new ArrayList<Button>();
+        listImageButton = new ArrayList<>();
+        ArrayList<Button> listButton = new ArrayList<>();
 
         drawingView = (DrawingView) findViewById(R.id.DrawArea);
 
@@ -123,7 +124,7 @@ public class TouchPaintActivity extends Activity implements SeekBar.OnSeekBarCha
 
         ((LinearLayout) viewChangeColor.findViewById(R.id.colorPickerLayout)).addView(colorPicker.getColorPickerView());
 
-        alertBuilderChangeColor = new AlertDialog.Builder(this);
+        AlertDialog.Builder alertBuilderChangeColor = new AlertDialog.Builder(this);
         alertBuilderChangeColor.setView(viewChangeColor);
         alertBuilderChangeColor.setNegativeButton("Close", new DialogInterface.OnClickListener() {
             @Override
@@ -149,12 +150,10 @@ public class TouchPaintActivity extends Activity implements SeekBar.OnSeekBarCha
         if(resultCode == RESULT_OK){
             switch (requestCode){
                 case SELECT_IMAGE:
-                    if(requestCode == SELECT_IMAGE){
-                        Uri imageUri = data.getData();
-                        String imagePath = getPath(imageUri);
-                        imagePath.getBytes();
-                        drawingView.setBitmap(BitmapFactory.decodeFile(imagePath));
-                    }
+                    Uri imageUri = data.getData();
+                    String imagePath = getPath(imageUri);
+                    imagePath.getBytes();
+                    drawingView.setBitmap(BitmapFactory.decodeFile(imagePath));
                     break;
                 case TAKE_PHOTO:
                     getContentResolver().notifyChange(imageFromCamera, null);
@@ -236,7 +235,7 @@ public class TouchPaintActivity extends Activity implements SeekBar.OnSeekBarCha
         }
 
         areaColorView.setBackgroundColor(drawingView.getCurrentPaintColor());
-        ((LinearLayout) viewChangeColor.findViewById(R.id.ColorShow)).setBackgroundColor(drawingView.getCurrentPaintColor());
+        viewChangeColor.findViewById(R.id.ColorShow).setBackgroundColor(drawingView.getCurrentPaintColor());
     }
 
     @Override
@@ -282,6 +281,7 @@ public class TouchPaintActivity extends Activity implements SeekBar.OnSeekBarCha
                 intentTakePhoto();
                 break;
             case R.id.buttonSaveImage:
+                @SuppressLint("InflateParams")
                 View promptView = LayoutInflater.from(this).inflate(R.layout.prompt_dialog, null);
 
                 final AlertDialog.Builder alertBuilderSaveImage = new AlertDialog.Builder(this);
@@ -330,7 +330,7 @@ public class TouchPaintActivity extends Activity implements SeekBar.OnSeekBarCha
             case R.id.buttonColorGold:
                 drawingView.changeColor(((Button) viewChangeColor.findViewById(v.getId())).getText().toString());
                 areaColorView.setBackgroundColor(drawingView.getCurrentPaintColor());
-                ((LinearLayout) viewChangeColor.findViewById(R.id.ColorShow)).setBackgroundColor(drawingView.getCurrentPaintColor());
+                viewChangeColor.findViewById(R.id.ColorShow).setBackgroundColor(drawingView.getCurrentPaintColor());
 
                 this.showColorCode();
                 drawingView.ActiveEraser(false);
@@ -349,21 +349,21 @@ public class TouchPaintActivity extends Activity implements SeekBar.OnSeekBarCha
 
     public void drawerOpen(){
         drawerTool.setVisibility(View.VISIBLE);
-        ((ImageButton) findViewById(R.id.buttonOpenDrawerTool)).setVisibility(View.GONE);
-        ((LinearLayout) findViewById(R.id.layoutCloseDrawerTool)).setVisibility(View.VISIBLE);
+        findViewById(R.id.buttonOpenDrawerTool).setVisibility(View.GONE);
+        findViewById(R.id.layoutCloseDrawerTool).setVisibility(View.VISIBLE);
     }
 
     public void drawerClose(){
         drawerTool.setVisibility(View.GONE);
-        ((ImageButton) findViewById(R.id.buttonOpenDrawerTool)).setVisibility(View.VISIBLE);
-        ((LinearLayout) findViewById(R.id.layoutCloseDrawerTool)).setVisibility(View.GONE);
+        findViewById(R.id.buttonOpenDrawerTool).setVisibility(View.VISIBLE);
+        findViewById(R.id.layoutCloseDrawerTool).setVisibility(View.GONE);
     }
 
     @Override
     public void colorChanged(int color) {
         drawingView.changeColor(color);
         areaColorView.setBackgroundColor(drawingView.getCurrentPaintColor());
-        ((LinearLayout) viewChangeColor.findViewById(R.id.ColorShow)).setBackgroundColor(drawingView.getCurrentPaintColor());
+        viewChangeColor.findViewById(R.id.ColorShow).setBackgroundColor(drawingView.getCurrentPaintColor());
 
         this.showColorCode();
         drawingView.ActiveEraser(false);

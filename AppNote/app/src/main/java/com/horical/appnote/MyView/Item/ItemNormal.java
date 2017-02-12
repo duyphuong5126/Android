@@ -8,9 +8,9 @@ import com.horical.appnote.R;
  * Created by Phuong on 30/07/2015.
  */
 public class ItemNormal extends BaseItem {
-    protected Bitmap mBitmapIllustrateImage;
-    protected Bitmap mBitmapIllustrateImageFocus;
-    protected String mItemName;
+    private Bitmap mBitmapIllustrateImage;
+    private Bitmap mBitmapIllustrateImageFocus;
+    private String mItemName;
 
     public Bitmap getBitmapIllustrateImageFocus() {
         return mBitmapIllustrateImageFocus;

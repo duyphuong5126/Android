@@ -1,5 +1,6 @@
 package com.horical.appnote.Fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -24,7 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -39,7 +39,6 @@ import com.horical.appnote.DTO.NoteDTO.NoteText;
 import com.horical.appnote.DTO.NoteDTO.NoteVideoClip;
 import com.horical.appnote.DTO.NoteDTO.NoteVoice;
 import com.horical.appnote.Interfaces.EditNoteListener;
-import com.horical.appnote.LocalStorage.ApplicationSharedData;
 import com.horical.appnote.LocalStorage.DAO.NoteDataDAO;
 import com.horical.appnote.LocalStorage.DAO.NoteReminderDAO;
 import com.horical.appnote.LocalStorage.DataConstant;
@@ -62,6 +61,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Stack;
 
 
@@ -80,7 +80,7 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
     private static final int CREATE_AUDIO = 7;
     public static final int CREATE_FINGER_PAINT = 8;
 
-    private LinearLayout mLayoutEditorManager, mLayoutContainer, mLayoutAttachFiles;
+    private LinearLayout mLayoutEditorManager, mLayoutContainer;
     private LinearLayout mLayoutProgress;
 
     private ArrayList<PairDataView> mListContent;
@@ -92,8 +92,6 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
 
     private NoteReminder mNoteReminder;
 
-    private NoteDataDAO mNoteDataDAO;
-
     private AlertDialog.Builder mBuilder;
     private MediaChooserDialog mMediaChooserDialog;
 
@@ -101,13 +99,10 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
 
     private Uri mCameraPhoto;
 
-    private AsyncTask<Void, View, Void> mAsyncLoadNoteDetails;
-
     private ArrayList<FormattedText> mListFormatEditor;
 
     private TextView mTvCreateNew, mTvAttach;
     private TextView mTvTakePhoto, mTvAudioRecord, mTvVideoCapture, mTvImage, mTvAudio;
-    private TextView mTvScreenTitle;
 
     private ArrayList<String> mContextMenuImageView;
     private int mCurrentImageViewSelected;
@@ -139,48 +134,46 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
         mTvVideoCapture = (TextView) mFragmentView.findViewById(R.id.tvVideoCapture);
         mTvImage = (TextView) mFragmentView.findViewById(R.id.tvImage);
         mTvAudio = (TextView) mFragmentView.findViewById(R.id.tvAudio);
-        mTvScreenTitle = (TextView) mFragmentView.findViewById(R.id.tvScreenTitle);
+        TextView mTvScreenTitle = (TextView) mFragmentView.findViewById(R.id.tvScreenTitle);
 
         mTvScreenTitle.setText(LanguageUtils.getYourNoteString());
 
-        this.mListFormatEditor = new ArrayList<FormattedText>();
+        this.mListFormatEditor = new ArrayList<>();
 
-        this.mContextMenuImageView = new ArrayList<String>();
-        for (String resource : mActivity.getResources().getStringArray(R.array.ImageViewContextItem)) {
-            mContextMenuImageView.add(resource);
-        }
+        this.mContextMenuImageView = new ArrayList<>();
+        Collections.addAll(mContextMenuImageView, mActivity.getResources().getStringArray(R.array.ImageViewContextItem));
 
         mNoteSummary = new NoteSummary();
 
         mBuilder = new AlertDialog.Builder(mActivity);
 
-        mUndoRedoStack = new Stack<PairDataView>();
+        mUndoRedoStack = new Stack<>();
 
-        mListContent = new ArrayList<PairDataView>();
+        mListContent = new ArrayList<>();
 
         mLayoutEditorManager = (LinearLayout) mFragmentView.findViewById(R.id.layoutEditorManager);
         mLayoutContainer = ((LinearLayout) mFragmentView.findViewById(R.id.EditArea));
 
         //set click listener method for button
-        ((ImageButton) mFragmentView.findViewById(R.id.buttonEditor)).setOnClickListener(this);
-        ((ImageButton) mFragmentView.findViewById(R.id.buttonAttachFile)).setOnClickListener(this);
-        ((ImageButton) mFragmentView.findViewById(R.id.buttonConfirm)).setOnClickListener(this);
-        ((ImageButton) mFragmentView.findViewById(R.id.buttonEditorBold)).setOnClickListener(this);
-        ((ImageButton) mFragmentView.findViewById(R.id.buttonEditorItalic)).setOnClickListener(this);
-        ((ImageButton) mFragmentView.findViewById(R.id.buttonEditorUnderline)).setOnClickListener(this);
-        ((ImageButton) mFragmentView.findViewById(R.id.buttonCloseAttachLayout)).setOnClickListener(this);
-        ((ImageButton) mFragmentView.findViewById(R.id.buttonReminder)).setOnClickListener(this);
-        ((ImageButton) mFragmentView.findViewById(R.id.buttonUndo)).setOnClickListener(this);
-        ((ImageButton) mFragmentView.findViewById(R.id.buttonRedo)).setOnClickListener(this);
-        ((ImageButton) mFragmentView.findViewById(R.id.buttonMore)).setOnClickListener(this);
+        mFragmentView.findViewById(R.id.buttonEditor).setOnClickListener(this);
+        mFragmentView.findViewById(R.id.buttonAttachFile).setOnClickListener(this);
+        mFragmentView.findViewById(R.id.buttonConfirm).setOnClickListener(this);
+        mFragmentView.findViewById(R.id.buttonEditorBold).setOnClickListener(this);
+        mFragmentView.findViewById(R.id.buttonEditorItalic).setOnClickListener(this);
+        mFragmentView.findViewById(R.id.buttonEditorUnderline).setOnClickListener(this);
+        mFragmentView.findViewById(R.id.buttonCloseAttachLayout).setOnClickListener(this);
+        mFragmentView.findViewById(R.id.buttonReminder).setOnClickListener(this);
+        mFragmentView.findViewById(R.id.buttonUndo).setOnClickListener(this);
+        mFragmentView.findViewById(R.id.buttonRedo).setOnClickListener(this);
+        mFragmentView.findViewById(R.id.buttonMore).setOnClickListener(this);
 
-        ((LinearLayout) mFragmentView.findViewById(R.id.layoutAttachImage)).setOnClickListener(this);
-        ((LinearLayout) mFragmentView.findViewById(R.id.layoutAttachVideo)).setOnClickListener(this);
-        ((LinearLayout) mFragmentView.findViewById(R.id.layoutAttachAudio)).setOnClickListener(this);
-        ((LinearLayout) mFragmentView.findViewById(R.id.layoutTakePhoto)).setOnClickListener(this);
-        ((LinearLayout) mFragmentView.findViewById(R.id.layoutVideoRecorder)).setOnClickListener(this);
-        ((LinearLayout) mFragmentView.findViewById(R.id.layoutVoiceRecorder)).setOnClickListener(this);
-        ((LinearLayout) mFragmentView.findViewById(R.id.layoutTouchPaint)).setOnClickListener(this);
+        mFragmentView.findViewById(R.id.layoutAttachImage).setOnClickListener(this);
+        mFragmentView.findViewById(R.id.layoutAttachVideo).setOnClickListener(this);
+        mFragmentView.findViewById(R.id.layoutAttachAudio).setOnClickListener(this);
+        mFragmentView.findViewById(R.id.layoutTakePhoto).setOnClickListener(this);
+        mFragmentView.findViewById(R.id.layoutVideoRecorder).setOnClickListener(this);
+        mFragmentView.findViewById(R.id.layoutVoiceRecorder).setOnClickListener(this);
+        mFragmentView.findViewById(R.id.layoutTouchPaint).setOnClickListener(this);
 
         mLayoutProgress = (LinearLayout) mFragmentView.findViewById(R.id.layoutProgress);
 
@@ -203,10 +196,17 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
             mLayoutProgress.setVisibility(View.VISIBLE);
             mNoteData = new NoteData();
             mNoteData = (NoteData) getArguments().getSerializable("NoteData");
-            mNoteSummary = mNoteData.getNoteSummary();
-            edittextNoteTitle.setText(this.getFormattedEditable(mNoteData.getNoteSummary().getTitle()));
+            if (mNoteData != null) {
+                mNoteSummary = mNoteData.getNoteSummary();
+            }
+            if (mNoteData != null) {
+                edittextNoteTitle.setText(this.getFormattedEditable(mNoteData.getNoteSummary().getTitle()));
+            }
 
-            String format = FormattedText.getFormatFromFormatedJSON(mNoteData.getNoteSummary().getTitle());
+            String format = null;
+            if (mNoteData != null) {
+                format = FormattedText.getFormatFromFormatedJSON(mNoteData.getNoteSummary().getTitle());
+            }
             this.mListFormatEditor.add(new FormattedText(edittextNoteTitle, format));
             int start = 0;
             if (!mNoteData.getNoteData().isEmpty()) {
@@ -224,7 +224,7 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
                 mListContent.add(new PairDataView(new NoteText(mNoteSummary.getID(), DataConstant.TYPE_TEXT, "con", 0), edittextNoteContent));
             }
             final int startPos = start;
-            mAsyncLoadNoteDetails = new AsyncTask<Void, View, Void>() {
+            AsyncTask<Void, View, Void> mAsyncLoadNoteDetails = new AsyncTask<Void, View, Void>() {
                 @Override
                 protected Void doInBackground(Void... voids) {
                     for (int i = startPos; i < mNoteData.getNoteData().size(); i++) {
@@ -312,7 +312,6 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
     }
 
     private void addTextWatcher(final EditText editText) {
-        final EditText edit = editText;
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
@@ -324,7 +323,7 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
                 Log.d("Text change", "start: " + i + " before: " + i2 + " end: " + i3);
                 int start = i, before = i2, count = i3;
 
-                int position = getFormatItem(edit.getId());
+                int position = getFormatItem(editText.getId());
                 if (position >= 0) {
                     if (count > before) {
                         mListFormatEditor.get(position).addFormatItem(start);
@@ -337,11 +336,10 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
             @Override
             public void afterTextChanged(Editable editable) {
                 Log.d("After Text change", "in");
-                int position = getFormatItem(edit.getId());
+                int position = getFormatItem(editText.getId());
                 if (position >= 0) {
                     editable = mListFormatEditor.get(position).getFormattedText();
                 }
-                return;
             }
         });
     }
@@ -387,7 +385,7 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == mActivity.RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
                 case LOAD_IMAGE_SUCCESS:
                 case LOAD_VIDEO_SUCCESS:
@@ -443,7 +441,7 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
         editText.setText(text);
         editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         editText.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        editText.setBackgroundDrawable(mActivity.getResources().getDrawable(R.drawable.transparent));
+        editText.setBackgroundResource(R.drawable.transparent);
 
         mListContent.add(new PairDataView(new NoteText(mNoteSummary.getID(), DataConstant.TYPE_TEXT, "", 0), editText));
         editText.setOnTouchListener(this);
@@ -470,7 +468,7 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
         editText.setText(FormattedText.getFormattedText(content, format));
         editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         editText.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        editText.setBackgroundDrawable(mActivity.getResources().getDrawable(R.drawable.transparent));
+        editText.setBackgroundResource(R.drawable.transparent);
 
         mListContent.add(new PairDataView(new NoteText(mNoteSummary.getID(), DataConstant.TYPE_TEXT, "", 0), editText));
         editText.setOnTouchListener(this);
@@ -548,7 +546,7 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
         layoutAudioInfor.hideDivider();
         layoutAudioInfor.getView().setId(SupportUtils.getRandomID());
         layoutAudioInfor.setTextViewName(fileName);
-        layoutAudioInfor.setTextViewInfor(SupportUtils.MilliSecToTime(SupportUtils.getDuration(uri, mActivity)));
+        layoutAudioInfor.setTextViewInfo(SupportUtils.MilliSecToTime(SupportUtils.getDuration(uri, mActivity)));
         layoutAudioInfor.setOpenFileListener(this);
 
         layoutAudioInfor.getDeleteThisButton().setOnClickListener(this);
@@ -564,7 +562,9 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
     private void hideSoftKeyboard() {
         View view = getActivity().getCurrentFocus();
         InputMethodManager input = (InputMethodManager) this.mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-        input.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        if (view != null) {
+            input.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     @Override
@@ -757,17 +757,17 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
                     break;
                 case DataConstant.TYPE_IMAGE:
                     if (v.getVisibility() == View.VISIBLE) {
-                        listData.add((NoteImage) pairDataView.getNoteDataInterface());
+                        listData.add(pairDataView.getNoteDataInterface());
                     }
                     break;
                 case DataConstant.TYPE_VIDEOCLIP:
                     if (((MyVideoView) pairDataView.getView()).getView().getVisibility() == View.VISIBLE) {
-                        listData.add((NoteVideoClip) pairDataView.getNoteDataInterface());
+                        listData.add(pairDataView.getNoteDataInterface());
                     }
                     break;
                 case DataConstant.TYPE_VOICE:
                     if (((MyAudioView) pairDataView.getView()).getView().getVisibility() == View.VISIBLE) {
-                        listData.add((NoteVoice) pairDataView.getNoteDataInterface());
+                        listData.add(pairDataView.getNoteDataInterface());
                     }
                     break;
             }
@@ -781,7 +781,7 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
             mNoteSummary.setModifiedAt(SupportUtils.convertDateToString(Calendar.getInstance()));
             mNoteData.setNoteSummary(mNoteSummary);
 
-            mNoteDataDAO = new NoteDataDAO(mActivity);
+            NoteDataDAO mNoteDataDAO = new NoteDataDAO(mActivity);
             mNoteDataDAO.setNoteData(mNoteData);
 
             /*store or update data...*/
@@ -882,13 +882,13 @@ public class NewNoteFragment extends BaseFragment implements View.OnClickListene
     }
 
     private void toggleArea(int layout_id) {
-        View viewSource = (View) mFragmentView.findViewById(layout_id);
+        View viewSource = mFragmentView.findViewById(layout_id);
         viewSource.setVisibility((viewSource.getVisibility() == View.VISIBLE) ? View.GONE : View.VISIBLE);
     }
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
-        ((LinearLayout) mFragmentView.findViewById(R.id.layoutAttachFile)).setVisibility(View.GONE);
+        mFragmentView.findViewById(R.id.layoutAttachFile).setVisibility(View.GONE);
         return false;
     }
 

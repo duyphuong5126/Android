@@ -49,10 +49,7 @@ public class ViewNoteFragment extends BaseFragment implements ImageButton.OnClic
 
     private ArrayList<NoteDataLine> mListNoteLine;
     private LinearLayout mLayoutContainer, mLayoutProgress;
-    private NoteDataDAO mNoteDataDAO;
     private ArrayList<PairDataView> mListContent;
-
-    private ImageButton mButtonBack, mButtonEdit;
 
     private BaseActivity.ActivityAction mAction;
     private MainInterface mCallback;
@@ -81,11 +78,11 @@ public class ViewNoteFragment extends BaseFragment implements ImageButton.OnClic
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.mNoteDataDAO = new NoteDataDAO(mActivity);
-        mListNoteLine = new ArrayList<NoteDataLine>();
-        mListNoteLine = this.mNoteDataDAO.loadNoteDetails(mNoteSummary.getID());
-        mListContent = new ArrayList<PairDataView>();
-        mListBitmap = new HashMap<String, Bitmap>();
+        NoteDataDAO mNoteDataDAO = new NoteDataDAO(mActivity);
+        mListNoteLine = new ArrayList<>();
+        mListNoteLine = mNoteDataDAO.loadNoteDetails(mNoteSummary.getID());
+        mListContent = new ArrayList<>();
+        mListBitmap = new HashMap<>();
     }
 
     @Override
@@ -102,9 +99,9 @@ public class ViewNoteFragment extends BaseFragment implements ImageButton.OnClic
         String Format = FormattedText.getFormatFromFormatedJSON(Json);
         ((TextView) mFragmentView.findViewById(R.id.textviewNoteTitle)).setText(FormattedText.getFormattedText(Content, Format));
 
-        mButtonBack = (ImageButton) mFragmentView.findViewById(R.id.buttonViewNote_Back);
+        ImageButton mButtonBack = (ImageButton) mFragmentView.findViewById(R.id.buttonViewNote_Back);
         mButtonBack.setOnClickListener(this);
-        mButtonEdit = (ImageButton) mFragmentView.findViewById(R.id.buttonViewNote_Edit);
+        ImageButton mButtonEdit = (ImageButton) mFragmentView.findViewById(R.id.buttonViewNote_Edit);
         mButtonEdit.setOnClickListener(this);
 
         final ViewGroup.LayoutParams layoutParams =
@@ -181,7 +178,7 @@ public class ViewNoteFragment extends BaseFragment implements ImageButton.OnClic
                             NoteVoice noteVoice = (NoteVoice) noteLine;
                             MyAudioView myAudioView = new MyAudioView(mActivity, noteVoice.getFilePath());
                             myAudioView.setTextViewName(noteVoice.getFileName());
-                            myAudioView.setTextViewInfor(
+                            myAudioView.setTextViewInfo(
                                     SupportUtils.MilliSecToTime(
                                             SupportUtils.getDuration(Uri.parse(noteVoice.getFilePath()), mActivity)));
                             myAudioView.setOpenFileListener(ViewNoteFragment.this);
@@ -288,8 +285,7 @@ public class ViewNoteFragment extends BaseFragment implements ImageButton.OnClic
         ViewGroup.LayoutParams layoutParams = SupportUtils.getScreenParams(mActivity);
         int w = (bitmap.getWidth() > layoutParams.width)?layoutParams.width:bitmap.getWidth();
         int h = (bitmap.getHeight() > (layoutParams.height/2))?(layoutParams.height/2):bitmap.getHeight();
-        Bitmap bmp = SupportUtils.resizeBitmap(bitmap, w, h);
-        return bmp;
+        return SupportUtils.resizeBitmap(bitmap, w, h);
     }
 
     private Bitmap getSuitableSizeBitmap(String path) {

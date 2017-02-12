@@ -3,7 +3,6 @@ package com.horical.appnote.MyView.MyDialog;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -21,17 +20,18 @@ import java.lang.reflect.Field;
 /**
  * Created by phuong on 10/10/2015.
  */
-public class ChooseReminderVoiceDialog  extends Dialog {
+class ChooseReminderVoiceDialog extends Dialog {
     private RadioGroup mGroupVoices;
     private Context mContext;
     private Callback mCallback;
-    private Button mButtonFinish;
 
     private Intent mReminderService;
+
     public ChooseReminderVoiceDialog(Activity activity) {
         super(activity);
     }
-    public ChooseReminderVoiceDialog(Context context) {
+
+    ChooseReminderVoiceDialog(Context context) {
         super(context);
         mContext = context;
     }
@@ -42,7 +42,7 @@ public class ChooseReminderVoiceDialog  extends Dialog {
         setContentView(R.layout.dialog_voice_picker);
         mReminderService = new Intent(mContext, MediaService.class);
         mGroupVoices = (RadioGroup) findViewById(R.id.groupVoices);
-        mButtonFinish = (Button) findViewById(R.id.buttonFinish);
+        Button mButtonFinish = (Button) findViewById(R.id.buttonFinish);
         Field[] fields = R.raw.class.getFields();
         for (Field field : fields) {
             this.addVoice(field.getName());

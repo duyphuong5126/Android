@@ -7,10 +7,10 @@ public abstract class BaseItem {
     public static final int SideMenu_Normal_Item = 1;
     public static final int SideMenu_Notification_Item = 2;
 
-    protected int mXmlLayout;
-    protected int mKindOfItem;
-    protected String mNameOfItem;
-    protected boolean mFocused;
+    int mXmlLayout;
+    int mKindOfItem;
+    String mNameOfItem;
+    private boolean mFocused;
 
     public boolean isFocused() {
         return mFocused;

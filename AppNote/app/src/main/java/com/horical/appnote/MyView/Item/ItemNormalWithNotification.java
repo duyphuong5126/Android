@@ -7,7 +7,7 @@ import com.horical.appnote.Supports.LanguageUtils;
  * Created by Phuong on 30/07/2015.
  */
 public class ItemNormalWithNotification extends ItemNormal {
-    protected String mNotification;
+    private String mNotification;
 
     public ItemNormalWithNotification() {
         this.mXmlLayout = R.layout.list_menu_item_normal_with_notification;

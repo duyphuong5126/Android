@@ -3,6 +3,7 @@ package com.horical.appnote.TouchPaint;
 import com.horical.appnote.R;
 import com.horical.appnote.Supports.FileUtils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -31,7 +32,6 @@ import java.util.ArrayList;
  * Created by Phuong on 15/07/2015.
  */
 public class DrawingView extends View {
-    private Paint drawBitMapPaint;
     private ArrayList<Stuff> pairDrawers;
     private Bitmap bitmap, cacheBitmap;
     private Path path;
@@ -54,9 +54,9 @@ public class DrawingView extends View {
 
     public DrawingView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        drawBitMapPaint = new Paint();
+        Paint drawBitMapPaint = new Paint();
 
-        pairDrawers = new ArrayList<Stuff>();
+        pairDrawers = new ArrayList<>();
 
         drawBitMapPaint.setColor(Color.RED);
 
@@ -76,6 +76,7 @@ public class DrawingView extends View {
 
 
 
+    @SuppressLint("DrawAllocation")
     @Override
     protected void onDraw(Canvas canvas) {
         cacheBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
@@ -123,15 +124,15 @@ public class DrawingView extends View {
         File myFileDir = new File(rootPath);
         myFileDir.mkdir();
         File myFile = new File(myFileDir, bitmapName+".png");
-        if(myFile.exists()) myFile.delete();
+        if(myFile.exists()) {
+            myFile.delete();
+        }
 
         try {
             FileOutputStream fos = new FileOutputStream(myFile);
             this.mergeBitmap().compress(Bitmap.CompressFormat.PNG, 90, fos);
             fos.flush();
             fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -141,7 +142,7 @@ public class DrawingView extends View {
     }
 
     public Bitmap mergeBitmap(){
-        if(bitmap == null) return bitmap;
+        if(bitmap == null) return null;
         Bitmap mergeBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
         Canvas mergeCanvas = new Canvas(mergeBitmap);
 
@@ -227,7 +228,7 @@ public class DrawingView extends View {
         int rgb = Color.parseColor(strColor);
         int r = (rgb >> 16) & 0xff;
         int g = (rgb >> 8) & 0xff;
-        int b = (rgb >> 0) & 0xff;
+        int b = (rgb) & 0xff;
         currentPaintColor.setRGB(r, g, b);
         return currentPaintColor.getRGB();
     }
@@ -235,7 +236,7 @@ public class DrawingView extends View {
     public int changeColor(int Color){
         int r = (Color >> 16) & 0xff;
         int g = (Color >> 8) & 0xff;
-        int b = (Color >> 0) & 0xff;
+        int b = (Color) & 0xff;
         currentPaintColor.setRGB(r, g, b);
         return currentPaintColor.getRGB();
     }

@@ -1,12 +1,12 @@
 package com.horical.appnote.MyView.MyAdapter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.horical.appnote.DTO.NoteDTO.NoteData;
@@ -33,8 +33,10 @@ public class ListNoteAdapter extends ArrayAdapter<NoteData> {
         this.mActivity = activity;
     }
 
+    @SuppressLint("InflateParams")
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         NoteData noteData = mListNoteData.get(position);
         LayoutInflater inflater = this.mActivity.getLayoutInflater();
         NoteSummary noteSummary = noteData.getNoteSummary();
@@ -54,10 +56,10 @@ public class ListNoteAdapter extends ArrayAdapter<NoteData> {
                         setText(SupportUtils.getShortContent(FormattedText.getContentFromFormatedJSON(list.get(0).toString())));
             }
             if (!noteSummary.isScheduled()) {
-                ((ImageView) convertView.findViewById(R.id.imageScheduled)).setVisibility(View.GONE);
+                convertView.findViewById(R.id.imageScheduled).setVisibility(View.GONE);
             }
             if (position >= mListNoteData.size() - 1) {
-                ((LinearLayout) convertView.findViewById(R.id.noteDivider)).setVisibility(View.GONE);
+                convertView.findViewById(R.id.noteDivider).setVisibility(View.GONE);
             }
         }
         return convertView;

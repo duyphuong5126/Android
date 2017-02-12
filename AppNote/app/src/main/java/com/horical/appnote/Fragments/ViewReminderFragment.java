@@ -31,15 +31,10 @@ public class ViewReminderFragment extends BaseFragment implements AdapterView.On
     private TextView mDateTextView, mNoticeTextView;
     private ListView mListView;
     private ArrayList<NoteReminder> mArrayList;
-    private ViewReminderAdapter mAdapter;
     private ImageButton mAddReminderButton;
-    private AddReminderDialog mAddReminderDialog;
     private String mDateSelected;
 
     private NoteReminderDAO mNoteReminderDAO;
-
-    private final int mNumOfFakeItem = 10;
-    private int mCurrentFakeItem = 0;
 
     public ViewReminderFragment(){
 
@@ -110,7 +105,7 @@ public class ViewReminderFragment extends BaseFragment implements AdapterView.On
     }
 
     public void showDialogAddReminder() {
-        mAddReminderDialog = new AddReminderDialog(getActivity());
+        AddReminderDialog mAddReminderDialog = new AddReminderDialog(getActivity());
         mAddReminderDialog.setCallback(this);
         mAddReminderDialog.show();
     }
@@ -135,8 +130,9 @@ public class ViewReminderFragment extends BaseFragment implements AdapterView.On
     }
 
     public void refreshListReminder() {
-        mCurrentFakeItem = 0;
-        mArrayList = new ArrayList<NoteReminder>();
+        int mCurrentFakeItem = 0;
+        mArrayList = new ArrayList<>();
+        int mNumOfFakeItem = 10;
         for (int i = 0; i< mNumOfFakeItem; i++) {
             mArrayList.add(new NoteReminder());
         }
@@ -149,7 +145,7 @@ public class ViewReminderFragment extends BaseFragment implements AdapterView.On
             }
         }
         try {
-            mAdapter = new ViewReminderAdapter(getActivity(), R.layout.list_reminder_item, mArrayList);
+            ViewReminderAdapter mAdapter = new ViewReminderAdapter(getActivity(), R.layout.list_reminder_item, mArrayList);
             mAdapter.setCallback(this);
             mListView.setAdapter(mAdapter);
             check();

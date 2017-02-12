@@ -1,5 +1,6 @@
 package com.horical.appnote.Fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -29,10 +30,8 @@ import com.parse.SaveCallback;
  * Created by Phuong on 03/09/2015.
  */
 public class SignUpFragment extends BaseFragment implements Button.OnClickListener {
-    private EditText mEdtUsername, mEdtEmail, mEdtDisplayname, mEdtPassword;
-    private Button mBtnSignUp;
+    private EditText mEdtUsername, mEdtEmail, mEdtDisplayName, mEdtPassword;
     private RoundImageView mAvatarView;
-    private TextView mTvSignUpTitle;
 
     private String mAvatarPath = "";
     private Bitmap mAvatar = null;
@@ -52,7 +51,7 @@ public class SignUpFragment extends BaseFragment implements Button.OnClickListen
                 final SignUpParam param = new SignUpParam();
                 param.username = mEdtUsername.getText().toString();
                 param.email = mEdtEmail.getText().toString();
-                param.displayname = mEdtDisplayname.getText().toString();
+                param.displayname = mEdtDisplayName.getText().toString();
                 param.password = mEdtPassword.getText().toString();
                 if (!param.email.equals("") && !param.username.equals("") && !param.password.equals("") ) {
                     //TODO sign up on parse.com database
@@ -119,7 +118,7 @@ public class SignUpFragment extends BaseFragment implements Button.OnClickListen
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == mActivity.RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
                 case LOAD_IMAGE:
                     Uri uri = data.getData();
@@ -144,21 +143,21 @@ public class SignUpFragment extends BaseFragment implements Button.OnClickListen
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mTvSignUpTitle = (TextView) mFragmentView.findViewById(R.id.tvSignUpTitle);
+        TextView mTvSignUpTitle = (TextView) mFragmentView.findViewById(R.id.tvSignUpTitle);
         mTvSignUpTitle.setText(LanguageUtils.getSignUpString());
 
         mEdtUsername = (EditText) mFragmentView.findViewById(R.id.edtUsername);
         mEdtUsername.setHint(LanguageUtils.getUserNameString());
 
-        mEdtDisplayname = (EditText) mFragmentView.findViewById(R.id.edtDisplayName);
-        mEdtDisplayname.setHint(LanguageUtils.getDisplayNameString());
+        mEdtDisplayName = (EditText) mFragmentView.findViewById(R.id.edtDisplayName);
+        mEdtDisplayName.setHint(LanguageUtils.getDisplayNameString());
 
         mEdtEmail = (EditText) mFragmentView.findViewById(R.id.edtEmail);
 
         mEdtPassword = (EditText) mFragmentView.findViewById(R.id.edtPassword);
         mEdtPassword.setHint(LanguageUtils.getPasswordString());
 
-        mBtnSignUp = (Button) mFragmentView.findViewById(R.id.buttonSignup);
+        Button mBtnSignUp = (Button) mFragmentView.findViewById(R.id.buttonSignup);
         mBtnSignUp.setText(LanguageUtils.getSignUpString());
         mBtnSignUp.setOnClickListener(this);
 

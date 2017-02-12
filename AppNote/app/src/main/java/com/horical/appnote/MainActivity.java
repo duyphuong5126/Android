@@ -928,9 +928,8 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
 
     private void getExistsFragment(String name) {
         if (mFragmentManager.findFragmentByTag(name) != null) {
-            mFragmentManager.beginTransaction()
-                    .replace(R.id.fragmentsContainer, mFragmentManager.findFragmentByTag(name))
-                    .commit();
+            mFragmentTransaction = mFragmentManager.beginTransaction();
+            mFragmentTransaction.replace(R.id.fragmentsContainer, mFragmentManager.findFragmentByTag(name));
         }
     }
 

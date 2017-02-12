@@ -1,5 +1,6 @@
 package com.horical.appnote.MyView.NoteDataView;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
@@ -16,12 +17,12 @@ import com.horical.appnote.Supports.SupportUtils;
 /**
  * Created by Phuong on 11/08/2015.
  */
+@SuppressLint("ViewConstructor")
 public class MyVideoView extends View{
     private Activity activity;
     private int layout_xml;
     private int buttonPlayer, buttonDeleteThis;
-    private int textviewName, textviewInfor;
-    private int layoutButtonDelete;
+    private int textName, textInfo;
 
     private String mPath;
 
@@ -47,12 +48,12 @@ public class MyVideoView extends View{
         currentView = inflater.inflate(layout_xml, null);
         buttonPlayer = SupportUtils.getRandomID();
         buttonDeleteThis = buttonPlayer + 1;
-        textviewName = buttonPlayer + 2;
-        textviewInfor = buttonPlayer + 3;
-        layoutButtonDelete = buttonPlayer + 4;
-        ((ImageButton) currentView.findViewById(R.id.buttonPlayVideo)).setId(buttonPlayer);
-        ((ImageButton) currentView.findViewById(R.id.buttonDeleteThis)).setId(buttonDeleteThis);
-        ((ImageButton) currentView.findViewById(buttonPlayer)).setOnClickListener(new OnClickListener() {
+        textName = buttonPlayer + 2;
+        textInfo = buttonPlayer + 3;
+        int layoutButtonDelete = buttonPlayer + 4;
+        currentView.findViewById(R.id.buttonPlayVideo).setId(buttonPlayer);
+        currentView.findViewById(R.id.buttonDeleteThis).setId(buttonDeleteThis);
+        currentView.findViewById(buttonPlayer).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 mOpenMediaListener.OpenFile(mPath);
@@ -66,15 +67,15 @@ public class MyVideoView extends View{
     }
     public void setImageView(Bitmap bitmap){
         ((ImageView) currentView.findViewById(R.id.FileThumbnail)).setImageBitmap(bitmap);
-        ((ImageView) currentView.findViewById(R.id.FileThumbnail)).setId(SupportUtils.getRandomID());
+        currentView.findViewById(R.id.FileThumbnail).setId(SupportUtils.getRandomID());
     }
     public void setTextViewName(String name){
         ((TextView) currentView.findViewById(R.id.FileName)).setText(name);
-        ((TextView) currentView.findViewById(R.id.FileName)).setId(textviewName);
+        currentView.findViewById(R.id.FileName).setId(textName);
     }
     public void setTextViewInfor(String infor){
         ((TextView) currentView.findViewById(R.id.FileInfor)).setText(infor);
-        ((TextView) currentView.findViewById(R.id.FileInfor)).setId(textviewInfor);
+        currentView.findViewById(R.id.FileInfor).setId(textInfo);
     }
     public ImageButton getPlayerButton(){
         return ((ImageButton) currentView.findViewById(buttonPlayer));
@@ -84,11 +85,11 @@ public class MyVideoView extends View{
     }
 
     public void showDivider(){
-        ((LinearLayout) currentView.findViewById(R.id.layoutDivider)).setVisibility(View.VISIBLE);
+        currentView.findViewById(R.id.layoutDivider).setVisibility(View.VISIBLE);
     }
 
     public void hideDivider(){
-        ((LinearLayout) currentView.findViewById(R.id.layoutDivider)).setVisibility(View.GONE);
+        currentView.findViewById(R.id.layoutDivider).setVisibility(View.GONE);
     }
 
     public void hideDeleteButton() {

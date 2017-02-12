@@ -9,13 +9,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.horical.appnote.MainActivity;
 import com.horical.appnote.R;
 import com.horical.appnote.ServerStorage.Callback.LoginCallback;
 import com.horical.appnote.ServerStorage.Param.LoginParam;
 import com.horical.appnote.ServerStorage.Response.LoginResponse;
 import com.horical.appnote.ServerStorage.UserRoute;
-import com.horical.appnote.Supports.FileUtils;
 import com.horical.appnote.Supports.LanguageUtils;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -25,8 +23,7 @@ import com.parse.ParseFile;
  */
 public class LoginFragment extends BaseFragment implements Button.OnClickListener {
     private EditText mEdtUsername, mEdtPassword;
-    private Button mBtnLogin, mBtnSignUp, mBtnForgot;
-    private TextView mTvInternetSignal, mTvOr;
+    private TextView mTvInternetSignal;
     private ImageView mImgInternetSignal;
     private LinearLayout mLoginProcessLayout;
 
@@ -53,7 +50,7 @@ public class LoginFragment extends BaseFragment implements Button.OnClickListene
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mTvOr = (TextView) mFragmentView.findViewById(R.id.tvDivider);
+        TextView mTvOr = (TextView) mFragmentView.findViewById(R.id.tvDivider);
         mTvOr.setText(LanguageUtils.getOrString());
 
         mEdtUsername = (EditText) this.mFragmentView.findViewById(R.id.edtUsername);
@@ -62,15 +59,15 @@ public class LoginFragment extends BaseFragment implements Button.OnClickListene
         mEdtPassword = (EditText) this.mFragmentView.findViewById(R.id.edtPassword);
         mEdtPassword.setHint(LanguageUtils.getPasswordString());
 
-        mBtnLogin = (Button) this.mFragmentView.findViewById(R.id.buttonLogin);
+        Button mBtnLogin = (Button) this.mFragmentView.findViewById(R.id.buttonLogin);
         mBtnLogin.setOnClickListener(this);
         mBtnLogin.setText(LanguageUtils.getLoginString().toUpperCase());
 
-        mBtnSignUp = (Button) this.mFragmentView.findViewById(R.id.buttonSignup);
+        Button mBtnSignUp = (Button) this.mFragmentView.findViewById(R.id.buttonSignup);
         mBtnSignUp.setOnClickListener(this);
         mBtnSignUp.setText(LanguageUtils.getSignUpString());
 
-        mBtnForgot = (Button) this.mFragmentView.findViewById(R.id.buttonForgetPassword);
+        Button mBtnForgot = (Button) this.mFragmentView.findViewById(R.id.buttonForgetPassword);
         mBtnForgot.setOnClickListener(this);
         mBtnForgot.setText(LanguageUtils.getForgotPasswordString());
 

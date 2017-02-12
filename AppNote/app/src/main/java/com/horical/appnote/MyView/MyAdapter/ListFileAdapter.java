@@ -1,16 +1,17 @@
 package com.horical.appnote.MyView.MyAdapter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class ListFileAdapter extends ArrayAdapter<FileData> {
     private Activity mActivity;
     private String mCurrentFileType;
     private HashMap<Integer, String> mListGroupItem;
-    String mFlag = "";
+    private String mFlag = "";
 
     private View mHeaderView;
 
@@ -42,16 +43,17 @@ public class ListFileAdapter extends ArrayAdapter<FileData> {
         mOpenMediaInterface = openMediaInterface;
     }
 
+    @SuppressLint("UseSparseArrays")
     public ListFileAdapter(Activity activity, int resource, ArrayList<FileData> listFile, String currentFileType) {
         super(activity, resource, listFile);
         this.mListFile = listFile;
         this.mActivity = activity;
         this.mCurrentFileType = currentFileType;
-        this.mListGroupItem = new HashMap<Integer, String>();
+        this.mListGroupItem = new HashMap<>();
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, @NonNull ViewGroup parent) {
         LayoutInflater inflater = mActivity.getLayoutInflater();
         FileData fileData = mListFile.get(position);
         char c = mListFile.get(position).getFileName().charAt(0);
@@ -78,15 +80,15 @@ public class ListFileAdapter extends ArrayAdapter<FileData> {
                     ((ImageView) convertView.findViewById(R.id.FileThumbnail)).setImageBitmap(thumbnail);
                 }
                 ((TextView) convertView.findViewById(R.id.GroupText)).setText("");
-                ((LinearLayout) convertView.findViewById(R.id.layoutDivider)).setVisibility(View.GONE);
+                convertView.findViewById(R.id.layoutDivider).setVisibility(View.GONE);
                 for (Map.Entry<Integer, String> entry : mListGroupItem.entrySet()) {
                     if (position == entry.getKey()) {
                         ((TextView) convertView.findViewById(R.id.GroupText)).setText(entry.getValue());
-                        ((LinearLayout) convertView.findViewById(R.id.layoutDivider)).setVisibility(View.VISIBLE);
+                        convertView.findViewById(R.id.layoutDivider).setVisibility(View.VISIBLE);
                     }
                 }
                 if (position == 0) {
-                    ((LinearLayout) convertView.findViewById(R.id.layoutDivider)).setVisibility(View.GONE);
+                    convertView.findViewById(R.id.layoutDivider).setVisibility(View.GONE);
                 }
                 ((TextView) convertView.findViewById(R.id.FileName)).setText(SupportUtils.getShortName(fileData.getFileName()));
                 ((TextView) convertView.findViewById(R.id.FileInfor)).setText(SupportUtils.checkFileSize(fileData.getFilePath()));
@@ -104,20 +106,20 @@ public class ListFileAdapter extends ArrayAdapter<FileData> {
                     }
                 });
                 ((TextView) convertView.findViewById(R.id.GroupText)).setText("");
-                ((LinearLayout) convertView.findViewById(R.id.layoutDivider)).setVisibility(View.GONE);
+                convertView.findViewById(R.id.layoutDivider).setVisibility(View.GONE);
                 for (Map.Entry<Integer, String> entry : mListGroupItem.entrySet()) {
                     if (position == entry.getKey()) {
                         ((TextView) convertView.findViewById(R.id.GroupText)).setText(entry.getValue());
-                        ((LinearLayout) convertView.findViewById(R.id.layoutDivider)).setVisibility(View.VISIBLE);
+                        convertView.findViewById(R.id.layoutDivider).setVisibility(View.VISIBLE);
                     }
                 }
                 if (position == 0) {
-                    ((LinearLayout) convertView.findViewById(R.id.layoutDivider)).setVisibility(View.GONE);
+                    convertView.findViewById(R.id.layoutDivider).setVisibility(View.GONE);
                 }
                 ((ImageView) convertView.findViewById(R.id.FileThumbnail)).setImageBitmap(video_thumbnail);
                 ((TextView) convertView.findViewById(R.id.FileName)).setText(SupportUtils.getShortName(fileData.getFileName()));
                 ((TextView) convertView.findViewById(R.id.FileInfor)).setText(fileData.getDescirption());
-                ((LinearLayout) convertView.findViewById(R.id.layoutButtonDelete)).setVisibility(View.GONE);
+                convertView.findViewById(R.id.layoutButtonDelete).setVisibility(View.GONE);
                 break;
             case DataConstant.TYPE_VOICE:
                 if (convertView == null) {
@@ -131,19 +133,19 @@ public class ListFileAdapter extends ArrayAdapter<FileData> {
                     }
                 });
                 ((TextView) convertView.findViewById(R.id.GroupText)).setText("");
-                ((LinearLayout) convertView.findViewById(R.id.layoutDivider)).setVisibility(View.GONE);
+                convertView.findViewById(R.id.layoutDivider).setVisibility(View.GONE);
                 for (Map.Entry<Integer, String> entry : mListGroupItem.entrySet()) {
                     if (position == entry.getKey()) {
                         ((TextView) convertView.findViewById(R.id.GroupText)).setText(entry.getValue());
-                        ((LinearLayout) convertView.findViewById(R.id.layoutDivider)).setVisibility(View.VISIBLE);
+                        convertView.findViewById(R.id.layoutDivider).setVisibility(View.VISIBLE);
                     }
                 }
                 if (position == 0) {
-                    ((LinearLayout) convertView.findViewById(R.id.layoutDivider)).setVisibility(View.GONE);
+                    convertView.findViewById(R.id.layoutDivider).setVisibility(View.GONE);
                 }
                 ((TextView) convertView.findViewById(R.id.FileName)).setText(SupportUtils.getShortName(fileData.getFileName()));
                 ((TextView) convertView.findViewById(R.id.FileInfor)).setText(fileData.getDescirption());
-                ((LinearLayout) convertView.findViewById(R.id.layoutButtonDelete)).setVisibility(View.GONE);
+                convertView.findViewById(R.id.layoutButtonDelete).setVisibility(View.GONE);
                 break;
             default:
                 if (convertView == null) {

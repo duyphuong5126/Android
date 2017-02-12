@@ -28,9 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 /**
  * Created by Phuong on 17/08/2015.
@@ -73,8 +71,6 @@ public abstract class FileUtils {
             bufferedOutputStream.close();
 
             return true;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -115,27 +111,30 @@ public abstract class FileUtils {
     }
 
     public static boolean checkFileIsFromContent(String path) {
-        if (path.contains("/mnt/sdcard/")) return false;
-        return true;
+        return !path.contains("/mnt/sdcard/");
     }
 
     public static String getPath(Uri uri, Activity activity) {
         int currentAPI = Build.VERSION.SDK_INT;
         if (currentAPI > Build.VERSION_CODES.KITKAT) {
             Cursor cursor = activity.getContentResolver().query(uri, null, null, null, null);
-            cursor.moveToFirst();
-            String document_id = cursor.getString(0);
-            document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
-            cursor.close();
-
-            cursor = activity.getContentResolver().query(
-                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
             String path = "";
-            if (cursor != null && cursor.moveToFirst()) {
-                path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+            if (cursor != null) {
+                cursor.moveToFirst();
+                String document_id = cursor.getString(0);
+                document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
+                cursor.close();
+
+                cursor = activity.getContentResolver().query(
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+                if (cursor != null && cursor.moveToFirst()) {
+                    path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+                }
+                if (cursor != null) {
+                    cursor.close();
+                }
             }
-            cursor.close();
 
             return path;
         } else {
@@ -144,7 +143,7 @@ public abstract class FileUtils {
             activity.startManagingCursor(cursor);
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             String path ="";
-            if (cursor != null && cursor.moveToFirst()) {
+            if (cursor.moveToFirst()) {
                 path =  cursor.getString(column_index);
             }
             return path;
@@ -168,7 +167,7 @@ public abstract class FileUtils {
     public static String getStringFromStream(InputStream stream) {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
         StringBuilder builder = new StringBuilder();
-        String line = null;
+        String line;
         try {
             while ((line = bufferedReader.readLine()) != null) {
                 builder.append(line).append("\n");
@@ -210,7 +209,7 @@ public abstract class FileUtils {
         return false;
     }
 
-    public static String loadStringFileUploadLog(Activity activity) {
+    private static String loadStringFileUploadLog(Activity activity) {
         String result = "";
         try {
             InputStream inputStream = activity.openFileInput("UploadFileLog.txt");
@@ -218,14 +217,12 @@ public abstract class FileUtils {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                 StringBuilder builder = new StringBuilder();
-                String temp = "";
+                String temp;
                 while ((temp = bufferedReader.readLine()) != null) {
                     builder.append(temp);
                 }
                 result = builder.toString();
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -254,8 +251,10 @@ public abstract class FileUtils {
                 int read;
                 byte[] buffer = new byte[1024];
                 try {
-                    while ((read = bufferedInputStream.read(buffer)) > 0) {
-                        stream.write(buffer, 0, read);
+                    if (bufferedInputStream != null) {
+                        while ((read = bufferedInputStream.read(buffer)) > 0) {
+                            stream.write(buffer, 0, read);
+                        }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

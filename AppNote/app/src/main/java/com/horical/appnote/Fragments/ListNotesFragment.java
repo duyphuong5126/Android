@@ -1,5 +1,6 @@
 package com.horical.appnote.Fragments;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import com.horical.appnote.DTO.NoteDTO.NoteData;
 import com.horical.appnote.DTO.NoteDTO.NoteImage;
@@ -53,7 +55,6 @@ public class ListNotesFragment extends BaseFragment implements ImageButton.OnCli
     private ArrayList<String> mNotesContextMenu;
     private NoteDataDAO mNoteDataDAO;
 
-    private FrameLayout mLayoutBanner;
     private ScrollView mScrollParent;
 
     private LinearLayout mLayoutSearch, mLayoutSearchHolder;
@@ -80,9 +81,7 @@ public class ListNotesFragment extends BaseFragment implements ImageButton.OnCli
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mNotesContextMenu = new ArrayList<>();
-        for (String string : LanguageUtils.getListNoteMenu()) {
-            mNotesContextMenu.add(string);
-        }
+        Collections.addAll(mNotesContextMenu, LanguageUtils.getListNoteMenu());
         mListTips = new ArrayList<>();
     }
 
@@ -160,7 +159,7 @@ public class ListNotesFragment extends BaseFragment implements ImageButton.OnCli
         this.reLoadListNote();
         registerForContextMenu(mListNote);
 
-        mLayoutBanner = (FrameLayout) mFragmentView.findViewById(R.id.layoutBanner);
+        FrameLayout mLayoutBanner = (FrameLayout) mFragmentView.findViewById(R.id.layoutBanner);
         mLayoutBanner.requestLayout();
         mScrollParent = (ScrollView) mFragmentView.findViewById(R.id.scrollParent);
         mScrollParent.smoothScrollTo(0, 0);
@@ -168,15 +167,11 @@ public class ListNotesFragment extends BaseFragment implements ImageButton.OnCli
         int banner_id = CalendarUtils.checkTimeStamp();
         for (int i = 0; i < mListTips.size(); i++) {
             if (i == banner_id) {
-                ((LinearLayout) mFragmentView.findViewById(mListTips.get(i))).setVisibility(View.VISIBLE);
+                mFragmentView.findViewById(mListTips.get(i)).setVisibility(View.VISIBLE);
             } else {
-                ((LinearLayout) mFragmentView.findViewById(mListTips.get(i))).setVisibility(View.GONE);
+                mFragmentView.findViewById(mListTips.get(i)).setVisibility(View.GONE);
             }
         }
-    }
-
-    private void reloadResource() {
-
     }
 
     @Override
@@ -203,10 +198,10 @@ public class ListNotesFragment extends BaseFragment implements ImageButton.OnCli
 
     public void reLoadListNote(){
         if (mListNoteData == null) {
-            mListNoteData = new ArrayList<NoteData>();
+            mListNoteData = new ArrayList<>();
         }
         if (mSource == null) {
-            mSource = new ArrayList<NoteData>();
+            mSource = new ArrayList<>();
         }
         mSource.clear();
         mListNoteData.clear();
@@ -251,9 +246,9 @@ public class ListNotesFragment extends BaseFragment implements ImageButton.OnCli
             mMainInterface.PassEditInfo(noteData);
         }
         if (item.getTitle().toString().equals(LanguageUtils.getDeleteString())) {
-            String message = "";
+            String message;
             if (mNoteDataDAO.deleteNote(noteData.getNoteSummary().getID())){
-                ArrayList<String> filePaths = new ArrayList<String>();
+                ArrayList<String> filePaths = new ArrayList<>();
                 for (NoteDataLine noteLine : noteData.getNoteData()) {
                     switch (noteLine.typeIdentify()) {
                         case DataConstant.TYPE_IMAGE:
@@ -308,6 +303,7 @@ public class ListNotesFragment extends BaseFragment implements ImageButton.OnCli
     }
 
     private View getEmptyListView(){
+        @SuppressLint("InflateParams")
         View view = mActivity.getLayoutInflater().inflate(R.layout.list_empty, null);
         ((TextView) view.findViewById(R.id.tvEmptyList)).setText(LanguageUtils.getNothingListNoteString());
         return view;
@@ -348,7 +344,9 @@ public class ListNotesFragment extends BaseFragment implements ImageButton.OnCli
     private void hideSoftKeyboard() {
         View view = mActivity.getCurrentFocus();
         InputMethodManager input = (InputMethodManager) this.mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-        input.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        if (view != null) {
+            input.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
 }

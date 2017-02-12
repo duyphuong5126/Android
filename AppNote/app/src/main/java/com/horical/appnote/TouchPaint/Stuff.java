@@ -6,17 +6,17 @@ import android.graphics.Path;
 /**
  * Created by Phuong on 16/07/2015.
  */
-public class Stuff {
+class Stuff {
     private Paint paint;
     private Path path;
     private boolean Visible;
-    public Stuff(){
+    Stuff(){
         paint = new Paint();
         path = new Path();
         Visible = true;
     }
 
-    public void setPaint(Paint paint) {
+    void setPaint(Paint paint) {
         this.paint = paint;
     }
 
@@ -24,7 +24,7 @@ public class Stuff {
         this.path = path;
     }
 
-    public Paint getPaint() {
+    Paint getPaint() {
         return paint;
     }
 

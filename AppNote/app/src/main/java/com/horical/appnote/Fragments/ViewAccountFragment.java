@@ -30,8 +30,7 @@ public class ViewAccountFragment extends BaseFragment implements View.OnClickLis
     private String mUserName, mEmail, mAvatar, mUserId;
 
     private TextView mTvUsername, mTvEmail;
-    private EditText mEdtOldPassword, mEdtNewPasword;
-    private Button mBtnChangePassword, mBtnSaveChangePassword;
+    private EditText mEdtOldPassword, mEdtNewPassword;
 
     private RoundImageView mAvatarView;
 
@@ -58,14 +57,14 @@ public class ViewAccountFragment extends BaseFragment implements View.OnClickLis
         mEdtOldPassword = (EditText) mFragmentView.findViewById(R.id.edtOldPassword);
         mEdtOldPassword.setHint(LanguageUtils.getOldPasswordString());
 
-        mEdtNewPasword = (EditText) mFragmentView.findViewById(R.id.edtNewPassword);
-        mEdtNewPasword.setHint(LanguageUtils.getNewPasswordString());
+        mEdtNewPassword = (EditText) mFragmentView.findViewById(R.id.edtNewPassword);
+        mEdtNewPassword.setHint(LanguageUtils.getNewPasswordString());
 
-        mBtnChangePassword = (Button) mFragmentView.findViewById(R.id.buttonChangePassword);
+        Button mBtnChangePassword = (Button) mFragmentView.findViewById(R.id.buttonChangePassword);
         mBtnChangePassword.setOnClickListener(this);
         mBtnChangePassword.setText(LanguageUtils.getChangePasswordString());
 
-        mBtnSaveChangePassword = (Button) mFragmentView.findViewById(R.id.buttonSaveChangePassword);
+        Button mBtnSaveChangePassword = (Button) mFragmentView.findViewById(R.id.buttonSaveChangePassword);
         mBtnSaveChangePassword.setOnClickListener(this);
         mBtnSaveChangePassword.setText(LanguageUtils.getSaveChangesString().toUpperCase());
 
@@ -105,7 +104,7 @@ public class ViewAccountFragment extends BaseFragment implements View.OnClickLis
             case R.id.buttonSaveChangePassword:
                 if (mMainInterface.checkInternetAvailable()) {
                     String oldPassword = mEdtOldPassword.getText().toString();
-                    String newPassword = mEdtNewPasword.getText().toString();
+                    String newPassword = mEdtNewPassword.getText().toString();
                     doChangePassword(oldPassword, newPassword);
                 } else {
                     Toast.makeText(mActivity, LanguageUtils.getInternetOfflineString(), Toast.LENGTH_SHORT).show();
@@ -151,6 +150,8 @@ public class ViewAccountFragment extends BaseFragment implements View.OnClickLis
     private void hideSoftKeyboard() {
         View view = mActivity.getCurrentFocus();
         InputMethodManager input = (InputMethodManager) this.mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-        input.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        if (view != null) {
+            input.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 }

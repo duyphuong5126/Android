@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -22,13 +23,10 @@ public class AddReminderDialog extends Dialog implements View.OnClickListener, T
         ChooseReminderVoiceDialog.Callback
 {
 
-    private DisplayMetrics mDisplayMetrics;
     private TextView mDateTextView, mTimeTextView, mVoiceTextView;
-    private TextView mTimeTextViewTitle, mDateTextViewTitle;
-    private Button mCancelButton, mOKButton, mGetVoiceButton;
-    private EditText mContentEdittext;
+    private EditText mContentEditText;
     private NoteReminder mNoteReminder;
-    public Callback mCallback;
+    private Callback mCallback;
     private ReminderCallback mReminderCallback;
 
     public static boolean isReminderForNote = false;
@@ -53,29 +51,32 @@ public class AddReminderDialog extends Dialog implements View.OnClickListener, T
         init();
     }
 
-    public void init() {
-        mDisplayMetrics = getContext().getResources().getDisplayMetrics();
+    private void init() {
+        DisplayMetrics mDisplayMetrics = getContext().getResources().getDisplayMetrics();
 
-        mTimeTextViewTitle = (TextView) findViewById(R.id.timeTextViewTitle);
+        TextView mTimeTextViewTitle = (TextView) findViewById(R.id.timeTextViewTitle);
         mTimeTextViewTitle.setText(LanguageUtils.getTimeString());
 
-        mDateTextViewTitle = (TextView) findViewById(R.id.dateTextViewTitle);
+        TextView mDateTextViewTitle = (TextView) findViewById(R.id.dateTextViewTitle);
         mDateTextViewTitle.setText(LanguageUtils.getDateString());
 
-        this.getWindow().setLayout(mDisplayMetrics.widthPixels, LinearLayout.LayoutParams.WRAP_CONTENT);
+        Window window = this.getWindow();
+        if (window != null) {
+            window.setLayout(mDisplayMetrics.widthPixels, LinearLayout.LayoutParams.WRAP_CONTENT);
+        }
         mDateTextView = (TextView) findViewById(R.id.dateTextView);
         mTimeTextView = (TextView) findViewById(R.id.timeTextView);
         mVoiceTextView= (TextView) findViewById(R.id.VoiceName);
 
-        mCancelButton = (Button) findViewById(R.id.dialog_add_reminder_cancel);
+        Button mCancelButton = (Button) findViewById(R.id.dialog_add_reminder_cancel);
         mCancelButton.setText(LanguageUtils.getCancelString());
 
-        mOKButton = (Button) findViewById(R.id.dialog_add_reminder_ok);
+        Button mOKButton = (Button) findViewById(R.id.dialog_add_reminder_ok);
 
-        mContentEdittext = (EditText) findViewById(R.id.dialog_add_reminder_content);
-        mContentEdittext.setHint(LanguageUtils.getContentString());
+        mContentEditText = (EditText) findViewById(R.id.dialog_add_reminder_content);
+        mContentEditText.setHint(LanguageUtils.getContentString());
 
-        mGetVoiceButton = (Button) findViewById(R.id.BrowseVoice);
+        Button mGetVoiceButton = (Button) findViewById(R.id.BrowseVoice);
         mGetVoiceButton.setText(LanguageUtils.getBrowseVoiceString());
         mGetVoiceButton.setOnClickListener(this);
         mCancelButton.setOnClickListener(this);
@@ -97,7 +98,7 @@ public class AddReminderDialog extends Dialog implements View.OnClickListener, T
                 break;
             case R.id.dialog_add_reminder_ok:
                 mNoteReminder.setTimeComplete(mDateTextView.getText() + " " + mTimeTextView.getText());
-                mNoteReminder.setContent(mContentEdittext.getText().toString());
+                mNoteReminder.setContent(mContentEditText.getText().toString());
                 mNoteReminder.setStatus(1);
                 if (!isReminderForNote){
                     boolean result = mCallback.addReminder(mNoteReminder);

@@ -1,8 +1,10 @@
 package com.horical.appnote.MyView.MyAdapter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +30,6 @@ public class CalendarAdapter extends ArrayAdapter {
     private Activity mActivity;
     private int mLayoutId;
     private ArrayList<CalendarObject> mArrayList;
-    private NoteReminder mNoteReminder;
     private List<NoteReminder> mListNoteReminders;
 
     public CalendarAdapter(Activity context, int layoutId, ArrayList<CalendarObject> arrayList) {
@@ -36,11 +37,13 @@ public class CalendarAdapter extends ArrayAdapter {
         this.mActivity = context;
         this.mLayoutId = layoutId;
         this.mArrayList = arrayList;
-        this.mListNoteReminders = new ArrayList<NoteReminder>();
+        this.mListNoteReminders = new ArrayList<>();
     }
 
+    @SuppressLint("SetTextI18n")
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         LayoutInflater inflater = mActivity.getLayoutInflater();
         convertView = inflater.inflate(mLayoutId, null);
         CalendarObject obj = mArrayList.get(position);
@@ -55,7 +58,8 @@ public class CalendarAdapter extends ArrayAdapter {
             tv.setTextColor(Color.BLACK);
         }
         for (int i = 0; i < mListNoteReminders.size(); i++) {
-            mNoteReminder = mListNoteReminders.get(i);
+            NoteReminder mNoteReminder = mListNoteReminders.get(i);
+            @SuppressLint("SimpleDateFormat")
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             try {
                 Date d = sdf.parse(mNoteReminder.getTimeComplete());

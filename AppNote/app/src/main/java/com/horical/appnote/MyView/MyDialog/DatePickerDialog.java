@@ -14,18 +14,16 @@ import com.horical.appnote.Supports.LanguageUtils;
 /**
  * Created by trandu on 12/08/2015.
  */
-public class DatePickerDialog extends Dialog implements View.OnClickListener {
+class DatePickerDialog extends Dialog implements View.OnClickListener {
 
     private DatePicker mDatePicker;
-    private Button mCancelButton;
-    private Button mOKButton;
     private Callback mCallback;
 
     public DatePickerDialog(Context context) {
         super(context);
     }
 
-    public DatePickerDialog(Context context, int theme) {
+    DatePickerDialog(Context context, int theme) {
         super(context, theme);
     }
 
@@ -41,10 +39,10 @@ public class DatePickerDialog extends Dialog implements View.OnClickListener {
         init();
     }
 
-    public void init() {
+    private void init() {
         mDatePicker = (DatePicker) findViewById(R.id.datePicker);
-        mCancelButton = (Button) findViewById(R.id.btn_cancel);
-        mOKButton = (Button) findViewById(R.id.btn_ok);
+        Button mCancelButton = (Button) findViewById(R.id.btn_cancel);
+        Button mOKButton = (Button) findViewById(R.id.btn_ok);
         mCancelButton.setOnClickListener(this);
         mOKButton.setOnClickListener(this);
     }

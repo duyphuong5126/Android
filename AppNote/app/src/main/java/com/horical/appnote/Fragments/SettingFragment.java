@@ -17,8 +17,8 @@ import com.horical.appnote.Supports.LanguageUtils;
  * Created by Phuong on 30/07/2015.
  */
 public class SettingFragment extends BaseFragment {
-    private LinearLayout mLayoutSettingAccount, mLayoutSettingLanguage, mLayoutUseGuide;
-    private Switch mChooseSaveOnExit;
+    private LinearLayout mLayoutSettingLanguage;
+    private LinearLayout mLayoutUseGuide;
     private TextView mTvCurrentUser, mTvCurrentLanguage;
     private TextView mTvCurrentUserTitle, mTvCurrentLanguageTitle, mTvUseGuideTitle, mTvAutoSaveTitle;
 
@@ -37,7 +37,7 @@ public class SettingFragment extends BaseFragment {
         mTvUseGuideTitle = (TextView) mFragmentView.findViewById(R.id.tvHowToUseTitle);
         mTvAutoSaveTitle = (TextView) mFragmentView.findViewById(R.id.tvAutoSave);
 
-        mLayoutSettingAccount = (LinearLayout) mFragmentView.findViewById(R.id.layoutSettingAccount);
+        LinearLayout mLayoutSettingAccount = (LinearLayout) mFragmentView.findViewById(R.id.layoutSettingAccount);
         mLayoutSettingAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,7 +70,7 @@ public class SettingFragment extends BaseFragment {
         });
         mLayoutUseGuide = (LinearLayout) mFragmentView.findViewById(R.id.layoutUseGuide);
 
-        mChooseSaveOnExit = (Switch) mFragmentView.findViewById(R.id.chooseSaveOnExit);
+        Switch mChooseSaveOnExit = (Switch) mFragmentView.findViewById(R.id.chooseSaveOnExit);
         mChooseSaveOnExit.setChecked(ApplicationSharedData.isAutoSave());
         mChooseSaveOnExit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

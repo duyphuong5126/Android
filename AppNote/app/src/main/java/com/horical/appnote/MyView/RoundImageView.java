@@ -28,7 +28,7 @@ public class RoundImageView extends ImageView {
         if (getDrawable() == null || getWidth() == 0 || getHeight() == 0) return;
         Bitmap drawable = ((BitmapDrawable) getDrawable()).getBitmap();
         Bitmap src = drawable.copy(Bitmap.Config.ARGB_8888, true);
-        Bitmap roundedBitmap = RoundImageView.getRoundeditmap(src, (getWidth() >= getHeight()) ? getHeight() : getWidth());
+        Bitmap roundedBitmap = RoundImageView.getRoundedBitmap(src, (getWidth() >= getHeight()) ? getHeight() : getWidth());
         canvas.drawColor(((ColorDrawable) getBackground()).getColor());
         canvas.drawBitmap(roundedBitmap, (getWidth() - roundedBitmap.getWidth()) / 2, (getHeight() - roundedBitmap.getHeight()) / 2, null);
     }
@@ -38,8 +38,8 @@ public class RoundImageView extends ImageView {
         return super.isInEditMode();
     }
 
-    public static Bitmap getRoundeditmap(Bitmap src, int radius) {
-        Bitmap roundBitmap = null;
+    public static Bitmap getRoundedBitmap(Bitmap src, int radius) {
+        Bitmap roundBitmap;
         roundBitmap = (src.getWidth() == radius || src.getHeight() == radius) ? src : Bitmap.createScaledBitmap(src, radius, radius, false);
         Bitmap des = Bitmap.createBitmap(roundBitmap.getWidth(), roundBitmap.getHeight(), Bitmap.Config.ARGB_8888);
 

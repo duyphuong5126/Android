@@ -1,5 +1,6 @@
 package com.horical.appnote.TouchPaint;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -53,6 +54,7 @@ public class ColorPicker extends Dialog {
         private boolean mTrackingCenter;
         private boolean mHighlightCenter;
 
+        @SuppressLint("DrawAllocation")
         @Override
         protected void onDraw(Canvas canvas) {
             float r = CENTER_X - mPaint.getStrokeWidth() * 0.5f;
@@ -92,8 +94,7 @@ public class ColorPicker extends Dialog {
         private static final int CENTER_RADIUS = 32;
 
         private int floatToByte(float x) {
-            int n = Math.round(x);
-            return n;
+            return Math.round(x);
         }
 
         private int pinToByte(int n) {
@@ -204,16 +205,16 @@ public class ColorPicker extends Dialog {
         }
     }
 
-    public ColorPicker(Context context,
-                       OnColorChangedListener listener,
-                       int initialColor) {
+    ColorPicker(Context context,
+                OnColorChangedListener listener,
+                int initialColor) {
         super(context);
 
         mListener = listener;
         mInitialColor = initialColor;
     }
 
-    public View getColorPickerView() {
+    View getColorPickerView() {
         OnColorChangedListener l = new OnColorChangedListener() {
             public void colorChanged(int color) {
                 mListener.colorChanged(color);

@@ -67,9 +67,7 @@ public class FilesManagerFragment extends BaseFragment implements MediaChooserDi
     private MediaChooserDialog mMediaChooser;
 
     private LinearLayout mLayoutImageView;
-    private FrameLayout mLayoutSelectedImage;
     private ImageView mIvSelectedImage;
-    private ImageButton mBtnNextImage, mBtnPreviousImage, mBtnSlideShow, mBtnCloseImageViewer;
 
     private static int mCurrentSelectedImage;
 
@@ -92,13 +90,13 @@ public class FilesManagerFragment extends BaseFragment implements MediaChooserDi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mListFile = new ArrayList<FileData>();
+        mListFile = new ArrayList<>();
 
-        mListImageAlphabet = new ArrayList<String>();
-        mListVideoAlphabet = new ArrayList<String>();
-        mListAudioAlphabet = new ArrayList<String>();
+        mListImageAlphabet = new ArrayList<>();
+        mListVideoAlphabet = new ArrayList<>();
+        mListAudioAlphabet = new ArrayList<>();
 
-        mListBitmap = new HashMap<String, Bitmap>();
+        mListBitmap = new HashMap<>();
     }
 
     @Override
@@ -109,17 +107,17 @@ public class FilesManagerFragment extends BaseFragment implements MediaChooserDi
         mLayoutTabsControl = (LinearLayout) mFragmentView.findViewById(R.id.layoutTabsControl);
 
         mLayoutImageView = (LinearLayout) mFragmentView.findViewById(R.id.layoutViewImage);
-        mLayoutSelectedImage = (FrameLayout) mFragmentView.findViewById(R.id.layoutSelectedImage);
+        FrameLayout mLayoutSelectedImage = (FrameLayout) mFragmentView.findViewById(R.id.layoutSelectedImage);
         mLayoutSelectedImage.setOnClickListener(this);
         mIvSelectedImage = (ImageView) mFragmentView.findViewById(R.id.selectedImage);
         mIvSelectedImage.setOnClickListener(this);
-        mBtnNextImage = (ImageButton) mFragmentView.findViewById(R.id.buttonImageNext);
+        ImageButton mBtnNextImage = (ImageButton) mFragmentView.findViewById(R.id.buttonImageNext);
         mBtnNextImage.setOnClickListener(this);
-        mBtnPreviousImage = (ImageButton) mFragmentView.findViewById(R.id.buttonImageBefore);
+        ImageButton mBtnPreviousImage = (ImageButton) mFragmentView.findViewById(R.id.buttonImageBefore);
         mBtnPreviousImage.setOnClickListener(this);
-        mBtnSlideShow = (ImageButton) mFragmentView.findViewById(R.id.buttonImageSlideShow);
+        ImageButton mBtnSlideShow = (ImageButton) mFragmentView.findViewById(R.id.buttonImageSlideShow);
         mBtnSlideShow.setOnClickListener(this);
-        mBtnCloseImageViewer = (ImageButton) mFragmentView.findViewById(R.id.buttonCloseImageViewer);
+        ImageButton mBtnCloseImageViewer = (ImageButton) mFragmentView.findViewById(R.id.buttonCloseImageViewer);
         mBtnCloseImageViewer.setOnClickListener(this);
 
         mMediaChooser = new MediaChooserDialog(mActivity);
@@ -158,7 +156,7 @@ public class FilesManagerFragment extends BaseFragment implements MediaChooserDi
         mLvVideoAlphabets = (ListView) mFragmentView.findViewById(R.id.ListVideoAlphabet);
         mLvAudioAlphabets = (ListView) mFragmentView.findViewById(R.id.ListAudioAlphabet);
 
-        mAlphabetAdapter = new ArrayAdapter<String>(mActivity, R.layout.list_alphabet, mListImageAlphabet);
+        mAlphabetAdapter = new ArrayAdapter<>(mActivity, R.layout.list_alphabet, mListImageAlphabet);
 
         mLvImageAlphabets.setAdapter(mAlphabetAdapter);
         mLvImageAlphabets.setOnItemClickListener(this);
@@ -179,7 +177,7 @@ public class FilesManagerFragment extends BaseFragment implements MediaChooserDi
 
             @Override
             public void afterTextChanged(Editable editable) {
-                String search_type = "";
+                String search_type;
                 switch (mTabsControl.getCheckedRadioButtonId()) {
                     case R.id.buttonImage:
                         search_type = DataConstant.TYPE_IMAGE;
@@ -362,7 +360,7 @@ public class FilesManagerFragment extends BaseFragment implements MediaChooserDi
                 }
 
                 sortListAlphabet();
-                mAlphabetAdapter = new ArrayAdapter<String>(mActivity, R.layout.list_alphabet, mListImageAlphabet);
+                mAlphabetAdapter = new ArrayAdapter<>(mActivity, R.layout.list_alphabet, mListImageAlphabet);
                 mLvImageAlphabets.setAdapter(mAlphabetAdapter);
                 mFileAdapter.notifyDataSetChanged();
             }
@@ -440,7 +438,6 @@ public class FilesManagerFragment extends BaseFragment implements MediaChooserDi
         AsyncTask<Void, FileData, Void> asyncTask = new AsyncTask<Void, FileData, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                String flag = "";
                 for (FileData fileData : mMainInterface.getAllFiles(DataConstant.TYPE_VOICE)) {
                     publishProgress(fileData);
                 }
@@ -475,7 +472,7 @@ public class FilesManagerFragment extends BaseFragment implements MediaChooserDi
                 }
 
                 sortListAlphabet();
-                mAlphabetAdapter = new ArrayAdapter<String>(mActivity, R.layout.list_alphabet, mListAudioAlphabet);
+                mAlphabetAdapter = new ArrayAdapter<>(mActivity, R.layout.list_alphabet, mListAudioAlphabet);
                 mLvAudioAlphabets.setAdapter(mAlphabetAdapter);
                 mFileAdapter.notifyDataSetChanged();
             }
@@ -554,7 +551,7 @@ public class FilesManagerFragment extends BaseFragment implements MediaChooserDi
                     isSearchImage = false;
                     isNewImageList = false;
                 }
-                mAlphabetAdapter = new ArrayAdapter<String>(mActivity, R.layout.list_alphabet, mListImageAlphabet);
+                mAlphabetAdapter = new ArrayAdapter<>(mActivity, R.layout.list_alphabet, mListImageAlphabet);
                 mLvImageAlphabets.setAdapter(mAlphabetAdapter);
                 mLvImageAlphabets.setOnItemClickListener(this);
                 break;
@@ -570,7 +567,7 @@ public class FilesManagerFragment extends BaseFragment implements MediaChooserDi
                     isSearchVideo = false;
                     isNewVideoList = false;
                 }
-                mAlphabetAdapter = new ArrayAdapter<String>(mActivity, R.layout.list_alphabet, mListVideoAlphabet);
+                mAlphabetAdapter = new ArrayAdapter<>(mActivity, R.layout.list_alphabet, mListVideoAlphabet);
                 mLvVideoAlphabets.setAdapter(mAlphabetAdapter);
                 mLvVideoAlphabets.setOnItemClickListener(this);
                 break;
@@ -586,7 +583,7 @@ public class FilesManagerFragment extends BaseFragment implements MediaChooserDi
                     isSearchAudio = false;
                     isNewAudioList = false;
                 }
-                mAlphabetAdapter = new ArrayAdapter<String>(mActivity, R.layout.list_alphabet, mListAudioAlphabet);
+                mAlphabetAdapter = new ArrayAdapter<>(mActivity, R.layout.list_alphabet, mListAudioAlphabet);
                 mLvAudioAlphabets.setAdapter(mAlphabetAdapter);
                 mLvAudioAlphabets.setOnItemClickListener(this);
                 break;
@@ -685,9 +682,11 @@ public class FilesManagerFragment extends BaseFragment implements MediaChooserDi
                 source = mMainInterface.getAllFiles(DataConstant.TYPE_VOICE);
                 break;
         }
-        for (FileData data : source) {
-            if (data.getFileName().contains(name)) {
-                mListFile.add(data);
+        if (source != null) {
+            for (FileData data : source) {
+                if (data.getFileName().contains(name)) {
+                    mListFile.add(data);
+                }
             }
         }
     }

@@ -5,10 +5,10 @@ import android.graphics.Color;
 /**
  * Created by Phuong on 17/07/2015.
  */
-public class ColorUtil {
+class ColorUtil {
     private int RedChannel, GreenChannel, BlueChannel;
 
-    public ColorUtil(){
+    ColorUtil(){
         RedChannel = GreenChannel = BlueChannel = 0;
     }
     public ColorUtil(int r, int g, int b){
@@ -29,25 +29,25 @@ public class ColorUtil {
         return RedChannel;
     }
 
-    public void setBlueChannel(int blueChannel) {
+    private void setBlueChannel(int blueChannel) {
         BlueChannel = blueChannel;
     }
 
-    public void setGreenChannel(int greenChannel) {
+    private void setGreenChannel(int greenChannel) {
         GreenChannel = greenChannel;
     }
 
-    public void setRedChannel(int redChannel) {
+    private void setRedChannel(int redChannel) {
         RedChannel = redChannel;
     }
 
-    public void setRGB(int redChannel, int greenChannel, int blueChannel){
+    void setRGB(int redChannel, int greenChannel, int blueChannel){
         this.setRedChannel(redChannel);
         this.setGreenChannel(greenChannel);
         this.setBlueChannel(blueChannel);
     }
 
-    public int getRGB(){
+    int getRGB(){
         return Color.rgb(RedChannel, GreenChannel, BlueChannel);
     }
 
@@ -56,7 +56,7 @@ public class ColorUtil {
         return "RGB("+RedChannel+", "+GreenChannel+", "+BlueChannel+")";
     }
 
-    public int changeColorByChannel(int value, int channel){
+    int changeColorByChannel(int value, int channel){
         switch (channel){
             case Color.RED:
                 this.setRedChannel(value);

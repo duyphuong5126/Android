@@ -8,8 +8,6 @@ import android.view.MotionEvent;
  */
 public class GestureListener extends GestureDetector.SimpleOnGestureListener {
 
-    public static final String TAG = GestureListener.class.getSimpleName();
-
     private Callback mCallback;
 
 

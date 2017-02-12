@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import java.util.HashMap;
@@ -23,7 +24,7 @@ public class ApplicationStorage extends ContentProvider {
     private static final String NOTE_URI = "content://" + PROVIDER_NAME + "/notes";
     private static final Uri uriNOTE = Uri.parse(NOTE_URI);
     private static final String NOTE_DETAILS_URI = "content://" + PROVIDER_NAME + "/note_details";
-    private static final Uri uriNOTEDETAILS = Uri.parse(NOTE_DETAILS_URI);
+    private static final Uri uriNOTE_DETAILS = Uri.parse(NOTE_DETAILS_URI);
     private static final String NOTE_REMINDERS_URI = "content://" + PROVIDER_NAME + "/note_reminders";
 
 
@@ -47,7 +48,7 @@ public class ApplicationStorage extends ContentProvider {
     }
 
     public static class NoteTable {
-        public static final String TABLE_NAME = "Note";
+        static final String TABLE_NAME = "Note";
 
         public static final String ID = "_id";
         public static final String TITLE = "Title";
@@ -58,11 +59,11 @@ public class ApplicationStorage extends ContentProvider {
         public static final String UPLOADED = "Uploaded";
         public static final String SCHEDULED = "Scheduled";
 
-        public static final int NOTE = 1;
-        public static final int NOTE_ID = 2;
+        static final int NOTE = 1;
+        static final int NOTE_ID = 2;
         public static final int NOTE_STATUS = 3;
 
-        public static final String CREATE_DB_TABLE =
+        static final String CREATE_DB_TABLE =
                 "CREATE TABLE " + TABLE_NAME +
                         " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         "Title TEXT NOT NULL, " +
@@ -73,34 +74,34 @@ public class ApplicationStorage extends ContentProvider {
                         "Scheduled TEXT NOT NULL," +
                         "Uploaded TEXT NOT NULL);";
 
-        public static HashMap<String, String> PROJECTION_MAP;
+        static HashMap<String, String> PROJECTION_MAP;
     }
 
     public static class NoteDetailsTable {
-        public static final String TABLE_NAME = "NoteDetails";
+        static final String TABLE_NAME = "NoteDetails";
 
         public static final String ID = "_id";
         public static final String NOTE_ID = "NoteID";
         public static final String TYPE = "Type";
         public static final String CONTENT = "Content";
 
-        public static final String CREATE_DB_TABLE =
+        static final String CREATE_DB_TABLE =
                 "CREATE TABLE " + TABLE_NAME +
                         " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         "NoteID INTEGER NOT NULL, " +
                         "Type TEXT NOT NULL, " +
                         "Content TEXT NOT NULL);";
 
-        public static final int NOTE_DETAILS = 3;
-        public static final int NOTE_DETAILS_ID = 4;
-        public static final int NOTE_DETAILS_BY_NOTE_ID = 5;
+        static final int NOTE_DETAILS = 3;
+        static final int NOTE_DETAILS_ID = 4;
+        static final int NOTE_DETAILS_BY_NOTE_ID = 5;
 
-        public static HashMap<String, String> PROJECTION_MAP;
+        static HashMap<String, String> PROJECTION_MAP;
 
     }
 
     public static class NoteReminderTable{
-        public static final String TABLE_NAME = "NoteReminders";
+        static final String TABLE_NAME = "NoteReminders";
 
         public static final String ID = "_id";
         public static final String TIME = "Time";
@@ -110,7 +111,7 @@ public class ApplicationStorage extends ContentProvider {
         public static final String REMIND_VOICE = "Voice";
         public static final String UPLOADED = "Uploaded";
 
-        public static final String CREATE_DB_TABLE =
+        static final String CREATE_DB_TABLE =
                 "CREATE TABLE " + TABLE_NAME +
                         " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         "Time TEXT NOT NULL, " +
@@ -120,16 +121,16 @@ public class ApplicationStorage extends ContentProvider {
                         "Voice TEXT NOT NULL," +
                         "Uploaded TEXT NOT NULL);";
 
-        public static final int NOTE_REMINDERS = 6;
-        public static final int NOTE_REMINDERS_ID = 7;
-        public static final int NOTE_REMINDERS_BY_TIME = 8;
+        static final int NOTE_REMINDERS = 6;
+        static final int NOTE_REMINDERS_ID = 7;
+        static final int NOTE_REMINDERS_BY_TIME = 8;
 
-        public static HashMap<String, String> PROJECTION_MAP;
+        static HashMap<String, String> PROJECTION_MAP;
     }
 
     private static class DatabaseHelper extends SQLiteOpenHelper {
 
-        public DatabaseHelper(Context context) {
+        DatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
         }
 
@@ -158,7 +159,7 @@ public class ApplicationStorage extends ContentProvider {
     }
 
     @Override
-    public Cursor query(Uri uri, String[] strings, String s, String[] strings2, String s2) {
+    public Cursor query(@NonNull Uri uri, String[] strings, String s, String[] strings2, String s2) {
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
         switch (uriMatcher.match(uri)) {
             case NoteTable.NOTE:
@@ -194,12 +195,15 @@ public class ApplicationStorage extends ContentProvider {
         }
 
         Cursor cursor = queryBuilder.query(AppNoteDatabase, strings, s, strings2, null, null, s2);
-        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        Context context = getContext();
+        if (context != null) {
+            cursor.setNotificationUri(context.getContentResolver(), uri);
+        }
         return cursor;
     }
 
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         switch (uriMatcher.match(uri)) {
             case NoteTable.NOTE:
                 return "vnd.android.cursor.dir/vnd.duyphuong.notes";
@@ -215,29 +219,36 @@ public class ApplicationStorage extends ContentProvider {
     }
 
     @Override
-    public Uri insert(Uri uri, ContentValues contentValues) {
-        long insertedRow = 0;
+    public Uri insert(@NonNull Uri uri, ContentValues contentValues) {
+        long insertedRow;
         Uri _uri = null;
+        Context context = getContext();
         switch (uriMatcher.match(uri)) {
             case NoteTable.NOTE:
                 insertedRow = AppNoteDatabase.insert(NoteTable.TABLE_NAME, "", contentValues);
                 if (insertedRow > 0) {
                     _uri = ContentUris.withAppendedId(uriNOTE, insertedRow);
-                    getContext().getContentResolver().notifyChange(_uri, null);
+                    if (context != null) {
+                        context.getContentResolver().notifyChange(_uri, null);
+                    }
                 }
                 break;
             case NoteDetailsTable.NOTE_DETAILS:
                 insertedRow = AppNoteDatabase.insert(NoteDetailsTable.TABLE_NAME, "", contentValues);
                 if (insertedRow > 0) {
-                    _uri = ContentUris.withAppendedId(uriNOTEDETAILS, insertedRow);
-                    getContext().getContentResolver().notifyChange(_uri, null);
+                    _uri = ContentUris.withAppendedId(uriNOTE_DETAILS, insertedRow);
+                    if (context != null) {
+                        context.getContentResolver().notifyChange(_uri, null);
+                    }
                 }
                 break;
             case NoteReminderTable.NOTE_REMINDERS:
                 insertedRow = AppNoteDatabase.insert(NoteReminderTable.TABLE_NAME, "", contentValues);
                 if (insertedRow > 0){
                     _uri = ContentUris.withAppendedId(uriNOTE_REMINDERS, insertedRow);
-                    getContext().getContentResolver().notifyChange(_uri, null);
+                    if (context != null) {
+                        context.getContentResolver().notifyChange(_uri, null);
+                    }
                 }
                 break;
             default:
@@ -247,8 +258,8 @@ public class ApplicationStorage extends ContentProvider {
     }
 
     @Override
-    public int delete(Uri uri, String s, String[] strings) {
-        int result = 0;
+    public int delete(@NonNull Uri uri, String s, String[] strings) {
+        int result;
         switch (uriMatcher.match(uri)) {
             case NoteTable.NOTE:
                 result = AppNoteDatabase.delete(NoteTable.TABLE_NAME, s, strings);
@@ -275,13 +286,16 @@ public class ApplicationStorage extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Unknow URI " + uri);
         }
-        getContext().getContentResolver().notifyChange(uri, null);
+        Context context = getContext();
+        if (context != null) {
+            context.getContentResolver().notifyChange(uri, null);
+        }
         return result;
     }
 
     @Override
-    public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
-        int result = 0;
+    public int update(@NonNull Uri uri, ContentValues contentValues, String s, String[] strings) {
+        int result;
         switch (uriMatcher.match(uri)) {
             case NoteTable.NOTE:
                 result = AppNoteDatabase.update(NoteTable.TABLE_NAME, contentValues, s, strings);
@@ -302,7 +316,10 @@ public class ApplicationStorage extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Unknow URI " + uri);
         }
-        getContext().getContentResolver().notifyChange(uri, null);
+        Context context = getContext();
+        if (context != null) {
+            context.getContentResolver().notifyChange(uri, null);
+        }
         return result;
     }
 
@@ -323,7 +340,7 @@ public class ApplicationStorage extends ContentProvider {
     }
 
     public static Uri getUriNOTEDETAILS() {
-        return uriNOTEDETAILS;
+        return uriNOTE_DETAILS;
     }
 
     public static Uri getUriNOTE_REMINDERS() {

@@ -1,5 +1,7 @@
 package com.horical.appnote.Supports;
 
+import android.annotation.SuppressLint;
+
 import com.horical.appnote.DTO.CalendarObject;
 
 import java.text.ParseException;
@@ -12,8 +14,6 @@ import java.util.Date;
  * Created by dutn on 27/07/2015.
  */
 public class CalendarUtils {
-
-    private static final String TAG = CalendarUtils.class.getSimpleName();
     private static String dayOfWeek[] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
     private static String monthOfYear[] = {"January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"};
@@ -111,7 +111,7 @@ public class CalendarUtils {
         return 0;
     }
 
-    public static String getToday() {
+    private static String getToday() {
         Calendar calendar = Calendar.getInstance();
         int month = calendar.get(Calendar.MONTH) + 1;
         return calendar.get(Calendar.YEAR) + "-" + ((month < 10)?"0"+month:""+month) + "-" + calendar.get(Calendar.DAY_OF_MONTH);
@@ -124,6 +124,7 @@ public class CalendarUtils {
 
     public static Calendar StringToCalendar(String datetime) {
         Calendar calendar = Calendar.getInstance();
+        @SuppressLint("SimpleDateFormat")
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         try {
             calendar.setTime(simpleDateFormat.parse(datetime));
@@ -208,6 +209,7 @@ public class CalendarUtils {
     }
 
     public static String getTimeNow() {
+        @SuppressLint("SimpleDateFormat")
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
         return sdf.format(new Date());
     }
@@ -222,7 +224,8 @@ public class CalendarUtils {
 
     public static Calendar getDateFromString(String strDate){
         Calendar date = Calendar.getInstance();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat simpleDateFormat = new  SimpleDateFormat("dd/MM/yyyy");
         try {
             date.setTime(simpleDateFormat.parse(strDate));
         } catch (ParseException e) {

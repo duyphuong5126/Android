@@ -22,11 +22,11 @@ import java.util.StringTokenizer;
  * Created by Phuong on 13/08/2015.
  */
 public abstract class SupportUtils {
-    public enum DataSource {
+    private enum DataSource {
         FROM_FILE_MANAGER, FROM_GALLERY
     }
 
-    public static DataSource checkdataSource(Uri uri) {
+    public static DataSource checkDataSource(Uri uri) {
         if (uri.getPath().contains("/mnt/")) return DataSource.FROM_FILE_MANAGER;
         if (uri.getPath().contains("/external/")) return DataSource.FROM_GALLERY;
         return null;
@@ -92,7 +92,7 @@ public abstract class SupportUtils {
         return (name.length() > 23) ? name.substring(0, 19) + "..." : name;
     }
 
-    public static long getFileSize(String path) {
+    private static long getFileSize(String path) {
         File file = new File(path);
         return file.length();
     }
