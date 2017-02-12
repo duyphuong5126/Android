@@ -1,12 +1,17 @@
 package com.horical.appnote.Supports;
 
 import android.app.Activity;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.view.ViewGroup;
+
+import com.horical.appnote.R;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -127,5 +132,12 @@ public abstract class SupportUtils {
         java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
         java.util.regex.Matcher m = p.matcher(email);
         return m.matches();
+    }
+
+    public static Bitmap getBitmapResource(Activity activity, int resId) {
+        Resources resources = activity.getResources();
+        return BitmapFactory.decodeResource(resources, resId);
+        /*return ((BitmapDrawable) activity.getResources().
+                getDrawable(R.drawable.ic_list_black_24dp)).getBitmap();*/
     }
 }

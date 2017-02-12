@@ -23,7 +23,7 @@ import com.parse.ParseFile;
 /**
  * Created by Phuong on 03/09/2015.
  */
-public class LoginFragment extends BaseFragment implements Button.OnClickListener{
+public class LoginFragment extends BaseFragment implements Button.OnClickListener {
     private EditText mEdtUsername, mEdtPassword;
     private Button mBtnLogin, mBtnSignUp, mBtnForgot;
     private TextView mTvInternetSignal, mTvOr;
@@ -31,9 +31,11 @@ public class LoginFragment extends BaseFragment implements Button.OnClickListene
     private LinearLayout mLoginProcessLayout;
 
 
-    public interface LoginListener{
+    public interface LoginListener {
         void onLoginSuccess(String username, String email, String id, String displayname, ParseFile avatar);
+
         void onForgotPassword();
+
         void onSignUp();
     }
 
@@ -43,7 +45,7 @@ public class LoginFragment extends BaseFragment implements Button.OnClickListene
         this.mListener = listener;
     }
 
-    public LoginFragment(){
+    public LoginFragment() {
         this.mLayout_xml_id = R.layout.fragment_login;
     }
 
@@ -117,7 +119,7 @@ public class LoginFragment extends BaseFragment implements Button.OnClickListene
                 if (mMainInterface.checkInternetAvailable()) {
                     doLogin(mEdtUsername.getText().toString().trim(), mEdtPassword.getText().toString().trim());
                 } else {
-                    Toast.makeText(mActivity, LanguageUtils.getInternetOfflineString(), Toast.LENGTH_SHORT);
+                    Toast.makeText(mActivity, LanguageUtils.getInternetOfflineString(), Toast.LENGTH_SHORT).show();
                 }
                 return;
             case R.id.buttonForgetPassword:
@@ -132,9 +134,9 @@ public class LoginFragment extends BaseFragment implements Button.OnClickListene
     }
 
     public void setInternetSignal(boolean isInternetConnected) {
-        mTvInternetSignal.setText((isInternetConnected)?LanguageUtils.getInternetOnlineString() : LanguageUtils.getInternetOfflineString());
-        mImgInternetSignal.setImageResource((isInternetConnected)?
-                R.drawable.ic_signal_wifi_4_bar_white_24dp:R.drawable.ic_signal_wifi_off_white_24dp);
+        mTvInternetSignal.setText((isInternetConnected) ? LanguageUtils.getInternetOnlineString() : LanguageUtils.getInternetOfflineString());
+        mImgInternetSignal.setImageResource((isInternetConnected) ?
+                R.drawable.ic_signal_wifi_4_bar_white_24dp : R.drawable.ic_signal_wifi_off_white_24dp);
     }
 
     @Override

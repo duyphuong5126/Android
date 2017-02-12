@@ -232,7 +232,7 @@ public class ViewNoteFragment extends BaseFragment implements ImageButton.OnClic
                 NoteData noteData = new NoteData();
                 noteData.setNoteSummary(mNoteSummary);
                 noteData.setNoteData(mListNoteLine);
-                mCallback.PassEditInfor(noteData);
+                mCallback.PassEditInfo(noteData);
                 return;
             default:
                 break;

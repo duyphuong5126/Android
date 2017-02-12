@@ -39,8 +39,6 @@ import com.horical.appnote.Supports.CalendarUtils;
 import com.horical.appnote.Supports.FileUtils;
 import com.horical.appnote.Supports.LanguageUtils;
 
-import org.w3c.dom.Text;
-
 /**
  * Created by Phuong on 24/07/2015.
  */
@@ -250,7 +248,7 @@ public class ListNotesFragment extends BaseFragment implements ImageButton.OnCli
             mMainInterface.PassNoteSummary(noteData.getNoteSummary());
         }
         if (item.getTitle().toString().equals(LanguageUtils.getUpdateString())) {
-            mMainInterface.PassEditInfor(noteData);
+            mMainInterface.PassEditInfo(noteData);
         }
         if (item.getTitle().toString().equals(LanguageUtils.getDeleteString())) {
             String message = "";

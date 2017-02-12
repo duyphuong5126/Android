@@ -15,7 +15,7 @@ public interface MainInterface {
 
     void PassNoteSummary(NoteSummary noteSummary);
 
-    void PassEditInfor(NoteData noteData);
+    void PassEditInfo(NoteData noteData);
     void CalendarItemClicked(CalendarObject calendarObject);
     void PlayMedia(String path);
     ArrayList<NoteData> getAllNotes();

@@ -2,6 +2,7 @@ package com.horical.appnote;
 
 import android.app.Application;
 
+import com.horical.appnote.LocalStorage.ApplicationSharedData;
 import com.horical.appnote.ServerStorage.Entities.FileObject;
 import com.horical.appnote.ServerStorage.Entities.NoteObject;
 import com.horical.appnote.ServerStorage.Entities.UserObject;
@@ -20,5 +21,9 @@ public class DailyDiary extends Application {
         ParseObject.registerSubclass(UserObject.class);
         ParseObject.registerSubclass(FileObject.class);
         ParseObject.registerSubclass(NoteObject.class);
+        if (!ApplicationSharedData.isInitResource()) {
+            ApplicationSharedData.initResource(getApplicationContext());
+        }
+        ApplicationSharedData.saveSession("username", "email", "1", "display name", "");
     }
 }

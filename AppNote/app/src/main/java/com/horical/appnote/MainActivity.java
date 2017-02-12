@@ -1,18 +1,18 @@
 package com.horical.appnote;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
@@ -100,7 +100,6 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
     private LinearLayout mActionBar;
     private LinearLayout mSideMenuArea;
     private TextView mTitleHeader, mInternetConnection;
-    private ListView mSideMenu;
 
     private RoundImageView mRoundImageView;
 
@@ -124,15 +123,12 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
     private ImageButton mButtonSearchNote, mButtonOptionMenu, mSyncButton;
     private AlertDialog mDialog;
 
-    private String mTimeStamp;
-
     private Intent mReminderService;
 
     private TextView mTvAppTitle;
     private LinearLayout mProgressbarLayout;
-    private TextView mMainProcess;
 
-    private int mNumberOfFile = 0, mNumberOfReminders = 0;
+    private int mNumberOfFile = 0;
 
     private int mCurrentUploadedFiles = 0;
     private int mCurrentSavedNote = 0;
@@ -140,7 +136,7 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
     private ProgressBar mSyncProgress;
     private TextView mLogView;
 
-    private boolean mInternetAvailibility;
+    private boolean mInternetAvailability;
 
     private EditNoteListener mEditNoteListener;
 
@@ -155,10 +151,7 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
         void onSyncFail(String message);
     }
 
-    private SameFragmentProperty mCheckSameStatus = SameFragmentProperty.NotExists;
-
-    private AlertDialog.Builder mBuilder;
-
+    @SuppressLint("CommitTransaction")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -173,7 +166,7 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
 
         mReminderService = new Intent(MainActivity.this, MediaService.class);
 
-        mBuilder = new AlertDialog.Builder(MainActivity.this);
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainActivity.this);
         mBuilder.setNegativeButton("Got it", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -251,7 +244,7 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
         mMainLayout = (DrawerLayout) findViewById(R.id.MainLayout);
         mActionBar = (LinearLayout) findViewById(R.id.ActionBar);
         mSideMenuArea = (LinearLayout) findViewById(R.id.areaSideMenu);
-        mSideMenu = (ListView) findViewById(R.id.sideMenu);
+        ListView mSideMenu = (ListView) findViewById(R.id.sideMenu);
         mTitleHeader = (TextView) findViewById(R.id.TitleHeader);
         mButtonSearchNote = (ImageButton) findViewById(R.id.buttonSearch);
         mButtonSearchNote.setOnClickListener(this);
@@ -268,24 +261,22 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
         mProgressbarLayout.setOnClickListener(this);
         mLogView = (TextView) findViewById(R.id.LogView);
         mLogView.setText(LanguageUtils.getSyncTitleString());
-        mMainProcess = (TextView) findViewById(R.id.tvMainProcess);
+        TextView mMainProcess = (TextView) findViewById(R.id.tvMainProcess);
         mMainProcess.setText(LanguageUtils.getProcessingString());
 
         this.checkAvatar();
 
         //Set up resource for side menu
-        ArrayList<String> menuStringResource = new ArrayList<String>();
-        for (String resource : LanguageUtils.getSideMenu()) {
-            menuStringResource.add(resource);
-        }
+        ArrayList<String> menuStringResource = new ArrayList<>();
+        Collections.addAll(menuStringResource, LanguageUtils.getSideMenu());
         menuStringResource.add("Last sync: " + (new Date()).toString());
-        mSideMenuResource = new ArrayList<BaseItem>();
+        mSideMenuResource = new ArrayList<>();
         initSideMenu(menuStringResource);
         mSideMenuAdapter = new SideMenuAdapter(MainActivity.this, 0, mSideMenuResource);
         mSideMenu.setAdapter(mSideMenuAdapter);
 
         //set up for navigation button to control fragments
-        ((ImageButton) findViewById(R.id.buttonNavigation)).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.buttonNavigation).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mListFragments.size() <= 0) mMainLayout.openDrawer(mSideMenuArea);
@@ -329,6 +320,13 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
         this.updateUI();
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getWindow().setStatusBarColor(Color.parseColor("#075c52"));
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -351,7 +349,7 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
                 showLoadingEffect(false, "");
                 return;
             case R.id.buttonSyncToServer:
-                if (mInternetAvailibility) {
+                if (mInternetAvailability) {
                     this.syncData(new SyncDataCallback() {
                         @Override
                         public void onSyncSuccess(String message) {
@@ -382,7 +380,7 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
                                 NewFragment(BaseFragment.ListNotesFragment);
                                 break;
                             case R.id.itemLogOut:
-                                if (mInternetAvailibility) {
+                                if (mInternetAvailability) {
                                     onLogout();
                                 } else {
                                     Toast.makeText(MainActivity.this, LanguageUtils.getInternetOfflineString(), Toast.LENGTH_SHORT).show();
@@ -396,7 +394,6 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
                     }
                 });
                 popupMenu.show();
-                return;
         }
     }
 
@@ -444,7 +441,7 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
     @Override
     public void NewFragment(String fragment_id) {
         this.showLoadingEffect(false, "");
-        mCheckSameStatus = checkSameFragment(fragment_id);
+        SameFragmentProperty mCheckSameStatus = checkSameFragment(fragment_id);
         if (mCheckSameStatus == SameFragmentProperty.SameCurrent) {
             Toast.makeText(getApplicationContext(), LanguageUtils.getNotifySameScreenString(), Toast.LENGTH_SHORT).show();
         } else {
@@ -551,8 +548,8 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
                 getExistsFragment(mFragmentName);
 
                 //begin update back stack
-                Stack<String> stack = new Stack<String>();
-                String key = "";
+                Stack<String> stack = new Stack<>();
+                String key;
                 while (mListFragments.size() > 1) {
                     key = mListFragments.pop();
                     if (key.contains(mFragmentName)) break;
@@ -844,22 +841,22 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
                 itemNormal.setItemName(data);
                 itemNormal.setFocused(false);
                 if (data.equals(LanguageUtils.getNewNoteString())) {
-                    itemNormal.setIllustrateImage(((BitmapDrawable) getResources().
-                            getDrawable(R.drawable.ic_add_black_24dp)).getBitmap());
-                    itemNormal.setBitmapIllustrateImageFocus(((BitmapDrawable) getResources().
-                            getDrawable(R.drawable.ic_add_green_24dp)).getBitmap());
+                    itemNormal.setIllustrateImage(
+                            SupportUtils.getBitmapResource(MainActivity.this, R.drawable.ic_add_black_24dp));
+                    itemNormal.setBitmapIllustrateImageFocus(
+                            SupportUtils.getBitmapResource(MainActivity.this, R.drawable.ic_add_green_24dp));
                 } else {
                     if (data.equals(LanguageUtils.getListNotesString())) {
                         itemNormal.setFocused(true);
-                        itemNormal.setIllustrateImage(((BitmapDrawable) getResources().
-                                getDrawable(R.drawable.ic_list_black_24dp)).getBitmap());
-                        itemNormal.setBitmapIllustrateImageFocus(((BitmapDrawable) getResources().
-                                getDrawable(R.drawable.ic_list_green_24dp)).getBitmap());
+                        itemNormal.setIllustrateImage(
+                                SupportUtils.getBitmapResource(MainActivity.this, R.drawable.ic_list_black_24dp));
+                        itemNormal.setBitmapIllustrateImageFocus(
+                                SupportUtils.getBitmapResource(MainActivity.this, R.drawable.ic_list_green_24dp));
                     } else {
-                        itemNormal.setIllustrateImage(((BitmapDrawable) getResources().
-                                getDrawable(R.drawable.ic_settings_black_24dp)).getBitmap());
-                        itemNormal.setBitmapIllustrateImageFocus(((BitmapDrawable) getResources().
-                                getDrawable(R.drawable.ic_settings_green_24dp)).getBitmap());
+                        itemNormal.setIllustrateImage(
+                                SupportUtils.getBitmapResource(MainActivity.this, R.drawable.ic_settings_black_24dp));
+                        itemNormal.setBitmapIllustrateImageFocus(
+                                SupportUtils.getBitmapResource(MainActivity.this, R.drawable.ic_settings_green_24dp));
                     }
                 }
                 mSideMenuResource.add(itemNormal);
@@ -871,15 +868,15 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
                 itemNotification.setItemName(data);
                 itemNotification.setFocused(false);
                 if (data.equals(LanguageUtils.getCalendarString())) {
-                    itemNotification.setIllustrateImage(((BitmapDrawable) getResources().
-                            getDrawable(R.drawable.ic_event_note_black_24dp)).getBitmap());
-                    itemNotification.setBitmapIllustrateImageFocus(((BitmapDrawable) getResources().
-                            getDrawable(R.drawable.ic_event_note_green_24dp)).getBitmap());
+                    itemNotification.setIllustrateImage(
+                            SupportUtils.getBitmapResource(MainActivity.this, R.drawable.ic_event_note_black_24dp));
+                    itemNotification.setBitmapIllustrateImageFocus(
+                            SupportUtils.getBitmapResource(MainActivity.this, R.drawable.ic_event_note_green_24dp));
                 } else {
-                    itemNotification.setIllustrateImage(((BitmapDrawable) getResources().
-                            getDrawable(R.drawable.ic_folder_black_24dp)).getBitmap());
-                    itemNotification.setBitmapIllustrateImageFocus(((BitmapDrawable) getResources().
-                            getDrawable(R.drawable.ic_folder_green_24dp)).getBitmap());
+                    itemNotification.setIllustrateImage(
+                            SupportUtils.getBitmapResource(MainActivity.this, R.drawable.ic_folder_black_24dp));
+                    itemNotification.setBitmapIllustrateImageFocus(
+                            SupportUtils.getBitmapResource(MainActivity.this, R.drawable.ic_folder_green_24dp));
                 }
                 mSideMenuResource.add(itemNotification);
             }
@@ -919,7 +916,7 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
 
     //check if current fragment is the same with the on replacing fragment
     private SameFragmentProperty checkSameFragment(String fragment_id) {
-        String searchObject = "";
+        String searchObject;
         searchObject = fragment_id;
         if (mFragmentName.contains(searchObject)) return SameFragmentProperty.SameCurrent;
         for (String name : mListFragments) {
@@ -931,8 +928,9 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
 
     private void getExistsFragment(String name) {
         if (mFragmentManager.findFragmentByTag(name) != null) {
-            mFragmentTransaction = mFragmentManager.beginTransaction();
-            mFragmentTransaction.replace(R.id.fragmentsContainer, mFragmentManager.findFragmentByTag(name));
+            mFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentsContainer, mFragmentManager.findFragmentByTag(name))
+                    .commit();
         }
     }
 
@@ -1040,7 +1038,7 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
     }
 
     @Override
-    public void PassEditInfor(NoteData noteData) {
+    public void PassEditInfo(NoteData noteData) {
         mBundle = new Bundle();
         mBundle.putSerializable("NoteData", noteData);
         NewFragment(BaseFragment.UpdateNoteFragment);
@@ -1108,7 +1106,7 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
         mListNoteData = new ArrayList<>();
         if (mNoteDataDAO != null) {
             ArrayList<NoteSummary> listNoteSummary = mNoteDataDAO.loadListNote();
-            this.mTimeStamp = null;
+            String mTimeStamp = null;
             if (mListNoteData == null) {
                 mListNoteData = new ArrayList<>();
             } else {
@@ -1126,7 +1124,7 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
                 if (mTimeStamp == null ||
                         !mTimeStamp.equals(CalendarUtils.checkTimeStamp(CalendarUtils.getDateFromString(noteSummary.getCreatedAt())))) {
                     mListNoteData.add(new NoteData(noteSummary, null));
-                    this.mTimeStamp = CalendarUtils.checkTimeStamp(CalendarUtils.getDateFromString(noteSummary.getCreatedAt()));
+                    mTimeStamp = CalendarUtils.checkTimeStamp(CalendarUtils.getDateFromString(noteSummary.getCreatedAt()));
                 }
                 ArrayList<NoteDataLine> listNoteContent = mNoteDataDAO.loadNoteDetails(noteSummary.getID());
                 mListNoteData.add(new NoteData(noteSummary, listNoteContent));
@@ -1291,7 +1289,7 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
 
     @Override
     public boolean checkInternetAvailable() {
-        return mInternetAvailibility;
+        return mInternetAvailability;
     }
 
     private void updateInternetStatus() {
@@ -1299,15 +1297,15 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
         service.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                mInternetAvailibility = checkInternetAvailibility();
+                mInternetAvailability = checkInternetAvailibility();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         mInternetConnection.setText(
-                                (mInternetAvailibility)?LanguageUtils.getInternetOnlineString():LanguageUtils.getInternetOfflineString());
+                                (mInternetAvailability)?LanguageUtils.getInternetOnlineString():LanguageUtils.getInternetOfflineString());
                         LoginFragment fragment = (LoginFragment) mFragmentManager.findFragmentByTag(BaseFragment.LoginFragment);
                         if (fragment != null) {
-                            fragment.setInternetSignal(mInternetAvailibility);
+                            fragment.setInternetSignal(mInternetAvailability);
                         }
                     }
                 });
@@ -1318,7 +1316,7 @@ public class MainActivity extends BaseActivity implements MainInterface, BaseAct
     @Override
     public void reloadListReminder() {
         mListReminders = mNoteReminderDAO.getAllReminders();
-        mNumberOfReminders = 0;
+        int mNumberOfReminders = 0;
         for (NoteReminder reminder : mListReminders) {
             if (CalendarUtils.checkToday(reminder.getTimeComplete())) {
                 mNumberOfReminders++;
