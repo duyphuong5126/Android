@@ -20,11 +20,9 @@ public class CircularProgressBar extends View {
 
     private int mProgress;
 
-    private final float mStartAngle = -90;      // Always start from top (default is: "3 o'clock on a watch.")
     private float mSweepAngle = 0;              // How long to sweep from mStartAngle
     private float mMaxSweepAngle = 360;         // Max degrees to sweep = full circle
     private int mStrokeWidth = 20;              // Width of outline
-    private int mAnimationDuration = 200;       // Animation duration for progress change
     private int mMaxProgress = 100;             // Max progress to use
     private boolean mDrawText = true;           // Set to true if progress text should be drawn
     private boolean mRoundedCorners = true;     // Set to true if rounded corners should be applied to outline ends
@@ -73,6 +71,7 @@ public class CircularProgressBar extends View {
         mPaint.setAntiAlias(true);
         mPaint.setStrokeCap(mRoundedCorners ? Paint.Cap.ROUND : Paint.Cap.BUTT);
         mPaint.setStyle(Paint.Style.STROKE);
+        float mStartAngle = -90;
         canvas.drawArc(outerOval, mStartAngle, mSweepAngle, false, mPaint);
     }
 
@@ -104,6 +103,7 @@ public class CircularProgressBar extends View {
     public void setProgress(int progress) {
         ValueAnimator animator = ValueAnimator.ofFloat(mSweepAngle, calcSweepAngleFromProgress(progress));
         animator.setInterpolator(new DecelerateInterpolator());
+        int mAnimationDuration = 200;
         animator.setDuration(mAnimationDuration);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override

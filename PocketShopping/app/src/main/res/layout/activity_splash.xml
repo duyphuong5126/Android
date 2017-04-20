@@ -1,32 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/banner_1"
-    android:orientation="vertical"
     tools:context="com.phuong.pocketshopping.SplashActivity">
 
-    <LinearLayout
+    <ImageView
+        android:id="@+id/imageSplash"
         android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="3"></LinearLayout>
-
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/splash_image" />
 
     <LinearLayout
+        android:id="@+id/layoutLoading"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/banner_1"
+        android:visibility="gone">
 
-        <com.phuong.pocketshopping.MyView.CircularProgressBar
-            android:id="@+id/circularProgress"
-            android:layout_width="100dip"
-            android:layout_height="100dip" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="3"></LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <com.phuong.pocketshopping.MyView.CircularProgressBar
+                android:id="@+id/circularProgress"
+                android:layout_width="100dip"
+                android:layout_height="100dip" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1"></LinearLayout>
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1"></LinearLayout>
-
-</LinearLayout>
+</FrameLayout>
