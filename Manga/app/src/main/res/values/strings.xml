@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">nhentai</string>
+    <string name="main_logo">nhentai logo</string>
+    <string name="main_search_button">Main search button</string>
+    <string name="main_item">Main item</string>
+    <string name="main_item_description">Main item description</string>
+    <string name="random">Random</string>
+    <string name="tags">Tags</string>
+    <string name="artists">Artists</string>
+    <string name="groups">Groups</string>
+    <string name="info">Info</string>
+    <string name="parodies">Parodies</string>
+    <string name="characters">Characters</string>
+    <string name="search">Search</string>
+    <string name="loading">Loading, please be patient</string>
+    <string name="previous">\f054</string>
+    <string name="next">Next</string>
+
+    <string name="main_item_chinese_sample">[Achromic (Musouduki)] Loli &amp; Futa Vol. 8 | 蘿莉&amp;扶她 Vol.8 (Kantai Collection -KanColle-) [Chinese] [Lolipoi汉化组] [Digital]</string>
+    <string name="main_item_japanese_sample">(C93) [studio A (Inanaki Shiki)] Iyarashii Houshi-bu no Kanojo-tachi. (Yahari Ore no Seishun Love Come wa Machigatteiru.) [Chinese] [無邪氣漢化组]</string>
+    <string name="main_item_english_sample">(C93) [studio A (Inanaki Shiki)] Iyarashii Houshi-bu no Kanojo-tachi. (Yahari Ore no Seishun Love Come wa Machigatteiru.) [Chinese] [無邪氣漢化组]</string>
+    <string name="page_number">1</string>
+    <string name="nothing_to_show">Nothing here</string>
+</resources>

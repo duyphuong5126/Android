@@ -1,0 +1,113 @@
+package nhdphuong.com.manga.features.home
+
+import android.content.Context
+import android.util.Log
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
+import nhdphuong.com.manga.data.entity.book.Book
+import nhdphuong.com.manga.data.repository.BookRepository
+import java.util.*
+import javax.inject.Inject
+import kotlin.collections.HashMap
+
+/*
+ * Created by nhdphuong on 3/18/18.
+ */
+
+class HomePresenter @Inject constructor(private val mContext: Context,
+                                        private val mView: HomeContract.View,
+                                        private val mBookRepository: BookRepository) : HomeContract.Presenter {
+    companion object {
+        private val TAG = HomePresenter::class.java.simpleName
+        private const val NUMBER_OF_PREVENTIVE_PAGES = 10
+    }
+
+    private var mMainList = LinkedList<Book>()
+    private var mCurrentNumOfPages = 0L
+    private var mCurrentLimitPerPage = 0
+    private var mCurrentPage = 1
+    private var mPreventiveData = HashMap<Int, List<Book>>()
+    private var isLoadingPreventiveData = false
+
+    init {
+        mView.setPresenter(this)
+    }
+
+    override fun start() {
+        Log.d(TAG, "start")
+        mMainList.clear()
+
+        mView.showLoading()
+        mView.setUpHomeBookList(mMainList)
+        launch {
+            val startTime = System.currentTimeMillis()
+            val remoteBook = mBookRepository.getBookByPage(mCurrentPage)
+            Log.d(TAG, "Time spent=${System.currentTimeMillis() - startTime}")
+            mCurrentNumOfPages = remoteBook?.numOfPages ?: 0L
+            mCurrentLimitPerPage = remoteBook?.numOfBooksPerPage ?: 0
+            Log.d(TAG, "Remote books: $mCurrentNumOfPages")
+            val bookList = remoteBook?.bookList ?: LinkedList()
+            mMainList.addAll(bookList)
+            mPreventiveData[mCurrentPage] = mMainList
+            for (book in bookList) {
+                Log.d(TAG, book.logString)
+            }
+            launch(UI) {
+                mView.refreshHomeBookList()
+                if (mCurrentNumOfPages > 0) {
+                    mView.refreshHomePagination(mCurrentNumOfPages)
+                    mView.showNothingView(false)
+                } else {
+                    mView.showNothingView(true)
+                }
+                mView.hideLoading()
+            }
+        }.let {
+            loadPreventiveData()
+        }
+    }
+
+    override fun jumpToPage(pageNumber: Int) {
+        Log.d(TAG, "Current page: $pageNumber")
+        mCurrentPage = pageNumber
+        if (mPreventiveData[mCurrentPage] != null) {
+            mMainList = mPreventiveData[mCurrentPage] as LinkedList<Book>
+            mView.refreshHomeBookList()
+        }
+    }
+
+    override fun jumToFirstPage() {
+        mCurrentPage = 1
+        Log.d(TAG, "Current page: $mCurrentPage")
+    }
+
+    override fun jumToLastPage() {
+        mCurrentPage = mCurrentNumOfPages.toInt()
+        Log.d(TAG, "Current page: $mCurrentPage")
+    }
+
+    override fun stop() {
+        Log.d(TAG, "stop")
+    }
+
+    private fun loadPreventiveData() {
+        isLoadingPreventiveData = true
+        launch {
+            for (page in mCurrentPage + 1 .. NUMBER_OF_PREVENTIVE_PAGES) {
+                Log.d(TAG, "Start loading page $page")
+                val bookList = async {
+                    val remoteBook = mBookRepository.getBookByPage(page)
+                    remoteBook?.bookList
+                }.await()
+                Log.d(TAG, "Done loading page $page")
+                if (bookList != null && !bookList.isEmpty()) {
+                    mPreventiveData[page] = bookList
+                }
+            }
+        }.let {
+            Log.d(TAG, "Load preventive data successfully")
+            isLoadingPreventiveData = false
+        }
+    }
+}
