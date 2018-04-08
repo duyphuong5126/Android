@@ -7,12 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.text.TextUtils
 import android.util.Log
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.Constants
 import nhdphuong.com.manga.data.entity.book.Book
 import nhdphuong.com.manga.supports.GlideUtils
+import nhdphuong.com.manga.supports.SupportUtils
 
 /*
  * Created by nhdphuong on 3/18/18.
@@ -65,7 +65,7 @@ class MainListAdapter(private val mItemList: List<Book>, private val mMainListCl
             mTv1stTitle.viewTreeObserver.addOnGlobalLayoutListener({
                 if (mIsTitleModifiable) {
                     val fullText = item.previewTitle
-                    val ellipsizedText = getEllipsizedText(mTv1stTitle)
+                    val ellipsizedText = SupportUtils.getEllipsizedText(mTv1stTitle)
                     val remainText = fullText.replace(ellipsizedText, "")
                     mTv1stTitle.text = ellipsizedText
                     mTv2ndTitle.text = remainText
@@ -73,55 +73,6 @@ class MainListAdapter(private val mItemList: List<Book>, private val mMainListCl
                 }
             })
         }
-    }
-
-    private fun getEllipsizedText(textView: TextView): String {
-        val text = textView.text.toString()
-        val lines = textView.lineCount
-        val width = textView.width
-        val len = text.length
-        val where = TextUtils.TruncateAt.END
-        val paint = textView.paint
-
-        val result = StringBuffer()
-
-        var spos = 0
-        var cnt: Int
-        var tmp: Int
-        var hasLines = 0
-
-        while (hasLines < lines - 1) {
-            cnt = paint.breakText(text, spos, len, true, width.toFloat(), null)
-            if (cnt >= len - spos) {
-                result.append(text.substring(spos))
-                break
-            }
-
-            tmp = text.lastIndexOf('\n', spos + cnt - 1)
-
-            if (tmp >= 0 && tmp < spos + cnt) {
-                result.append(text.substring(spos, tmp + 1))
-                spos += tmp + 1
-            } else {
-                tmp = text.lastIndexOf(' ', spos + cnt - 1)
-                spos += if (tmp >= spos) {
-                    result.append(text.substring(spos, tmp + 1))
-                    tmp + 1
-                } else {
-                    result.append(text.substring(spos, cnt))
-                    cnt
-                }
-            }
-
-            hasLines++
-        }
-
-        if (spos < len) {
-            result.append(TextUtils.ellipsize(text.subSequence(spos, len), paint, width.toFloat(), where))
-        }
-
-        val ellipsizedText = result.toString()
-        return ellipsizedText.substring(0, ellipsizedText.length)
     }
 
     interface OnMainListClick {

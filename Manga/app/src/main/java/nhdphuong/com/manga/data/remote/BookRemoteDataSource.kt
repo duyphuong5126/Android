@@ -21,13 +21,13 @@ class BookRemoteDataSource(private val mHomeApiService: HomeApiService) : BookDa
         var remoteBook: RemoteBook? = null
         mHomeApiService.getGalleriesByPage(page).enqueue(object : Callback<RemoteBook> {
             override fun onResponse(call: Call<RemoteBook>?, response: Response<RemoteBook>?) {
-                Log.d(TAG, "getBookByPage get remote successfully")
+                Log.d(TAG, "get all remote book of page $page successfully")
                 remoteBook = response?.body()
                 countDownLatch.countDown()
             }
 
             override fun onFailure(call: Call<RemoteBook>?, t: Throwable?) {
-                Log.d(TAG, "getBookByPage get remote fail")
+                Log.d(TAG, "get all remote book of page $page fail")
                 countDownLatch.countDown()
             }
         })

@@ -167,6 +167,9 @@ class HomeFragment : Fragment(), HomeContract.View {
 
     override fun refreshHomeBookList() {
         mHomeListAdapter.notifyDataSetChanged()
+        mBinding.rvMainList.post {
+            mBinding.rvMainList.smoothScrollBy(0, 0)
+        }
     }
 
     override fun refreshHomePagination(pageCount: Long) {

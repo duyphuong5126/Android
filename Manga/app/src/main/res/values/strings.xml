@@ -21,4 +21,5 @@
     <string name="main_item_english_sample">(C93) [studio A (Inanaki Shiki)] Iyarashii Houshi-bu no Kanojo-tachi. (Yahari Ore no Seishun Love Come wa Machigatteiru.) [Chinese] [無邪氣漢化组]</string>
     <string name="page_number">1</string>
     <string name="nothing_to_show">Nothing here</string>
+    <string name="internet_error">Look like you lost your connection!</string>
 </resources>
