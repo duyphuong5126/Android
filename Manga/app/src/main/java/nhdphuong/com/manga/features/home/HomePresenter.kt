@@ -7,7 +7,6 @@ import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import nhdphuong.com.manga.data.entity.book.Book
 import nhdphuong.com.manga.data.repository.BookRepository
-import nhdphuong.com.manga.supports.SupportUtils
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.HashMap
@@ -40,12 +39,6 @@ class HomePresenter @Inject constructor(private val mContext: Context,
         mMainList.clear()
 
         mView.showLoading()
-        if (!SupportUtils.isNetworkAvailable()) {
-            Log.d(TAG, "No internet connection")
-            mView.showNothingView(true)
-            mView.hideLoading()
-            return
-        }
         mView.setUpHomeBookList(mMainList)
         launch {
             val startTime = System.currentTimeMillis()

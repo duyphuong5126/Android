@@ -4,9 +4,6 @@ import android.content.Context
 import android.text.TextUtils
 import android.util.TypedValue
 import android.widget.TextView
-import java.net.InetSocketAddress
-import java.net.Socket
-import java.net.InetAddress
 
 
 class SupportUtils {
@@ -61,15 +58,6 @@ class SupportUtils {
 
             val ellipsizedText = result.toString()
             return ellipsizedText.substring(0, ellipsizedText.length - 1)
-        }
-
-        fun isNetworkAvailable(): Boolean {
-            val networkTimeOut = 2000
-            return try {
-                InetAddress.getByName("https://google.com").isReachable(networkTimeOut)
-            } catch (exception: Exception) {
-                false
-            }
         }
     }
 }
