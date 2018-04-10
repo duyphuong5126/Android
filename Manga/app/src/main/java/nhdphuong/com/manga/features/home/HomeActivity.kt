@@ -11,6 +11,8 @@ import nhdphuong.com.manga.R
 import javax.inject.Inject
 import android.content.Intent
 import android.view.KeyEvent
+import nhdphuong.com.manga.features.header.HeaderFragment
+import nhdphuong.com.manga.features.header.HeaderModule
 
 
 class HomeActivity : AppCompatActivity() {
@@ -26,7 +28,7 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         Log.e(TAG, "onCreate")
         setContentView(R.layout.activity_home)
-        showFragment()
+        showFragments()
     }
 
     override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
@@ -118,7 +120,7 @@ class HomeActivity : AppCompatActivity() {
 
     }
 
-    private fun showFragment() {
+    private fun showFragments() {
         var homeFragment = supportFragmentManager.findFragmentById(R.id.clMainFragment) as HomeFragment?
         if (homeFragment == null) {
             homeFragment = HomeFragment()
@@ -127,7 +129,14 @@ class HomeActivity : AppCompatActivity() {
                     .addToBackStack(TAG)
                     .commitAllowingStateLoss()
         }
+        var headerFragment = supportFragmentManager.findFragmentById(R.id.clHeader) as HeaderFragment?
+        if (headerFragment == null) {
+            headerFragment = HeaderFragment()
+            supportFragmentManager.beginTransaction().
+                    replace(R.id.clHeader, headerFragment, TAG)
+                    .addToBackStack(TAG).commitAllowingStateLoss()
+        }
 
-        NHentaiApp.instance.applicationComponent.plus(HomeModule(homeFragment)).inject(this)
+        NHentaiApp.instance.applicationComponent.plus(HomeModule(homeFragment), HeaderModule(headerFragment)).inject(this)
     }
 }

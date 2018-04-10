@@ -18,11 +18,8 @@ import android.view.View
 import android.view.ViewGroup
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.views.adapters.MainListAdapter
-import nhdphuong.com.manga.views.adapters.TabAdapter
-import nhdphuong.com.manga.data.Tab
 import nhdphuong.com.manga.data.entity.book.Book
 import nhdphuong.com.manga.databinding.FragmentHomeBinding
-import nhdphuong.com.manga.supports.SpaceItemDecoration
 import nhdphuong.com.manga.views.DialogHelper
 import nhdphuong.com.manga.views.adapters.HomePaginationAdapter
 
@@ -37,7 +34,6 @@ class HomeFragment : Fragment(), HomeContract.View {
     }
 
     private lateinit var mBinding: FragmentHomeBinding
-    private lateinit var mTabAdapter: TabAdapter
     private lateinit var mHomeListAdapter: MainListAdapter
     private lateinit var mHomePaginationAdapter: HomePaginationAdapter
     private lateinit var mHomePresenter: HomeContract.Presenter
@@ -66,20 +62,6 @@ class HomeFragment : Fragment(), HomeContract.View {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "onViewCreated")
-        mTabAdapter = TabAdapter(context, object : TabAdapter.OnMainTabClick {
-            override fun onTabClick(tab: Tab) {
-
-            }
-        })
-
-        val tabSelector: RecyclerView = mBinding.rvMainTabs
-        tabSelector.adapter = mTabAdapter
-        tabSelector.addItemDecoration(SpaceItemDecoration(context, R.dimen.dp20, true, true))
-        tabSelector.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
-        mBinding.ibHamburger.setOnClickListener {
-            val isTabHidden = tabSelector.visibility == View.GONE
-            tabSelector.visibility = if (!isTabHidden) View.GONE else View.VISIBLE
-        }
 
         mBinding.btnFirst.setOnClickListener {
             mHomePresenter.jumToFirstPage()
