@@ -11,6 +11,7 @@ import android.widget.TextView
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.data.entity.book.Tag
 import nhdphuong.com.manga.supports.SupportUtils
+import java.util.*
 
 /*
  * Created by nhdphuong on 4/15/18.
@@ -27,14 +28,22 @@ class InfoCardLayout(private val layoutInflater: LayoutInflater, private val tag
         }
         var tagLine = layoutInflater.inflate(R.layout.item_tag_line, viewGroup, false).findViewById<LinearLayout>(R.id.lineRoot)
         viewGroup.addView(tagLine)
+        val viewList = LinkedList<View>()
+        for (tag in tagList) {
+            val view = InfoCardViewHolder(layoutInflater.inflate(R.layout.item_tag, viewGroup, false), tag).view
+            view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+            viewList.add(view)
+        }
+        viewList.sortWith(compareBy({ it.measuredWidth }))
         val totalWidth = viewGroup.measuredWidth
         val totalMargin = SupportUtils.dp2Pixel(mContext, 6)
         Log.d(TAG, "Total width: $totalWidth")
         var widthCount = 0
-        for (tag in tagList) {
-            val infoCardViewHolder = InfoCardViewHolder(layoutInflater.inflate(R.layout.item_tag, viewGroup, false), tag)
-            infoCardViewHolder.view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-            val itemWidth = infoCardViewHolder.view.measuredWidth + totalMargin
+        for (view in viewList) {
+            if (view.measuredWidth > totalWidth - totalMargin) {
+                view.layoutParams.width = totalWidth - totalMargin
+            }
+            val itemWidth = view.measuredWidth + totalMargin
             widthCount += itemWidth
             Log.d(TAG, "Item: $itemWidth, widthCount: $widthCount, total: $totalWidth")
             if (widthCount > totalWidth) {
@@ -42,7 +51,7 @@ class InfoCardLayout(private val layoutInflater: LayoutInflater, private val tag
                 viewGroup.addView(tagLine)
                 widthCount = itemWidth
             }
-            tagLine.addView(infoCardViewHolder.view)
+            tagLine.addView(view)
         }
     }
 
