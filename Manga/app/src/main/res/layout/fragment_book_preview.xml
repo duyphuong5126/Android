@@ -9,21 +9,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/ivBookCover"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:contentDescription="@string/book_cover"
-            android:scaleType="center"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <ScrollView
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@color/transparent_grey_1"
+            android:background="@color/grey_1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -36,6 +25,16 @@
                 android:paddingStart="@dimen/dp10"
                 android:paddingTop="@dimen/dp10">
 
+                <ImageView
+                    android:id="@+id/ivBookCover"
+                    android:layout_width="0dp"
+                    android:layout_height="300dp"
+                    android:contentDescription="@string/book_cover"
+                    android:scaleType="center"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
                 <TextView
                     android:id="@+id/tvTitle_1"
                     android:layout_width="0dp"
@@ -47,7 +46,7 @@
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toBottomOf="@id/ivBookCover" />
 
                 <TextView
                     android:id="@+id/tvTitle_2"
@@ -66,13 +65,13 @@
                 <TextView
                     android:id="@+id/tvTagsLabel"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/dp30"
                     android:layout_marginTop="@dimen/dp10"
                     android:fontFamily="sans-serif-condensed"
                     android:gravity="center_vertical"
                     android:text="@string/tags_label"
                     android:textColor="@color/greyD9D9D9"
-                    android:textSize="17sp"
+                    android:textSize="19sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvTitle_2"
@@ -91,13 +90,13 @@
                 <TextView
                     android:id="@+id/tvArtistsLabel"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/dp30"
                     android:layout_marginTop="5dp"
                     android:fontFamily="sans-serif-condensed"
                     android:gravity="center_vertical"
                     android:text="@string/artists_label"
                     android:textColor="@color/greyD9D9D9"
-                    android:textSize="17sp"
+                    android:textSize="19sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/clTags"
@@ -116,13 +115,13 @@
                 <TextView
                     android:id="@+id/tvLanguagesLabel"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/dp30"
                     android:layout_marginTop="5dp"
                     android:fontFamily="sans-serif-condensed"
                     android:gravity="center_vertical"
                     android:text="@string/languages_label"
                     android:textColor="@color/greyD9D9D9"
-                    android:textSize="17sp"
+                    android:textSize="19sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/clArtists"
@@ -141,13 +140,13 @@
                 <TextView
                     android:id="@+id/tvCategoriesLabel"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/dp30"
                     android:layout_marginTop="5dp"
                     android:fontFamily="sans-serif-condensed"
                     android:gravity="center_vertical"
                     android:text="@string/categories_label"
                     android:textColor="@color/greyD9D9D9"
-                    android:textSize="17sp"
+                    android:textSize="19sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/clLanguages"
@@ -166,16 +165,16 @@
                 <TextView
                     android:id="@+id/tvCharactersLabel"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/dp30"
                     android:layout_marginTop="5dp"
                     android:fontFamily="sans-serif-condensed"
                     android:gravity="center_vertical"
                     android:text="@string/characters_label"
                     android:textColor="@color/greyD9D9D9"
-                    android:textSize="17sp"
+                    android:textSize="19sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/clLanguages"
+                    app:layout_constraintTop_toBottomOf="@+id/clCategories"
                     tools:targetApi="jelly_bean" />
 
                 <LinearLayout
@@ -191,16 +190,16 @@
                 <TextView
                     android:id="@+id/tvParodiesLabel"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/dp30"
                     android:layout_marginTop="5dp"
                     android:fontFamily="sans-serif-condensed"
                     android:gravity="center_vertical"
                     android:text="@string/parodies_label"
                     android:textColor="@color/greyD9D9D9"
-                    android:textSize="17sp"
+                    android:textSize="19sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/clLanguages"
+                    app:layout_constraintTop_toBottomOf="@+id/clCharacters"
                     tools:targetApi="jelly_bean" />
 
                 <LinearLayout
@@ -216,16 +215,16 @@
                 <TextView
                     android:id="@+id/tvGroupsLabel"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/dp30"
                     android:layout_marginTop="5dp"
                     android:fontFamily="sans-serif-condensed"
                     android:gravity="center_vertical"
                     android:text="@string/groups_label"
                     android:textColor="@color/greyD9D9D9"
-                    android:textSize="17sp"
+                    android:textSize="19sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/clLanguages"
+                    app:layout_constraintTop_toBottomOf="@+id/clParodies"
                     tools:targetApi="jelly_bean" />
 
                 <LinearLayout
