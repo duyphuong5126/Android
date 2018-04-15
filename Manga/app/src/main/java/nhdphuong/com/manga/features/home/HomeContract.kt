@@ -18,5 +18,6 @@ interface HomeContract {
         fun jumpToPage(pageNumber: Int)
         fun jumToFirstPage()
         fun jumToLastPage()
+        fun showBookPreview(book: Book)
     }
 }

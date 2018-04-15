@@ -16,10 +16,22 @@
     <string name="previous">\f054</string>
     <string name="next">Next</string>
 
+    <string name="tags_label">Tags:</string>
+    <string name="artists_label">Artists:</string>
+    <string name="languages_label">Languages:</string>
+    <string name="categories_label">Categories:</string>
+    <string name="parodies_label">Parodies:</string>
+    <string name="characters_label">Characters:</string>
+    <string name="groups_label">Groups:</string>
+
+    <string name="count">(%s)</string>
+
     <string name="main_item_chinese_sample">[Achromic (Musouduki)] Loli &amp; Futa Vol. 8 | 蘿莉&amp;扶她 Vol.8 (Kantai Collection -KanColle-) [Chinese] [Lolipoi汉化组] [Digital]</string>
     <string name="main_item_japanese_sample">(C93) [studio A (Inanaki Shiki)] Iyarashii Houshi-bu no Kanojo-tachi. (Yahari Ore no Seishun Love Come wa Machigatteiru.) [Chinese] [無邪氣漢化组]</string>
     <string name="main_item_english_sample">(C93) [studio A (Inanaki Shiki)] Iyarashii Houshi-bu no Kanojo-tachi. (Yahari Ore no Seishun Love Come wa Machigatteiru.) [Chinese] [無邪氣漢化组]</string>
     <string name="page_number">1</string>
     <string name="nothing_to_show">Nothing here</string>
     <string name="internet_error">Look like you lost your connection!</string>
+    <string name="book_cover">Book cover</string>
+    <string name="title_1">Title 1</string>
 </resources>

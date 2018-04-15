@@ -137,7 +137,7 @@ class HomeFragment : Fragment(), HomeContract.View {
     override fun setUpHomeBookList(homeBookList: List<Book>) {
         mHomeListAdapter = MainListAdapter(homeBookList, object : MainListAdapter.OnMainListClick {
             override fun onItemClick(item: Book) {
-
+                mHomePresenter.showBookPreview(item)
             }
         })
         val mainList: RecyclerView = mBinding.rvMainList

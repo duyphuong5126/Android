@@ -43,6 +43,13 @@ class MainListAdapter(private val mItemList: List<Book>, private val mMainListCl
         private val mIvLanguage: ImageView = itemView.findViewById(R.id.ivLanguage)
         private var mIsTitleModifiable = true
 
+        init {
+            mIvItemThumbnail.setOnClickListener(this)
+            mTv1stTitle.setOnClickListener(this)
+            mTv2ndTitle.setOnClickListener(this)
+            mIvLanguage.setOnClickListener(this)
+        }
+
         override fun onClick(p0: View?) {
             mMainListClickCallback.onItemClick(mBookPreview)
         }

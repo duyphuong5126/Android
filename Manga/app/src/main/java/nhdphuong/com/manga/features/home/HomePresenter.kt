@@ -7,6 +7,7 @@ import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import nhdphuong.com.manga.data.entity.book.Book
 import nhdphuong.com.manga.data.repository.BookRepository
+import nhdphuong.com.manga.features.preview.BookPreviewActivity
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.HashMap
@@ -85,6 +86,10 @@ class HomePresenter @Inject constructor(private val mContext: Context,
         mCurrentPage = mCurrentNumOfPages.toInt()
         Log.d(TAG, "Current page: $mCurrentPage")
         onPageChange()
+    }
+
+    override fun showBookPreview(book: Book) {
+        BookPreviewActivity.start(mContext, book)
     }
 
     override fun stop() {

@@ -4,19 +4,20 @@ import android.text.TextUtils
 import com.google.gson.annotations.SerializedName
 import nhdphuong.com.manga.api.ApiConstants
 import nhdphuong.com.manga.Constants
+import java.io.Serializable
 
 /*
  * Created by nhdphuong on 3/24/18.
  */
-class Book(@field:SerializedName("id") val bookId: String,
-           @field:SerializedName("media_id") private val mediaId: String,
-           @field:SerializedName("title") private val title: BookTitle,
-           @field:SerializedName("images") private val bookImages: BookImages,
-           @field:SerializedName("scanlator") val scanlator: String,
-           @field:SerializedName("upload_date") val updateAt: Long,
-           @field:SerializedName("tags") val tags: List<Tag>,
-           @field:SerializedName("num_pages") val numOfPages: Int,
-           @field:SerializedName("num_favorites") val numOfFavorites: Int) {
+class Book(@field:SerializedName(Constants.ID) val bookId: String,
+           @field:SerializedName(Constants.MEDIA_ID) val mediaId: String,
+           @field:SerializedName(Constants.TITLE) val title: BookTitle,
+           @field:SerializedName(Constants.IMAGES) private val bookImages: BookImages,
+           @field:SerializedName(Constants.SCANLATOR) val scanlator: String,
+           @field:SerializedName(Constants.UPLOAD_DATE) val updateAt: Long,
+           @field:SerializedName(Constants.TAGS_LIST) val tags: List<Tag>,
+           @field:SerializedName(Constants.NUM_PAGES) val numOfPages: Int,
+           @field:SerializedName(Constants.NUM_FAVORITES) val numOfFavorites: Int) : Serializable {
 
     companion object {
         private const val ENG = "[English]"
@@ -27,7 +28,7 @@ class Book(@field:SerializedName("id") val bookId: String,
     val thumbnail: String
         get() {
             val imageType = if (Constants.PNG_TYPE.equals(bookImages.thumbnail.type, ignoreCase = true)) Constants.PNG else Constants.JPG
-            return ApiConstants.getBookThumbnailBytId(mediaId, imageType)
+            return ApiConstants.getBookThumbnailById(mediaId, imageType)
         }
 
     val previewTitle: String

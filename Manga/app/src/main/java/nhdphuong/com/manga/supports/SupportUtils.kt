@@ -4,12 +4,18 @@ import android.content.Context
 import android.text.TextUtils
 import android.util.TypedValue
 import android.widget.TextView
+import java.text.NumberFormat
+import java.util.*
 
 
 class SupportUtils {
     companion object {
         fun dp2Pixel(context: Context, dp: Int): Int =
                 TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp * 1F, context.resources.displayMetrics).toInt()
+
+        fun formatBigNumber(number: Long): String {
+            return NumberFormat.getNumberInstance(Locale.US).format(number)
+        }
 
         fun getEllipsizedText(textView: TextView): String {
             val text = textView.text.toString()

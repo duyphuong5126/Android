@@ -8,5 +8,9 @@ object ApiConstants {
     const val NHENTAI_I = "https://i.nhentai.net"
     const val NHENTAI_T = "https://t.nhentai.net"
 
-    fun getBookThumbnailBytId(mediaId: String, imageType: String): String = "$NHENTAI_T/galleries/$mediaId/thumb$imageType"
+    private fun getThumbnailUrl(mediaId: String) = "$NHENTAI_T/galleries/$mediaId"
+
+    fun getBookThumbnailById(mediaId: String, imageType: String): String = "$NHENTAI_T/galleries/$mediaId/thumb$imageType"
+
+    fun getBookCover(mediaId: String): String = "${getThumbnailUrl(mediaId)}/cover.jpg"
 }
