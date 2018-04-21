@@ -48,6 +48,11 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        mPresenter.stop()
+    }
+
     override fun showBookCoverImage(coverUrl: String) {
         mRequestManager.load(coverUrl).apply(mRequestOptions).into(mBinding.ivBookCover)
     }

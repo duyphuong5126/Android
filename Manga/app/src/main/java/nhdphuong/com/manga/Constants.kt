@@ -53,8 +53,8 @@ class Constants {
         const val JAPANESE_LANG = "jp"
         const val ENGLISH_LANG = "eng"
 
-        const val JPG = ".jpg"
-        const val PNG = ".png"
+        const val JPG = "jpg"
+        const val PNG = "png"
         const val JPG_TYPE = "j"
         const val PNG_TYPE = "p"
     }

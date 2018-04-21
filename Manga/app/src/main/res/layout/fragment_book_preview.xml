@@ -25,15 +25,28 @@
                 android:paddingStart="@dimen/dp10"
                 android:paddingTop="@dimen/dp10">
 
-                <ImageView
-                    android:id="@+id/ivBookCover"
+                <android.support.v4.widget.NestedScrollView
+                    android:id="@+id/svBookCover"
                     android:layout_width="0dp"
                     android:layout_height="300dp"
-                    android:contentDescription="@string/book_cover"
-                    android:scaleType="center"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:id="@+id/ivBookCover"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="@string/book_cover"
+                            android:scaleType="center"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </LinearLayout>
+                </android.support.v4.widget.NestedScrollView>
 
                 <nhdphuong.com.manga.views.MyTextView
                     android:id="@+id/tvTitle_1"
@@ -44,7 +57,7 @@
                     android:textSize="21sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/ivBookCover"
+                    app:layout_constraintTop_toBottomOf="@id/svBookCover"
                     app:myFont="@string/NotoSansBold" />
 
                 <nhdphuong.com.manga.views.MyTextView

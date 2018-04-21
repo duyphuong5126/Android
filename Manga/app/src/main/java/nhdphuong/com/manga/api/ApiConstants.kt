@@ -13,4 +13,8 @@ object ApiConstants {
     fun getBookThumbnailById(mediaId: String, imageType: String): String = "$NHENTAI_T/galleries/$mediaId/thumb$imageType"
 
     fun getBookCover(mediaId: String): String = "${getThumbnailUrl(mediaId)}/cover.jpg"
+
+    private fun getGalleryUrl(mediaId: String): String = "$NHENTAI_I/galleries/$mediaId"
+
+    fun getPictureUrl(mediaId: String, pageNumber: Int, imageType: String) = "${getGalleryUrl(mediaId)}/$pageNumber.$imageType"
 }

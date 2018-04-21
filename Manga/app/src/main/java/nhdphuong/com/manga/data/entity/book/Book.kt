@@ -12,7 +12,7 @@ import java.io.Serializable
 class Book(@field:SerializedName(Constants.ID) val bookId: String,
            @field:SerializedName(Constants.MEDIA_ID) val mediaId: String,
            @field:SerializedName(Constants.TITLE) val title: BookTitle,
-           @field:SerializedName(Constants.IMAGES) private val bookImages: BookImages,
+           @field:SerializedName(Constants.IMAGES) val bookImages: BookImages,
            @field:SerializedName(Constants.SCANLATOR) val scanlator: String,
            @field:SerializedName(Constants.UPLOAD_DATE) val updateAt: Long,
            @field:SerializedName(Constants.TAGS_LIST) val tags: List<Tag>,
@@ -27,8 +27,8 @@ class Book(@field:SerializedName(Constants.ID) val bookId: String,
 
     val thumbnail: String
         get() {
-            val imageType = if (Constants.PNG_TYPE.equals(bookImages.thumbnail.type, ignoreCase = true)) Constants.PNG else Constants.JPG
-            return ApiConstants.getBookThumbnailById(mediaId, imageType)
+            val imageType = bookImages.thumbnail.imageType
+            return ApiConstants.getBookThumbnailById(mediaId, ".$imageType")
         }
 
     val previewTitle: String

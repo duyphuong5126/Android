@@ -1,11 +1,17 @@
 package nhdphuong.com.manga.features.preview
 
 import android.content.Context
+import android.net.ConnectivityManager
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import nhdphuong.com.manga.Constants
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.api.ApiConstants
 import nhdphuong.com.manga.data.entity.book.Book
 import nhdphuong.com.manga.data.entity.book.Tag
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.*
 import javax.inject.Inject
 
@@ -46,7 +52,14 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
     }
 
     override fun start() {
-        mView.showBookCoverImage(ApiConstants.getBookCover(mBook.mediaId))
+        launch {
+            val coverUrl = async {
+                getReachableBookCover()
+            }.await()
+            launch(UI) {
+                mView.showBookCoverImage(coverUrl)
+            }
+        }
         mView.show1stTitle(mBook.title.englishName)
         mView.show2ndTitle(mBook.title.japaneseName)
         mView.showUploadedTime(String.format(mContext.getString(R.string.uploaded), getUploadedTimeString()))
@@ -186,5 +199,35 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
             }
         }
         return mContext.getString(R.string.just_now)
+    }
+
+    private fun getReachableBookCover(): String {
+        val connectivityManager = mContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+        val mediaId = mBook.mediaId
+        val coverUrl = ApiConstants.getBookCover(mediaId)
+        if (networkInfo != null && networkInfo.isConnected) {
+            var isReachable = false
+            val bookImages = mBook.bookImages.pages
+            var currentPage = 0
+            var url = coverUrl
+            while (!isReachable && currentPage < bookImages.size) {
+                isReachable = try {
+                    val urlServer = URL(url)
+                    val urlConn = urlServer.openConnection() as HttpURLConnection
+                    urlConn.connectTimeout = 3000
+                    urlConn.connect()
+                    urlConn.responseCode == 200
+                } catch (e: Exception) {
+                    false
+                }
+                if (isReachable) {
+                    return url
+                }
+                url = ApiConstants.getPictureUrl(mediaId, currentPage, bookImages[currentPage].imageType)
+                currentPage++
+            }
+        }
+        return coverUrl
     }
 }
