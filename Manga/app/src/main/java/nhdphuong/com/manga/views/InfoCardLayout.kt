@@ -34,7 +34,7 @@ class InfoCardLayout(private val layoutInflater: LayoutInflater, private val tag
             view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
             viewList.add(view)
         }
-        viewList.sortWith(compareBy({ it.measuredWidth }))
+        // viewList.sortWith(compareBy({ it.measuredWidth })) // TODO: review cards layout when it's not sorted
         val totalWidth = viewGroup.measuredWidth
         val totalMargin = SupportUtils.dp2Pixel(mContext, 6)
         Log.d(TAG, "Total width: $totalWidth")

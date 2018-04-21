@@ -35,46 +35,43 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
+                <nhdphuong.com.manga.views.MyTextView
                     android:id="@+id/tvTitle_1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-condensed"
                     android:text="@string/title_1"
                     android:textColor="@android:color/white"
-                    android:textSize="23sp"
-                    android:textStyle="bold"
+                    android:textSize="21sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/ivBookCover" />
+                    app:layout_constraintTop_toBottomOf="@id/ivBookCover"
+                    app:myFont="@string/NotoSansBold" />
 
-                <TextView
+                <nhdphuong.com.manga.views.MyTextView
                     android:id="@+id/tvTitle_2"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp10"
-                    android:fontFamily="sans-serif-condensed"
                     android:text="@string/title_1"
                     android:textColor="@android:color/white"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
+                    android:textSize="18sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tvTitle_1" />
+                    app:layout_constraintTop_toBottomOf="@id/tvTitle_1"
+                    app:myFont="@string/NotoSansBold" />
 
-                <TextView
+                <nhdphuong.com.manga.views.MyTextView
                     android:id="@+id/tvTagsLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dp30"
                     android:layout_marginTop="@dimen/dp10"
-                    android:fontFamily="sans-serif-condensed"
                     android:gravity="center_vertical"
                     android:text="@string/tags_label"
                     android:textColor="@color/greyD9D9D9"
-                    android:textSize="19sp"
-                    android:textStyle="bold"
+                    android:textSize="15sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvTitle_2"
+                    app:myFont="@string/NotoSansBold"
                     tools:targetApi="jelly_bean" />
 
                 <LinearLayout
@@ -84,22 +81,21 @@
                     android:layout_marginStart="5dp"
                     android:orientation="vertical"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/tvCategoriesLabel"
+                    app:layout_constraintStart_toEndOf="@id/tvTagsLabel"
                     app:layout_constraintTop_toTopOf="@+id/tvTagsLabel" />
 
-                <TextView
+                <nhdphuong.com.manga.views.MyTextView
                     android:id="@+id/tvArtistsLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dp30"
                     android:layout_marginTop="5dp"
-                    android:fontFamily="sans-serif-condensed"
                     android:gravity="center_vertical"
                     android:text="@string/artists_label"
                     android:textColor="@color/greyD9D9D9"
-                    android:textSize="19sp"
-                    android:textStyle="bold"
+                    android:textSize="15sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/clTags"
+                    app:myFont="@string/NotoSansBold"
                     tools:targetApi="jelly_bean" />
 
                 <LinearLayout
@@ -109,22 +105,21 @@
                     android:layout_marginStart="5dp"
                     android:orientation="vertical"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/tvCategoriesLabel"
+                    app:layout_constraintStart_toEndOf="@id/tvArtistsLabel"
                     app:layout_constraintTop_toTopOf="@+id/tvArtistsLabel" />
 
-                <TextView
+                <nhdphuong.com.manga.views.MyTextView
                     android:id="@+id/tvLanguagesLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dp30"
                     android:layout_marginTop="5dp"
-                    android:fontFamily="sans-serif-condensed"
                     android:gravity="center_vertical"
                     android:text="@string/languages_label"
                     android:textColor="@color/greyD9D9D9"
-                    android:textSize="19sp"
-                    android:textStyle="bold"
+                    android:textSize="15sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/clArtists"
+                    app:myFont="@string/NotoSansBold"
                     tools:targetApi="jelly_bean" />
 
                 <LinearLayout
@@ -134,22 +129,21 @@
                     android:layout_marginStart="5dp"
                     android:orientation="vertical"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/tvCategoriesLabel"
+                    app:layout_constraintStart_toEndOf="@id/tvLanguagesLabel"
                     app:layout_constraintTop_toTopOf="@+id/tvLanguagesLabel" />
 
-                <TextView
+                <nhdphuong.com.manga.views.MyTextView
                     android:id="@+id/tvCategoriesLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dp30"
                     android:layout_marginTop="5dp"
-                    android:fontFamily="sans-serif-condensed"
                     android:gravity="center_vertical"
                     android:text="@string/categories_label"
                     android:textColor="@color/greyD9D9D9"
-                    android:textSize="19sp"
-                    android:textStyle="bold"
+                    android:textSize="15sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/clLanguages"
+                    app:myFont="@string/NotoSansBold"
                     tools:targetApi="jelly_bean" />
 
                 <LinearLayout
@@ -162,19 +156,18 @@
                     app:layout_constraintStart_toEndOf="@id/tvCategoriesLabel"
                     app:layout_constraintTop_toTopOf="@+id/tvCategoriesLabel" />
 
-                <TextView
+                <nhdphuong.com.manga.views.MyTextView
                     android:id="@+id/tvCharactersLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dp30"
                     android:layout_marginTop="5dp"
-                    android:fontFamily="sans-serif-condensed"
                     android:gravity="center_vertical"
                     android:text="@string/characters_label"
                     android:textColor="@color/greyD9D9D9"
-                    android:textSize="19sp"
-                    android:textStyle="bold"
+                    android:textSize="15sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/clCategories"
+                    app:myFont="@string/NotoSansBold"
                     tools:targetApi="jelly_bean" />
 
                 <LinearLayout
@@ -184,22 +177,21 @@
                     android:layout_marginStart="5dp"
                     android:orientation="vertical"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/tvCategoriesLabel"
+                    app:layout_constraintStart_toEndOf="@id/tvCharactersLabel"
                     app:layout_constraintTop_toTopOf="@+id/tvCharactersLabel" />
 
-                <TextView
+                <nhdphuong.com.manga.views.MyTextView
                     android:id="@+id/tvParodiesLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dp30"
                     android:layout_marginTop="5dp"
-                    android:fontFamily="sans-serif-condensed"
                     android:gravity="center_vertical"
                     android:text="@string/parodies_label"
                     android:textColor="@color/greyD9D9D9"
-                    android:textSize="19sp"
-                    android:textStyle="bold"
+                    android:textSize="15sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/clCharacters"
+                    app:myFont="@string/NotoSansBold"
                     tools:targetApi="jelly_bean" />
 
                 <LinearLayout
@@ -209,22 +201,21 @@
                     android:layout_marginStart="5dp"
                     android:orientation="vertical"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/tvCategoriesLabel"
+                    app:layout_constraintStart_toEndOf="@id/tvParodiesLabel"
                     app:layout_constraintTop_toTopOf="@+id/tvParodiesLabel" />
 
-                <TextView
+                <nhdphuong.com.manga.views.MyTextView
                     android:id="@+id/tvGroupsLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dp30"
                     android:layout_marginTop="5dp"
-                    android:fontFamily="sans-serif-condensed"
                     android:gravity="center_vertical"
                     android:text="@string/groups_label"
                     android:textColor="@color/greyD9D9D9"
-                    android:textSize="19sp"
-                    android:textStyle="bold"
+                    android:textSize="15sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/clParodies"
+                    app:myFont="@string/NotoSansBold"
                     tools:targetApi="jelly_bean" />
 
                 <LinearLayout
@@ -234,8 +225,36 @@
                     android:layout_marginStart="5dp"
                     android:orientation="vertical"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/tvCategoriesLabel"
+                    app:layout_constraintStart_toEndOf="@id/tvGroupsLabel"
                     app:layout_constraintTop_toTopOf="@+id/tvGroupsLabel" />
+
+                <nhdphuong.com.manga.views.MyTextView
+                    android:id="@+id/tvPageCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/dp30"
+                    android:layout_marginTop="5dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/page_count"
+                    android:textColor="@color/greyD9D9D9"
+                    android:textSize="17sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvGroupsLabel"
+                    app:myFont="@string/NotoSansRegular"
+                    tools:targetApi="jelly_bean" />
+
+                <nhdphuong.com.manga.views.MyTextView
+                    android:id="@+id/tvUpdatedAt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/dp30"
+                    android:layout_marginTop="5dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/uploaded"
+                    android:textColor="@color/greyD9D9D9"
+                    android:textSize="17sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvPageCount"
+                    app:myFont="@string/NotoSansRegular"
+                    tools:targetApi="jelly_bean" />
 
             </android.support.constraint.ConstraintLayout>
         </ScrollView>

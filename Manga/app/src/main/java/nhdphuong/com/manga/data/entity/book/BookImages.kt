@@ -9,6 +9,4 @@ import java.io.Serializable
  */
 class BookImages(@field:SerializedName(Constants.PAGES) val pages: List<ImageMeasurements>,
                  @field:SerializedName(Constants.COVER) val cover: ImageMeasurements,
-                 @field:SerializedName(Constants.THUMBNAIL) val thumbnail: ImageMeasurements): Serializable {
-
-}
+                 @field:SerializedName(Constants.THUMBNAIL) val thumbnail: ImageMeasurements): Serializable

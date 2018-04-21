@@ -25,6 +25,8 @@ interface BookPreviewContract {
         fun hideCharacterList()
         fun hideGroupList()
         fun hideParodyList()
+        fun showPageCount(pageCount: String)
+        fun showUploadedTime(uploadedTime: String)
     }
     interface Presenter : Base.Presenter {
         fun loadInfoLists()

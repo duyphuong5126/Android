@@ -11,6 +11,4 @@ class Tag(@field:SerializedName(Constants.ID) val tagId: Long,
           @field:SerializedName(Constants.TYPE) val type: String,
           @field:SerializedName(Constants.NAME) val name: String,
           @field:SerializedName(Constants.URL) val url: String,
-          @field:SerializedName(Constants.COUNT) val count: Long): Serializable {
-
-}
+          @field:SerializedName(Constants.COUNT) val count: Long): Serializable

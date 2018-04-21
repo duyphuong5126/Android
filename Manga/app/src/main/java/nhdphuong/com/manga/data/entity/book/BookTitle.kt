@@ -8,6 +8,5 @@ import java.io.Serializable
  * Created by nhdphuong on 3/24/18.
  */
 class BookTitle(@field:SerializedName(Constants.TITLE_ENG) val englishName: String,
-                @field:SerializedName(Constants.TITLE_JAPANESE) val japaneseName: String,
-                @field:SerializedName(Constants.TITLE_PRETTY) val pretty: String): Serializable {
-}
+                @field:SerializedName(Constants.TITLE_JAPANESE) val japaneseName: String = "",
+                @field:SerializedName(Constants.TITLE_PRETTY) val pretty: String) : Serializable

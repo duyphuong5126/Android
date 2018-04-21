@@ -9,6 +9,4 @@ import java.io.Serializable
  */
 class ImageMeasurements(@field:SerializedName(Constants.IMAGE_TYPE) val type: String,
                         @field:SerializedName(Constants.IMAGE_WIDTH) val width: Int,
-                        @field:SerializedName(Constants.IMAGE_HEIGHT) val height: Int): Serializable {
-
-}
+                        @field:SerializedName(Constants.IMAGE_HEIGHT) val height: Int): Serializable

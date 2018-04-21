@@ -50,7 +50,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
+                <nhdphuong.com.manga.views.MyTextView
                     android:id="@+id/tvItemTitle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -60,15 +60,15 @@
                     android:maxLines="1"
                     android:text="@string/main_item_chinese_sample"
                     android:textColor="@color/greyEEE"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    app:myFont="@string/NotoSansBold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/ivLanguage"
                     app:layout_constraintTop_toTopOf="parent" />
             </android.support.constraint.ConstraintLayout>
 
-            <TextView
+            <nhdphuong.com.manga.views.MyTextView
                 android:id="@+id/tv2ndTitlePart"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -77,8 +77,8 @@
                 android:lineSpacingExtra="4dp"
                 android:maxLines="2"
                 android:textColor="@color/greyEEE"
-                android:textSize="16sp"
-                android:textStyle="bold"
+                android:textSize="15sp"
+                app:myFont="@string/NotoSansBold"
                 android:gravity="center"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

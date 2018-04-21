@@ -3,6 +3,7 @@ package nhdphuong.com.manga.features.preview
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,11 +53,21 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
     }
 
     override fun show1stTitle(firstTitle: String) {
-        mBinding.tvTitle1.text = firstTitle
+        if (!TextUtils.isEmpty(firstTitle)) {
+            mBinding.tvTitle1.visibility = View.VISIBLE
+            mBinding.tvTitle1.text = firstTitle
+        } else {
+            mBinding.tvTitle1.visibility = View.GONE
+        }
     }
 
     override fun show2ndTitle(secondTitle: String) {
-        mBinding.tvTitle2.text = secondTitle
+        if (!TextUtils.isEmpty(secondTitle)) {
+            mBinding.tvTitle2.visibility = View.VISIBLE
+            mBinding.tvTitle2.text = secondTitle
+        } else {
+            mBinding.tvTitle2.visibility = View.GONE
+        }
     }
 
     override fun showTagList(tagList: List<Tag>) {
@@ -134,6 +145,14 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
     override fun hideParodyList() {
         mBinding.tvParodiesLabel.visibility = View.GONE
         mBinding.clParodies.visibility = View.GONE
+    }
+
+    override fun showPageCount(pageCount: String) {
+        mBinding.tvPageCount.text = pageCount
+    }
+
+    override fun showUploadedTime(uploadedTime: String) {
+        mBinding.tvUpdatedAt.text = uploadedTime
     }
 
     override fun showLoading() {

@@ -7,12 +7,12 @@
     android:background="@android:color/black"
     tools:targetApi="jelly_bean">
 
-    <TextView
+    <nhdphuong.com.manga.views.MyTextView
         android:id="@+id/tvPageNumber"
         style="@style/PageNotSelected"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:fontFamily="sans-serif"
+        android:background="@drawable/bg_circle_grey_1"
         android:gravity="center"
         android:minWidth="30dp"
         android:text="@string/page_number"
@@ -22,6 +22,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/bg_circle_grey_1"/>
+        app:myFont="@string/NotoSansRegular" />
 
 </android.support.constraint.ConstraintLayout>
