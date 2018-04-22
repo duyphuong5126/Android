@@ -34,9 +34,11 @@ class InfoCardLayout(private val layoutInflater: LayoutInflater, private val tag
             view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
             viewList.add(view)
         }
-        // viewList.sortWith(compareBy({ it.measuredWidth })) // TODO: review cards layout when it's not sorted
         val totalWidth = viewGroup.measuredWidth
         val totalMargin = SupportUtils.dp2Pixel(mContext, 6)
+        if (viewList.size >= 3) {
+            sortViewList(viewList, totalWidth, totalMargin / 2)
+        }
         Log.d(TAG, "Total width: $totalWidth")
         var widthCount = 0
         for (view in viewList) {
@@ -66,6 +68,35 @@ class InfoCardLayout(private val layoutInflater: LayoutInflater, private val tag
 
         override fun onClick(p0: View?) {
 
+        }
+    }
+
+    private fun sortViewList(viewList: LinkedList<View>, totalWidth: Int, totalMargin: Int) {
+        var anchorId = 0
+        val size = viewList.size
+        while (anchorId < size - 1) {
+            var widthSum = viewList[anchorId].measuredWidth + totalMargin
+            var viewId = anchorId + 1
+            val suitableViews = LinkedList<Int>()
+            while (widthSum <= totalWidth && viewId < size) {
+                widthSum += viewList[viewId].measuredWidth + totalMargin
+                if (widthSum <= totalWidth) {
+                    suitableViews.add(viewId)
+                } else {
+                    widthSum += viewList[viewId].measuredWidth + totalMargin
+                }
+                viewId++
+            }
+            if (suitableViews.isEmpty()) {
+                anchorId++
+            } else {
+                var idOffset = 1
+                for (i in suitableViews) {
+                    Collections.swap(viewList, i, anchorId + idOffset)
+                    idOffset++
+                }
+                anchorId += suitableViews.size + 1
+            }
         }
     }
 }

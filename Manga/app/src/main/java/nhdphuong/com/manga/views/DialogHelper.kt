@@ -9,9 +9,8 @@ import android.os.Looper
 import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.DrawableImageViewTarget
 import nhdphuong.com.manga.R
+import nhdphuong.com.manga.supports.GlideUtils
 
 class DialogHelper {
     companion object {
@@ -25,11 +24,10 @@ class DialogHelper {
             val contentView = layoutInflater.inflate(R.layout.layout_loading_dialog, null, false)
             val tvLoading: TextView = contentView.findViewById(R.id.tvLoading)
             val ivLoading: ImageView = contentView.findViewById(R.id.ivLoading)
-            val ivLoadingTarget = DrawableImageViewTarget(ivLoading)
             dialog.setContentView(contentView)
             dialog.setCancelable(false)
             dialog.window.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
-            Glide.with(activity).load(R.raw.ic_loading_cat_transparent).into(ivLoadingTarget)
+            GlideUtils.loadGifImage(R.raw.ic_loading_cat_transparent, ivLoading)
             val onFinishTask = runScheduledTaskOnMainThread({
                 Log.d("Dialog", "Current pos: $currentPos")
                 tvLoading.text = loadingString + dotsArray[currentPos]

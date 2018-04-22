@@ -21,10 +21,12 @@
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/dp10"
                 android:paddingEnd="@dimen/dp10"
                 android:paddingStart="@dimen/dp10"
                 android:paddingTop="@dimen/dp10">
 
+                <!-- Book cover-->
                 <android.support.v4.widget.NestedScrollView
                     android:id="@+id/svBookCover"
                     android:layout_width="0dp"
@@ -41,13 +43,14 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:contentDescription="@string/book_cover"
-                            android:scaleType="center"
+                            android:scaleType="fitCenter"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
                     </LinearLayout>
                 </android.support.v4.widget.NestedScrollView>
 
+                <!-- Book info-->
                 <nhdphuong.com.manga.views.MyTextView
                     android:id="@+id/tvTitle_1"
                     android:layout_width="0dp"
@@ -268,6 +271,46 @@
                     app:layout_constraintTop_toBottomOf="@+id/tvPageCount"
                     app:myFont="@string/NotoSansRegular"
                     tools:targetApi="jelly_bean" />
+
+                <!-- Book preview thumbnails-->
+                <nhdphuong.com.manga.views.MyTextView
+                    android:id="@+id/mbtFavorite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_red_all_corners_radius_1"
+                    android:drawablePadding="@dimen/dp10"
+                    android:drawableStart="@drawable/ic_heart_white"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="@dimen/dp10"
+                    android:paddingEnd="15dp"
+                    android:paddingStart="15dp"
+                    android:paddingTop="@dimen/dp10"
+                    android:text="@string/favorite"
+                    android:textColor="@android:color/white"
+                    android:textSize="17sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvUpdatedAt"
+                    app:myFont="@string/NotoSansBold" />
+
+                <nhdphuong.com.manga.views.MyTextView
+                    android:id="@+id/mbtDownload"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dp10"
+                    android:background="@drawable/bg_grey_all_corners_radius_3"
+                    android:drawablePadding="@dimen/dp10"
+                    android:drawableStart="@drawable/ic_download_grey"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="@dimen/dp10"
+                    android:paddingEnd="15dp"
+                    android:paddingStart="15dp"
+                    android:paddingTop="@dimen/dp10"
+                    android:text="@string/download"
+                    android:textColor="@android:color/white"
+                    android:textSize="17sp"
+                    app:layout_constraintStart_toEndOf="@id/mbtFavorite"
+                    app:layout_constraintTop_toBottomOf="@+id/tvUpdatedAt"
+                    app:myFont="@string/NotoSansBold" />
 
             </android.support.constraint.ConstraintLayout>
         </ScrollView>

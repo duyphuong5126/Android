@@ -56,4 +56,6 @@
     <string name="NotoSansBold" translatable="false">fonts/NotoSans-Bold.ttf</string>
     <string name="NotoSansItalic" translatable="false">fonts/NotoSans-Italic.ttf</string>
     <string name="NotoSansBoldItalic" translatable="false">fonts/NotoSans-BoldItalic.ttf</string>
+    <string name="favorite">Favorite</string>
+    <string name="download">Download</string>
 </resources>

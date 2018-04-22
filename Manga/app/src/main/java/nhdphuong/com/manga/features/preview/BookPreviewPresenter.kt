@@ -52,14 +52,7 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
     }
 
     override fun start() {
-        launch {
-            val coverUrl = async {
-                getReachableBookCover()
-            }.await()
-            launch(UI) {
-                mView.showBookCoverImage(coverUrl)
-            }
-        }
+        mView.showBookCoverImage(ApiConstants.getBookCover(mBook.mediaId))
         mView.show1stTitle(mBook.title.englishName)
         mView.show2ndTitle(mBook.title.japaneseName)
         mView.showUploadedTime(String.format(mContext.getString(R.string.uploaded), getUploadedTimeString()))
@@ -144,6 +137,17 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
         }
     }
 
+    override fun reloadCoverImage() {
+        launch {
+            val coverUrl = async {
+                getReachableBookCover()
+            }.await()
+            launch(UI) {
+                mView.showBookCoverImage(coverUrl)
+            }
+        }
+    }
+
     override fun stop() {
 
     }
@@ -208,10 +212,10 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
         val coverUrl = ApiConstants.getBookCover(mediaId)
         if (networkInfo != null && networkInfo.isConnected) {
             var isReachable = false
-            val bookImages = mBook.bookImages.pages
+            val bookPages = mBook.bookImages.pages
             var currentPage = 0
-            var url = coverUrl
-            while (!isReachable && currentPage < bookImages.size) {
+            var url = ApiConstants.getPictureUrl(mediaId, currentPage, bookPages[currentPage].imageType)
+            while (!isReachable && currentPage < bookPages.size) {
                 isReachable = try {
                     val urlServer = URL(url)
                     val urlConn = urlServer.openConnection() as HttpURLConnection
@@ -224,7 +228,7 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
                 if (isReachable) {
                     return url
                 }
-                url = ApiConstants.getPictureUrl(mediaId, currentPage, bookImages[currentPage].imageType)
+                url = ApiConstants.getPictureUrl(mediaId, currentPage, bookPages[currentPage].imageType)
                 currentPage++
             }
         }
