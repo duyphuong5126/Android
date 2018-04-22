@@ -7,6 +7,15 @@ import java.io.Serializable
 /*
  * Created by nhdphuong on 3/24/18.
  */
-class BookTitle(@field:SerializedName(Constants.TITLE_ENG) val englishName: String,
-                @field:SerializedName(Constants.TITLE_JAPANESE) val japaneseName: String = "",
-                @field:SerializedName(Constants.TITLE_PRETTY) val pretty: String) : Serializable
+class BookTitle(@field:SerializedName(Constants.TITLE_ENG) private val mEnglishName: String?,
+                @field:SerializedName(Constants.TITLE_JAPANESE) private val mJapaneseName: String?,
+                @field:SerializedName(Constants.TITLE_PRETTY) private val mPretty: String?) : Serializable {
+    val japaneseName: String
+        get() = mJapaneseName ?: ""
+
+    val englishName: String
+        get() = mEnglishName ?: ""
+
+    val pretty: String
+        get() = mPretty ?: ""
+}
