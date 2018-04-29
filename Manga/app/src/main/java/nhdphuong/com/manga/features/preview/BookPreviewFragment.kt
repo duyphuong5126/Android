@@ -1,6 +1,7 @@
 package nhdphuong.com.manga.features.preview
 
 import android.databinding.DataBindingUtil
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.TextUtils
@@ -9,17 +10,29 @@ import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
 import nhdphuong.com.manga.R
+import nhdphuong.com.manga.data.entity.book.Book
 import nhdphuong.com.manga.data.entity.book.Tag
 import nhdphuong.com.manga.databinding.FragmentBookPreviewBinding
 import nhdphuong.com.manga.views.InfoCardLayout
+import nhdphuong.com.manga.views.MyGridLayoutManager
+import nhdphuong.com.manga.views.adapters.BookAdapter
+import nhdphuong.com.manga.views.adapters.PreviewAdapter
 
 /*
  * Created by nhdphuong on 4/14/18.
  */
 class BookPreviewFragment : Fragment(), BookPreviewContract.View {
+    companion object {
+        private const val NUM_OF_ROWS = 2
+    }
+
     private lateinit var mPresenter: BookPreviewContract.Presenter
     private lateinit var mBinding: FragmentBookPreviewBinding
     private lateinit var mRequestOptions: RequestOptions
@@ -54,7 +67,17 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
     }
 
     override fun showBookCoverImage(coverUrl: String) {
-        mRequestManager.load(coverUrl).apply(mRequestOptions).into(mBinding.ivBookCover)
+        mRequestManager.load(coverUrl).apply(mRequestOptions).listener(object : RequestListener<Drawable> {
+            override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                mPresenter.saveCurrentAvailableCoverUrl(coverUrl)
+                return false
+            }
+
+            override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
+                mPresenter.reloadCoverImage()
+                return true
+            }
+        }).into(mBinding.ivBookCover)
     }
 
     override fun show1stTitle(firstTitle: String) {
@@ -158,6 +181,30 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
 
     override fun showUploadedTime(uploadedTime: String) {
         mBinding.tvUpdatedAt.text = uploadedTime
+    }
+
+    override fun showBookThumbnailList(thumbnailList: List<String>) {
+        var spanCount = thumbnailList.size / NUM_OF_ROWS
+        if (thumbnailList.size % NUM_OF_ROWS != 0) {
+            spanCount++
+        }
+
+        val previewLayoutManager = MyGridLayoutManager(context, spanCount)
+        previewLayoutManager.isAutoMeasureEnabled = true
+        mBinding.rvPreviewList.layoutManager = previewLayoutManager
+        mBinding.rvPreviewList.adapter = PreviewAdapter(NUM_OF_ROWS, thumbnailList)
+    }
+
+    override fun showRecommendBook(bookList: List<Book>) {
+        val gridLayoutManager = MyGridLayoutManager(context, bookList.size)
+        gridLayoutManager.isAutoMeasureEnabled = true
+
+        mBinding.rvRecommendList.layoutManager = gridLayoutManager
+        mBinding.rvRecommendList.adapter = BookAdapter(bookList, BookAdapter.RECOMMEND_BOOK, object : BookAdapter.OnBookClick {
+            override fun onItemClick(item: Book) {
+
+            }
+        })
     }
 
     override fun showLoading() {

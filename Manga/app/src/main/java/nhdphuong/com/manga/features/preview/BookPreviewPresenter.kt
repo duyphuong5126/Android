@@ -2,14 +2,18 @@ package nhdphuong.com.manga.features.preview
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.util.Log
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.runBlocking
 import nhdphuong.com.manga.Constants
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.api.ApiConstants
 import nhdphuong.com.manga.data.entity.book.Book
+import nhdphuong.com.manga.data.entity.book.ImageMeasurements
 import nhdphuong.com.manga.data.entity.book.Tag
+import nhdphuong.com.manga.data.repository.BookRepository
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
@@ -20,8 +24,10 @@ import javax.inject.Inject
  */
 class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewContract.View,
                                                private val mBook: Book,
-                                               private val mContext: Context) : BookPreviewContract.Presenter {
+                                               private val mContext: Context,
+                                               private val mBookRepository: BookRepository) : BookPreviewContract.Presenter {
     companion object {
+        private val TAG = BookPreviewPresenter::class.java.simpleName
         private const val MILLISECOND: Long = 1000
         private const val MINUTE: Long = MILLISECOND * 60
         private const val HOUR: Long = MINUTE * 60
@@ -38,6 +44,9 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
     private var isCharacterListInitialized = false
     private var isParodyListInitialized = false
     private var isGroupListInitialized = false
+    private var isInfoLoaded = false
+    private var isBookCoverReloaded = false
+    private lateinit var mCacheCoverUrl: String
 
     private lateinit var mTagList: LinkedList<Tag>
     private lateinit var mArtistList: LinkedList<Tag>
@@ -52,7 +61,11 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
     }
 
     override fun start() {
-        mView.showBookCoverImage(ApiConstants.getBookCover(mBook.mediaId))
+        if (!this::mCacheCoverUrl.isInitialized) {
+            mView.showBookCoverImage(ApiConstants.getBookCover(mBook.mediaId))
+        } else {
+            mView.showBookCoverImage(mCacheCoverUrl)
+        }
         mView.show1stTitle(mBook.title.englishName)
         mView.show2ndTitle(mBook.title.japaneseName)
         mView.showUploadedTime(String.format(mContext.getString(R.string.uploaded), getUploadedTimeString()))
@@ -67,85 +80,99 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
     }
 
     override fun loadInfoLists() {
-        for (tag in mBook.tags) {
-            when (tag.type) {
-                Constants.TAG -> mTagList.add(tag)
-                Constants.CATEGORY -> mCategoryList.add(tag)
-                Constants.CHARACTER -> mCharacterList.add(tag)
-                Constants.ARTIST -> mArtistList.add(tag)
-                Constants.LANGUAGE -> mLanguageList.add(tag)
-                Constants.PARODY -> mParodyList.add(tag)
-                Constants.GROUP -> mGroupList.add(tag)
+        if (!isInfoLoaded) {
+            for (tag in mBook.tags) {
+                when (tag.type) {
+                    Constants.TAG -> mTagList.add(tag)
+                    Constants.CATEGORY -> mCategoryList.add(tag)
+                    Constants.CHARACTER -> mCharacterList.add(tag)
+                    Constants.ARTIST -> mArtistList.add(tag)
+                    Constants.LANGUAGE -> mLanguageList.add(tag)
+                    Constants.PARODY -> mParodyList.add(tag)
+                    Constants.GROUP -> mGroupList.add(tag)
+                }
             }
-        }
 
-        if (!isTagListInitialized) {
-            if (mTagList.isEmpty()) {
-                mView.hideTagList()
-            } else {
-                mView.showTagList(mTagList)
+            if (!isTagListInitialized) {
+                if (mTagList.isEmpty()) {
+                    mView.hideTagList()
+                } else {
+                    mView.showTagList(mTagList)
+                }
+                isTagListInitialized = true
             }
-            isTagListInitialized = true
-        }
-        if (!isArtistListInitialized) {
-            if (mArtistList.isEmpty()) {
-                mView.hideArtistList()
-            } else {
-                mView.showArtistList(mArtistList)
+            if (!isArtistListInitialized) {
+                if (mArtistList.isEmpty()) {
+                    mView.hideArtistList()
+                } else {
+                    mView.showArtistList(mArtistList)
+                }
+                isArtistListInitialized = true
             }
-            isArtistListInitialized = true
-        }
-        if (!isLanguageListInitialized) {
-            if (mLanguageList.isEmpty()) {
-                mView.hideLanguageList()
-            } else {
-                mView.showLanguageList(mLanguageList)
+            if (!isLanguageListInitialized) {
+                if (mLanguageList.isEmpty()) {
+                    mView.hideLanguageList()
+                } else {
+                    mView.showLanguageList(mLanguageList)
+                }
+                isLanguageListInitialized = true
             }
-            isLanguageListInitialized = true
-        }
-        if (!isCategoryListInitialized) {
-            if (mCategoryList.isEmpty()) {
-                mView.hideCategoryList()
-            } else {
-                mView.showCategoryList(mCategoryList)
+            if (!isCategoryListInitialized) {
+                if (mCategoryList.isEmpty()) {
+                    mView.hideCategoryList()
+                } else {
+                    mView.showCategoryList(mCategoryList)
+                }
+                isCategoryListInitialized = true
             }
-            isCategoryListInitialized = true
-        }
-        if (!isCharacterListInitialized) {
-            if (mCharacterList.isEmpty()) {
-                mView.hideCharacterList()
-            } else {
-                mView.showCharacterList(mCharacterList)
+            if (!isCharacterListInitialized) {
+                if (mCharacterList.isEmpty()) {
+                    mView.hideCharacterList()
+                } else {
+                    mView.showCharacterList(mCharacterList)
+                }
+                isCharacterListInitialized = true
             }
-            isCharacterListInitialized = true
-        }
-        if (!isGroupListInitialized) {
-            if (mGroupList.isEmpty()) {
-                mView.hideGroupList()
-            } else {
-                mView.showGroupList(mGroupList)
+            if (!isGroupListInitialized) {
+                if (mGroupList.isEmpty()) {
+                    mView.hideGroupList()
+                } else {
+                    mView.showGroupList(mGroupList)
+                }
+                isGroupListInitialized = true
             }
-            isGroupListInitialized = true
-        }
-        if (!isParodyListInitialized) {
-            if (mParodyList.isEmpty()) {
-                mView.hideParodyList()
-            } else {
-                mView.showParodyList(mParodyList)
+            if (!isParodyListInitialized) {
+                if (mParodyList.isEmpty()) {
+                    mView.hideParodyList()
+                } else {
+                    mView.showParodyList(mParodyList)
+                }
+                isParodyListInitialized = true
             }
-            isParodyListInitialized = true
+
+            loadBookThumbnails()
+
+            loadRecommendBook()
         }
     }
 
     override fun reloadCoverImage() {
-        launch {
-            val coverUrl = async {
-                getReachableBookCover()
-            }.await()
-            launch(UI) {
-                mView.showBookCoverImage(coverUrl)
+        if (!isBookCoverReloaded) {
+            isBookCoverReloaded = true
+            launch {
+                val coverUrl = async {
+                    getReachableBookCover()
+                }.await()
+                launch(UI) {
+                    mView.showBookCoverImage(coverUrl)
+                }
             }
         }
+    }
+
+    override fun saveCurrentAvailableCoverUrl(url: String) {
+        Log.d(TAG, "Current available url: $url")
+        mCacheCoverUrl = url
     }
 
     override fun stop() {
@@ -228,10 +255,34 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
                 if (isReachable) {
                     return url
                 }
-                url = ApiConstants.getPictureUrl(mediaId, currentPage, bookPages[currentPage].imageType)
                 currentPage++
+                url = ApiConstants.getPictureUrl(mediaId, currentPage, bookPages[currentPage].imageType)
             }
         }
         return coverUrl
+    }
+
+    private fun loadBookThumbnails() {
+        val thumbnails = LinkedList<String>()
+        val mediaId = mBook.mediaId
+        val bookPages: List<ImageMeasurements> = mBook.bookImages.pages
+        for (pageId in 0 until bookPages.size) {
+            val page = bookPages[pageId]
+            val url = ApiConstants.getThumbnailByPage(mediaId, pageId + 1, page.imageType)
+            thumbnails.add(url)
+        }
+        mView.showBookThumbnailList(thumbnails)
+        isInfoLoaded = true
+    }
+
+    private fun loadRecommendBook() {
+        launch {
+            mBookRepository.getRecommendBook(mBook.bookId)?.bookList?.let { bookList ->
+                Log.d(TAG, "Number of recommend book of book ${mBook.bookId}: ${bookList.size}")
+                launch(UI) {
+                    mView.showRecommendBook(bookList)
+                }
+            }
+        }
     }
 }

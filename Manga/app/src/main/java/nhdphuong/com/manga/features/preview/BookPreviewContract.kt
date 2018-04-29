@@ -1,6 +1,7 @@
 package nhdphuong.com.manga.features.preview
 
 import nhdphuong.com.manga.Base
+import nhdphuong.com.manga.data.entity.book.Book
 import nhdphuong.com.manga.data.entity.book.Tag
 
 /*
@@ -27,10 +28,13 @@ interface BookPreviewContract {
         fun hideParodyList()
         fun showPageCount(pageCount: String)
         fun showUploadedTime(uploadedTime: String)
+        fun showBookThumbnailList(thumbnailList: List<String>)
+        fun showRecommendBook(bookList: List<Book>)
     }
 
     interface Presenter : Base.Presenter {
         fun loadInfoLists()
         fun reloadCoverImage()
+        fun saveCurrentAvailableCoverUrl(url: String)
     }
 }

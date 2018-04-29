@@ -3,7 +3,7 @@ package nhdphuong.com.manga
 import dagger.Module
 import dagger.Provides
 import nhdphuong.com.manga.api.ApiConstants
-import nhdphuong.com.manga.api.HomeApiService
+import nhdphuong.com.manga.api.BookApiService
 import nhdphuong.com.manga.supports.ServiceGenerator
 import javax.inject.Singleton
 
@@ -20,9 +20,9 @@ class ApplicationModule(private val mApplication: NHentaiApp) {
 
     @Singleton
     @Provides
-    fun provideHomeApiService(): HomeApiService {
+    fun provideHomeApiService(): BookApiService {
         ServiceGenerator.setBaseUrl(ApiConstants.NHENTAI_HOME)
         ServiceGenerator.setInterceptor(null)
-        return ServiceGenerator.createService(HomeApiService::class.java)
+        return ServiceGenerator.createService(BookApiService::class.java)
     }
 }

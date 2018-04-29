@@ -58,4 +58,7 @@
     <string name="NotoSansBoldItalic" translatable="false">fonts/NotoSans-BoldItalic.ttf</string>
     <string name="favorite">Favorite</string>
     <string name="download">Download</string>
+    <string name="preview">Preview</string>
+    <string name="page_thumbnail">Page thumbnail</string>
+    <string name="recommend_for_you">Recommend for you</string>
 </resources>

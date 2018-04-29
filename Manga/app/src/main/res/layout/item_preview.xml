@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    android:padding="2dp">
+
+    <ImageView
+        android:id="@+id/ivPageThumbnail"
+        android:layout_width="150dp"
+        android:layout_height="200dp"
+        android:contentDescription="@string/page_thumbnail"
+        android:src="@drawable/ic_404_not_found"
+        android:background="@android:color/transparent"
+        android:scaleType="center"/>
+
+    <nhdphuong.com.manga.views.MyTextView
+        android:id="@+id/mtvPageNumber"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@drawable/bg_gradient_transparent_grey_1"
+        android:gravity="center"
+        android:text="1"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="parent"
+        app:myFont="@string/NotoSansBold" />
+
+</android.support.constraint.ConstraintLayout>

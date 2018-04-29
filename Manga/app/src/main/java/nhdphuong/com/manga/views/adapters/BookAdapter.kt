@@ -17,25 +17,34 @@ import nhdphuong.com.manga.supports.SupportUtils
 /*
  * Created by nhdphuong on 3/18/18.
  */
-class MainListAdapter(private val mItemList: List<Book>, private val mMainListClickCallback: OnMainListClick)
+class BookAdapter(private val mItemList: List<Book>, private val mAdapterType: Int, private val mBookClickCallback: OnBookClick)
     : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     companion object {
-        private val TAG = MainListAdapter::class.java.simpleName
+        private val TAG = BookAdapter::class.java.simpleName
+        const val HOME_PREVIEW_BOOK = 1
+        const val RECOMMEND_BOOK = 2
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_main_list, parent, false)
-        return MainListViewHolder(view, mMainListClickCallback)
+        val layoutResId = when (viewType) {
+            HOME_PREVIEW_BOOK -> R.layout.item_home_list
+            RECOMMEND_BOOK -> R.layout.item_recommend_list
+            else -> R.layout.item_home_list
+        }
+        val view = LayoutInflater.from(parent.context).inflate(layoutResId, parent, false)
+        return MainListViewHolder(view, mBookClickCallback)
     }
 
     override fun getItemCount(): Int = mItemList.size
+
+    override fun getItemViewType(position: Int): Int = mAdapterType
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder?, position: Int) {
         val mainLisViewHolder = holder as MainListViewHolder
         mainLisViewHolder.setData(mItemList[position])
     }
 
-    inner class MainListViewHolder(itemView: View, private val mMainListClickCallback: OnMainListClick) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class MainListViewHolder(itemView: View, private val mBookClickCallback: OnBookClick) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
         private lateinit var mBookPreview: Book
         private val mIvItemThumbnail: ImageView = itemView.findViewById(R.id.ivItemThumbnail)
         private val mTv1stTitle: TextView = itemView.findViewById(R.id.tvItemTitle)
@@ -51,7 +60,7 @@ class MainListAdapter(private val mItemList: List<Book>, private val mMainListCl
         }
 
         override fun onClick(p0: View?) {
-            mMainListClickCallback.onItemClick(mBookPreview)
+            mBookClickCallback.onItemClick(mBookPreview)
         }
 
         @SuppressLint("SetTextI18n")
@@ -82,7 +91,7 @@ class MainListAdapter(private val mItemList: List<Book>, private val mMainListCl
         }
     }
 
-    interface OnMainListClick {
+    interface OnBookClick {
         fun onItemClick(item: Book)
     }
 }

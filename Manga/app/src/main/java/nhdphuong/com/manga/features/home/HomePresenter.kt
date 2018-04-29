@@ -2,6 +2,7 @@ package nhdphuong.com.manga.features.home
 
 import android.content.Context
 import android.util.Log
+import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
@@ -30,6 +31,7 @@ class HomePresenter @Inject constructor(private val mContext: Context,
     private var mCurrentPage = 1
     private var mPreventiveData = HashMap<Int, List<Book>>()
     private var isLoadingPreventiveData = false
+    private val mJobStack = Stack<Job>()
 
     init {
         mView.setPresenter(this)
@@ -41,7 +43,7 @@ class HomePresenter @Inject constructor(private val mContext: Context,
 
         mView.showLoading()
         mView.setUpHomeBookList(mMainList)
-        launch {
+        val job = launch {
             val startTime = System.currentTimeMillis()
             val remoteBook = mBookRepository.getBookByPage(mCurrentPage)
             Log.d(TAG, "Time spent=${System.currentTimeMillis() - startTime}")
@@ -68,6 +70,7 @@ class HomePresenter @Inject constructor(private val mContext: Context,
                 mView.hideLoading()
             }
         }
+        mJobStack.push(job)
     }
 
     override fun jumpToPage(pageNumber: Int) {
@@ -94,6 +97,12 @@ class HomePresenter @Inject constructor(private val mContext: Context,
 
     override fun stop() {
         Log.d(TAG, "stop")
+        launch {
+            while (mJobStack.size > 0) {
+                val job = mJobStack.pop()
+                job.cancel()
+            }
+        }
     }
 
     private fun onPageChange() {

@@ -17,7 +17,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import nhdphuong.com.manga.R
-import nhdphuong.com.manga.views.adapters.MainListAdapter
+import nhdphuong.com.manga.views.adapters.BookAdapter
 import nhdphuong.com.manga.data.entity.book.Book
 import nhdphuong.com.manga.databinding.FragmentHomeBinding
 import nhdphuong.com.manga.views.DialogHelper
@@ -34,7 +34,7 @@ class HomeFragment : Fragment(), HomeContract.View {
     }
 
     private lateinit var mBinding: FragmentHomeBinding
-    private lateinit var mHomeListAdapter: MainListAdapter
+    private lateinit var mHomeListAdapter: BookAdapter
     private lateinit var mHomePaginationAdapter: HomePaginationAdapter
     private lateinit var mHomePresenter: HomeContract.Presenter
     private lateinit var mLoadingDialog: Dialog
@@ -135,7 +135,7 @@ class HomeFragment : Fragment(), HomeContract.View {
 
     @SuppressLint("PrivateResource")
     override fun setUpHomeBookList(homeBookList: List<Book>) {
-        mHomeListAdapter = MainListAdapter(homeBookList, object : MainListAdapter.OnMainListClick {
+        mHomeListAdapter = BookAdapter(homeBookList, BookAdapter.HOME_PREVIEW_BOOK, object : BookAdapter.OnBookClick {
             override fun onItemClick(item: Book) {
                 mHomePresenter.showBookPreview(item)
             }

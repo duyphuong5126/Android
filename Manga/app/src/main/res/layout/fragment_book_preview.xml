@@ -10,6 +10,7 @@
         android:layout_height="match_parent">
 
         <ScrollView
+            android:id="@+id/svPreview"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@color/grey_1"
@@ -272,7 +273,6 @@
                     app:myFont="@string/NotoSansRegular"
                     tools:targetApi="jelly_bean" />
 
-                <!-- Book preview thumbnails-->
                 <nhdphuong.com.manga.views.MyTextView
                     android:id="@+id/mbtFavorite"
                     android:layout_width="wrap_content"
@@ -311,6 +311,71 @@
                     app:layout_constraintStart_toEndOf="@id/mbtFavorite"
                     app:layout_constraintTop_toBottomOf="@+id/tvUpdatedAt"
                     app:myFont="@string/NotoSansBold" />
+
+                <!-- Book preview thumbnails-->
+                <nhdphuong.com.manga.views.MyTextView
+                    android:id="@+id/mtvPreview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp10"
+                    android:text="@string/preview"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp"
+                    app:layout_constraintStart_toStartOf="@+id/mbtFavorite"
+                    app:layout_constraintTop_toBottomOf="@+id/mbtFavorite"
+                    app:myFont="@string/NotoSansBold" />
+
+                <HorizontalScrollView
+                    android:id="@+id/hsvPreviewThumbNail"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/mtvPreview"
+                    app:layout_constraintTop_toBottomOf="@+id/mtvPreview">
+
+                    <android.support.constraint.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/rvPreviewList"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </android.support.constraint.ConstraintLayout>
+                </HorizontalScrollView>
+
+                <nhdphuong.com.manga.views.MyTextView
+                    android:id="@+id/mtvRecommendBook"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp10"
+                    android:text="@string/recommend_for_you"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp"
+                    app:layout_constraintStart_toStartOf="@+id/hsvPreviewThumbNail"
+                    app:layout_constraintTop_toBottomOf="@+id/hsvPreviewThumbNail"
+                    app:layout_goneMarginTop="@dimen/dp10"
+                    app:myFont="@string/NotoSansBold" />
+
+                <HorizontalScrollView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/mtvRecommendBook"
+                    app:layout_constraintTop_toBottomOf="@id/mtvRecommendBook">
+
+                    <android.support.constraint.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/rvRecommendList"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </android.support.constraint.ConstraintLayout>
+
+                </HorizontalScrollView>
 
             </android.support.constraint.ConstraintLayout>
         </ScrollView>
