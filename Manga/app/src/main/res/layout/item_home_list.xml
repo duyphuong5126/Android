@@ -50,7 +50,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <nhdphuong.com.manga.views.MyTextView
+                <nhdphuong.com.manga.views.customs.MyTextView
                     android:id="@+id/tvItemTitle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -61,29 +61,29 @@
                     android:text="@string/main_item_chinese_sample"
                     android:textColor="@color/greyEEE"
                     android:textSize="15sp"
-                    app:myFont="@string/NotoSansBold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/ivLanguage"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:myFont="@string/NotoSansBold" />
             </android.support.constraint.ConstraintLayout>
 
-            <nhdphuong.com.manga.views.MyTextView
+            <nhdphuong.com.manga.views.customs.MyTextView
                 android:id="@+id/tv2ndTitlePart"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:ellipsize="end"
+                android:gravity="center"
                 android:lineSpacingExtra="4dp"
                 android:maxLines="2"
                 android:textColor="@color/greyEEE"
                 android:textSize="15sp"
-                app:myFont="@string/NotoSansBold"
-                android:gravity="center"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/cl1stTitlePart" />
+                app:layout_constraintTop_toBottomOf="@id/cl1stTitlePart"
+                app:myFont="@string/NotoSansBold" />
 
         </android.support.constraint.ConstraintLayout>
     </LinearLayout>

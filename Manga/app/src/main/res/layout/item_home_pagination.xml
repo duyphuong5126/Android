@@ -7,7 +7,7 @@
     android:background="@android:color/black"
     tools:targetApi="jelly_bean">
 
-    <nhdphuong.com.manga.views.MyTextView
+    <nhdphuong.com.manga.views.customs.MyTextView
         android:id="@+id/tvPageNumber"
         style="@style/PageNotSelected"
         android:layout_width="30dp"

@@ -19,5 +19,6 @@ interface HomeContract {
         fun jumToFirstPage()
         fun jumToLastPage()
         fun showBookPreview(book: Book)
+        fun reloadCurrentPage(onRefreshed: () -> Unit)
     }
 }

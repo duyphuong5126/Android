@@ -65,7 +65,7 @@ class TabAdapter(context: Context, private val mOnMainTabClick: OnMainTabClick) 
         }
 
         fun toggleTab(selected: Boolean) {
-            mTabIndicator.visibility = if (selected) View.VISIBLE else View.GONE
+            mTabIndicator.visibility = if (selected) View.VISIBLE else View.INVISIBLE
             val textColor = if (selected) mEnableTextColor else mDisableTextColor
             mTvLabel.setTextColor(textColor)
         }

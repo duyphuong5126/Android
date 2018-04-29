@@ -16,6 +16,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import kotlinx.android.synthetic.main.fragment_home.*
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.views.adapters.BookAdapter
 import nhdphuong.com.manga.data.entity.book.Book
@@ -31,6 +32,7 @@ class HomeFragment : Fragment(), HomeContract.View {
     companion object {
         private val TAG = HomeFragment::class.java.simpleName
         private const val GRID_COLUMNS = 2
+        private const val LANDSCAPE_GRID_COLUMNS = 3
     }
 
     private lateinit var mBinding: FragmentHomeBinding
@@ -74,6 +76,11 @@ class HomeFragment : Fragment(), HomeContract.View {
             jumpTo(mHomePaginationAdapter.itemCount - 1)
         }
         mLoadingDialog = DialogHelper.showLoadingDialog(activity)
+        mBinding.srlPullToReload.setOnRefreshListener {
+            mHomePresenter.reloadCurrentPage {
+                mBinding.srlPullToReload.isRefreshing = false
+            }
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -141,7 +148,8 @@ class HomeFragment : Fragment(), HomeContract.View {
             }
         })
         val mainList: RecyclerView = mBinding.rvMainList
-        val mainListLayoutManager = GridLayoutManager(context, GRID_COLUMNS)
+        val isLandscape = resources.getBoolean(R.bool.is_landscape)
+        val mainListLayoutManager = GridLayoutManager(context, if (isLandscape) LANDSCAPE_GRID_COLUMNS else GRID_COLUMNS)
         mainListLayoutManager.isAutoMeasureEnabled = true
         mainList.layoutManager = mainListLayoutManager
         mainList.adapter = mHomeListAdapter

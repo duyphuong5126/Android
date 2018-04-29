@@ -55,7 +55,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <nhdphuong.com.manga.views.MyTextView
+                <nhdphuong.com.manga.views.customs.MyTextView
                     android:id="@+id/tvItemTitle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
                     app:myFont="@string/NotoSansBold" />
             </android.support.constraint.ConstraintLayout>
 
-            <nhdphuong.com.manga.views.MyTextView
+            <nhdphuong.com.manga.views.customs.MyTextView
                 android:id="@+id/tv2ndTitlePart"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

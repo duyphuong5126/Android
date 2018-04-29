@@ -84,7 +84,7 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rvMainTabs"
             android:layout_width="0dp"
-            android:layout_height="45dp"
+            android:layout_height="40dp"
             android:background="@android:color/white"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"

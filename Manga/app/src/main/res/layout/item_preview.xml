@@ -10,12 +10,12 @@
         android:id="@+id/ivPageThumbnail"
         android:layout_width="150dp"
         android:layout_height="200dp"
-        android:contentDescription="@string/page_thumbnail"
-        android:src="@drawable/ic_404_not_found"
         android:background="@android:color/transparent"
-        android:scaleType="center"/>
+        android:contentDescription="@string/page_thumbnail"
+        android:scaleType="center"
+        android:src="@drawable/ic_404_not_found" />
 
-    <nhdphuong.com.manga.views.MyTextView
+    <nhdphuong.com.manga.views.customs.MyTextView
         android:id="@+id/mtvPageNumber"
         android:layout_width="match_parent"
         android:layout_height="40dp"

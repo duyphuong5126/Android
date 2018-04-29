@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.supports.GlideUtils
-import nhdphuong.com.manga.views.MyTextView
+import nhdphuong.com.manga.views.customs.MyTextView
 
 /*
  * Created by nhdphuong on 4/28/18.

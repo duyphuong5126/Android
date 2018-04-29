@@ -52,7 +52,7 @@
                 </android.support.v4.widget.NestedScrollView>
 
                 <!-- Book info-->
-                <nhdphuong.com.manga.views.MyTextView
+                <nhdphuong.com.manga.views.customs.MyTextView
                     android:id="@+id/tvTitle_1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
                     app:layout_constraintTop_toBottomOf="@id/svBookCover"
                     app:myFont="@string/NotoSansBold" />
 
-                <nhdphuong.com.manga.views.MyTextView
+                <nhdphuong.com.manga.views.customs.MyTextView
                     android:id="@+id/tvTitle_2"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -77,7 +77,7 @@
                     app:layout_constraintTop_toBottomOf="@id/tvTitle_1"
                     app:myFont="@string/NotoSansBold" />
 
-                <nhdphuong.com.manga.views.MyTextView
+                <nhdphuong.com.manga.views.customs.MyTextView
                     android:id="@+id/tvTagsLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dp30"
@@ -101,7 +101,7 @@
                     app:layout_constraintStart_toEndOf="@id/tvTagsLabel"
                     app:layout_constraintTop_toTopOf="@+id/tvTagsLabel" />
 
-                <nhdphuong.com.manga.views.MyTextView
+                <nhdphuong.com.manga.views.customs.MyTextView
                     android:id="@+id/tvArtistsLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dp30"
@@ -125,7 +125,7 @@
                     app:layout_constraintStart_toEndOf="@id/tvArtistsLabel"
                     app:layout_constraintTop_toTopOf="@+id/tvArtistsLabel" />
 
-                <nhdphuong.com.manga.views.MyTextView
+                <nhdphuong.com.manga.views.customs.MyTextView
                     android:id="@+id/tvLanguagesLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dp30"
@@ -149,7 +149,7 @@
                     app:layout_constraintStart_toEndOf="@id/tvLanguagesLabel"
                     app:layout_constraintTop_toTopOf="@+id/tvLanguagesLabel" />
 
-                <nhdphuong.com.manga.views.MyTextView
+                <nhdphuong.com.manga.views.customs.MyTextView
                     android:id="@+id/tvCategoriesLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dp30"
@@ -173,7 +173,7 @@
                     app:layout_constraintStart_toEndOf="@id/tvCategoriesLabel"
                     app:layout_constraintTop_toTopOf="@+id/tvCategoriesLabel" />
 
-                <nhdphuong.com.manga.views.MyTextView
+                <nhdphuong.com.manga.views.customs.MyTextView
                     android:id="@+id/tvCharactersLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dp30"
@@ -197,7 +197,7 @@
                     app:layout_constraintStart_toEndOf="@id/tvCharactersLabel"
                     app:layout_constraintTop_toTopOf="@+id/tvCharactersLabel" />
 
-                <nhdphuong.com.manga.views.MyTextView
+                <nhdphuong.com.manga.views.customs.MyTextView
                     android:id="@+id/tvParodiesLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dp30"
@@ -221,7 +221,7 @@
                     app:layout_constraintStart_toEndOf="@id/tvParodiesLabel"
                     app:layout_constraintTop_toTopOf="@+id/tvParodiesLabel" />
 
-                <nhdphuong.com.manga.views.MyTextView
+                <nhdphuong.com.manga.views.customs.MyTextView
                     android:id="@+id/tvGroupsLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dp30"
@@ -245,7 +245,7 @@
                     app:layout_constraintStart_toEndOf="@id/tvGroupsLabel"
                     app:layout_constraintTop_toTopOf="@+id/tvGroupsLabel" />
 
-                <nhdphuong.com.manga.views.MyTextView
+                <nhdphuong.com.manga.views.customs.MyTextView
                     android:id="@+id/tvPageCount"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dp30"
@@ -259,7 +259,7 @@
                     app:myFont="@string/NotoSansRegular"
                     tools:targetApi="jelly_bean" />
 
-                <nhdphuong.com.manga.views.MyTextView
+                <nhdphuong.com.manga.views.customs.MyTextView
                     android:id="@+id/tvUpdatedAt"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dp30"
@@ -273,7 +273,7 @@
                     app:myFont="@string/NotoSansRegular"
                     tools:targetApi="jelly_bean" />
 
-                <nhdphuong.com.manga.views.MyTextView
+                <nhdphuong.com.manga.views.customs.MyTextView
                     android:id="@+id/mbtFavorite"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -292,7 +292,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/tvUpdatedAt"
                     app:myFont="@string/NotoSansBold" />
 
-                <nhdphuong.com.manga.views.MyTextView
+                <nhdphuong.com.manga.views.customs.MyTextView
                     android:id="@+id/mbtDownload"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -313,7 +313,7 @@
                     app:myFont="@string/NotoSansBold" />
 
                 <!-- Book preview thumbnails-->
-                <nhdphuong.com.manga.views.MyTextView
+                <nhdphuong.com.manga.views.customs.MyTextView
                     android:id="@+id/mtvPreview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -344,7 +344,7 @@
                     </android.support.constraint.ConstraintLayout>
                 </HorizontalScrollView>
 
-                <nhdphuong.com.manga.views.MyTextView
+                <nhdphuong.com.manga.views.customs.MyTextView
                     android:id="@+id/mtvRecommendBook"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
