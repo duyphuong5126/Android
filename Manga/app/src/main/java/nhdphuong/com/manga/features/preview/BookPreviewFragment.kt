@@ -49,7 +49,7 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_book_preview, container, false)
+        mBinding = DataBindingUtil.inflate(inflater!!, R.layout.fragment_book_preview, container, false)
         return mBinding.root
     }
 

@@ -57,7 +57,7 @@ class HomeFragment : Fragment(), HomeContract.View {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.d(TAG, "onCreateView")
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
+        mBinding = DataBindingUtil.inflate(inflater!!, R.layout.fragment_home, container, false)
         return mBinding.root
     }
 
