@@ -1,8 +1,12 @@
 package nhdphuong.com.manga.features.preview
 
+import android.animation.Animator
+import android.animation.ObjectAnimator
 import android.databinding.DataBindingUtil
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
+import android.support.annotation.RequiresApi
 import android.support.v4.app.Fragment
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -37,6 +41,8 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
     private lateinit var mBinding: FragmentBookPreviewBinding
     private lateinit var mRequestOptions: RequestOptions
     private lateinit var mRequestManager: RequestManager
+    private lateinit var mScrollUpAnimator: ObjectAnimator
+    private lateinit var mScrollDownAnimator: ObjectAnimator
 
     override fun setPresenter(presenter: BookPreviewContract.Presenter) {
         mPresenter = presenter
@@ -51,6 +57,21 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         mBinding = DataBindingUtil.inflate(inflater!!, R.layout.fragment_book_preview, container, false)
         return mBinding.root
+    }
+
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
+    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        mBinding.svBookCover.let { svBookCover ->
+            mScrollDownAnimator = ObjectAnimator.ofInt(svBookCover, "scrollY", 1000)
+            mScrollDownAnimator.startDelay = 100
+            mScrollDownAnimator.duration = 6500
+            mScrollUpAnimator = ObjectAnimator.ofInt(svBookCover, "scrollY", -1000)
+            mScrollUpAnimator.startDelay = 100
+            mScrollUpAnimator.duration = 6500
+            mScrollDownAnimator.addListener(getAnimationListener(mScrollUpAnimator))
+            mScrollUpAnimator.addListener(getAnimationListener(mScrollDownAnimator))
+        }
     }
 
     override fun onResume() {
@@ -70,6 +91,7 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
         mRequestManager.load(coverUrl).apply(mRequestOptions).listener(object : RequestListener<Drawable> {
             override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
                 mPresenter.saveCurrentAvailableCoverUrl(coverUrl)
+                mScrollDownAnimator.start()
                 return false
             }
 
@@ -202,7 +224,7 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
         mBinding.rvRecommendList.layoutManager = gridLayoutManager
         mBinding.rvRecommendList.adapter = BookAdapter(bookList, BookAdapter.RECOMMEND_BOOK, object : BookAdapter.OnBookClick {
             override fun onItemClick(item: Book) {
-
+                BookPreviewActivity.restart(item)
             }
         })
     }
@@ -211,12 +233,30 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
 
     }
 
+    override fun hideLoading() {
+
+    }
+
     private fun loadInfoList(layout: ViewGroup, infoList: List<Tag>) {
         val infoCardLayout = InfoCardLayout(activity.layoutInflater, infoList, context)
         infoCardLayout.loadInfoList(layout)
     }
 
-    override fun hideLoading() {
+    private fun getAnimationListener(callOnEndingObject: ObjectAnimator) = object : Animator.AnimatorListener{
+        override fun onAnimationEnd(p0: Animator?) {
+            callOnEndingObject.start()
+        }
 
+        override fun onAnimationCancel(p0: Animator?) {
+
+        }
+
+        override fun onAnimationRepeat(p0: Animator?) {
+
+        }
+
+        override fun onAnimationStart(p0: Animator?) {
+
+        }
     }
 }

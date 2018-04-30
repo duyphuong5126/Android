@@ -98,20 +98,28 @@ class HomePresenter @Inject constructor(private val mContext: Context,
 
     override fun reloadCurrentPage(onRefreshed: () -> Unit) {
         launch {
-            mBookRepository.getBookByPage(mCurrentPage)?.bookList?.let { bookList ->
-                mPreventiveData[mCurrentPage]?.let { page ->
-                    page.clear()
-                    page.addAll(bookList)
-                }
-                mMainList.clear()
-                mMainList.addAll(bookList)
+            val remoteBooks = mBookRepository.getBookByPage(mCurrentPage)
+            if (remoteBooks != null) {
+                remoteBooks.bookList.let { bookList ->
+                    mPreventiveData[mCurrentPage]?.let { page ->
+                        page.clear()
+                        page.addAll(bookList)
+                    }
+                    mMainList.clear()
+                    mMainList.addAll(bookList)
 
+                    launch(UI) {
+                        onRefreshed()
+                        mView.refreshHomeBookList()
+                        mView.showNothingView(false)
+                    }
+                }
+            } else {
                 launch(UI) {
                     onRefreshed()
-                    mView.refreshHomeBookList()
+                    mView.showNothingView(true)
                 }
             }
-
         }
     }
 

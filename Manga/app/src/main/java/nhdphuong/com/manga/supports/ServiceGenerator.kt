@@ -11,6 +11,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 /*
  * Created by nhdphuong on 3/24/18.
@@ -27,6 +28,9 @@ object ServiceGenerator {
     private var mRetrofit: Retrofit? = null
     private val mLoggingInterceptor = HttpLoggingInterceptor().setLevel(if (BuildConfig.BUILD_TYPE.equals("debug")) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.BASIC)
     private val mHttpClientBuilder = OkHttpClient.Builder().addInterceptor(mLoggingInterceptor)
+            .connectTimeout(30000, TimeUnit.MILLISECONDS)
+            .readTimeout(30000, TimeUnit.MILLISECONDS)
+            .writeTimeout(30000, TimeUnit.MILLISECONDS)
     private var mBaseUrl: String? = null
 
     fun setBaseUrl(baseUrl: String) {

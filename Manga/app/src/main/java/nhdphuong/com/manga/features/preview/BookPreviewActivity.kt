@@ -24,12 +24,22 @@ class BookPreviewActivity : AppCompatActivity() {
             intent.putExtra(Constants.BOOK, book)
             context.startActivity(intent)
         }
+
+        private var mInstance: BookPreviewActivity? = null
+
+        fun restart(book: Book) {
+            mInstance?.let { bookPreviewActivity ->
+                bookPreviewActivity.intent.putExtra(Constants.BOOK, book)
+                bookPreviewActivity.recreate()
+            }
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_book_preview)
+        mInstance = this
 
         val book = intent.extras.getSerializable(Constants.BOOK) as Book
 
