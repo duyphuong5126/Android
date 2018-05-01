@@ -1,6 +1,7 @@
 package nhdphuong.com.manga.features.preview
 
 import android.animation.Animator
+import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.databinding.DataBindingUtil
 import android.graphics.drawable.Drawable
@@ -41,8 +42,7 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
     private lateinit var mBinding: FragmentBookPreviewBinding
     private lateinit var mRequestOptions: RequestOptions
     private lateinit var mRequestManager: RequestManager
-    private lateinit var mScrollUpAnimator: ObjectAnimator
-    private lateinit var mScrollDownAnimator: ObjectAnimator
+    private lateinit var mAnimatorSet: AnimatorSet
 
     override fun setPresenter(presenter: BookPreviewContract.Presenter) {
         mPresenter = presenter
@@ -63,14 +63,20 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mBinding.svBookCover.let { svBookCover ->
-            mScrollDownAnimator = ObjectAnimator.ofInt(svBookCover, "scrollY", 1000)
-            mScrollDownAnimator.startDelay = 100
-            mScrollDownAnimator.duration = 6500
-            mScrollUpAnimator = ObjectAnimator.ofInt(svBookCover, "scrollY", -1000)
-            mScrollUpAnimator.startDelay = 100
-            mScrollUpAnimator.duration = 6500
-            mScrollDownAnimator.addListener(getAnimationListener(mScrollUpAnimator))
-            mScrollUpAnimator.addListener(getAnimationListener(mScrollDownAnimator))
+            val scrollDownAnimator = ObjectAnimator.ofInt(svBookCover, "scrollY", 1000)
+            scrollDownAnimator.startDelay = 100
+            scrollDownAnimator.duration = 6500
+            val scrollUpAnimator = ObjectAnimator.ofInt(svBookCover, "scrollY", -1000)
+            scrollUpAnimator.startDelay = 100
+            scrollUpAnimator.duration = 6500
+            scrollDownAnimator.addListener(getAnimationListener(scrollUpAnimator))
+            scrollUpAnimator.addListener(getAnimationListener(scrollDownAnimator))
+
+            mAnimatorSet = AnimatorSet()
+            mAnimatorSet.playTogether(scrollDownAnimator)
+            svBookCover.setOnTouchListener { _, _ ->
+                true
+            }
         }
     }
 
@@ -91,7 +97,7 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
         mRequestManager.load(coverUrl).apply(mRequestOptions).listener(object : RequestListener<Drawable> {
             override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
                 mPresenter.saveCurrentAvailableCoverUrl(coverUrl)
-                mScrollDownAnimator.start()
+                mAnimatorSet.start()
                 return false
             }
 
