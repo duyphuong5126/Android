@@ -220,7 +220,11 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
         val previewLayoutManager = MyGridLayoutManager(context, spanCount)
         previewLayoutManager.isAutoMeasureEnabled = true
         mBinding.rvPreviewList.layoutManager = previewLayoutManager
-        mBinding.rvPreviewList.adapter = PreviewAdapter(NUM_OF_ROWS, thumbnailList)
+        mBinding.rvPreviewList.adapter = PreviewAdapter(NUM_OF_ROWS, thumbnailList, object : PreviewAdapter.ThumbnailClickCallback{
+            override fun onThumbnailClicked(page: Int) {
+                mPresenter.startReadingFrom(page)
+            }
+        })
     }
 
     override fun showRecommendBook(bookList: List<Book>) {

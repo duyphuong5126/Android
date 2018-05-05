@@ -61,4 +61,7 @@
     <string name="preview">Preview</string>
     <string name="page_thumbnail">Page thumbnail</string>
     <string name="recommend_for_you">Recommend for you</string>
+    <string name="book_page">Book page</string>
+    <string name="back">Back</string>
+    <string name="book_title">Book title</string>
 </resources>

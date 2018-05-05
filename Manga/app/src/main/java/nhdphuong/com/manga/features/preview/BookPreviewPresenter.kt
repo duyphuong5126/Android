@@ -13,6 +13,7 @@ import nhdphuong.com.manga.data.entity.book.Book
 import nhdphuong.com.manga.data.entity.book.ImageMeasurements
 import nhdphuong.com.manga.data.entity.book.Tag
 import nhdphuong.com.manga.data.repository.BookRepository
+import nhdphuong.com.manga.features.reader.ReaderActivity
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
@@ -172,6 +173,10 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
     override fun saveCurrentAvailableCoverUrl(url: String) {
         Log.d(TAG, "Current available url: $url")
         mCacheCoverUrl = url
+    }
+
+    override fun startReadingFrom(startReadingPage: Int) {
+        ReaderActivity.start(mContext, startReadingPage, mBook)
     }
 
     override fun stop() {

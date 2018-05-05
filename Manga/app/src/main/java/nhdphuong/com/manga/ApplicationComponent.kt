@@ -7,6 +7,8 @@ import nhdphuong.com.manga.features.home.HomeComponent
 import nhdphuong.com.manga.features.home.HomeModule
 import nhdphuong.com.manga.features.preview.BookPreviewComponent
 import nhdphuong.com.manga.features.preview.BookPreviewModule
+import nhdphuong.com.manga.features.reader.ReaderComponent
+import nhdphuong.com.manga.features.reader.ReaderModule
 import javax.inject.Singleton
 
 /*
@@ -17,4 +19,5 @@ import javax.inject.Singleton
 interface ApplicationComponent {
     fun plus(homeModule: HomeModule, headerModule: HeaderModule): HomeComponent
     fun plus(bookPreviewModule: BookPreviewModule): BookPreviewComponent
+    fun plus(readerModule: ReaderModule): ReaderComponent
 }

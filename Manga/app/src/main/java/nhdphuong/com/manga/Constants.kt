@@ -49,6 +49,8 @@ class Constants {
 
         const val BOOK = "book"
 
+        const val START_PAGE = "start_page"
+
         const val CHINESE_LANG = "cn"
         const val JAPANESE_LANG = "jp"
         const val ENGLISH_LANG = "eng"

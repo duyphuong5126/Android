@@ -36,5 +36,6 @@ interface BookPreviewContract {
         fun loadInfoLists()
         fun reloadCoverImage()
         fun saveCurrentAvailableCoverUrl(url: String)
+        fun startReadingFrom(startReadingPage: Int)
     }
 }

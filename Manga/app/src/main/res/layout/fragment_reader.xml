@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="RtlCompat">
+
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/grey_1">
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/vpPages"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/clReaderTop"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dp50"
+            android:background="#96000000"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                android:id="@+id/ibBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp10"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/back"
+                android:padding="5dp"
+                android:scaleType="center"
+                android:scaleX="0.8"
+                android:scaleY="0.8"
+                android:src="@drawable/ic_back_white_1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginEnd="@dimen/dp10"
+                android:layout_marginStart="@dimen/dp10"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/ibDownload"
+                app:layout_constraintStart_toEndOf="@id/ibBack"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <nhdphuong.com.manga.views.customs.MyTextView
+                    android:id="@+id/mtvBookTitle"
+                    android:layout_width="1500dp"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:text="@string/book_title"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:myFont="@string/NotoSansItalic" />
+
+            </android.support.constraint.ConstraintLayout>
+
+            <ImageButton
+                android:id="@+id/ibDownload"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/dp20"
+                android:layout_marginStart="@dimen/dp10"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/back"
+                android:scaleType="center"
+                android:scaleX="0.8"
+                android:scaleY="0.8"
+                android:src="@drawable/ic_download_white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/clReaderBottom"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:background="#96000000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+        </android.support.constraint.ConstraintLayout>
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

@@ -12,10 +12,11 @@ import nhdphuong.com.manga.views.customs.MyTextView
 /*
  * Created by nhdphuong on 4/28/18.
  */
-class PreviewAdapter(private val mNumOfRows: Int, private val mPreviewUrlList: List<String>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class PreviewAdapter(private val mNumOfRows: Int, private val mPreviewUrlList: List<String>,
+                     private val callback: ThumbnailClickCallback) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder {
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.item_preview, parent, false)
-        return PreviewViewHolder(view)
+        return PreviewViewHolder(view, callback)
     }
 
     override fun getItemCount(): Int = mPreviewUrlList.size
@@ -27,12 +28,14 @@ class PreviewAdapter(private val mNumOfRows: Int, private val mPreviewUrlList: L
 
         val vhPreview = holder as PreviewViewHolder
         val zigzagPosition = getDisplayPositionByZigzag(position)
-        vhPreview.setData(mPreviewUrlList[zigzagPosition], zigzagPosition + 1)
+        vhPreview.setData(mPreviewUrlList[zigzagPosition], zigzagPosition)
     }
 
-    private inner class PreviewViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    private inner class PreviewViewHolder(itemView: View, private val thumbnailClickCallback: ThumbnailClickCallback)
+        : RecyclerView.ViewHolder(itemView), View.OnClickListener {
         private val ivPageThumbnail: ImageView = itemView.findViewById(R.id.ivPageThumbnail)
         private val mtvPageNumber: MyTextView = itemView.findViewById(R.id.mtvPageNumber)
+        private var mPageNumber: Int = -1
 
         init {
             ivPageThumbnail.setOnClickListener(this)
@@ -40,11 +43,12 @@ class PreviewAdapter(private val mNumOfRows: Int, private val mPreviewUrlList: L
         }
 
         override fun onClick(p0: View?) {
-
+            thumbnailClickCallback.onThumbnailClicked(mPageNumber)
         }
 
         fun setData(url: String, pageNumber: Int) {
-            mtvPageNumber.text = pageNumber.toString()
+            mPageNumber = pageNumber
+            mtvPageNumber.text = (pageNumber + 1).toString()
             GlideUtils.loadImage(url, R.drawable.ic_404_not_found, ivPageThumbnail)
         }
     }
@@ -60,5 +64,9 @@ class PreviewAdapter(private val mNumOfRows: Int, private val mPreviewUrlList: L
         } else {
             ((position - currentSpanCount) * 2) + 1
         }
+    }
+
+    interface ThumbnailClickCallback {
+        fun onThumbnailClicked(page: Int)
     }
 }
