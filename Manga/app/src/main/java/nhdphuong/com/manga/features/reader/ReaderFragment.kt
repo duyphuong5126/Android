@@ -3,6 +3,7 @@ package nhdphuong.com.manga.features.reader
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.view.ViewPager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,7 +52,8 @@ class ReaderFragment : Fragment(), ReaderContract.View {
     }
 
     override fun showBookPages(pageList: List<String>) {
-        mBinding.vpPages.adapter = BookReaderAdapter(context, pageList, View.OnClickListener {
+        val pageCount = pageList.size
+        val bookReaderAdapter = BookReaderAdapter(context, pageList, View.OnClickListener {
             if (mBinding.clReaderBottom.visibility == View.VISIBLE) {
                 AnimationHelper.startSlideOutTop(activity, mBinding.clReaderTop, {
                     mBinding.clReaderTop.visibility = View.GONE
@@ -66,6 +68,27 @@ class ReaderFragment : Fragment(), ReaderContract.View {
                 AnimationHelper.startSlideInBottom(activity, mBinding.clReaderBottom, {
                     mBinding.clReaderBottom.visibility = View.VISIBLE
                 })
+            }
+        })
+        mBinding.vpPages.adapter = bookReaderAdapter
+        mBinding.mtvCurrentPage.text = String.format(getString(R.string.bottom_reader), 1, pageCount)
+        mBinding.vpPages.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+            override fun onPageScrollStateChanged(state: Int) {
+
+            }
+
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+
+            }
+
+            override fun onPageSelected(position: Int) {
+                mBinding.mtvCurrentPage.text = String.format(getString(R.string.bottom_reader), position + 1, pageCount)
+                if (position - 1 >= 0) {
+                    bookReaderAdapter.resetPage(position - 1)
+                }
+                if (position + 1 < bookReaderAdapter.count) {
+                    bookReaderAdapter.resetPage(position + 1)
+                }
             }
         })
     }

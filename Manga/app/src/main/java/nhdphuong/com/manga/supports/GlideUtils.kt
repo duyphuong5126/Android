@@ -12,7 +12,7 @@ class GlideUtils {
         @SuppressLint("CheckResult")
         fun <IV : ImageView> loadImage(url: String, defaultResource: Int, imageView: IV) {
             val requestOptions = RequestOptions()
-            requestOptions.diskCacheStrategy(DiskCacheStrategy.ALL)
+            requestOptions.diskCacheStrategy(DiskCacheStrategy.NONE)
             requestOptions.error(defaultResource)
             Glide.with(imageView).load(url).apply(requestOptions).into(imageView)
         }

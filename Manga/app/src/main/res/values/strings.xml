@@ -64,4 +64,5 @@
     <string name="book_page">Book page</string>
     <string name="back">Back</string>
     <string name="book_title">Book title</string>
+    <string name="bottom_reader">Page %s of %s</string>
 </resources>

@@ -24,6 +24,7 @@ class ReaderPresenter @Inject constructor(private val mView: ReaderContract.View
     }
 
     override fun start() {
+        Log.d(TAG, "Start reading: ${mBook.previewTitle}")
         mView.showBookTitle(mBook.previewTitle)
 
         val bookPages = LinkedList<String>()
@@ -37,7 +38,7 @@ class ReaderPresenter @Inject constructor(private val mView: ReaderContract.View
 
         if (mStartReadingPage != 0) {
             launch {
-                delay(6000)
+                delay(1000)
                 launch(UI) {
                     mView.jumpToPage(mStartReadingPage)
                 }
