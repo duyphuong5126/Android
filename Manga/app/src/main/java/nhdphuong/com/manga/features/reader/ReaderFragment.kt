@@ -1,8 +1,11 @@
 package nhdphuong.com.manga.features.reader
 
+import android.annotation.TargetApi
 import android.databinding.DataBindingUtil
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +21,7 @@ import nhdphuong.com.manga.views.adapters.BookReaderAdapter
 class ReaderFragment : Fragment(), ReaderContract.View {
     private lateinit var mPresenter: ReaderContract.Presenter
     private lateinit var mBinding: FragmentReaderBinding
+
     override fun setPresenter(presenter: ReaderContract.Presenter) {
         mPresenter = presenter
     }
@@ -27,8 +31,10 @@ class ReaderFragment : Fragment(), ReaderContract.View {
         return mBinding.root
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        activity.window.statusBarColor = ContextCompat.getColor(context, R.color.grey_1)
         mBinding.ibBack.setOnClickListener {
             activity.onBackPressed()
         }
@@ -41,6 +47,13 @@ class ReaderFragment : Fragment(), ReaderContract.View {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         mPresenter.start()
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    override fun onStop() {
+        super.onStop()
+        activity.window.statusBarColor = ContextCompat.getColor(context, R.color.colorPrimary)
+        mPresenter.stop()
     }
 
     override fun showBookTitle(bookTitle: String) {
@@ -95,11 +108,6 @@ class ReaderFragment : Fragment(), ReaderContract.View {
 
     override fun jumpToPage(pageNumber: Int) {
         mBinding.vpPages.setCurrentItem(pageNumber, true)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        mPresenter.stop()
     }
 
     override fun showLoading() {

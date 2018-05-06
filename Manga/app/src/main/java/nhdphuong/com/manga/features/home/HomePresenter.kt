@@ -159,7 +159,9 @@ class HomePresenter @Inject constructor(private val mContext: Context,
             logListInt("To load list: ", toLoadList)
             for (page in toLoadList.iterator()) {
                 if (!mPreventiveData.containsKey(page)) {
-                    mPreventiveData[page] = mBookRepository.getBookByPage(mCurrentPage)?.bookList ?: LinkedList()
+                    mBookRepository.getBookByPage(page)?.bookList?.let { bookList ->
+                        mPreventiveData[page] = bookList
+                    }
                     Log.d(TAG, "Page $page loaded")
                 }
             }
