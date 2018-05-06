@@ -11,15 +11,19 @@ class GlideUtils {
     companion object {
         @SuppressLint("CheckResult")
         fun <IV : ImageView> loadImage(url: String, defaultResource: Int, imageView: IV) {
-            val requestOptions = RequestOptions()
-            requestOptions.diskCacheStrategy(DiskCacheStrategy.NONE)
-            requestOptions.error(defaultResource)
+            val requestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                    .error(defaultResource)
+                    .skipMemoryCache(true)
             Glide.with(imageView).load(url).apply(requestOptions).into(imageView)
         }
 
         fun <IV : ImageView> loadGifImage(gifResource: Int, imageView: IV) {
             val ivLoadingTarget = DrawableImageViewTarget(imageView)
             Glide.with(imageView).load(gifResource).into(ivLoadingTarget)
+        }
+
+        fun <IV : ImageView> clear(imageView: IV) {
+            Glide.with(imageView.context).clear(imageView)
         }
     }
 }

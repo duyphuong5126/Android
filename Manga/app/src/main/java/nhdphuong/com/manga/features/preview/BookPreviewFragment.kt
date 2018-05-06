@@ -25,6 +25,7 @@ import nhdphuong.com.manga.R
 import nhdphuong.com.manga.data.entity.book.Book
 import nhdphuong.com.manga.data.entity.book.Tag
 import nhdphuong.com.manga.databinding.FragmentBookPreviewBinding
+import nhdphuong.com.manga.supports.GlideUtils
 import nhdphuong.com.manga.views.InfoCardLayout
 import nhdphuong.com.manga.views.MyGridLayoutManager
 import nhdphuong.com.manga.views.adapters.BookAdapter
@@ -91,6 +92,7 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
     override fun onStop() {
         super.onStop()
         mPresenter.stop()
+        GlideUtils.clear(mBinding.ivBookCover)
     }
 
     override fun showBookCoverImage(coverUrl: String) {

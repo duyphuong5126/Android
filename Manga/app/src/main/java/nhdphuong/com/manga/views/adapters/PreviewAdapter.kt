@@ -31,9 +31,15 @@ class PreviewAdapter(private val mNumOfRows: Int, private val mPreviewUrlList: L
         vhPreview.setData(mPreviewUrlList[zigzagPosition], zigzagPosition)
     }
 
+    override fun onViewRecycled(holder: RecyclerView.ViewHolder?) {
+        super.onViewRecycled(holder)
+        val previewViewHolder = holder as PreviewViewHolder
+        GlideUtils.clear(previewViewHolder.ivPageThumbnail)
+    }
+
     private inner class PreviewViewHolder(itemView: View, private val thumbnailClickCallback: ThumbnailClickCallback)
         : RecyclerView.ViewHolder(itemView), View.OnClickListener {
-        private val ivPageThumbnail: ImageView = itemView.findViewById(R.id.ivPageThumbnail)
+        val ivPageThumbnail: ImageView = itemView.findViewById(R.id.ivPageThumbnail)
         private val mtvPageNumber: MyTextView = itemView.findViewById(R.id.mtvPageNumber)
         private var mPageNumber: Int = -1
 

@@ -35,6 +35,12 @@ class BookAdapter(private val mItemList: List<Book>, private val mAdapterType: I
         return MainListViewHolder(view, mBookClickCallback)
     }
 
+    override fun onViewRecycled(holder: RecyclerView.ViewHolder?) {
+        super.onViewRecycled(holder)
+        val mainListViewHolder = holder as MainListViewHolder
+        GlideUtils.clear(mainListViewHolder.ivThumbnail)
+    }
+
     override fun getItemCount(): Int = mItemList.size
 
     override fun getItemViewType(position: Int): Int = mAdapterType
@@ -51,6 +57,9 @@ class BookAdapter(private val mItemList: List<Book>, private val mAdapterType: I
         private val mTv2ndTitle: TextView = itemView.findViewById(R.id.tv2ndTitlePart)
         private val mIvLanguage: ImageView = itemView.findViewById(R.id.ivLanguage)
         private var mIsTitleModifiable = true
+
+        val ivThumbnail: ImageView
+            get() = mIvItemThumbnail
 
         init {
             mIvItemThumbnail.setOnClickListener(this)

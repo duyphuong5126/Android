@@ -2,6 +2,7 @@ package nhdphuong.com.manga.views.adapters
 
 import android.content.Context
 import android.support.v4.view.PagerAdapter
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,10 @@ import nhdphuong.com.manga.supports.GlideUtils
  */
 class BookReaderAdapter(private val mContext: Context, private val mPageUrlList: List<String>,
                         private val mOnTapListener: View.OnClickListener) : PagerAdapter() {
+    companion object {
+        private val TAG = PagerAdapter::class.java.simpleName
+    }
+
     private val mPageMap: HashMap<Int, BookReaderViewHolder> = HashMap()
 
     init {
@@ -40,6 +45,10 @@ class BookReaderAdapter(private val mContext: Context, private val mPageUrlList:
     override fun getCount(): Int = mPageUrlList.size
 
     override fun destroyItem(container: ViewGroup?, position: Int, `object`: Any?) {
+        Log.d(TAG, "Remove item $position")
+        mPageMap[position]?.ivPage?.let { ivPage ->
+            GlideUtils.clear(ivPage)
+        }
         container?.removeView(`object` as View)
     }
 

@@ -1,8 +1,6 @@
 package nhdphuong.com.manga.data.remote
 
 import android.util.Log
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.runBlocking
 import nhdphuong.com.manga.api.BookApiService
 import nhdphuong.com.manga.data.BookDataSource
 import nhdphuong.com.manga.data.entity.book.RecommendBook
