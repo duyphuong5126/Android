@@ -16,14 +16,16 @@ import java.util.*
  */
 class TabAdapter(context: Context, private val mOnMainTabClick: OnMainTabClick) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var mTabList: LinkedList<Tab> = LinkedList()
-    private var mCurrentTab = 0
+    private var mCurrentTab: Tab = Tab.NONE
     private val mEnableTextColor = ContextCompat.getColor(context, R.color.colorPrimaryDark)
     private val mDisableTextColor = ContextCompat.getColor(context, R.color.greyBBB)
 
     init {
         mTabList.clear()
         for (tab in Tab.values()) {
-            mTabList.add(tab)
+            if (tab != Tab.NONE) {
+                mTabList.add(tab)
+            }
         }
     }
 
@@ -36,8 +38,10 @@ class TabAdapter(context: Context, private val mOnMainTabClick: OnMainTabClick) 
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder?, position: Int) {
         val tabViewHolder = holder as MainTabViewHolder
-        tabViewHolder.setTab(mTabList[position])
-        tabViewHolder.toggleTab(position == mCurrentTab)
+        mTabList[position].let { tab ->
+            tabViewHolder.setTab(tab)
+            tabViewHolder.toggleTab(tab == mCurrentTab && mCurrentTab != Tab.NONE)
+        }
     }
 
     private inner class MainTabViewHolder(itemView: View, private val mOnMainTabClick: OnMainTabClick) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
@@ -53,10 +57,7 @@ class TabAdapter(context: Context, private val mOnMainTabClick: OnMainTabClick) 
 
         override fun onClick(p0: View?) {
             mOnMainTabClick.onTabClick(mTab)
-            val oldActiveTab = mCurrentTab
-            mCurrentTab = mTab.ordinal
-            notifyItemChanged(oldActiveTab)
-            notifyItemChanged(mCurrentTab)
+            updateTab(mTab)
         }
 
         fun setTab(tab: Tab) {
@@ -69,6 +70,21 @@ class TabAdapter(context: Context, private val mOnMainTabClick: OnMainTabClick) 
             val textColor = if (selected) mEnableTextColor else mDisableTextColor
             mTvLabel.setTextColor(textColor)
         }
+    }
+
+    fun updateTab(tab: Tab) {
+        val oldActiveTab = mCurrentTab
+        mCurrentTab = tab
+        if (tab == Tab.NONE) {
+            notifyDataSetChanged()
+        } else {
+            notifyItemChanged(mCurrentTab.ordinal)
+            notifyItemChanged(oldActiveTab.ordinal)
+        }
+    }
+
+    fun reset() {
+        updateTab(Tab.NONE)
     }
 
     interface OnMainTabClick {

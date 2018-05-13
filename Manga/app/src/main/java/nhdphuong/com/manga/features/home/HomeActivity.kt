@@ -13,6 +13,7 @@ import android.content.Intent
 import android.view.KeyEvent
 import nhdphuong.com.manga.features.header.HeaderFragment
 import nhdphuong.com.manga.features.header.HeaderModule
+import nhdphuong.com.manga.features.header.HeaderPresenter
 
 
 class HomeActivity : AppCompatActivity() {
@@ -22,7 +23,11 @@ class HomeActivity : AppCompatActivity() {
 
     @Suppress("unused")
     @Inject
-    lateinit var mPresenter: HomePresenter
+    lateinit var mHomePresenter: HomePresenter
+
+    @Suppress("unused")
+    @Inject
+    lateinit var mHeaderPresenter: HeaderPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

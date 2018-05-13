@@ -28,7 +28,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".features.preview.BookPreviewActivity" />
-        <activity android:name=".features.reader.ReaderActivity"></activity>
+        <activity android:name=".features.reader.ReaderActivity" />
+        <activity android:name=".features.tags.TagsActivity"></activity>
     </application>
 
 </manifest>

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="nhdphuong.com.manga.features.home.HomeActivity">
+    tools:context="nhdphuong.com.manga.features.tags.TagsActivity">
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/clHeader"
@@ -15,7 +15,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/clMainFragment"
+        android:id="@+id/clTagsFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"

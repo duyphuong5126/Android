@@ -47,6 +47,9 @@ class Constants {
         const val INFO = "Info"
         const val ARTISTS = "Artists"
 
+        const val TAG_TYPE = "Tag_type"
+        const val NONE = "None"
+
         const val BOOK = "book"
 
         const val START_PAGE = "start_page"

@@ -1,14 +1,20 @@
 package nhdphuong.com.manga.views.adapters
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.support.v4.view.PagerAdapter
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.ortiz.touchview.TouchImageView
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.supports.GlideUtils
+import nhdphuong.com.manga.views.customs.MyTextView
 
 /*
  * Created by nhdphuong on 5/5/18.
@@ -28,7 +34,8 @@ class BookReaderAdapter(private val mContext: Context, private val mPageUrlList:
     override fun instantiateItem(container: ViewGroup?, position: Int): Any {
         val readerViewHolder = BookReaderViewHolder(
                 LayoutInflater.from(mContext).inflate(R.layout.item_book_page, container, false),
-                mPageUrlList[position]
+                mPageUrlList[position],
+                position + 1
         )
         mPageMap[position] = readerViewHolder
         container?.addView(readerViewHolder.view)
@@ -62,11 +69,23 @@ class BookReaderAdapter(private val mContext: Context, private val mPageUrlList:
         }
     }
 
-    private class BookReaderViewHolder(val view: View, pageUrl: String) {
+    private class BookReaderViewHolder(val view: View, pageUrl: String, page: Int) {
         val ivPage: TouchImageView = view.findViewById(R.id.ivPage)
+        val mtvPageTitle: MyTextView = view.findViewById(R.id.mtvPageTitle)
 
         init {
-            GlideUtils.loadImage(pageUrl, R.drawable.ic_404_not_found, ivPage)
+            mtvPageTitle.text = page.toString()
+            mtvPageTitle.visibility = View.VISIBLE
+            GlideUtils.loadImage(pageUrl, R.drawable.ic_404_not_found, ivPage, object : RequestListener<Drawable>{
+                override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                    mtvPageTitle.visibility = View.GONE
+                    return false
+                }
+
+                override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
+                    return true
+                }
+            })
         }
     }
 }

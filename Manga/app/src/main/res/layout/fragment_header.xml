@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:ignore="RtlCompat">
@@ -41,12 +40,14 @@
                 android:background="@drawable/bg_white_left_corners_radius_1"
                 android:hint="@string/search"
                 android:inputType="text"
+                android:outlineProvider="none"
                 android:paddingEnd="0dp"
                 android:paddingStart="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/ibSearch"
                 app:layout_constraintStart_toEndOf="@id/ivMainLogo"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:targetApi="lollipop" />
 
             <ImageButton
                 android:id="@+id/ibSearch"
