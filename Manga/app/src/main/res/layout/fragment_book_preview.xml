@@ -312,6 +312,47 @@
                     app:layout_constraintTop_toBottomOf="@+id/tvUpdatedAt"
                     app:myFont="@string/NotoSansBold" />
 
+                <android.support.constraint.ConstraintLayout
+                    android:id="@+id/clDownloadProgress"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/mbtDownload">
+
+                    <ProgressBar
+                        android:id="@+id/pbDownloading"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="0dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="5dp"
+                        android:indeterminateTint="@color/redED2553"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/mtvDownloaded"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:targetApi="lollipop" />
+
+                    <nhdphuong.com.manga.views.customs.MyTextView
+                        android:id="@+id/mtvDownloaded"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:text="@string/preview_download_progress"
+                        android:textColor="@android:color/white"
+                        android:textSize="15sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/pbDownloading"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:myFont="@string/NotoSansRegular" />
+
+                </android.support.constraint.ConstraintLayout>
+
                 <!-- Book preview thumbnails-->
                 <nhdphuong.com.manga.views.customs.MyTextView
                     android:id="@+id/mtvPreview"
@@ -321,8 +362,8 @@
                     android:text="@string/preview"
                     android:textColor="@android:color/white"
                     android:textSize="18sp"
-                    app:layout_constraintStart_toStartOf="@+id/mbtFavorite"
-                    app:layout_constraintTop_toBottomOf="@+id/mbtFavorite"
+                    app:layout_constraintStart_toStartOf="@+id/clDownloadProgress"
+                    app:layout_constraintTop_toBottomOf="@+id/clDownloadProgress"
                     app:myFont="@string/NotoSansBold" />
 
                 <HorizontalScrollView

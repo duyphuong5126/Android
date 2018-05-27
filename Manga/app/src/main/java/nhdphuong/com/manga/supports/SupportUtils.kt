@@ -88,6 +88,7 @@ class SupportUtils {
 
             val outputStream = FileOutputStream(output)
             bitmap.compress(format, 100, outputStream)
+            bitmap.recycle()
         }
     }
 }

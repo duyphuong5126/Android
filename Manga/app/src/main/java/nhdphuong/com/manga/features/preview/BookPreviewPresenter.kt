@@ -1,12 +1,15 @@
 package nhdphuong.com.manga.features.preview
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.ConnectivityManager
 import android.util.Log
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import nhdphuong.com.manga.Constants
+import nhdphuong.com.manga.NHentaiApp
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.api.ApiConstants
 import nhdphuong.com.manga.data.entity.book.Book
@@ -14,6 +17,8 @@ import nhdphuong.com.manga.data.entity.book.ImageMeasurements
 import nhdphuong.com.manga.data.entity.book.Tag
 import nhdphuong.com.manga.data.repository.BookRepository
 import nhdphuong.com.manga.features.reader.ReaderActivity
+import nhdphuong.com.manga.supports.GlideUtils
+import nhdphuong.com.manga.supports.SupportUtils
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
@@ -55,6 +60,17 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
     private lateinit var mParodyList: LinkedList<Tag>
     private lateinit var mCharacterList: LinkedList<Tag>
     private lateinit var mGroupList: LinkedList<Tag>
+
+    private val mPrefixNumber: Int
+        get() {
+            var totalPages = mBook.numOfPages
+            var prefixCount = 1
+            while (totalPages / 10 > 0) {
+                totalPages /= 10
+                prefixCount++
+            }
+            return prefixCount
+        }
 
     init {
         mView.setPresenter(this)
@@ -177,6 +193,56 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
 
     override fun startReadingFrom(startReadingPage: Int) {
         ReaderActivity.start(mContext, startReadingPage, mBook)
+    }
+
+    override fun downloadBook() {
+        NHentaiApp.instance.let { nHentaiApp ->
+            if (!nHentaiApp.isStoragePermissionAccepted) {
+                mView.showRequestStoragePermission()
+                return@let
+            }
+
+            val bookPages = LinkedList<String>()
+            for (pageId in 0 until mBook.bookImages.pages.size) {
+                val page = mBook.bookImages.pages[pageId]
+                bookPages.add(ApiConstants.getPictureUrl(mBook.mediaId, pageId + 1, page.imageType))
+            }
+            bookPages.size.let { total ->
+                if (total > 0) {
+                    mView.initDownloading(total)
+                    launch {
+                        var progress = 0
+                        for (downloadPage in 0 until total) {
+                            async {
+                                mBook.bookImages.pages[downloadPage].let { page ->
+                                    val result = GlideUtils.downloadImage(mContext, bookPages[downloadPage], page.width, page.height)
+
+                                    val resultFilePath = nHentaiApp.getImageDirectory(mBook.mediaId)
+
+                                    val format = if (page.imageType == Constants.PNG_TYPE) {
+                                        Bitmap.CompressFormat.PNG
+                                    } else {
+                                        Bitmap.CompressFormat.JPEG
+                                    }
+                                    val fileName = String.format("%0${mPrefixNumber}d", downloadPage + 1)
+                                    SupportUtils.compressBitmap(result, resultFilePath, fileName, format)
+                                    Log.d(TAG, "$fileName is saved successfully")
+                                }
+                                launch(UI) {
+                                    progress++
+                                    mView.updateDownloadProgress(progress, total)
+                                }
+                                Log.d(TAG, "Download page ${downloadPage + 1} completed")
+                            }.await()
+                        }
+                        delay(1000)
+                        launch(UI) {
+                            mView.finishDownloading()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun stop() {

@@ -36,7 +36,7 @@ class ReaderPresenter @Inject constructor(private val mView: ReaderContract.View
 
     private val mPrefixNumber: Int
         get() {
-            var totalPages = mBookPages.size
+            var totalPages = mBook.numOfPages
             var prefixCount = 1
             while (totalPages / 10 > 0) {
                 totalPages /= 10
@@ -96,7 +96,7 @@ class ReaderPresenter @Inject constructor(private val mView: ReaderContract.View
     override fun downloadCurrentPage() {
         NHentaiApp.instance.let { nHentaiApp ->
             if (!nHentaiApp.isStoragePermissionAccepted) {
-                mView.requestStoragePermission()
+                mView.showRequestStoragePermission()
                 return@let
             }
             mDownloadQueue.add(mCurrentPage)

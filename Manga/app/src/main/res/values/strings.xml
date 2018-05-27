@@ -72,6 +72,8 @@
     <string name="dismiss">Dismiss</string>
     <string name="permission_require">Permission Requirement</string>
     <string name="ok">OK</string>
+    <string name="done">Done</string>
     <string name="storage_permission_require">We need you to allow us to store the downloaded data.</string>
     <string name="toast_storage_permission_require">Please allow us to store data in your device!</string>
+    <string name="preview_download_progress">Downloaded %s of %s</string>
 </resources>

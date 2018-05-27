@@ -30,6 +30,10 @@ interface BookPreviewContract {
         fun showUploadedTime(uploadedTime: String)
         fun showBookThumbnailList(thumbnailList: List<String>)
         fun showRecommendBook(bookList: List<Book>)
+        fun showRequestStoragePermission()
+        fun initDownloading(total: Int)
+        fun updateDownloadProgress(progress: Int, total: Int)
+        fun finishDownloading()
     }
 
     interface Presenter : Base.Presenter {
@@ -37,5 +41,6 @@ interface BookPreviewContract {
         fun reloadCoverImage()
         fun saveCurrentAvailableCoverUrl(url: String)
         fun startReadingFrom(startReadingPage: Int)
+        fun downloadBook()
     }
 }

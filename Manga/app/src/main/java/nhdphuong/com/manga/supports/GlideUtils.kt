@@ -38,7 +38,16 @@ class GlideUtils {
         }
 
         fun downloadImage(context: Context, url: String, width: Int, height: Int): Bitmap {
-            return Glide.with(context).asBitmap().load(url).submit(width, height).get()
+            val requestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                    .skipMemoryCache(true)
+            val future = Glide.with(context)
+                    .asBitmap()
+                    .load(url)
+                    .apply(requestOptions)
+                    .submit(width, height)
+            val bitmap = future.get()
+            future.cancel(true)
+            return bitmap
         }
     }
 }
