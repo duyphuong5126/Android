@@ -12,7 +12,7 @@ interface ReaderContract {
         fun jumpToPage(pageNumber: Int)
         fun showPageIndicator(pageString: String)
         fun navigateToGallery()
-        fun requestStoragePermission()
+        fun showRequestStoragePermission()
         fun showDownloadPopup()
         fun hideDownloadPopup()
         fun updateDownloadPopupTitle(downloadTitle: String)

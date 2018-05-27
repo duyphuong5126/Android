@@ -15,12 +15,16 @@ class MyButton(context: Context, attrs: AttributeSet?, defStyle: Int) : Button(c
         private val TAG = MyButton::class.java.simpleName
     }
 
+    init {
+        setCustomFont(context, attrs)
+    }
+
     constructor(context: Context) : this(context, null, 0)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
 
     private fun setCustomFont(context: Context, attrs: AttributeSet?) {
-        val attribute = context.obtainStyledAttributes(attrs, R.styleable.MyTextView)
-        val customFont = attribute.getString(R.styleable.MyTextView_myFont)
+        val attribute = context.obtainStyledAttributes(attrs, R.styleable.MyButton)
+        val customFont = attribute.getString(R.styleable.MyButton_myButtonFont)
         setCustomFont(context, customFont)
         attribute.recycle()
     }

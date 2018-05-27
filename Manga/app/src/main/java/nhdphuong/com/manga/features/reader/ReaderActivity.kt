@@ -20,6 +20,7 @@ class ReaderActivity : AppCompatActivity() {
         }
     }
 
+    @Suppress("unused")
     @Inject
     lateinit var mReadPresenter: ReaderPresenter
 

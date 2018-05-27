@@ -69,4 +69,9 @@
     <string name="close">Close</string>
     <string name="download_progress">Page %s is downloaded</string>
     <string name="all_pages_downloaded">All pages are downloaded</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="permission_require">Permission Requirement</string>
+    <string name="ok">OK</string>
+    <string name="storage_permission_require">We need you to allow us to store the downloaded data.</string>
+    <string name="toast_storage_permission_require">Please allow us to store data in your device!</string>
 </resources>

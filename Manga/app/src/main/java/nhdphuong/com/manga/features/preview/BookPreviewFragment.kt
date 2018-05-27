@@ -79,6 +79,10 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
                 true
             }
         }
+
+        mBinding.mbtDownload.setOnClickListener {
+
+        }
     }
 
     override fun onResume() {

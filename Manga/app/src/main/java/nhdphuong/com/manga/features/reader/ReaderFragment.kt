@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.databinding.DataBindingUtil
 import android.os.Build
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
@@ -13,9 +12,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.databinding.FragmentReaderBinding
 import nhdphuong.com.manga.supports.AnimationHelper
+import nhdphuong.com.manga.views.DialogHelper
 import nhdphuong.com.manga.views.adapters.BookReaderAdapter
 
 /*
@@ -24,7 +25,7 @@ import nhdphuong.com.manga.views.adapters.BookReaderAdapter
 class ReaderFragment : Fragment(), ReaderContract.View {
     companion object {
         private val TAG = ReaderFragment::class.java.simpleName
-        private const val REQUEST_STORAGE_PERMISSION = 1001
+        private const val REQUEST_STORAGE_PERMISSION = 2364
     }
 
     private lateinit var mPresenter: ReaderContract.Presenter
@@ -72,7 +73,11 @@ class ReaderFragment : Fragment(), ReaderContract.View {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_STORAGE_PERMISSION) {
-            val result = if (grantResults[0] == PackageManager.PERMISSION_GRANTED) "granted" else "denied"
+            val permissionGranted = grantResults[0] == PackageManager.PERMISSION_GRANTED
+            if (!permissionGranted) {
+                showRequestStoragePermission()
+            }
+            val result = if (permissionGranted) "granted" else "denied"
             Log.d(TAG, "Storage permission is $result")
         }
     }
@@ -144,9 +149,12 @@ class ReaderFragment : Fragment(), ReaderContract.View {
         activity.onBackPressed()
     }
 
-    override fun requestStoragePermission() {
-        val storagePermission = arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        ActivityCompat.requestPermissions(activity, storagePermission, REQUEST_STORAGE_PERMISSION)
+    override fun showRequestStoragePermission() {
+        DialogHelper.showStoragePermissionDialog(activity, onOk = {
+            requestStoragePermission()
+        }, onDismiss = {
+            Toast.makeText(context, getString(R.string.toast_storage_permission_require), Toast.LENGTH_SHORT).show()
+        })
     }
 
     override fun showDownloadPopup() {
@@ -169,4 +177,8 @@ class ReaderFragment : Fragment(), ReaderContract.View {
         mBinding.pbDownloading.visibility = View.GONE
     }
 
+    private fun requestStoragePermission() {
+        val storagePermission = arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        requestPermissions(storagePermission, REQUEST_STORAGE_PERMISSION)
+    }
 }

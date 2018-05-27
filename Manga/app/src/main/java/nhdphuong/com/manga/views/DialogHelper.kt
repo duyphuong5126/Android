@@ -7,10 +7,14 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.Gravity
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.supports.GlideUtils
+import nhdphuong.com.manga.views.customs.MyButton
+import nhdphuong.com.manga.views.customs.MyTextView
 
 class DialogHelper {
     companion object {
@@ -39,6 +43,29 @@ class DialogHelper {
             }
 
             return dialog
+        }
+
+        @SuppressLint("InflateParams")
+        fun showStoragePermissionDialog(activity: Activity, onOk: () -> Unit, onDismiss: () -> Unit) {
+            val contentView = activity.layoutInflater.inflate(R.layout.dialog_permission, null, false)
+            val dialog = Dialog(activity)
+            val mtvDescription: MyTextView = contentView.findViewById(R.id.mtvPermissionDescription)
+            mtvDescription.text = activity.getString(R.string.storage_permission_require)
+            contentView.findViewById<MyButton>(R.id.mbOkButton).setOnClickListener {
+                dialog.dismiss()
+                onOk()
+            }
+            contentView.findViewById<MyButton>(R.id.mbDismissButton).setOnClickListener {
+                dialog.dismiss()
+                onDismiss()
+            }
+            dialog.setContentView(contentView)
+            dialog.show()
+            dialog.window.let { window ->
+                window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                window.setGravity(Gravity.CENTER)
+                window.decorView.setBackgroundResource(android.R.color.transparent)
+            }
         }
 
         private fun runScheduledTaskOnMainThread(task: () -> Unit, timeInterval: Long): () -> Unit {
