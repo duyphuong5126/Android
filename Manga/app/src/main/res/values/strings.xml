@@ -65,4 +65,8 @@
     <string name="back">Back</string>
     <string name="book_title">Book title</string>
     <string name="bottom_reader">Page %s of %s</string>
+    <string name="back_to_gallery">Back to gallery</string>
+    <string name="close">Close</string>
+    <string name="download_progress">Page %s is downloaded</string>
+    <string name="all_pages_downloaded">All pages are downloaded</string>
 </resources>

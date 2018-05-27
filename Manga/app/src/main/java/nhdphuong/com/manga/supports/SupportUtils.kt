@@ -1,9 +1,13 @@
 package nhdphuong.com.manga.supports
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.text.TextUtils
 import android.util.TypedValue
 import android.widget.TextView
+import nhdphuong.com.manga.Constants
+import java.io.File
+import java.io.FileOutputStream
 import java.text.NumberFormat
 import java.util.*
 
@@ -64,6 +68,26 @@ class SupportUtils {
 
             val ellipsizedText = result.toString()
             return ellipsizedText.substring(0, ellipsizedText.length - 1)
+        }
+
+        fun compressBitmap(bitmap: Bitmap, filePath: String, filename: String, format: Bitmap.CompressFormat) {
+            val dirs = File(filePath)
+            if (!dirs.exists()) {
+                dirs.mkdirs()
+            }
+
+            val fileType = if (format == Bitmap.CompressFormat.PNG) {
+                Constants.PNG
+            } else {
+                Constants.JPG
+            }
+            val output = File("$filePath/$filename.$fileType")
+            if (!output.exists()) {
+                output.createNewFile()
+            }
+
+            val outputStream = FileOutputStream(output)
+            bitmap.compress(format, 100, outputStream)
         }
     }
 }

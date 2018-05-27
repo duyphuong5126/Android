@@ -1,12 +1,15 @@
 package nhdphuong.com.manga.features.reader
 
 import android.annotation.TargetApi
+import android.content.pm.PackageManager
 import android.databinding.DataBindingUtil
 import android.os.Build
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +22,11 @@ import nhdphuong.com.manga.views.adapters.BookReaderAdapter
  * Created by nhdphuong on 5/5/18.
  */
 class ReaderFragment : Fragment(), ReaderContract.View {
+    companion object {
+        private val TAG = ReaderFragment::class.java.simpleName
+        private const val REQUEST_STORAGE_PERMISSION = 1001
+    }
+
     private lateinit var mPresenter: ReaderContract.Presenter
     private lateinit var mBinding: FragmentReaderBinding
 
@@ -36,17 +44,37 @@ class ReaderFragment : Fragment(), ReaderContract.View {
         super.onViewCreated(view, savedInstanceState)
         activity.window.statusBarColor = ContextCompat.getColor(context, R.color.grey_1)
         mBinding.ibBack.setOnClickListener {
-            activity.onBackPressed()
+            navigateToGallery()
         }
 
         mBinding.ibDownload.setOnClickListener {
 
+        }
+
+        mBinding.mtvCurrentPage.setOnClickListener {
+            mPresenter.backToGallery()
+        }
+
+        mBinding.ibDownload.setOnClickListener {
+            mPresenter.downloadCurrentPage()
+        }
+
+        mBinding.ibDownloadPopupClose.setOnClickListener {
+            hideDownloadPopup()
         }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         mPresenter.start()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_STORAGE_PERMISSION) {
+            val result = if (grantResults[0] == PackageManager.PERMISSION_GRANTED) "granted" else "denied"
+            Log.d(TAG, "Storage permission is $result")
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -65,7 +93,6 @@ class ReaderFragment : Fragment(), ReaderContract.View {
     }
 
     override fun showBookPages(pageList: List<String>) {
-        val pageCount = pageList.size
         val bookReaderAdapter = BookReaderAdapter(context, pageList, View.OnClickListener {
             if (mBinding.clReaderBottom.visibility == View.VISIBLE) {
                 AnimationHelper.startSlideOutTop(activity, mBinding.clReaderTop, {
@@ -84,7 +111,6 @@ class ReaderFragment : Fragment(), ReaderContract.View {
             }
         })
         mBinding.vpPages.adapter = bookReaderAdapter
-        mBinding.mtvCurrentPage.text = String.format(getString(R.string.bottom_reader), 1, pageCount)
         mBinding.vpPages.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
 
@@ -95,7 +121,7 @@ class ReaderFragment : Fragment(), ReaderContract.View {
             }
 
             override fun onPageSelected(position: Int) {
-                mBinding.mtvCurrentPage.text = String.format(getString(R.string.bottom_reader), position + 1, pageCount)
+                mPresenter.updatePageIndicator(position)
                 if (position - 1 >= 0) {
                     bookReaderAdapter.resetPage(position - 1)
                 }
@@ -106,16 +132,41 @@ class ReaderFragment : Fragment(), ReaderContract.View {
         })
     }
 
+    override fun showPageIndicator(pageString: String) {
+        mBinding.mtvCurrentPage.text = pageString
+    }
+
     override fun jumpToPage(pageNumber: Int) {
         mBinding.vpPages.setCurrentItem(pageNumber, true)
     }
 
-    override fun showLoading() {
+    override fun navigateToGallery() {
+        activity.onBackPressed()
+    }
 
+    override fun requestStoragePermission() {
+        val storagePermission = arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        ActivityCompat.requestPermissions(activity, storagePermission, REQUEST_STORAGE_PERMISSION)
+    }
+
+    override fun showDownloadPopup() {
+        mBinding.clDownloadedPopup.visibility = View.VISIBLE
+    }
+
+    override fun hideDownloadPopup() {
+        mBinding.clDownloadedPopup.visibility = View.GONE
+    }
+
+    override fun updateDownloadPopupTitle(downloadTitle: String) {
+        mBinding.mtvDownloadTitle.text = downloadTitle
+    }
+
+    override fun showLoading() {
+        mBinding.pbDownloading.visibility = View.VISIBLE
     }
 
     override fun hideLoading() {
-
+        mBinding.pbDownloading.visibility = View.GONE
     }
 
 }

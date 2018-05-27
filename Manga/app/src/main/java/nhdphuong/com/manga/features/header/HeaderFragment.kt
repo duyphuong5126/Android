@@ -9,6 +9,7 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import nhdphuong.com.manga.Constants
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.data.Tab
@@ -43,7 +44,7 @@ class HeaderFragment : Fragment(), HeaderContract.View {
         super.onViewCreated(view, savedInstanceState)
         mTabAdapter = TabAdapter(context, object : TabAdapter.OnMainTabClick {
             override fun onTabClick(tab: Tab) {
-                when (tab) {
+                /*when (tab) {
                     Tab.RANDOM -> {
                         mTabAdapter.reset()
                     }
@@ -58,7 +59,9 @@ class HeaderFragment : Fragment(), HeaderContract.View {
                             mTabAdapter.reset()
                         }
                     }
-                }
+                }*/
+
+                Toast.makeText(context, "This feature is under construction, please try again later!", Toast.LENGTH_SHORT).show()
             }
         })
 

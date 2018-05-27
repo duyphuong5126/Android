@@ -62,5 +62,7 @@ class Constants {
         const val PNG = "png"
         const val JPG_TYPE = "j"
         const val PNG_TYPE = "p"
+
+        const val NHENTAI_DIRECTORY = "nhentai"
     }
 }

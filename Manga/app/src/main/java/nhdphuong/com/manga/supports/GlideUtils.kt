@@ -1,6 +1,8 @@
 package nhdphuong.com.manga.supports
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import com.bumptech.glide.Glide
@@ -33,6 +35,10 @@ class GlideUtils {
 
         fun <IV : ImageView> clear(imageView: IV) {
             Glide.with(imageView.context).clear(imageView)
+        }
+
+        fun downloadImage(context: Context, url: String, width: Int, height: Int): Bitmap {
+            return Glide.with(context).asBitmap().load(url).submit(width, height).get()
         }
     }
 }
