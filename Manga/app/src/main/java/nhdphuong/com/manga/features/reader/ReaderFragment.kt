@@ -177,6 +177,8 @@ class ReaderFragment : Fragment(), ReaderContract.View {
         mBinding.pbDownloading.visibility = View.GONE
     }
 
+    override fun isActive(): Boolean = isAdded
+
     private fun requestStoragePermission() {
         val storagePermission = arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
         requestPermissions(storagePermission, REQUEST_STORAGE_PERMISSION)

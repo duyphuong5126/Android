@@ -41,4 +41,6 @@ class TagsFragment : Fragment(), TagsContract, TagsContract.View {
     override fun hideLoading() {
 
     }
+
+    override fun isActive(): Boolean = isAdded
 }

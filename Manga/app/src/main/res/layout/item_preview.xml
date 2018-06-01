@@ -12,7 +12,7 @@
         android:layout_height="200dp"
         android:background="@android:color/transparent"
         android:contentDescription="@string/page_thumbnail"
-        android:scaleType="center"
+        android:scaleType="fitXY"
         android:src="@drawable/ic_404_not_found" />
 
     <nhdphuong.com.manga.views.customs.MyTextView

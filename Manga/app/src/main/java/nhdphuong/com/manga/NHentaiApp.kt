@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Environment
+import android.media.MediaScannerConnection
 
 /*
  * Created by nhdphuong on 3/21/18.
@@ -46,5 +47,11 @@ class NHentaiApp : Application() {
         super.onCreate()
         mInstance = this
         mApplicationComponent = DaggerApplicationComponent.builder().applicationModule(ApplicationModule(this)).build()
+    }
+
+    fun refreshGallery(vararg galleryPaths: String) {
+        MediaScannerConnection.scanFile(this, galleryPaths, null) { _, _ ->
+
+        }
     }
 }

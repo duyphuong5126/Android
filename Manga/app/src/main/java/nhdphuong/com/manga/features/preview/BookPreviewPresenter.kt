@@ -212,6 +212,7 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
                     mView.initDownloading(total)
                     launch {
                         var progress = 0
+                        val resultList = LinkedList<String>()
                         for (downloadPage in 0 until total) {
                             async {
                                 mBook.bookImages.pages[downloadPage].let { page ->
@@ -225,16 +226,20 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
                                         Bitmap.CompressFormat.JPEG
                                     }
                                     val fileName = String.format("%0${mPrefixNumber}d", downloadPage + 1)
-                                    SupportUtils.compressBitmap(result, resultFilePath, fileName, format)
+                                    val resultPath = SupportUtils.compressBitmap(result, resultFilePath, fileName, format)
+                                    resultList.add(resultPath)
                                     Log.d(TAG, "$fileName is saved successfully")
                                 }
                                 launch(UI) {
                                     progress++
-                                    mView.updateDownloadProgress(progress, total)
+                                    if (mView.isActive()) {
+                                        mView.updateDownloadProgress(progress, total)
+                                    }
                                 }
                                 Log.d(TAG, "Download page ${downloadPage + 1} completed")
                             }.await()
                         }
+                        nHentaiApp.refreshGallery(*resultList.toTypedArray())
                         delay(1000)
                         launch(UI) {
                             mView.finishDownloading()

@@ -187,6 +187,8 @@ class HomeFragment : Fragment(), HomeContract.View {
         mBinding.clNavigation.visibility = View.VISIBLE
     }
 
+    override fun isActive(): Boolean = isAdded
+
     private fun jumpTo(pageNumber: Int) {
         val handler = Handler(Looper.getMainLooper())
         handler.post {

@@ -70,7 +70,7 @@ class SupportUtils {
             return ellipsizedText.substring(0, ellipsizedText.length - 1)
         }
 
-        fun compressBitmap(bitmap: Bitmap, filePath: String, filename: String, format: Bitmap.CompressFormat) {
+        fun compressBitmap(bitmap: Bitmap, filePath: String, filename: String, format: Bitmap.CompressFormat): String {
             val dirs = File(filePath)
             if (!dirs.exists()) {
                 dirs.mkdirs()
@@ -81,7 +81,8 @@ class SupportUtils {
             } else {
                 Constants.JPG
             }
-            val output = File("$filePath/$filename.$fileType")
+            val resultPath = "$filePath/$filename.$fileType"
+            val output = File(resultPath)
             if (!output.exists()) {
                 output.createNewFile()
             }
@@ -89,6 +90,7 @@ class SupportUtils {
             val outputStream = FileOutputStream(output)
             bitmap.compress(format, 100, outputStream)
             bitmap.recycle()
+            return resultPath
         }
     }
 }

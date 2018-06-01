@@ -8,6 +8,7 @@ interface Base {
         fun setPresenter(presenter: T)
         fun showLoading()
         fun hideLoading()
+        fun isActive(): Boolean
     }
 
     interface Presenter {

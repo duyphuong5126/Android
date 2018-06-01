@@ -10,9 +10,19 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.DrawableImageViewTarget
+import com.bumptech.glide.request.target.Target
 
 class GlideUtils {
     companion object {
+        @SuppressLint("CheckResult")
+        fun <IV : ImageView> loadOriginalImage(url: String, defaultResource: Int, imageView: IV) {
+            val requestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                    .error(defaultResource)
+                    .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                    .skipMemoryCache(true)
+            Glide.with(imageView).load(url).apply(requestOptions).into(imageView)
+        }
+
         @SuppressLint("CheckResult")
         fun <IV : ImageView> loadImage(url: String, defaultResource: Int, imageView: IV) {
             val requestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)

@@ -104,6 +104,7 @@ class ReaderPresenter @Inject constructor(private val mView: ReaderContract.View
                 isDownloading = true
                 mView.showLoading()
                 launch {
+                    val resultList = LinkedList<String>()
                     while (!mDownloadQueue.isEmpty()) {
                         val downloadPage = mDownloadQueue.take()
                         mBook.bookImages.pages[downloadPage].let { page ->
@@ -117,7 +118,8 @@ class ReaderPresenter @Inject constructor(private val mView: ReaderContract.View
                                 Bitmap.CompressFormat.JPEG
                             }
                             val fileName = String.format("%0${mPrefixNumber}d", downloadPage + 1)
-                            SupportUtils.compressBitmap(result, resultFilePath, fileName, format)
+                            val resultPath = SupportUtils.compressBitmap(result, resultFilePath, fileName, format)
+                            resultList.add(resultPath)
                             Log.d(TAG, "$fileName is saved successfully")
                         }
                         launch(UI) {
@@ -126,6 +128,7 @@ class ReaderPresenter @Inject constructor(private val mView: ReaderContract.View
                         }
                         Log.d(TAG, "Download page ${downloadPage + 1} completed")
                     }
+                    nHentaiApp.refreshGallery(*resultList.toTypedArray())
                     isDownloading = false
                     launch(UI) {
                         mView.hideLoading()

@@ -308,6 +308,8 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
 
     }
 
+    override fun isActive() = isAdded
+
     private fun loadInfoList(layout: ViewGroup, infoList: List<Tag>) {
         val infoCardLayout = InfoCardLayout(activity.layoutInflater, infoList, context)
         infoCardLayout.loadInfoList(layout)

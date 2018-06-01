@@ -55,7 +55,7 @@ class PreviewAdapter(private val mNumOfRows: Int, private val mPreviewUrlList: L
         fun setData(url: String, pageNumber: Int) {
             mPageNumber = pageNumber
             mtvPageNumber.text = (pageNumber + 1).toString()
-            GlideUtils.loadImage(url, R.drawable.ic_404_not_found, ivPageThumbnail)
+            GlideUtils.loadOriginalImage(url, R.drawable.ic_404_not_found, ivPageThumbnail)
         }
     }
 
