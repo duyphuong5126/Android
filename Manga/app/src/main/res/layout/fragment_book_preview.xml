@@ -328,14 +328,15 @@
                         android:id="@+id/pbDownloading"
                         style="?android:attr/progressBarStyleHorizontal"
                         android:layout_width="0dp"
-                        android:layout_height="20dp"
+                        android:layout_height="10dp"
                         android:layout_marginEnd="5dp"
                         android:indeterminateTint="@color/redED2553"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/mtvDownloaded"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        tools:targetApi="lollipop" />
+                        tools:targetApi="lollipop"
+                        android:progressDrawable="@drawable/bg_download_red"/>
 
                     <nhdphuong.com.manga.views.customs.MyTextView
                         android:id="@+id/mtvDownloaded"

@@ -70,14 +70,14 @@ class DialogHelper {
 
         private fun runScheduledTaskOnMainThread(task: () -> Unit, timeInterval: Long): () -> Unit {
             val handler = Handler(Looper.getMainLooper())
-            val updateDotsTask = object : Runnable {
+            val updateTask = object : Runnable {
                 override fun run() {
                     task()
                     handler.postDelayed(this, timeInterval)
                 }
             }
             handler.post {
-                updateDotsTask.run()
+                updateTask.run()
             }
             return {
                 handler.removeCallbacksAndMessages(null)

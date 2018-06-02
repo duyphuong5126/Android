@@ -64,5 +64,8 @@ class Constants {
         const val PNG_TYPE = "p"
 
         const val NHENTAI_DIRECTORY = "nhentai"
+
+        const val DOWNLOAD_GREEN_LEVEL = 0.8f
+        const val DOWNLOAD_YELLOW_LEVEL = 0.6f
     }
 }

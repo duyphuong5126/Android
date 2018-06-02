@@ -10,6 +10,10 @@ import java.io.File
 import java.io.FileOutputStream
 import java.text.NumberFormat
 import java.util.*
+import android.graphics.BitmapFactory
+import java.io.BufferedInputStream
+import java.io.IOException
+import java.net.URL
 
 
 class SupportUtils {
@@ -91,6 +95,26 @@ class SupportUtils {
             bitmap.compress(format, 100, outputStream)
             bitmap.recycle()
             return resultPath
+        }
+
+        fun getImageBitmap(urlString: String): Bitmap? {
+            var bitmap: Bitmap? = null
+            try {
+                val url = URL(urlString)
+                val conn = url.openConnection()
+                conn.connectTimeout = 10000
+                conn.readTimeout = 20000
+                conn.connect()
+                val inputStream = conn.getInputStream()
+                val bufferedInputStream = BufferedInputStream(inputStream)
+                bitmap = BitmapFactory.decodeStream(bufferedInputStream)
+                bufferedInputStream.close()
+                inputStream.close()
+            } catch (e: IOException) {
+
+            }
+
+            return bitmap
         }
     }
 }

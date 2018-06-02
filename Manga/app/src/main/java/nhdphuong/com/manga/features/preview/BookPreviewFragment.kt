@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.support.annotation.RequiresApi
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.text.TextUtils
 import android.util.Log
@@ -25,6 +26,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
+import nhdphuong.com.manga.Constants
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.data.entity.book.Book
 import nhdphuong.com.manga.data.entity.book.Tag
@@ -59,17 +61,20 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d(TAG, "onCreate")
         mRequestManager = Glide.with(this)
         mRequestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL).error(R.drawable.ic_404_not_found)
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        Log.d(TAG, "onCreateView")
         mBinding = DataBindingUtil.inflate(inflater!!, R.layout.fragment_book_preview, container, false)
         return mBinding.root
     }
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        Log.d(TAG, "onViewCreated")
         super.onViewCreated(view, savedInstanceState)
         mBinding.svBookCover.let { svBookCover ->
             val scrollDownAnimator = ObjectAnimator.ofInt(svBookCover, "scrollY", 1000)
@@ -94,8 +99,9 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onActivityCreated")
+        super.onActivityCreated(savedInstanceState)
         mPresenter.start()
         mBinding.root.viewTreeObserver.addOnGlobalLayoutListener {
             mPresenter.loadInfoLists()
@@ -286,6 +292,7 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
     }
 
     override fun updateDownloadProgress(progress: Int, total: Int) {
+        mBinding.pbDownloading.progressDrawable = ActivityCompat.getDrawable(context, getProgressDrawableId(progress, mBinding.pbDownloading.max))
         mBinding.pbDownloading.progress = progress
         mBinding.mtvDownloaded.text = String.format(getString(R.string.preview_download_progress), progress, total)
     }
@@ -336,5 +343,14 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
     private fun requestStoragePermission() {
         val storagePermission = arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
         requestPermissions(storagePermission, REQUEST_STORAGE_PERMISSION)
+    }
+
+    private fun getProgressDrawableId(progress: Int, max: Int): Int {
+        val percentage = (progress * 1f) / (max * 1f)
+        return when {
+            percentage >= Constants.DOWNLOAD_GREEN_LEVEL -> R.drawable.bg_download_green
+            percentage >= Constants.DOWNLOAD_YELLOW_LEVEL -> R.drawable.bg_download_yellow
+            else -> R.drawable.bg_download_red
+        }
     }
 }
