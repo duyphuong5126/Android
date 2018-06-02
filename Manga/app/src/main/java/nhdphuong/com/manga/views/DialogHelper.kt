@@ -47,7 +47,7 @@ class DialogHelper {
 
         @SuppressLint("InflateParams")
         fun showStoragePermissionDialog(activity: Activity, onOk: () -> Unit, onDismiss: () -> Unit) {
-            val contentView = activity.layoutInflater.inflate(R.layout.dialog_permission, null, false)
+            val contentView = activity.layoutInflater.inflate(R.layout.dialog_ok_dismiss, null, false)
             val dialog = Dialog(activity)
             val mtvDescription: MyTextView = contentView.findViewById(R.id.mtvPermissionDescription)
             mtvDescription.text = activity.getString(R.string.storage_permission_require)
@@ -58,6 +58,32 @@ class DialogHelper {
             contentView.findViewById<MyButton>(R.id.mbDismissButton).setOnClickListener {
                 dialog.dismiss()
                 onDismiss()
+            }
+            dialog.setContentView(contentView)
+            dialog.show()
+            dialog.window.let { window ->
+                window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                window.setGravity(Gravity.CENTER)
+                window.decorView.setBackgroundResource(android.R.color.transparent)
+            }
+        }
+
+        @SuppressLint("InflateParams")
+        fun showBookDownloadingDialog(activity: Activity, mediaId: String?, onOk: () -> Unit) {
+            val contentView = activity.layoutInflater.inflate(R.layout.dialog_ok, null, false)
+            val dialog = Dialog(activity)
+            val mtvPermissionTitle: MyTextView = contentView.findViewById(R.id.mtvPermissionTitle)
+            mtvPermissionTitle.text = activity.getString(R.string.is_book_being_downloaded)
+            val mtvDescription: MyTextView = contentView.findViewById(R.id.mtvPermissionDescription)
+            val message = if (mediaId == null) {
+                activity.getString(R.string.is_downloading_this_book)
+            } else {
+                String.format(activity.getString(R.string.is_downloading_another_book), mediaId)
+            }
+            mtvDescription.text = message
+            contentView.findViewById<MyButton>(R.id.mbOkButton).setOnClickListener {
+                dialog.dismiss()
+                onOk()
             }
             dialog.setContentView(contentView)
             dialog.show()

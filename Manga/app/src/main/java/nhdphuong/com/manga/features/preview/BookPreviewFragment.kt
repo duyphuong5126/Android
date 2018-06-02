@@ -292,7 +292,9 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
     }
 
     override fun updateDownloadProgress(progress: Int, total: Int) {
-        mBinding.pbDownloading.progressDrawable = ActivityCompat.getDrawable(context, getProgressDrawableId(progress, mBinding.pbDownloading.max))
+        mBinding.clDownloadProgress.visibility = View.VISIBLE
+        mBinding.pbDownloading.max = total
+        mBinding.pbDownloading.progressDrawable = ActivityCompat.getDrawable(context, getProgressDrawableId(progress, total))
         mBinding.pbDownloading.progress = progress
         mBinding.mtvDownloaded.text = String.format(getString(R.string.preview_download_progress), progress, total)
     }
@@ -305,6 +307,12 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
             mBinding.clDownloadProgress.visibility = View.GONE
             mBinding.mtvDownloaded.text = getString(R.string.preview_download_progress)
         }, 2000)
+    }
+
+    override fun showBookBeingDownloaded(mediaId: String?) {
+        DialogHelper.showBookDownloadingDialog(activity, mediaId, onOk = {
+
+        })
     }
 
     override fun showLoading() {

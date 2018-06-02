@@ -34,6 +34,7 @@ interface BookPreviewContract {
         fun initDownloading(total: Int)
         fun updateDownloadProgress(progress: Int, total: Int)
         fun finishDownloading()
+        fun showBookBeingDownloaded(mediaId: String?)
     }
 
     interface Presenter : Base.Presenter {

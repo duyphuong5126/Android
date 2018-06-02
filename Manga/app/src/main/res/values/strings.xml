@@ -76,4 +76,7 @@
     <string name="storage_permission_require">We need you to allow us to store the downloaded data.</string>
     <string name="toast_storage_permission_require">Please allow us to store data in your device!</string>
     <string name="preview_download_progress">Downloaded %s of %s</string>
+    <string name="is_book_being_downloaded">Book downloading</string>
+    <string name="is_downloading_this_book">This book is being downloaded.\nPlease wait until it completes.</string>
+    <string name="is_downloading_another_book">The book with id %s being downloaded, please try again later.</string>
 </resources>
