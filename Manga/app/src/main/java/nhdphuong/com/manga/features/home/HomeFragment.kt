@@ -45,6 +45,8 @@ class HomeFragment : Fragment(), HomeContract.View, PtrUIHandler {
     private lateinit var mHomePresenter: HomeContract.Presenter
     private lateinit var mLoadingDialog: Dialog
 
+    private lateinit var mUpdateDotsHandler: Handler
+
     override fun setPresenter(presenter: HomeContract.Presenter) {
         mHomePresenter = presenter
     }
@@ -266,11 +268,9 @@ class HomeFragment : Fragment(), HomeContract.View, PtrUIHandler {
         }
     }
 
-    private lateinit var mHandler: Handler
-
     @SuppressLint("SetTextI18n")
     private fun runUpdateDotsTask() {
-        mHandler = Handler()
+        mUpdateDotsHandler = Handler()
         var currentPos = 0
         val updateDotsTask = {
             val dotsArray = resources.getStringArray(R.array.dots)
@@ -282,15 +282,15 @@ class HomeFragment : Fragment(), HomeContract.View, PtrUIHandler {
         val runnable = object : Runnable {
             override fun run() {
                 updateDotsTask()
-                mHandler.postDelayed(this, 500)
+                mUpdateDotsHandler.postDelayed(this, 500)
             }
         }
         runnable.run()
     }
 
     private fun endUpdateDotsTask() {
-        if (this::mHandler.isInitialized) {
-            mHandler.removeCallbacksAndMessages(null)
+        if (this::mUpdateDotsHandler.isInitialized) {
+            mUpdateDotsHandler.removeCallbacksAndMessages(null)
         }
     }
 }

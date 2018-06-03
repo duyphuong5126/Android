@@ -1,6 +1,7 @@
 package nhdphuong.com.manga.supports
 
 import android.app.Activity
+import android.content.Context
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
@@ -109,5 +110,7 @@ class AnimationHelper {
             val runningText = AnimationUtils.loadAnimation(textView.context, R.anim.text_running_1)
             textView.startAnimation(runningText)
         }
+
+        fun getRotationAnimation(context: Context): Animation = AnimationUtils.loadAnimation(context, R.anim.rotation)
     }
 }

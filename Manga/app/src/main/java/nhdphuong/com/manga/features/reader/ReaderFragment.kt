@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.databinding.DataBindingUtil
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
@@ -12,6 +13,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
 import android.widget.Toast
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.databinding.FragmentReaderBinding
@@ -30,6 +32,8 @@ class ReaderFragment : Fragment(), ReaderContract.View {
 
     private lateinit var mPresenter: ReaderContract.Presenter
     private lateinit var mBinding: FragmentReaderBinding
+    private lateinit var mRotationAnimation: Animation
+    private lateinit var mBookReaderAdapter: BookReaderAdapter
 
     override fun setPresenter(presenter: ReaderContract.Presenter) {
         mPresenter = presenter
@@ -62,6 +66,19 @@ class ReaderFragment : Fragment(), ReaderContract.View {
 
         mBinding.ibDownloadPopupClose.setOnClickListener {
             hideDownloadPopup()
+        }
+        mRotationAnimation = AnimationHelper.getRotationAnimation(context)
+        mBinding.ibRefresh.let { ibRefresh ->
+            ibRefresh.setOnClickListener {
+                ibRefresh.startAnimation(mRotationAnimation)
+                mPresenter.reloadCurrentPage { currentPage: Int ->
+                    mBookReaderAdapter.resetPage(currentPage)
+                    val handler = Handler()
+                    handler.postDelayed({
+                        ibRefresh.clearAnimation()
+                    }, 3000)
+                }
+            }
         }
     }
 
@@ -98,7 +115,7 @@ class ReaderFragment : Fragment(), ReaderContract.View {
     }
 
     override fun showBookPages(pageList: List<String>) {
-        val bookReaderAdapter = BookReaderAdapter(context, pageList, View.OnClickListener {
+        mBookReaderAdapter = BookReaderAdapter(context, pageList, View.OnClickListener {
             if (mBinding.clReaderBottom.visibility == View.VISIBLE) {
                 AnimationHelper.startSlideOutTop(activity, mBinding.clReaderTop, {
                     mBinding.clReaderTop.visibility = View.GONE
@@ -115,7 +132,7 @@ class ReaderFragment : Fragment(), ReaderContract.View {
                 })
             }
         })
-        mBinding.vpPages.adapter = bookReaderAdapter
+        mBinding.vpPages.adapter = mBookReaderAdapter
         mBinding.vpPages.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
 
@@ -128,10 +145,10 @@ class ReaderFragment : Fragment(), ReaderContract.View {
             override fun onPageSelected(position: Int) {
                 mPresenter.updatePageIndicator(position)
                 if (position - 1 >= 0) {
-                    bookReaderAdapter.resetPage(position - 1)
+                    mBookReaderAdapter.resetPageToNormal(position - 1)
                 }
-                if (position + 1 < bookReaderAdapter.count) {
-                    bookReaderAdapter.resetPage(position + 1)
+                if (position + 1 < mBookReaderAdapter.count) {
+                    mBookReaderAdapter.resetPageToNormal(position + 1)
                 }
             }
         })
@@ -170,11 +187,11 @@ class ReaderFragment : Fragment(), ReaderContract.View {
     }
 
     override fun showLoading() {
-        mBinding.pbDownloading.visibility = View.VISIBLE
+        mBinding.ibRefresh.startAnimation(mRotationAnimation)
     }
 
     override fun hideLoading() {
-        mBinding.pbDownloading.visibility = View.GONE
+        mBinding.ibRefresh.clearAnimation()
     }
 
     override fun isActive(): Boolean = isAdded

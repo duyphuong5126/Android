@@ -143,6 +143,10 @@ class ReaderPresenter @Inject constructor(private val mView: ReaderContract.View
         }
     }
 
+    override fun reloadCurrentPage(onForceReload: (Int) -> Unit) {
+        onForceReload(mCurrentPage)
+    }
+
     override fun stop() {
         isDownloading = false
     }

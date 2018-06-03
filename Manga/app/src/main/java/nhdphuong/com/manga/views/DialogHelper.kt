@@ -82,6 +82,11 @@ class DialogHelper {
                     activity.getString(R.string.book_list_refreshing_description), onOk)
         }
 
+        fun showTagsNotAvailable(activity: Activity, onOk: () -> Unit) {
+            showOkDialog(activity, activity.getString(R.string.under_construction_title),
+                    activity.getString(R.string.tag_under_construction_description), onOk)
+        }
+
         @SuppressLint("InflateParams")
         private fun showOkDialog(activity: Activity, title: String, description: String, onOk: () -> Unit) {
             val contentView = activity.layoutInflater.inflate(R.layout.dialog_ok, null, false)

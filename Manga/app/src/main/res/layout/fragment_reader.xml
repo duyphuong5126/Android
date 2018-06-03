@@ -149,6 +149,18 @@
                 app:layout_constraintTop_toTopOf="@id/mtvCurrentPage"
                 tools:targetApi="lollipop" />
 
+            <ImageButton
+                android:id="@+id/ibRefresh"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/refresh"
+                android:src="@drawable/ic_sync_white_1"
+                app:layout_constraintBottom_toBottomOf="@+id/mtvCurrentPage"
+                app:layout_constraintEnd_toStartOf="@id/mtvCurrentPage"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/mtvCurrentPage" />
+
             <nhdphuong.com.manga.views.customs.MyTextView
                 android:id="@+id/mtvCurrentPage"
                 android:layout_width="250dp"

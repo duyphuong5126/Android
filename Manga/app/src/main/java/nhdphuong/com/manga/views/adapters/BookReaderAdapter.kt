@@ -12,6 +12,8 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.ortiz.touchview.TouchImageView
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.supports.GlideUtils
 import nhdphuong.com.manga.views.customs.MyTextView
@@ -22,7 +24,7 @@ import nhdphuong.com.manga.views.customs.MyTextView
 class BookReaderAdapter(private val mContext: Context, private val mPageUrlList: List<String>,
                         private val mOnTapListener: View.OnClickListener) : PagerAdapter() {
     companion object {
-        private val TAG = PagerAdapter::class.java.simpleName
+        private val TAG = BookReaderAdapter::class.java.simpleName
     }
 
     private val mPageMap: HashMap<Int, BookReaderViewHolder> = HashMap()
@@ -61,7 +63,7 @@ class BookReaderAdapter(private val mContext: Context, private val mPageUrlList:
 
     override fun getPageTitle(position: Int): CharSequence = "Page number ${position + 1}"
 
-    fun resetPage(page: Int) {
+    fun resetPageToNormal(page: Int) {
         mPageMap[page]?.ivPage?.let { ivPage ->
             if (ivPage.isZoomed) {
                 ivPage.resetZoom()
@@ -69,20 +71,30 @@ class BookReaderAdapter(private val mContext: Context, private val mPageUrlList:
         }
     }
 
-    private class BookReaderViewHolder(val view: View, pageUrl: String, page: Int) {
+    fun resetPage(page: Int) {
+        mPageMap[page]?.reloadImage()
+    }
+
+    private class BookReaderViewHolder(val view: View, private val pageUrl: String, page: Int) {
         val ivPage: TouchImageView = view.findViewById(R.id.ivPage)
         val mtvPageTitle: MyTextView = view.findViewById(R.id.mtvPageTitle)
 
         init {
             mtvPageTitle.text = page.toString()
             mtvPageTitle.visibility = View.VISIBLE
+            reloadImage()
+        }
+
+        fun reloadImage() {
             GlideUtils.loadImage(pageUrl, R.drawable.ic_404_not_found, ivPage, object : RequestListener<Drawable>{
                 override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
                     mtvPageTitle.visibility = View.GONE
+                    Log.d(TAG, "Page is loaded successfully")
                     return false
                 }
 
                 override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
+                    Log.d(TAG, "Page loading failed")
                     return true
                 }
             })

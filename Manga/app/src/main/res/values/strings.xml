@@ -89,6 +89,11 @@
     <string name="updating">Updating%s</string>
     <string name="updated">Updated</string>
     <string name="last_update">Last update: %s</string>
+
+    <string name="under_construction_title">Not available</string>
+    <string name="tag_under_construction_description">Tags are under construction.\nPlease try again later</string>
+    <string name="refresh">Refresh</string>
+
     <string-array name="dots" tools:ignore="TypographyEllipsis">
         <item>.</item>
         <item>..</item>

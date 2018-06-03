@@ -22,5 +22,6 @@ interface ReaderContract {
         fun updatePageIndicator(page: Int)
         fun backToGallery()
         fun downloadCurrentPage()
+        fun reloadCurrentPage(onForceReload: (Int) -> Unit)
     }
 }

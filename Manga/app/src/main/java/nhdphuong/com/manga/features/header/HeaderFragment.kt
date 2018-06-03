@@ -9,13 +9,13 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import nhdphuong.com.manga.Constants
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.data.Tab
 import nhdphuong.com.manga.databinding.FragmentHeaderBinding
 import nhdphuong.com.manga.features.tags.TagsContract
 import nhdphuong.com.manga.supports.SpaceItemDecoration
+import nhdphuong.com.manga.views.DialogHelper
 import nhdphuong.com.manga.views.adapters.TabAdapter
 
 /*
@@ -61,7 +61,9 @@ class HeaderFragment : Fragment(), HeaderContract.View {
                     }
                 }*/
 
-                Toast.makeText(context, "This feature is under construction, please try again later!", Toast.LENGTH_SHORT).show()
+                DialogHelper.showTagsNotAvailable(activity, {
+                    toggleTagsLayout()
+                })
             }
         })
 
@@ -70,8 +72,7 @@ class HeaderFragment : Fragment(), HeaderContract.View {
         tabSelector.addItemDecoration(SpaceItemDecoration(context, R.dimen.dp20, true, true))
         tabSelector.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         mBinding.ibHamburger.setOnClickListener {
-            val isTabHidden = tabSelector.visibility == View.GONE
-            tabSelector.visibility = if (!isTabHidden) View.GONE else View.VISIBLE
+            toggleTagsLayout()
         }
     }
 
@@ -101,4 +102,11 @@ class HeaderFragment : Fragment(), HeaderContract.View {
     }
 
     override fun isActive(): Boolean = isAdded
+
+    private fun toggleTagsLayout() {
+        mBinding.rvMainTabs.let { tabSelector ->
+            val isTabHidden = tabSelector.visibility == View.GONE
+            tabSelector.visibility = if (!isTabHidden) View.GONE else View.VISIBLE
+        }
+    }
 }
