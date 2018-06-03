@@ -12,6 +12,7 @@ interface HomeContract {
         fun refreshHomeBookList()
         fun refreshHomePagination(pageCount: Long)
         fun showNothingView(isEmpty: Boolean)
+        fun showLastBookListRefreshTime(lastRefreshTimeStamp: String)
     }
 
     interface Presenter : Base.Presenter {
@@ -20,5 +21,7 @@ interface HomeContract {
         fun jumToLastPage()
         fun showBookPreview(book: Book)
         fun reloadCurrentPage(onRefreshed: () -> Unit)
+        fun reloadLastBookListRefreshTime()
+        fun saveLastBookListRefreshTime()
     }
 }

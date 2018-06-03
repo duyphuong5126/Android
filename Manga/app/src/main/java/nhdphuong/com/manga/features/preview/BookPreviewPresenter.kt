@@ -37,12 +37,6 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
     companion object {
         private val TAG = BookPreviewPresenter::class.java.simpleName
         private const val MILLISECOND: Long = 1000
-        private const val MINUTE: Long = MILLISECOND * 60
-        private const val HOUR: Long = MINUTE * 60
-        private const val DAY: Long = HOUR * 24
-        private const val WEEK: Long = DAY * 7
-        private const val MONTH: Long = DAY * 30
-        private const val YEAR: Long = DAY * 365
 
         private const val BATCH_COUNT = 5
     }
@@ -77,6 +71,8 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
             return prefixCount
         }
 
+    private val uploadedTimeStamp: String = SupportUtils.getTimeElapsed(System.currentTimeMillis() - mBook.updateAt * MILLISECOND)
+
     init {
         mView.setPresenter(this)
     }
@@ -89,7 +85,7 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
         }
         mView.show1stTitle(mBook.title.englishName)
         mView.show2ndTitle(mBook.title.japaneseName)
-        mView.showUploadedTime(String.format(mContext.getString(R.string.uploaded), getUploadedTimeString()))
+        mView.showUploadedTime(String.format(mContext.getString(R.string.uploaded), uploadedTimeStamp))
         mView.showPageCount(String.format(mContext.getString(R.string.page_count), mBook.numOfPages))
         mTagList = LinkedList()
         mCategoryList = LinkedList()
@@ -292,59 +288,6 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
         if (mView.isActive()) {
             mView.finishDownloading()
         }
-    }
-
-    private fun getUploadedTimeString(): String {
-        val uploadedTimeElapsed = System.currentTimeMillis() - mBook.updateAt * MILLISECOND
-        val yearsElapsed = uploadedTimeElapsed / YEAR
-        val monthsElapsed = uploadedTimeElapsed / MONTH
-        val weeksElapsed = uploadedTimeElapsed / WEEK
-        val daysElapsed = uploadedTimeElapsed / DAY
-        val hoursElapsed = uploadedTimeElapsed / HOUR
-        val minutesElapsed = uploadedTimeElapsed / MINUTE
-        if (yearsElapsed > 0) {
-            return if (yearsElapsed > 1) {
-                String.format(mContext.getString(R.string.years_elapsed), yearsElapsed)
-            } else {
-                mContext.getString(R.string.year_elapsed)
-            }
-        }
-        if (monthsElapsed > 0) {
-            return if (monthsElapsed > 1) {
-                String.format(mContext.getString(R.string.months_elapsed), monthsElapsed)
-            } else {
-                mContext.getString(R.string.month_elapsed)
-            }
-        }
-        if (weeksElapsed > 0) {
-            return if (weeksElapsed > 1) {
-                String.format(mContext.getString(R.string.weeks_elapsed), weeksElapsed)
-            } else {
-                mContext.getString(R.string.week_elapsed)
-            }
-        }
-        if (daysElapsed > 0) {
-            return if (daysElapsed > 1) {
-                String.format(mContext.getString(R.string.days_elapsed), daysElapsed)
-            } else {
-                mContext.getString(R.string.day_elapsed)
-            }
-        }
-        if (hoursElapsed > 0) {
-            return if (hoursElapsed > 1) {
-                String.format(mContext.getString(R.string.hours_elapsed), hoursElapsed)
-            } else {
-                mContext.getString(R.string.hour_elapsed)
-            }
-        }
-        if (minutesElapsed > 0) {
-            return if (minutesElapsed > 1) {
-                String.format(mContext.getString(R.string.minutes_elapsed), minutesElapsed)
-            } else {
-                mContext.getString(R.string.minute_elapsed)
-            }
-        }
-        return mContext.getString(R.string.just_now)
     }
 
     private fun getReachableBookCover(): String {

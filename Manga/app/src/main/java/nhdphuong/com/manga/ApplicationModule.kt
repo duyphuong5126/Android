@@ -25,4 +25,8 @@ class ApplicationModule(private val mApplication: NHentaiApp) {
         ServiceGenerator.setInterceptor(null)
         return ServiceGenerator.createService(BookApiService::class.java)
     }
+
+    @Singleton
+    @Provides
+    fun provideSharedPreferencesManager(): SharedPreferencesManager = SharedPreferencesManager.instance
 }

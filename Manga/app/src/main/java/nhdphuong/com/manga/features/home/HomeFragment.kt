@@ -1,5 +1,10 @@
 package nhdphuong.com.manga.features.home
 
+import `in`.srain.cube.views.ptr.PtrDefaultHandler
+import `in`.srain.cube.views.ptr.PtrFrameLayout
+import `in`.srain.cube.views.ptr.PtrHandler
+import `in`.srain.cube.views.ptr.PtrUIHandler
+import `in`.srain.cube.views.ptr.indicator.PtrIndicator
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
@@ -26,7 +31,7 @@ import nhdphuong.com.manga.views.adapters.HomePaginationAdapter
 /*
  * Created by nhdphuong on 3/16/18.
  */
-class HomeFragment : Fragment(), HomeContract.View {
+class HomeFragment : Fragment(), HomeContract.View, PtrUIHandler {
 
     companion object {
         private val TAG = HomeFragment::class.java.simpleName
@@ -75,9 +80,23 @@ class HomeFragment : Fragment(), HomeContract.View {
             jumpTo(mHomePaginationAdapter.itemCount - 1)
         }
         mLoadingDialog = DialogHelper.showLoadingDialog(activity)
-        mBinding.srlPullToReload.setOnRefreshListener {
+        mBinding.srlPullToReload.addPtrUIHandler(this)
+        mBinding.srlPullToReload.setPtrHandler(object : PtrHandler {
+            override fun onRefreshBegin(frame: PtrFrameLayout?) {
+                mHomePresenter.reloadCurrentPage {
+                    frame?.postDelayed({
+                        mBinding.srlPullToReload.refreshComplete()
+                    }, 1000)
+                }
+            }
+
+            override fun checkCanDoRefresh(frame: PtrFrameLayout?, content: View?, header: View?): Boolean {
+                return PtrDefaultHandler.checkContentCanBePulledDown(frame, content, header)
+            }
+        })
+        mBinding.mtvReload.setOnClickListener {
             mHomePresenter.reloadCurrentPage {
-                mBinding.srlPullToReload.isRefreshing = false
+                
             }
         }
     }
@@ -173,6 +192,10 @@ class HomeFragment : Fragment(), HomeContract.View {
         mainPagination.adapter = mHomePaginationAdapter
     }
 
+    override fun showLastBookListRefreshTime(lastRefreshTimeStamp: String) {
+        mBinding.refreshHeader?.mtvLastUpdate?.text = lastRefreshTimeStamp
+    }
+
     override fun showNothingView(isEmpty: Boolean) {
         mBinding.clNothing.visibility = if (isEmpty) View.VISIBLE else View.GONE
     }
@@ -189,10 +212,78 @@ class HomeFragment : Fragment(), HomeContract.View {
 
     override fun isActive(): Boolean = isAdded
 
+    override fun onUIRefreshComplete(frame: PtrFrameLayout?) {
+        Log.d(TAG, "onUIRefreshComplete")
+        endUpdateDotsTask()
+        mBinding.refreshHeader?.mtvRefresh?.text = getString(R.string.updated)
+        mHomePresenter.saveLastBookListRefreshTime()
+        mHomePresenter.reloadLastBookListRefreshTime()
+        mBinding.refreshHeader?.ivRefresh?.rotation = 0F
+        mBinding.refreshHeader?.ivRefresh?.visibility = View.VISIBLE
+        mBinding.refreshHeader?.pbRefresh?.visibility = View.GONE
+    }
+
+    override fun onUIPositionChange(frame: PtrFrameLayout?, isUnderTouch: Boolean, status: Byte, ptrIndicator: PtrIndicator?) {
+        Log.d(TAG, "onUIPositionChange isUnderTouch: $isUnderTouch, status: $status, " +
+                "over keep header: ${ptrIndicator?.isOverOffsetToKeepHeaderWhileLoading}, " +
+                "over refresh: ${ptrIndicator?.isOverOffsetToRefresh}")
+        if (ptrIndicator?.isOverOffsetToKeepHeaderWhileLoading == true) {
+            mBinding.refreshHeader?.mtvRefresh?.text = getString(R.string.release_to_refresh)
+            mBinding.refreshHeader?.ivRefresh?.rotation = 180F
+        }
+    }
+
+    override fun onUIRefreshBegin(frame: PtrFrameLayout?) {
+        Log.d(TAG, "onUIRefreshBegin")
+        mBinding.refreshHeader?.ivRefresh?.visibility = View.GONE
+        mBinding.refreshHeader?.pbRefresh?.visibility = View.VISIBLE
+        mBinding.refreshHeader?.mtvRefresh?.text = String.format(getString(R.string.updating), "")
+        runUpdateDotsTask()
+
+    }
+
+    override fun onUIRefreshPrepare(frame: PtrFrameLayout?) {
+        Log.d(TAG, "onUIRefreshPrepare")
+        mHomePresenter.reloadLastBookListRefreshTime()
+    }
+
+    override fun onUIReset(frame: PtrFrameLayout?) {
+        Log.d(TAG, "onUIReset")
+        mBinding.refreshHeader?.mtvRefresh?.text = getString(R.string.pull_down)
+    }
+
     private fun jumpTo(pageNumber: Int) {
         val handler = Handler(Looper.getMainLooper())
         handler.post {
             mBinding.rvPagination.scrollToPosition(pageNumber)
+        }
+    }
+
+    private lateinit var mHandler: Handler
+
+    @SuppressLint("SetTextI18n")
+    private fun runUpdateDotsTask() {
+        mHandler = Handler()
+        var currentPos = 0
+        val updateDotsTask = {
+            val dotsArray = resources.getStringArray(R.array.dots)
+            val loadingString = getString(R.string.updating)
+            Log.d("Dialog", "Current pos: $currentPos")
+            mBinding.refreshHeader?.mtvRefresh?.text = String.format(loadingString, dotsArray[currentPos])
+            if (currentPos < dotsArray.size - 1) currentPos++ else currentPos = 0
+        }
+        val runnable = object : Runnable {
+            override fun run() {
+                updateDotsTask()
+                mHandler.postDelayed(this, 500)
+            }
+        }
+        runnable.run()
+    }
+
+    private fun endUpdateDotsTask() {
+        if (this::mHandler.isInitialized) {
+            mHandler.removeCallbacksAndMessages(null)
         }
     }
 }

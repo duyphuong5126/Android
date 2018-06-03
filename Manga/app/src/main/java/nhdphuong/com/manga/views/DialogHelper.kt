@@ -20,7 +20,7 @@ class DialogHelper {
     companion object {
         @SuppressLint("InflateParams", "SetTextI18n")
         fun showLoadingDialog(activity: Activity): Dialog {
-            val dotsArray = listOf(".", "..", "...")
+            val dotsArray = activity.resources.getStringArray(R.array.dots)
             var currentPos = 0
             val loadingString = activity.getString(R.string.loading)
             val dialog = Dialog(activity, android.R.style.Theme_Black_NoTitleBar)

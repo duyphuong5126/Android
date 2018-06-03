@@ -63,8 +63,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/ibHamburger"
                 app:layout_constraintStart_toEndOf="@id/edtSearch"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:targetApi="lollipop" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
                 android:id="@+id/ibHamburger"

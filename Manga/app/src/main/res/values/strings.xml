@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">nhentai</string>
     <string name="main_logo">nhentai logo</string>
     <string name="main_search_button">Main search button</string>
@@ -79,4 +79,15 @@
     <string name="is_book_being_downloaded">Book downloading</string>
     <string name="is_downloading_this_book">This book is being downloaded.\nPlease wait until it completes.</string>
     <string name="is_downloading_another_book">The book with id %s being downloaded, please try again later.</string>
+    <string name="reload_library">Reload library</string>
+    <string name="pull_down">Pull it down</string>
+    <string name="release_to_refresh">Release to refresh</string>
+    <string name="updating">Updating%s</string>
+    <string name="updated">Updated</string>
+    <string name="last_update">Last update: %s</string>
+    <string-array name="dots" tools:ignore="TypographyEllipsis">
+        <item>.</item>
+        <item>..</item>
+        <item>...</item>
+    </string-array>
 </resources>

@@ -11,6 +11,8 @@ import java.io.FileOutputStream
 import java.text.NumberFormat
 import java.util.*
 import android.graphics.BitmapFactory
+import nhdphuong.com.manga.NHentaiApp
+import nhdphuong.com.manga.R
 import java.io.BufferedInputStream
 import java.io.IOException
 import java.net.URL
@@ -18,6 +20,14 @@ import java.net.URL
 
 class SupportUtils {
     companion object {
+        private const val MILLISECOND: Long = 1000
+        private const val MINUTE: Long = MILLISECOND * 60
+        private const val HOUR: Long = MINUTE * 60
+        private const val DAY: Long = HOUR * 24
+        private const val WEEK: Long = DAY * 7
+        private const val MONTH: Long = DAY * 30
+        private const val YEAR: Long = DAY * 365
+
         fun dp2Pixel(context: Context, dp: Int): Int =
                 TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp * 1F, context.resources.displayMetrics).toInt()
 
@@ -115,6 +125,61 @@ class SupportUtils {
             }
 
             return bitmap
+        }
+
+        fun getTimeElapsed(timeElapsed: Long): String {
+            NHentaiApp.instance.applicationContext.let { context ->
+
+                val yearsElapsed = timeElapsed / YEAR
+                val monthsElapsed = timeElapsed / MONTH
+                val weeksElapsed = timeElapsed / WEEK
+                val daysElapsed = timeElapsed / DAY
+                val hoursElapsed = timeElapsed / HOUR
+                val minutesElapsed = timeElapsed / MINUTE
+                if (yearsElapsed > 0) {
+                    return if (yearsElapsed > 1) {
+                        String.format(context.getString(R.string.years_elapsed), yearsElapsed)
+                    } else {
+                        context.getString(R.string.year_elapsed)
+                    }
+                }
+                if (monthsElapsed > 0) {
+                    return if (monthsElapsed > 1) {
+                        String.format(context.getString(R.string.months_elapsed), monthsElapsed)
+                    } else {
+                        context.getString(R.string.month_elapsed)
+                    }
+                }
+                if (weeksElapsed > 0) {
+                    return if (weeksElapsed > 1) {
+                        String.format(context.getString(R.string.weeks_elapsed), weeksElapsed)
+                    } else {
+                        context.getString(R.string.week_elapsed)
+                    }
+                }
+                if (daysElapsed > 0) {
+                    return if (daysElapsed > 1) {
+                        String.format(context.getString(R.string.days_elapsed), daysElapsed)
+                    } else {
+                        context.getString(R.string.day_elapsed)
+                    }
+                }
+                if (hoursElapsed > 0) {
+                    return if (hoursElapsed > 1) {
+                        String.format(context.getString(R.string.hours_elapsed), hoursElapsed)
+                    } else {
+                        context.getString(R.string.hour_elapsed)
+                    }
+                }
+                if (minutesElapsed > 0) {
+                    return if (minutesElapsed > 1) {
+                        String.format(context.getString(R.string.minutes_elapsed), minutesElapsed)
+                    } else {
+                        context.getString(R.string.minute_elapsed)
+                    }
+                }
+                return context.getString(R.string.just_now)
+            }
         }
     }
 }

@@ -6,9 +6,12 @@ import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
+import nhdphuong.com.manga.R
+import nhdphuong.com.manga.SharedPreferencesManager
 import nhdphuong.com.manga.data.entity.book.Book
 import nhdphuong.com.manga.data.repository.BookRepository
 import nhdphuong.com.manga.features.preview.BookPreviewActivity
+import nhdphuong.com.manga.supports.SupportUtils
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.HashMap
@@ -19,7 +22,8 @@ import kotlin.collections.HashMap
 
 class HomePresenter @Inject constructor(private val mContext: Context,
                                         private val mView: HomeContract.View,
-                                        private val mBookRepository: BookRepository) : HomeContract.Presenter {
+                                        private val mBookRepository: BookRepository,
+                                        private val mSharedPreferencesManager: SharedPreferencesManager) : HomeContract.Presenter {
     companion object {
         private val TAG = HomePresenter::class.java.simpleName
         private const val NUMBER_OF_PREVENTIVE_PAGES = 10
@@ -121,6 +125,18 @@ class HomePresenter @Inject constructor(private val mContext: Context,
                 }
             }
         }
+    }
+
+    override fun reloadLastBookListRefreshTime() {
+        mSharedPreferencesManager.getLastBookListRefreshTime().let { lastRefreshTime ->
+            val lastRefreshTimeStamp = String.format(mContext.getString(R.string.last_update),
+                    SupportUtils.getTimeElapsed(System.currentTimeMillis() - lastRefreshTime).toLowerCase())
+            mView.showLastBookListRefreshTime(lastRefreshTimeStamp)
+        }
+    }
+
+    override fun saveLastBookListRefreshTime() {
+        mSharedPreferencesManager.setLastBookListRefreshTime(System.currentTimeMillis())
     }
 
     override fun stop() {
