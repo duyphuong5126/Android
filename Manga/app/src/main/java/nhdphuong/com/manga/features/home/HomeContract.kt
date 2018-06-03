@@ -13,6 +13,7 @@ interface HomeContract {
         fun refreshHomePagination(pageCount: Long)
         fun showNothingView(isEmpty: Boolean)
         fun showLastBookListRefreshTime(lastRefreshTimeStamp: String)
+        fun showRefreshingDialog()
     }
 
     interface Presenter : Base.Presenter {

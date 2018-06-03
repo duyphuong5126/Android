@@ -5,6 +5,7 @@ import android.util.Log
 import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.SharedPreferencesManager
@@ -36,6 +37,7 @@ class HomePresenter @Inject constructor(private val mContext: Context,
     private var mPreventiveData = HashMap<Int, LinkedList<Book>>()
     private var isLoadingPreventiveData = false
     private val mJobStack = Stack<Job>()
+    private var isRefreshing: Boolean = false
 
     init {
         mView.setPresenter(this)
@@ -101,29 +103,36 @@ class HomePresenter @Inject constructor(private val mContext: Context,
     }
 
     override fun reloadCurrentPage(onRefreshed: () -> Unit) {
-        launch {
-            val remoteBooks = mBookRepository.getBookByPage(mCurrentPage)
-            if (remoteBooks != null) {
-                remoteBooks.bookList.let { bookList ->
-                    mPreventiveData[mCurrentPage]?.let { page ->
-                        page.clear()
-                        page.addAll(bookList)
-                    }
-                    mMainList.clear()
-                    mMainList.addAll(bookList)
+        if (!isRefreshing) {
+            isRefreshing = true
+            launch {
+                val remoteBooks = mBookRepository.getBookByPage(mCurrentPage)
+                if (remoteBooks != null) {
+                    remoteBooks.bookList.let { bookList ->
+                        mPreventiveData[mCurrentPage]?.let { page ->
+                            page.clear()
+                            page.addAll(bookList)
+                        }
+                        mMainList.clear()
+                        mMainList.addAll(bookList)
 
+                        launch(UI) {
+                            mView.refreshHomeBookList()
+                            onRefreshed()
+                            mView.showNothingView(false)
+                            isRefreshing = false
+                        }
+                    }
+                } else {
                     launch(UI) {
                         onRefreshed()
-                        mView.refreshHomeBookList()
-                        mView.showNothingView(false)
+                        mView.showNothingView(true)
+                        isRefreshing = false
                     }
                 }
-            } else {
-                launch(UI) {
-                    onRefreshed()
-                    mView.showNothingView(true)
-                }
             }
+        } else {
+            mView.showRefreshingDialog()
         }
     }
 

@@ -80,6 +80,10 @@
     <string name="is_downloading_this_book">This book is being downloaded.\nPlease wait until it completes.</string>
     <string name="is_downloading_another_book">The book with id %s being downloaded, please try again later.</string>
     <string name="reload_library">Reload library</string>
+    <string name="book_list_refreshing_title">Book list is refreshing</string>
+    <string name="book_list_refreshing_description">Book list is now refreshing.\nPlease try again later.</string>
+    <string name="page_refreshing">This page is refreshing</string>
+    <string name="page_refreshing_description">This is now refreshing.\nPlease try again later.</string>
     <string name="pull_down">Pull it down</string>
     <string name="release_to_refresh">Release to refresh</string>
     <string name="updating">Updating%s</string>

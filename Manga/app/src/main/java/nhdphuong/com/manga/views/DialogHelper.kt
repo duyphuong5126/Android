@@ -68,19 +68,28 @@ class DialogHelper {
             }
         }
 
-        @SuppressLint("InflateParams")
         fun showBookDownloadingDialog(activity: Activity, mediaId: String?, onOk: () -> Unit) {
-            val contentView = activity.layoutInflater.inflate(R.layout.dialog_ok, null, false)
-            val dialog = Dialog(activity)
-            val mtvPermissionTitle: MyTextView = contentView.findViewById(R.id.mtvPermissionTitle)
-            mtvPermissionTitle.text = activity.getString(R.string.is_book_being_downloaded)
-            val mtvDescription: MyTextView = contentView.findViewById(R.id.mtvPermissionDescription)
             val message = if (mediaId == null) {
                 activity.getString(R.string.is_downloading_this_book)
             } else {
                 String.format(activity.getString(R.string.is_downloading_another_book), mediaId)
             }
-            mtvDescription.text = message
+            showOkDialog(activity, activity.getString(R.string.is_book_being_downloaded), message, onOk)
+        }
+
+        fun showBookListRefreshingDialog(activity: Activity, onOk: () -> Unit) {
+            showOkDialog(activity, activity.getString(R.string.book_list_refreshing_title),
+                    activity.getString(R.string.book_list_refreshing_description), onOk)
+        }
+
+        @SuppressLint("InflateParams")
+        private fun showOkDialog(activity: Activity, title: String, description: String, onOk: () -> Unit) {
+            val contentView = activity.layoutInflater.inflate(R.layout.dialog_ok, null, false)
+            val dialog = Dialog(activity)
+            val mtvPermissionTitle: MyTextView = contentView.findViewById(R.id.mtvPermissionTitle)
+            mtvPermissionTitle.text = title
+            val mtvDescription: MyTextView = contentView.findViewById(R.id.mtvPermissionDescription)
+            mtvDescription.text = description
             contentView.findViewById<MyButton>(R.id.mbOkButton).setOnClickListener {
                 dialog.dismiss()
                 onOk()

@@ -96,7 +96,7 @@ class HomeFragment : Fragment(), HomeContract.View, PtrUIHandler {
         })
         mBinding.mtvReload.setOnClickListener {
             mHomePresenter.reloadCurrentPage {
-                
+
             }
         }
     }
@@ -175,6 +175,7 @@ class HomeFragment : Fragment(), HomeContract.View, PtrUIHandler {
 
     override fun refreshHomeBookList() {
         mHomeListAdapter.notifyDataSetChanged()
+        mHomePresenter.saveLastBookListRefreshTime()
         mBinding.rvMainList.post {
             mBinding.rvMainList.smoothScrollBy(0, 0)
         }
@@ -198,6 +199,12 @@ class HomeFragment : Fragment(), HomeContract.View, PtrUIHandler {
 
     override fun showNothingView(isEmpty: Boolean) {
         mBinding.clNothing.visibility = if (isEmpty) View.VISIBLE else View.GONE
+    }
+
+    override fun showRefreshingDialog() {
+        DialogHelper.showBookListRefreshingDialog(activity, onOk = {
+
+        })
     }
 
     override fun showLoading() {
