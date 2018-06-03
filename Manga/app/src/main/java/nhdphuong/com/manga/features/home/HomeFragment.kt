@@ -122,7 +122,6 @@ class HomeFragment : Fragment(), HomeContract.View, PtrUIHandler {
     override fun onStop() {
         super.onStop()
         Log.d(TAG, "onStop")
-        mHomePresenter.stop()
     }
 
     override fun onPause() {
@@ -153,6 +152,7 @@ class HomeFragment : Fragment(), HomeContract.View, PtrUIHandler {
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "onDestroy")
+        mHomePresenter.stop()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {

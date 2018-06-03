@@ -5,7 +5,6 @@ import android.util.Log
 import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.SharedPreferencesManager
@@ -14,6 +13,7 @@ import nhdphuong.com.manga.data.repository.BookRepository
 import nhdphuong.com.manga.features.preview.BookPreviewActivity
 import nhdphuong.com.manga.supports.SupportUtils
 import java.util.*
+import java.util.concurrent.CountDownLatch
 import javax.inject.Inject
 import kotlin.collections.HashMap
 
@@ -238,17 +238,21 @@ class HomePresenter @Inject constructor(private val mContext: Context,
 
     private suspend fun loadPreventiveData() {
         isLoadingPreventiveData = true
+        val countDownLatch = CountDownLatch(NUMBER_OF_PREVENTIVE_PAGES - mCurrentPage)
         for (page in mCurrentPage + 1..NUMBER_OF_PREVENTIVE_PAGES) {
             Log.d(TAG, "Start loading page $page")
-            val bookList = async {
+            async {
                 val remoteBook = mBookRepository.getBookByPage(page)
-                remoteBook?.bookList
-            }.await()
-            Log.d(TAG, "Done loading page $page")
-            if (bookList != null && !bookList.isEmpty()) {
-                mPreventiveData[page] = bookList
+                Log.d(TAG, "Done loading page $page")
+                remoteBook?.bookList?.let { bookList ->
+                    if (!bookList.isEmpty()) {
+                        mPreventiveData[page] = bookList
+                    }
+                }
+                countDownLatch.countDown()
             }
         }
+        countDownLatch.await()
         Log.d(TAG, "Load preventive data successfully")
         isLoadingPreventiveData = false
     }
