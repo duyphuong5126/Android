@@ -107,6 +107,7 @@ class HomePresenter @Inject constructor(private val mContext: Context,
             isRefreshing = true
             launch {
                 val remoteBooks = mBookRepository.getBookByPage(mCurrentPage)
+                mCurrentNumOfPages = remoteBooks?.numOfPages ?: 0L
                 if (remoteBooks != null) {
                     remoteBooks.bookList.let { bookList ->
                         mPreventiveData[mCurrentPage]?.let { page ->
@@ -120,6 +121,7 @@ class HomePresenter @Inject constructor(private val mContext: Context,
                             mView.refreshHomeBookList()
                             onRefreshed()
                             mView.showNothingView(false)
+                            mView.refreshHomePagination(mCurrentNumOfPages)
                             isRefreshing = false
                         }
                     }
