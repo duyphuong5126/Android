@@ -1,5 +1,6 @@
 package nhdphuong.com.manga.api
 
+import nhdphuong.com.manga.data.entity.book.Book
 import nhdphuong.com.manga.data.entity.book.RecommendBook
 import nhdphuong.com.manga.data.entity.book.RemoteBook
 import retrofit2.Call
@@ -13,6 +14,9 @@ import retrofit2.http.Query
 interface BookApiService {
     @GET("/api/galleries/all")
     fun getBookListByPage(@Query("page") pageNumber: Int): Call<RemoteBook>
+
+    @GET("/api/gallery/{bookId}")
+    fun getBookDetails(@Path("bookId") bookId: String): Call<Book>
 
     @GET("/api/gallery/{bookId}/related")
     fun getRecommendBook(@Path("bookId") bookId: String): Call<RecommendBook>

@@ -309,8 +309,16 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
         }, 2000)
     }
 
-    override fun showBookBeingDownloaded(mediaId: String?) {
-        DialogHelper.showBookDownloadingDialog(activity, mediaId, onOk = {
+    override fun showBookBeingDownloaded(bookId: String) {
+        DialogHelper.showBookDownloadingDialog(activity, bookId, onOk = {
+            mPresenter.restartBookPreview(bookId)
+        }, onDismiss = {
+
+        })
+    }
+
+    override fun showThisBookBeingDownloaded() {
+        DialogHelper.showThisBookDownloadingDialog(activity, onOk = {
 
         })
     }

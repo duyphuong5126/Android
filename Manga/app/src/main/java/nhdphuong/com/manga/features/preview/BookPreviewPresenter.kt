@@ -94,7 +94,7 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
         mLanguageList = LinkedList()
         mParodyList = LinkedList()
         mGroupList = LinkedList()
-        if (DownloadManager.isDownloading && DownloadManager.mediaId == mBook.mediaId) {
+        if (DownloadManager.isDownloading && DownloadManager.bookId == mBook.bookId) {
             DownloadManager.setDownloadCallback(this)
             mView.updateDownloadProgress(DownloadManager.progress, DownloadManager.total)
         }
@@ -216,7 +216,7 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
                 bookPages.size.let { total ->
                     if (total > 0) {
                         DownloadManager.setDownloadCallback(this)
-                        DownloadManager.startDownloading(mBook.mediaId, total)
+                        DownloadManager.startDownloading(mBook.bookId, total)
                         launch {
                             var progress = 0
                             val resultList = LinkedList<String>()
@@ -245,7 +245,7 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
                                             }
                                             launch(UI) {
                                                 progress++
-                                                DownloadManager.updateProgress(mBook.mediaId, progress)
+                                                DownloadManager.updateProgress(mBook.bookId, progress)
                                                 if (resultList.size == total) {
                                                     delay(1000)
                                                     nHentaiApp.refreshGallery(*resultList.toTypedArray())
@@ -263,7 +263,22 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
                     }
                 }
             } else {
-                mView.showBookBeingDownloaded(if (DownloadManager.mediaId == mBook.mediaId) null else DownloadManager.mediaId)
+                if (DownloadManager.bookId == mBook.bookId) {
+                    mView.showThisBookBeingDownloaded()
+                } else {
+                    mView.showBookBeingDownloaded(DownloadManager.bookId)
+                }
+            }
+        }
+    }
+
+    override fun restartBookPreview(bookId: String) {
+        launch {
+            val bookDetails = mBookRepository.getBookDetails(bookId)
+            bookDetails?.let {
+                launch(UI) {
+                    BookPreviewActivity.restart(bookDetails)
+                }
             }
         }
     }
@@ -272,13 +287,13 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
 
     }
 
-    override fun onDownloadingStarted(mediaId: String, total: Int) {
+    override fun onDownloadingStarted(bookId: String, total: Int) {
         if (mView.isActive()) {
             mView.initDownloading(total)
         }
     }
 
-    override fun onProgressUpdated(mediaId: String, progress: Int, total: Int) {
+    override fun onProgressUpdated(bookId: String, progress: Int, total: Int) {
         if (mView.isActive()) {
             mView.updateDownloadProgress(progress, total)
         }

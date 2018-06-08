@@ -45,35 +45,24 @@ class DialogHelper {
             return dialog
         }
 
-        @SuppressLint("InflateParams")
         fun showStoragePermissionDialog(activity: Activity, onOk: () -> Unit, onDismiss: () -> Unit) {
-            val contentView = activity.layoutInflater.inflate(R.layout.dialog_ok_dismiss, null, false)
-            val dialog = Dialog(activity)
-            val mtvDescription: MyTextView = contentView.findViewById(R.id.mtvPermissionDescription)
-            mtvDescription.text = activity.getString(R.string.storage_permission_require)
-            contentView.findViewById<MyButton>(R.id.mbOkButton).setOnClickListener {
-                dialog.dismiss()
-                onOk()
-            }
-            contentView.findViewById<MyButton>(R.id.mbDismissButton).setOnClickListener {
-                dialog.dismiss()
-                onDismiss()
-            }
-            dialog.setContentView(contentView)
-            dialog.show()
-            dialog.window.let { window ->
-                window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                window.setGravity(Gravity.CENTER)
-                window.decorView.setBackgroundResource(android.R.color.transparent)
-            }
+            val permissionTitle = activity.getString(R.string.permission_require)
+            val permissionDescription = activity.getString(R.string.storage_permission_require)
+            val okString = activity.getString(R.string.ok)
+            val dismissString = activity.getString(R.string.dismiss)
+            showOkDismissDialog(activity, permissionTitle, permissionDescription, okString, dismissString, onOk, onDismiss)
         }
 
-        fun showBookDownloadingDialog(activity: Activity, mediaId: String?, onOk: () -> Unit) {
-            val message = if (mediaId == null) {
-                activity.getString(R.string.is_downloading_this_book)
-            } else {
-                String.format(activity.getString(R.string.is_downloading_another_book), mediaId)
-            }
+        fun showBookDownloadingDialog(activity: Activity, mediaId: String, onOk: () -> Unit, onDismiss: () -> Unit) {
+            val title = activity.getString(R.string.is_book_being_downloaded)
+            val message = String.format(activity.getString(R.string.is_downloading_another_book), mediaId)
+            val okString = activity.getString(R.string.view)
+            val dismissString = activity.getString(R.string.ok)
+            showOkDismissDialog(activity, title, message, okString, dismissString, onOk, onDismiss)
+        }
+
+        fun showThisBookDownloadingDialog(activity: Activity, onOk: () -> Unit) {
+            val message = activity.getString(R.string.is_downloading_this_book)
             showOkDialog(activity, activity.getString(R.string.is_book_being_downloaded), message, onOk)
         }
 
@@ -91,13 +80,43 @@ class DialogHelper {
         private fun showOkDialog(activity: Activity, title: String, description: String, onOk: () -> Unit) {
             val contentView = activity.layoutInflater.inflate(R.layout.dialog_ok, null, false)
             val dialog = Dialog(activity)
-            val mtvPermissionTitle: MyTextView = contentView.findViewById(R.id.mtvPermissionTitle)
+            val mtvPermissionTitle: MyTextView = contentView.findViewById(R.id.mtvDialogTitle)
             mtvPermissionTitle.text = title
-            val mtvDescription: MyTextView = contentView.findViewById(R.id.mtvPermissionDescription)
+            val mtvDescription: MyTextView = contentView.findViewById(R.id.mtvDialogDescription)
             mtvDescription.text = description
             contentView.findViewById<MyButton>(R.id.mbOkButton).setOnClickListener {
                 dialog.dismiss()
                 onOk()
+            }
+            dialog.setContentView(contentView)
+            dialog.show()
+            dialog.window.let { window ->
+                window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                window.setGravity(Gravity.CENTER)
+                window.decorView.setBackgroundResource(android.R.color.transparent)
+            }
+        }
+
+        @SuppressLint("InflateParams")
+        private fun showOkDismissDialog(activity: Activity, title: String, description: String, ok: String, dismiss: String,
+                                        onOk: () -> Unit, onDismiss: () -> Unit) {
+            val contentView = activity.layoutInflater.inflate(R.layout.dialog_ok_dismiss, null, false)
+            val dialog = Dialog(activity)
+            val mtvTitle: MyTextView = contentView.findViewById(R.id.mtvDialogTitle)
+            val mtvDescription: MyTextView = contentView.findViewById(R.id.mtvDialogDescription)
+            val mbOk: MyButton = contentView.findViewById(R.id.mbOkButton)
+            val mbDismiss: MyButton = contentView.findViewById(R.id.mbDismissButton)
+            mbOk.text = ok
+            mbDismiss.text = dismiss
+            mtvTitle.text = title
+            mtvDescription.text = description
+            contentView.findViewById<MyButton>(R.id.mbOkButton).setOnClickListener {
+                dialog.dismiss()
+                onOk()
+            }
+            contentView.findViewById<MyButton>(R.id.mbDismissButton).setOnClickListener {
+                dialog.dismiss()
+                onDismiss()
             }
             dialog.setContentView(contentView)
             dialog.show()

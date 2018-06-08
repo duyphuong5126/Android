@@ -5,14 +5,14 @@ package nhdphuong.com.manga
  */
 class DownloadManager {
     companion object {
-        private var mMediaId: String = ""
+        private var mBookId: String = ""
             set(value) {
                 if (!isDownloading) {
                     field = value
                 }
             }
-        val mediaId: String
-            get() = mMediaId
+        val bookId: String
+            get() = mBookId
 
 
         private var mTotal: Int = 0
@@ -38,23 +38,23 @@ class DownloadManager {
 
         private var mDownloadCallback: DownloadCallback? = null
 
-        fun startDownloading(mediaId: String, total: Int) {
-            if (mMediaId != mediaId && !isDownloading) {
-                mMediaId = mediaId
+        fun startDownloading(bookId: String, total: Int) {
+            if (mBookId != bookId && !isDownloading) {
+                mBookId = bookId
                 mTotal = total
-                mDownloadCallback?.onDownloadingStarted(mediaId, total)
+                mDownloadCallback?.onDownloadingStarted(bookId, total)
             }
         }
 
-        fun updateProgress(mediaId: String, progress: Int) {
-            if (mMediaId == mediaId && isDownloading) {
+        fun updateProgress(bookId: String, progress: Int) {
+            if (mBookId == bookId && isDownloading) {
                 mProgress = progress
-                mDownloadCallback?.onProgressUpdated(mediaId, progress, total)
+                mDownloadCallback?.onProgressUpdated(bookId, progress, total)
             }
         }
 
         fun endDownloading() {
-            mMediaId = ""
+            mBookId = ""
             mTotal = 0
             mProgress = 0
             mDownloadCallback?.onDownloadingEnded()
@@ -67,8 +67,8 @@ class DownloadManager {
     }
 
     interface DownloadCallback {
-        fun onDownloadingStarted(mediaId: String, total: Int)
-        fun onProgressUpdated(mediaId: String, progress: Int, total: Int)
+        fun onDownloadingStarted(bookId: String, total: Int)
+        fun onProgressUpdated(bookId: String, progress: Int, total: Int)
         fun onDownloadingEnded()
     }
 }

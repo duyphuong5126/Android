@@ -34,7 +34,8 @@ interface BookPreviewContract {
         fun initDownloading(total: Int)
         fun updateDownloadProgress(progress: Int, total: Int)
         fun finishDownloading()
-        fun showBookBeingDownloaded(mediaId: String?)
+        fun showThisBookBeingDownloaded()
+        fun showBookBeingDownloaded(bookId: String)
     }
 
     interface Presenter : Base.Presenter {
@@ -43,5 +44,6 @@ interface BookPreviewContract {
         fun saveCurrentAvailableCoverUrl(url: String)
         fun startReadingFrom(startReadingPage: Int)
         fun downloadBook()
+        fun restartBookPreview(bookId: String)
     }
 }

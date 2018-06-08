@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">nhentai</string>
+    <string name="app_name">nHentai</string>
     <string name="main_logo">nhentai logo</string>
     <string name="main_search_button">Main search button</string>
     <string name="main_item">Main item</string>
@@ -70,9 +70,10 @@
     <string name="download_progress">Page %s is downloaded</string>
     <string name="all_pages_downloaded">All pages are downloaded</string>
     <string name="dismiss">Dismiss</string>
-    <string name="permission_require">Permission Requirement</string>
     <string name="ok">OK</string>
+    <string name="view">View</string>
     <string name="done">Done</string>
+    <string name="permission_require">Permission Requirement</string>
     <string name="storage_permission_require">We need you to allow us to store the downloaded data.</string>
     <string name="toast_storage_permission_require">Please allow us to store data in your device!</string>
     <string name="preview_download_progress">Downloaded %s of %s</string>
