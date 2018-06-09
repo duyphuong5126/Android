@@ -93,10 +93,14 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
             }
         }
 
-        mBinding.mbtDownload.setOnClickListener {
+        mBinding.mtvDownload.setOnClickListener {
             isDownloadRequested = true
             mPresenter.downloadBook()
         }
+
+        val changeFavoriteListener = View.OnClickListener { mPresenter.changeBookFavorite() }
+        mBinding.mtvFavorite.setOnClickListener(changeFavoriteListener)
+        mBinding.mtvNotFavorite.setOnClickListener(changeFavoriteListener)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -321,6 +325,16 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
         DialogHelper.showThisBookDownloadingDialog(activity, onOk = {
 
         })
+    }
+
+    override fun showFavoriteBookSaved(isFavorite: Boolean) {
+        if (isFavorite) {
+            mBinding.mtvNotFavorite.visibility = View.INVISIBLE
+            mBinding.mtvFavorite.visibility = View.VISIBLE
+        } else {
+            mBinding.mtvNotFavorite.visibility = View.VISIBLE
+            mBinding.mtvFavorite.visibility = View.INVISIBLE
+        }
     }
 
     override fun showLoading() {

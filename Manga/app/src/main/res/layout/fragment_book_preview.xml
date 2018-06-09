@@ -274,26 +274,43 @@
                     tools:targetApi="jelly_bean" />
 
                 <nhdphuong.com.manga.views.customs.MyTextView
-                    android:id="@+id/mbtFavorite"
+                    android:id="@+id/mtvFavorite"
+                    style="@style/Favorite"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_red_all_corners_radius_1"
                     android:drawablePadding="@dimen/dp10"
-                    android:drawableStart="@drawable/ic_heart_white"
                     android:gravity="center_vertical"
                     android:paddingBottom="@dimen/dp10"
                     android:paddingEnd="15dp"
                     android:paddingStart="15dp"
                     android:paddingTop="@dimen/dp10"
                     android:text="@string/favorite"
-                    android:textColor="@android:color/white"
                     android:textSize="17sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvUpdatedAt"
-                    app:myFont="@string/NotoSansBold" />
+                    app:myFont="@string/NotoSansBold"
+                    android:visibility="invisible"/>
 
                 <nhdphuong.com.manga.views.customs.MyTextView
-                    android:id="@+id/mbtDownload"
+                    android:id="@+id/mtvNotFavorite"
+                    style="@style/NotFavorite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="@dimen/dp10"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="@dimen/dp10"
+                    android:paddingEnd="15dp"
+                    android:paddingStart="15dp"
+                    android:paddingTop="@dimen/dp10"
+                    android:text="@string/favorite"
+                    android:textSize="17sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvUpdatedAt"
+                    app:myFont="@string/NotoSansBold"
+                    android:visibility="visible" />
+
+                <nhdphuong.com.manga.views.customs.MyTextView
+                    android:id="@+id/mtvDownload"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/dp10"
@@ -308,7 +325,7 @@
                     android:text="@string/download"
                     android:textColor="@android:color/white"
                     android:textSize="17sp"
-                    app:layout_constraintStart_toEndOf="@id/mbtFavorite"
+                    app:layout_constraintStart_toEndOf="@id/mtvFavorite"
                     app:layout_constraintTop_toBottomOf="@+id/tvUpdatedAt"
                     app:myFont="@string/NotoSansBold" />
 
@@ -322,7 +339,7 @@
                     android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/mbtDownload">
+                    app:layout_constraintTop_toBottomOf="@+id/mtvDownload">
 
                     <ProgressBar
                         android:id="@+id/pbDownloading"
@@ -331,12 +348,12 @@
                         android:layout_height="10dp"
                         android:layout_marginEnd="5dp"
                         android:indeterminateTint="@color/redED2553"
+                        android:progressDrawable="@drawable/bg_download_red"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/mtvDownloaded"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        tools:targetApi="lollipop"
-                        android:progressDrawable="@drawable/bg_download_red"/>
+                        tools:targetApi="lollipop" />
 
                     <nhdphuong.com.manga.views.customs.MyTextView
                         android:id="@+id/mtvDownloaded"
@@ -363,8 +380,8 @@
                     android:text="@string/preview"
                     android:textColor="@android:color/white"
                     android:textSize="18sp"
-                    app:layout_constraintStart_toStartOf="@+id/clDownloadProgress"
-                    app:layout_constraintTop_toBottomOf="@+id/clDownloadProgress"
+                    app:layout_constraintStart_toStartOf="@+id/mtvFavorite"
+                    app:layout_constraintTop_toBottomOf="@+id/mtvFavorite"
                     app:myFont="@string/NotoSansBold" />
 
                 <HorizontalScrollView

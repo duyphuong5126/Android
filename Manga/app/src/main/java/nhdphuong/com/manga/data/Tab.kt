@@ -6,6 +6,9 @@ import nhdphuong.com.manga.Constants
  * Created by nhdphuong on 3/17/18.
  */
 enum class Tab(val defaultName: String) {
+    RECENT(Constants.RECENT),
+    FAVORITE(Constants.FAVORITE),
+
     RANDOM(Constants.RANDOM),
     ARTISTS(Constants.ARTISTS),
     TAGS(Constants.TAGS),
@@ -13,6 +16,7 @@ enum class Tab(val defaultName: String) {
     GROUPS(Constants.GROUPS),
     PARODIES(Constants.PARODIES),
     INFO(Constants.INFO),
+
     NONE(Constants.RANDOM);
 
     companion object {

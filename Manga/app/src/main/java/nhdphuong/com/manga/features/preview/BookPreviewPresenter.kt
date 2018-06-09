@@ -73,6 +73,8 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
 
     private val uploadedTimeStamp: String = SupportUtils.getTimeElapsed(System.currentTimeMillis() - mBook.updateAt * MILLISECOND)
 
+    private var isFavoriteBook: Boolean = false
+
     init {
         mView.setPresenter(this)
     }
@@ -83,6 +85,8 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
         } else {
             mView.showBookCoverImage(mCacheCoverUrl)
         }
+        refreshBookFavorite()
+        mView.showFavoriteBookSaved(isFavoriteBook)
         mView.show1stTitle(mBook.title.englishName)
         mView.show2ndTitle(mBook.title.japaneseName)
         mView.showUploadedTime(String.format(mContext.getString(R.string.uploaded), uploadedTimeStamp))
@@ -283,6 +287,16 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
         }
     }
 
+    override fun changeBookFavorite() {
+        launch {
+            mBookRepository.saveFavoriteBook(mBook.bookId, !isFavoriteBook)
+            refreshBookFavorite()
+            launch(UI) {
+                mView.showFavoriteBookSaved(isFavoriteBook)
+            }
+        }
+    }
+
     override fun stop() {
 
     }
@@ -357,5 +371,15 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
                 }
             }
         }
+    }
+
+    private fun refreshBookFavorite() {
+        val countDownLatch = CountDownLatch(1)
+        launch {
+            isFavoriteBook = mBookRepository.isFavoriteBook(mBook.bookId)
+            Log.d(TAG, "isFavoriteBook: $isFavoriteBook")
+            countDownLatch.countDown()
+        }
+        countDownLatch.await()
     }
 }

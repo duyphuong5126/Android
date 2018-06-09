@@ -47,6 +47,17 @@ class HomePresenter @Inject constructor(private val mContext: Context,
         Log.d(TAG, "start")
         mMainList.clear()
 
+        launch {
+            val recentBooks = mBookRepository.getRecentBooks(25, 0)
+            if (!recentBooks.isEmpty()) {
+                for (recentBook in recentBooks) {
+                    Log.d(TAG, "recent book: ${recentBook.bookId}, favorite: ${recentBook.favorite}")
+                }
+            } else {
+                Log.d(TAG, "recent list is empty")
+            }
+        }
+
         mView.showLoading()
         mView.setUpHomeBookList(mMainList)
         val job = launch {

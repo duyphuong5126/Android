@@ -12,6 +12,7 @@ import nhdphuong.com.manga.NHentaiApp
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.api.ApiConstants
 import nhdphuong.com.manga.data.entity.book.Book
+import nhdphuong.com.manga.data.repository.BookRepository
 import nhdphuong.com.manga.supports.GlideUtils
 import nhdphuong.com.manga.supports.SupportUtils
 import java.util.*
@@ -24,7 +25,8 @@ import javax.inject.Inject
 class ReaderPresenter @Inject constructor(private val mView: ReaderContract.View,
                                           private val mBook: Book,
                                           private val mStartReadingPage: Int,
-                                          private val mContext: Context) : ReaderContract.Presenter {
+                                          private val mContext: Context,
+                                          private val mBookRepository: BookRepository) : ReaderContract.Presenter {
     companion object {
         private val TAG = ReaderPresenter::class.java.simpleName
     }
@@ -51,6 +53,8 @@ class ReaderPresenter @Inject constructor(private val mView: ReaderContract.View
 
     override fun start() {
         Log.d(TAG, "Start reading: ${mBook.previewTitle}")
+        saveRecentBook()
+
         mView.showBookTitle(mBook.previewTitle)
         mDownloadQueue.clear()
 
@@ -149,5 +153,11 @@ class ReaderPresenter @Inject constructor(private val mView: ReaderContract.View
 
     override fun stop() {
         isDownloading = false
+    }
+
+    private fun saveRecentBook() {
+        launch {
+            mBookRepository.saveRecentBook(mBook.bookId)
+        }
     }
 }

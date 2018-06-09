@@ -36,6 +36,7 @@ interface BookPreviewContract {
         fun finishDownloading()
         fun showThisBookBeingDownloaded()
         fun showBookBeingDownloaded(bookId: String)
+        fun showFavoriteBookSaved(isFavorite: Boolean)
     }
 
     interface Presenter : Base.Presenter {
@@ -45,5 +46,6 @@ interface BookPreviewContract {
         fun startReadingFrom(startReadingPage: Int)
         fun downloadBook()
         fun restartBookPreview(bookId: String)
+        fun changeBookFavorite()
     }
 }

@@ -14,7 +14,7 @@ import java.util.concurrent.CountDownLatch
 /*
  * Created by nhdphuong on 3/24/18.
  */
-class BookRemoteDataSource(private val mBookApiService: BookApiService) : BookDataSource {
+class BookRemoteDataSource(private val mBookApiService: BookApiService) : BookDataSource.Remote {
     companion object {
         private val TAG = BookRemoteDataSource::class.java.simpleName
     }
