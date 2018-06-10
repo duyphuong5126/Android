@@ -30,4 +30,6 @@ class BookLocalDataSource @Inject constructor(private val mRecentBookDAO: Recent
     }
 
     override suspend fun isFavoriteBook(bookId: String): Boolean = mRecentBookDAO.isFavoriteBook(bookId) == 1
+
+    override suspend fun isRecentBook(bookId: String): Boolean = mRecentBookDAO.getRecentBook(bookId) == bookId
 }

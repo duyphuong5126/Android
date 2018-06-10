@@ -28,6 +28,24 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <jp.shts.android.library.TriangleLabelView
+            android:id="@+id/tlvRecent"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:backgroundColor="@color/redED2553"
+            app:corner="leftTop"
+            app:labelBottomPadding="3dp"
+            app:labelCenterPadding="3dp"
+            app:labelTopPadding="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:primaryText="@string/favorite"
+            app:primaryTextColor="@android:color/white"
+            app:primaryTextSize="13sp"
+            android:visibility="visible"/>
+
         <android.support.constraint.ConstraintLayout
             android:id="@+id/clItemDescription"
             android:layout_width="match_parent"

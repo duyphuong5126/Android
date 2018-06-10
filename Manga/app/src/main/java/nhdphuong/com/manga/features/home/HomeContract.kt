@@ -2,6 +2,7 @@ package nhdphuong.com.manga.features.home
 
 import nhdphuong.com.manga.Base
 import nhdphuong.com.manga.data.entity.book.Book
+import java.util.*
 
 /*
  * Created by nhdphuong on 3/18/18.
@@ -14,6 +15,8 @@ interface HomeContract {
         fun showNothingView(isEmpty: Boolean)
         fun showLastBookListRefreshTime(lastRefreshTimeStamp: String)
         fun showRefreshingDialog()
+        fun showRecentBooks(recentList: List<Int>)
+        fun showFavoriteBooks(favoriteList: List<Int>)
     }
 
     interface Presenter : Base.Presenter {
@@ -23,6 +26,7 @@ interface HomeContract {
         fun showBookPreview(book: Book)
         fun reloadCurrentPage(onRefreshed: () -> Unit)
         fun reloadLastBookListRefreshTime()
+        fun reloadRecentBooks()
         fun saveLastBookListRefreshTime()
     }
 }

@@ -27,6 +27,7 @@ import nhdphuong.com.manga.data.entity.book.Book
 import nhdphuong.com.manga.databinding.FragmentHomeBinding
 import nhdphuong.com.manga.views.DialogHelper
 import nhdphuong.com.manga.views.adapters.HomePaginationAdapter
+import java.util.*
 
 /*
  * Created by nhdphuong on 3/16/18.
@@ -181,6 +182,7 @@ class HomeFragment : Fragment(), HomeContract.View, PtrUIHandler {
         mBinding.rvMainList.post {
             mBinding.rvMainList.smoothScrollBy(0, 0)
         }
+        mHomePresenter.reloadRecentBooks()
     }
 
     override fun refreshHomePagination(pageCount: Long) {
@@ -207,6 +209,14 @@ class HomeFragment : Fragment(), HomeContract.View, PtrUIHandler {
         DialogHelper.showBookListRefreshingDialog(activity, onOk = {
 
         })
+    }
+
+    override fun showFavoriteBooks(favoriteList: List<Int>) {
+        mHomeListAdapter.setFavoriteList(favoriteList)
+    }
+
+    override fun showRecentBooks(recentList: List<Int>) {
+        mHomeListAdapter.setRecentList(recentList)
     }
 
     override fun showLoading() {

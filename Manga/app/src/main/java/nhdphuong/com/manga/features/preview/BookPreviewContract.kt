@@ -37,6 +37,8 @@ interface BookPreviewContract {
         fun showThisBookBeingDownloaded()
         fun showBookBeingDownloaded(bookId: String)
         fun showFavoriteBookSaved(isFavorite: Boolean)
+        fun showRecentBooks(recentList: List<Int>)
+        fun showFavoriteBooks(favoriteList: List<Int>)
     }
 
     interface Presenter : Base.Presenter {

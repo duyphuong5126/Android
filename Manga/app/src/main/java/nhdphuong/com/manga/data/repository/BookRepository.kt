@@ -37,4 +37,6 @@ class BookRepository @Inject constructor(@Remote private val mBookRemoteDataSour
     override suspend fun getRecentBooks(limit: Int, offset: Int): LinkedList<RecentBook> = mBookLocalDataSource.getRecentBooks(limit, offset)
 
     override suspend fun isFavoriteBook(bookId: String): Boolean = mBookLocalDataSource.isFavoriteBook(bookId)
+
+    override suspend fun isRecentBook(bookId: String): Boolean = mBookLocalDataSource.isRecentBook(bookId)
 }

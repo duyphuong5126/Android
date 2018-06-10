@@ -31,6 +31,9 @@ interface RecentBookDAO {
     @Query("select ${Constants.IS_FAVORITE} from $RECENT_BOOK_TABLE where ${Constants.BOOK_ID} = :bookId")
     fun isFavoriteBook(bookId: String): Int
 
+    @Query("select ${Constants.BOOK_ID} from $RECENT_BOOK_TABLE where ${Constants.BOOK_ID} = :bookId")
+    fun getRecentBook(bookId: String): String
+
     @Query("select * from $RECENT_BOOK_TABLE")
     fun getRecentBooks(): List<RecentBook>
 }

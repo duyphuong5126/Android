@@ -14,15 +14,39 @@
         android:background="@android:color/black"
         android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/ivItemThumbnail"
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:background="@android:color/black"
-            android:contentDescription="@string/main_search_button"
-            android:scaleType="fitStart"
-            android:src="@drawable/ic_404_not_found" />
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/ivItemThumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:background="@android:color/black"
+                android:contentDescription="@string/main_search_button"
+                android:scaleType="fitStart"
+                android:src="@drawable/ic_404_not_found" />
+
+            <jp.shts.android.library.TriangleLabelView
+                android:id="@+id/tlvRecent"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:backgroundColor="@color/redED2553"
+                app:corner="leftTop"
+                app:labelBottomPadding="5dp"
+                app:labelCenterPadding="5dp"
+                app:labelTopPadding="25dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:primaryText="@string/favorite"
+                app:primaryTextColor="@android:color/white"
+                app:primaryTextSize="15sp"
+                android:visibility="gone"/>
+
+        </android.support.constraint.ConstraintLayout>
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/clItemDescription"

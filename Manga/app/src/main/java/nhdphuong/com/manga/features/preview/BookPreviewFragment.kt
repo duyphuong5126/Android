@@ -50,6 +50,7 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
 
     private lateinit var mPresenter: BookPreviewContract.Presenter
     private lateinit var mBinding: FragmentBookPreviewBinding
+    private lateinit var mRecommendBookAdapter: BookAdapter
     private lateinit var mRequestOptions: RequestOptions
     private lateinit var mRequestManager: RequestManager
     private lateinit var mAnimatorSet: AnimatorSet
@@ -273,11 +274,12 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
         gridLayoutManager.isAutoMeasureEnabled = true
 
         mBinding.rvRecommendList.layoutManager = gridLayoutManager
-        mBinding.rvRecommendList.adapter = BookAdapter(bookList, BookAdapter.RECOMMEND_BOOK, object : BookAdapter.OnBookClick {
+        mRecommendBookAdapter = BookAdapter(bookList, BookAdapter.RECOMMEND_BOOK, object : BookAdapter.OnBookClick {
             override fun onItemClick(item: Book) {
                 BookPreviewActivity.restart(item)
             }
         })
+        mBinding.rvRecommendList.adapter = mRecommendBookAdapter
     }
 
     override fun showRequestStoragePermission() {
@@ -335,6 +337,14 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
             mBinding.mtvNotFavorite.visibility = View.VISIBLE
             mBinding.mtvFavorite.visibility = View.INVISIBLE
         }
+    }
+
+    override fun showFavoriteBooks(favoriteList: List<Int>) {
+        mRecommendBookAdapter.setFavoriteList(favoriteList)
+    }
+
+    override fun showRecentBooks(recentList: List<Int>) {
+        mRecommendBookAdapter.setRecentList(recentList)
     }
 
     override fun showLoading() {

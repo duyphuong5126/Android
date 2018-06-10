@@ -365,9 +365,27 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
     private fun loadRecommendBook() {
         launch {
             mBookRepository.getRecommendBook(mBook.bookId)?.bookList?.let { bookList ->
+                val recentList = LinkedList<Int>()
+                val favoriteList = LinkedList<Int>()
+                for (id in 0 until bookList.size) {
+                    bookList[id].bookId.let { bookId ->
+                        when {
+                            mBookRepository.isFavoriteBook(bookId) -> favoriteList.add(id)
+                            mBookRepository.isRecentBook(bookId) -> recentList.add(id)
+                            else -> {
+                            }
+                        }
+                    }
+                }
                 Log.d(TAG, "Number of recommend book of book ${mBook.bookId}: ${bookList.size}")
                 launch(UI) {
                     mView.showRecommendBook(bookList)
+                    if (!recentList.isEmpty()) {
+                        mView.showRecentBooks(recentList)
+                    }
+                    if (!favoriteList.isEmpty()) {
+                        mView.showFavoriteBooks(favoriteList)
+                    }
                 }
             }
         }

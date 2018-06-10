@@ -47,17 +47,6 @@ class HomePresenter @Inject constructor(private val mContext: Context,
         Log.d(TAG, "start")
         mMainList.clear()
 
-        launch {
-            val recentBooks = mBookRepository.getRecentBooks(25, 0)
-            if (!recentBooks.isEmpty()) {
-                for (recentBook in recentBooks) {
-                    Log.d(TAG, "recent book: ${recentBook.bookId}, favorite: ${recentBook.favorite}")
-                }
-            } else {
-                Log.d(TAG, "recent list is empty")
-            }
-        }
-
         mView.showLoading()
         mView.setUpHomeBookList(mMainList)
         val job = launch {
@@ -154,6 +143,32 @@ class HomePresenter @Inject constructor(private val mContext: Context,
             val lastRefreshTimeStamp = String.format(mContext.getString(R.string.last_update),
                     SupportUtils.getTimeElapsed(System.currentTimeMillis() - lastRefreshTime).toLowerCase())
             mView.showLastBookListRefreshTime(lastRefreshTimeStamp)
+        }
+    }
+
+    override fun reloadRecentBooks() {
+        launch {
+            val recentList = LinkedList<Int>()
+            val favoriteList = LinkedList<Int>()
+            for (id in 0 until mMainList.size) {
+                mMainList[id].bookId.let { bookId ->
+                    when {
+                        mBookRepository.isFavoriteBook(bookId) -> favoriteList.add(id)
+                        mBookRepository.isRecentBook(bookId) -> recentList.add(id)
+                        else -> {
+                        }
+                    }
+                }
+            }
+
+            launch(UI) {
+                if (!recentList.isEmpty()) {
+                    mView.showRecentBooks(recentList)
+                }
+                if (!favoriteList.isEmpty()) {
+                    mView.showFavoriteBooks(favoriteList)
+                }
+            }
         }
     }
 
