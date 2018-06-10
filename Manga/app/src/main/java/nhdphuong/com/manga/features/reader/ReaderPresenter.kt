@@ -157,7 +157,9 @@ class ReaderPresenter @Inject constructor(private val mView: ReaderContract.View
 
     private fun saveRecentBook() {
         launch {
-            mBookRepository.saveRecentBook(mBook.bookId)
+            if (!mBookRepository.isFavoriteBook(mBook.bookId)) {
+                mBookRepository.saveRecentBook(mBook.bookId)
+            }
         }
     }
 }

@@ -6,8 +6,10 @@ import `in`.srain.cube.views.ptr.PtrHandler
 import `in`.srain.cube.views.ptr.PtrUIHandler
 import `in`.srain.cube.views.ptr.indicator.PtrIndicator
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.databinding.DataBindingUtil
 import android.os.Bundle
@@ -21,13 +23,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import nhdphuong.com.manga.Constants
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.views.adapters.BookAdapter
 import nhdphuong.com.manga.data.entity.book.Book
 import nhdphuong.com.manga.databinding.FragmentHomeBinding
+import nhdphuong.com.manga.features.preview.BookPreviewActivity
 import nhdphuong.com.manga.views.DialogHelper
 import nhdphuong.com.manga.views.adapters.HomePaginationAdapter
-import java.util.*
 
 /*
  * Created by nhdphuong on 3/16/18.
@@ -161,11 +164,19 @@ class HomeFragment : Fragment(), HomeContract.View, PtrUIHandler {
         Log.d(TAG, "onConfigurationChanged")
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == Constants.BOOK_PREVIEW_RESULT && resultCode == Activity.RESULT_OK) {
+            mHomePresenter.reloadRecentBooks()
+        }
+    }
+
     @SuppressLint("PrivateResource")
     override fun setUpHomeBookList(homeBookList: List<Book>) {
+        val homeFragment = this
         mHomeListAdapter = BookAdapter(homeBookList, BookAdapter.HOME_PREVIEW_BOOK, object : BookAdapter.OnBookClick {
             override fun onItemClick(item: Book) {
-                mHomePresenter.showBookPreview(item)
+                BookPreviewActivity.start(homeFragment, item)
             }
         })
         val mainList: RecyclerView = mBinding.rvMainList
@@ -198,7 +209,8 @@ class HomeFragment : Fragment(), HomeContract.View, PtrUIHandler {
     }
 
     override fun showLastBookListRefreshTime(lastRefreshTimeStamp: String) {
-        mBinding.refreshHeader?.mtvLastUpdate?.text = lastRefreshTimeStamp
+        val lastRefresh = String.format(getString(R.string.last_update), lastRefreshTimeStamp)
+        mBinding.refreshHeader?.mtvLastUpdate?.text = lastRefresh
     }
 
     override fun showNothingView(isEmpty: Boolean) {

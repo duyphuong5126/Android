@@ -1,16 +1,13 @@
 package nhdphuong.com.manga.features.home
 
-import android.content.Context
 import android.util.Log
 import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
-import nhdphuong.com.manga.R
 import nhdphuong.com.manga.SharedPreferencesManager
 import nhdphuong.com.manga.data.entity.book.Book
 import nhdphuong.com.manga.data.repository.BookRepository
-import nhdphuong.com.manga.features.preview.BookPreviewActivity
 import nhdphuong.com.manga.supports.SupportUtils
 import java.util.*
 import java.util.concurrent.CountDownLatch
@@ -21,8 +18,7 @@ import kotlin.collections.HashMap
  * Created by nhdphuong on 3/18/18.
  */
 
-class HomePresenter @Inject constructor(private val mContext: Context,
-                                        private val mView: HomeContract.View,
+class HomePresenter @Inject constructor(private val mView: HomeContract.View,
                                         private val mBookRepository: BookRepository,
                                         private val mSharedPreferencesManager: SharedPreferencesManager) : HomeContract.Presenter {
     companion object {
@@ -98,10 +94,6 @@ class HomePresenter @Inject constructor(private val mContext: Context,
         onPageChange()
     }
 
-    override fun showBookPreview(book: Book) {
-        BookPreviewActivity.start(mContext, book)
-    }
-
     override fun reloadCurrentPage(onRefreshed: () -> Unit) {
         if (!isRefreshing) {
             isRefreshing = true
@@ -140,9 +132,7 @@ class HomePresenter @Inject constructor(private val mContext: Context,
 
     override fun reloadLastBookListRefreshTime() {
         mSharedPreferencesManager.getLastBookListRefreshTime().let { lastRefreshTime ->
-            val lastRefreshTimeStamp = String.format(mContext.getString(R.string.last_update),
-                    SupportUtils.getTimeElapsed(System.currentTimeMillis() - lastRefreshTime).toLowerCase())
-            mView.showLastBookListRefreshTime(lastRefreshTimeStamp)
+            mView.showLastBookListRefreshTime(SupportUtils.getTimeElapsed(System.currentTimeMillis() - lastRefreshTime).toLowerCase())
         }
     }
 

@@ -59,10 +59,12 @@ class BookAdapter(private val mItemList: List<Book>, private val mAdapterType: I
         val isRecent = mRecentList.contains(position)
         val isFavorite = mFavoriteList.contains(position)
         if (isFavorite || isRecent) {
-            if (mRecentList.contains(position)) {
+            if (isRecent) {
+                mRecentList.remove(position)
                 mainLisViewHolder.showRecentLabel()
             }
-            if (mFavoriteList.contains(position)) {
+            if (isFavorite) {
+                mFavoriteList.remove(position)
                 mainLisViewHolder.showFavoriteLabel()
             }
         } else {
@@ -71,7 +73,7 @@ class BookAdapter(private val mItemList: List<Book>, private val mAdapterType: I
     }
 
     fun setRecentList(recentList: List<Int>) {
-        clearRecentLists()
+        mRecentList.clear()
         mRecentList.addAll(recentList)
         for (recentId in recentList) {
             notifyItemChanged(recentId)
@@ -79,16 +81,11 @@ class BookAdapter(private val mItemList: List<Book>, private val mAdapterType: I
     }
 
     fun setFavoriteList(favoriteList: List<Int>) {
-        clearRecentLists()
+        mFavoriteList.clear()
         mFavoriteList.addAll(favoriteList)
         for (favoriteId in favoriteList) {
             notifyItemChanged(favoriteId)
         }
-    }
-
-    private fun clearRecentLists() {
-        mFavoriteList.clear()
-        mRecentList.clear()
     }
 
     inner class MainListViewHolder(itemView: View, private val mBookClickCallback: OnBookClick) : RecyclerView.ViewHolder(itemView), View.OnClickListener {

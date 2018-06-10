@@ -73,9 +73,11 @@ class Constants {
 
         const val MAX_PER_PAGE = 25
 
+        const val BOOK_PREVIEW_RESULT = 10073
+
         // App DB
         const val NHENTAI_DB = "nHentai"
         const val BOOK_ID = "bookId"
-        const val IS_FAVORITE ="isFavorite"
+        const val IS_FAVORITE = "isFavorite"
     }
 }

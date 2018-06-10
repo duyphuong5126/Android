@@ -2,7 +2,6 @@ package nhdphuong.com.manga.features.home
 
 import nhdphuong.com.manga.Base
 import nhdphuong.com.manga.data.entity.book.Book
-import java.util.*
 
 /*
  * Created by nhdphuong on 3/18/18.
@@ -23,7 +22,6 @@ interface HomeContract {
         fun jumpToPage(pageNumber: Int)
         fun jumToFirstPage()
         fun jumToLastPage()
-        fun showBookPreview(book: Book)
         fun reloadCurrentPage(onRefreshed: () -> Unit)
         fun reloadLastBookListRefreshTime()
         fun reloadRecentBooks()

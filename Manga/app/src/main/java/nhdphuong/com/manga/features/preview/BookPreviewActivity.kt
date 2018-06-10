@@ -1,7 +1,8 @@
 package nhdphuong.com.manga.features.preview
 
 import android.annotation.TargetApi
-import android.content.Context
+import android.app.Activity
+import android.support.v4.app.Fragment
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -19,10 +20,10 @@ class BookPreviewActivity : AppCompatActivity() {
     lateinit var mPresenter: BookPreviewPresenter
 
     companion object {
-        fun start(context: Context, book: Book) {
-            val intent = Intent(context, BookPreviewActivity::class.java)
+        fun start(fragment: Fragment, book: Book) {
+            val intent = Intent(fragment.activity, BookPreviewActivity::class.java)
             intent.putExtra(Constants.BOOK, book)
-            context.startActivity(intent)
+            fragment.startActivityForResult(intent, Constants.BOOK_PREVIEW_RESULT)
         }
 
         private var mInstance: BookPreviewActivity? = null
@@ -52,5 +53,10 @@ class BookPreviewActivity : AppCompatActivity() {
         }
 
         NHentaiApp.instance.applicationComponent.plus(BookPreviewModule(bookPreviewFragment, book)).inject(this)
+    }
+
+    override fun finish() {
+        setResult(Activity.RESULT_OK)
+        super.finish()
     }
 }
