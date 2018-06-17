@@ -62,14 +62,15 @@ class HeaderFragment : Fragment(), HeaderContract.View {
                         mTabAdapter.reset()
                     }
                     else -> {
-                        if (::mTagChangeListener.isInitialized) {
+                        /*if (::mTagChangeListener.isInitialized) {
                             mTagChangeListener.onTagChange(tab.defaultName)
                         } else {
                             mPresenter.goToTagList(tab.defaultName)
                             mTabAdapter.reset()
-                        }
+                        }*/
 
                         DialogHelper.showTagsNotAvailable(activity, {
+                            mTabAdapter.reset()
                             toggleTagsLayout()
                         })
                     }
