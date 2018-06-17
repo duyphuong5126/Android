@@ -57,16 +57,23 @@
                         android:layout_margin="10dp"
                         android:visibility="visible">
 
-                        <android.support.v7.widget.RecyclerView
-                            android:id="@+id/rvPagination"
+                        <android.support.constraint.ConstraintLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="5dp"
-                            android:layout_marginStart="5dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toStartOf="@id/btnLast"
                             app:layout_constraintStart_toEndOf="@id/btnFirst"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <android.support.v7.widget.RecyclerView
+                                android:id="@+id/rvPagination"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="5dp"
+                                android:layout_marginStart="5dp"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent" />
+                        </android.support.constraint.ConstraintLayout>
 
                         <ImageView
                             android:id="@+id/btnFirst"

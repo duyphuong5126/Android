@@ -11,10 +11,14 @@ import android.widget.TextView
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.supports.SupportUtils
 
-class HomePaginationAdapter(context: Context, pageCount: Int, private val onPageSelectCallback: OnPageSelectCallback) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val mPageList: List<Int> = (1 until pageCount).toList()
+class PaginationAdapter(context: Context, pageCount: Int, private val onPageSelectCallback: OnPageSelectCallback) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private val mPageList: List<Int> = (1..pageCount).toList()
     private var mCurrentPage = mPageList[0]
     private val mDefaultTextSize = SupportUtils.dp2Pixel(context, 30)
+
+    private var mMaxVisible: Int = 0
+    val maxVisible: Int
+        get() = mMaxVisible
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder {
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.item_home_pagination, parent, false)
@@ -27,6 +31,7 @@ class HomePaginationAdapter(context: Context, pageCount: Int, private val onPage
         val homePaginationViewHolder = holder as HomePaginationViewHolder
         homePaginationViewHolder.setData(mPageList[position])
         homePaginationViewHolder.setPageSelected(mPageList[position])
+        mMaxVisible++
     }
 
     private inner class HomePaginationViewHolder(itemView: View, private val onPageSelectCallback: OnPageSelectCallback) : RecyclerView.ViewHolder(itemView), View.OnClickListener {

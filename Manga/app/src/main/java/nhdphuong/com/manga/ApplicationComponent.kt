@@ -9,6 +9,8 @@ import nhdphuong.com.manga.features.preview.BookPreviewComponent
 import nhdphuong.com.manga.features.preview.BookPreviewModule
 import nhdphuong.com.manga.features.reader.ReaderComponent
 import nhdphuong.com.manga.features.reader.ReaderModule
+import nhdphuong.com.manga.features.recent.RecentComponent
+import nhdphuong.com.manga.features.recent.RecentModule
 import nhdphuong.com.manga.features.tags.TagsComponent
 import nhdphuong.com.manga.features.tags.TagsModule
 import javax.inject.Singleton
@@ -23,4 +25,5 @@ interface ApplicationComponent {
     fun plus(bookPreviewModule: BookPreviewModule): BookPreviewComponent
     fun plus(readerModule: ReaderModule): ReaderComponent
     fun plus(tagsModule: TagsModule, headerModule: HeaderModule): TagsComponent
+    fun plus(recentModule: RecentModule): RecentComponent
 }

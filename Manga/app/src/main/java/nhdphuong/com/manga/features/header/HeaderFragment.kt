@@ -13,6 +13,7 @@ import nhdphuong.com.manga.Constants
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.data.Tab
 import nhdphuong.com.manga.databinding.FragmentHeaderBinding
+import nhdphuong.com.manga.features.recent.RecentActivity
 import nhdphuong.com.manga.features.tags.TagsContract
 import nhdphuong.com.manga.supports.SpaceItemDecoration
 import nhdphuong.com.manga.views.DialogHelper
@@ -44,9 +45,18 @@ class HeaderFragment : Fragment(), HeaderContract.View {
         super.onViewCreated(view, savedInstanceState)
         mTabAdapter = TabAdapter(context, object : TabAdapter.OnMainTabClick {
             override fun onTabClick(tab: Tab) {
-                /*when (tab) {
-                    Tab.RANDOM -> {
+                when (tab) {
+                    Tab.RECENT -> {
+                        RecentActivity.start(context, Constants.RECENT)
                         mTabAdapter.reset()
+                        toggleTagsLayout()
+                        return
+                    }
+                    Tab.FAVORITE -> {
+                        RecentActivity.start(context, Constants.FAVORITE)
+                        mTabAdapter.reset()
+                        toggleTagsLayout()
+                        return
                     }
                     Tab.INFO -> {
                         mTabAdapter.reset()
@@ -58,12 +68,12 @@ class HeaderFragment : Fragment(), HeaderContract.View {
                             mPresenter.goToTagList(tab.defaultName)
                             mTabAdapter.reset()
                         }
-                    }
-                }*/
 
-                DialogHelper.showTagsNotAvailable(activity, {
-                    toggleTagsLayout()
-                })
+                        DialogHelper.showTagsNotAvailable(activity, {
+                            toggleTagsLayout()
+                        })
+                    }
+                }
             }
         })
 

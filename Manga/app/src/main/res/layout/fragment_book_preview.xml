@@ -286,10 +286,10 @@
                     android:paddingTop="@dimen/dp10"
                     android:text="@string/favorite"
                     android:textSize="17sp"
+                    android:visibility="invisible"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvUpdatedAt"
-                    app:myFont="@string/NotoSansBold"
-                    android:visibility="invisible"/>
+                    app:myFont="@string/NotoSansBold" />
 
                 <nhdphuong.com.manga.views.customs.MyTextView
                     android:id="@+id/mtvNotFavorite"
@@ -304,10 +304,10 @@
                     android:paddingTop="@dimen/dp10"
                     android:text="@string/favorite"
                     android:textSize="17sp"
+                    android:visibility="visible"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvUpdatedAt"
-                    app:myFont="@string/NotoSansBold"
-                    android:visibility="visible" />
+                    app:myFont="@string/NotoSansBold" />
 
                 <nhdphuong.com.manga.views.customs.MyTextView
                     android:id="@+id/mtvDownload"
@@ -337,6 +337,7 @@
                     android:paddingBottom="10dp"
                     android:paddingTop="10dp"
                     android:visibility="gone"
+                    app:layout_constraintBottom_toTopOf="@+id/mtvPreview"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/mtvDownload">
@@ -381,7 +382,7 @@
                     android:textColor="@android:color/white"
                     android:textSize="18sp"
                     app:layout_constraintStart_toStartOf="@+id/mtvFavorite"
-                    app:layout_constraintTop_toBottomOf="@+id/mtvFavorite"
+                    app:layout_constraintTop_toBottomOf="@+id/clDownloadProgress"
                     app:myFont="@string/NotoSansBold" />
 
                 <HorizontalScrollView

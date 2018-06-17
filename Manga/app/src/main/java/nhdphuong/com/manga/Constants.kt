@@ -47,6 +47,7 @@ class Constants {
         const val INFO = "Info"
         const val ARTISTS = "Artists"
 
+        const val RECENT_TYPE = "Recent_type"
         const val RECENT = "Recent"
         const val FAVORITE = "Favorite"
 

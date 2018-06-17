@@ -8,7 +8,7 @@ import javax.inject.Inject
 /*
  * Created by nhdphuong on 6/9/18.
  */
-class BookLocalDataSource @Inject constructor(private val mRecentBookDAO: RecentBookDAO): BookDataSource.Local {
+class BookLocalDataSource @Inject constructor(private val mRecentBookDAO: RecentBookDAO) : BookDataSource.Local {
     override suspend fun saveRecentBook(bookId: String) {
         mRecentBookDAO.insertRecentBooks(RecentBook(bookId, false))
     }
@@ -32,4 +32,8 @@ class BookLocalDataSource @Inject constructor(private val mRecentBookDAO: Recent
     override suspend fun isFavoriteBook(bookId: String): Boolean = mRecentBookDAO.isFavoriteBook(bookId) == 1
 
     override suspend fun isRecentBook(bookId: String): Boolean = mRecentBookDAO.getRecentBook(bookId) == bookId
+
+    override suspend fun getRecentCount(): Int = mRecentBookDAO.getRecentBookCount()
+
+    override suspend fun getFavoriteCount(): Int = mRecentBookDAO.getFavoriteBookCount()
 }

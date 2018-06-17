@@ -27,10 +27,10 @@ import nhdphuong.com.manga.Constants
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.views.adapters.BookAdapter
 import nhdphuong.com.manga.data.entity.book.Book
-import nhdphuong.com.manga.databinding.FragmentHomeBinding
+import nhdphuong.com.manga.databinding.FragmentBookListBinding
 import nhdphuong.com.manga.features.preview.BookPreviewActivity
 import nhdphuong.com.manga.views.DialogHelper
-import nhdphuong.com.manga.views.adapters.HomePaginationAdapter
+import nhdphuong.com.manga.views.adapters.PaginationAdapter
 
 /*
  * Created by nhdphuong on 3/16/18.
@@ -43,9 +43,9 @@ class HomeFragment : Fragment(), HomeContract.View, PtrUIHandler {
         private const val LANDSCAPE_GRID_COLUMNS = 3
     }
 
-    private lateinit var mBinding: FragmentHomeBinding
+    private lateinit var mBinding: FragmentBookListBinding
     private lateinit var mHomeListAdapter: BookAdapter
-    private lateinit var mHomePaginationAdapter: HomePaginationAdapter
+    private lateinit var mHomePaginationAdapter: PaginationAdapter
     private lateinit var mHomePresenter: HomeContract.Presenter
     private lateinit var mLoadingDialog: Dialog
 
@@ -67,7 +67,7 @@ class HomeFragment : Fragment(), HomeContract.View, PtrUIHandler {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.d(TAG, "onCreateView")
-        mBinding = DataBindingUtil.inflate(inflater!!, R.layout.fragment_home, container, false)
+        mBinding = DataBindingUtil.inflate(inflater!!, R.layout.fragment_book_list, container, false)
         return mBinding.root
     }
 
@@ -197,7 +197,7 @@ class HomeFragment : Fragment(), HomeContract.View, PtrUIHandler {
     }
 
     override fun refreshHomePagination(pageCount: Long) {
-        mHomePaginationAdapter = HomePaginationAdapter(context, pageCount.toInt(), object : HomePaginationAdapter.OnPageSelectCallback {
+        mHomePaginationAdapter = PaginationAdapter(context, pageCount.toInt(), object : PaginationAdapter.OnPageSelectCallback {
             override fun onPageSelected(page: Int) {
                 Log.d(TAG, "Page $page is selected")
                 mHomePresenter.jumpToPage(page)

@@ -95,6 +95,7 @@
     <string name="tag_under_construction_description">Tags are under construction.\nPlease try again later</string>
     <string name="refresh">Refresh</string>
     <string name="recent">Recent</string>
+    <string name="switch_recent_list">Switch</string>
 
     <string-array name="dots" tools:ignore="TypographyEllipsis">
         <item>.</item>
