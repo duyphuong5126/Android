@@ -131,13 +131,20 @@ class RecentFragment : Fragment(), RecentContract.View, PtrUIHandler {
     }
 
     override fun refreshRecentPagination(pageCount: Int) {
+        val recentPagination = mBinding.rvPagination
+        if (pageCount == 0) {
+            mBinding.btnFirst.visibility = View.GONE
+            mBinding.btnLast.visibility = View.GONE
+            recentPagination.visibility = View.GONE
+            return
+        }
         mPaginationAdapter = PaginationAdapter(context, pageCount, object : PaginationAdapter.OnPageSelectCallback {
             override fun onPageSelected(page: Int) {
                 Log.d(TAG, "Page $page is selected")
                 mPresenter.jumpToPage(page)
             }
         })
-        val recentPagination = mBinding.rvPagination
+        recentPagination.visibility = View.VISIBLE
         recentPagination.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         recentPagination.adapter = mPaginationAdapter
         recentPagination.viewTreeObserver.addOnGlobalLayoutListener {
