@@ -1,5 +1,7 @@
 package nhdphuong.com.manga.features.home
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.res.Configuration
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -10,20 +12,40 @@ import nhdphuong.com.manga.NHentaiApp
 import nhdphuong.com.manga.R
 import javax.inject.Inject
 import android.content.Intent
+import android.content.IntentFilter
+import android.support.v4.content.LocalBroadcastManager
+import android.text.TextUtils
 import android.view.KeyEvent
+import nhdphuong.com.manga.Constants
 import nhdphuong.com.manga.features.header.HeaderFragment
 import nhdphuong.com.manga.features.header.HeaderModule
 import nhdphuong.com.manga.features.header.HeaderPresenter
 
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity(), HomeContract {
     companion object {
         private val TAG = HomeActivity::class.java.simpleName
     }
 
+    private inner class TagSelectedBroadcastReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            intent?.getStringExtra(Constants.SELECTED_TAG)?.let { selectedTag ->
+                if (!TextUtils.isEmpty(selectedTag)) {
+                    mHeaderFragment.updateSearchBar(selectedTag)
+                    onSearchInputted(selectedTag)
+                }
+            }
+        }
+    }
+
+    private val mTagSelectedBroadcastReceiver = TagSelectedBroadcastReceiver()
+
     @Suppress("unused")
     @Inject
     lateinit var mHomePresenter: HomePresenter
+
+    private lateinit var mHomeFragment: HomeFragment
+    private lateinit var mHeaderFragment: HeaderFragment
 
     @Suppress("unused")
     @Inject
@@ -33,6 +55,7 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         Log.e(TAG, "onCreate")
         setContentView(R.layout.activity_home)
+        LocalBroadcastManager.getInstance(this).registerReceiver(mTagSelectedBroadcastReceiver, IntentFilter(Constants.TAG_SELECTED_ACTION))
         showFragments()
     }
 
@@ -89,6 +112,7 @@ class HomeActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         Log.e(TAG, "onDestroy")
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mTagSelectedBroadcastReceiver)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
@@ -125,6 +149,10 @@ class HomeActivity : AppCompatActivity() {
 
     }
 
+    override fun onSearchInputted(data: String) {
+        mHomeFragment.changeSearchInputted(data)
+    }
+
     private fun showFragments() {
         var homeFragment = supportFragmentManager.findFragmentById(R.id.clMainFragment) as HomeFragment?
         if (homeFragment == null) {
@@ -134,13 +162,16 @@ class HomeActivity : AppCompatActivity() {
                     .addToBackStack(TAG)
                     .commitAllowingStateLoss()
         }
+        mHomeFragment = homeFragment
+
         var headerFragment = supportFragmentManager.findFragmentById(R.id.clHeader) as HeaderFragment?
         if (headerFragment == null) {
             headerFragment = HeaderFragment()
-            supportFragmentManager.beginTransaction().
-                    replace(R.id.clHeader, headerFragment, TAG)
+            supportFragmentManager.beginTransaction().replace(R.id.clHeader, headerFragment, TAG)
                     .addToBackStack(TAG).commitAllowingStateLoss()
         }
+        headerFragment.setSearchInputListener(this)
+        mHeaderFragment = headerFragment
 
         NHentaiApp.instance.applicationComponent.plus(HomeModule(homeFragment), HeaderModule(headerFragment)).inject(this)
     }

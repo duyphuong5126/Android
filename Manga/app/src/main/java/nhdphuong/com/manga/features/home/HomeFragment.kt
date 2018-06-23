@@ -197,15 +197,31 @@ class HomeFragment : Fragment(), HomeContract.View, PtrUIHandler {
     }
 
     override fun refreshHomePagination(pageCount: Long) {
+        val mainPagination = mBinding.rvPagination
+        if (pageCount == 0L) {
+            mBinding.btnFirst.visibility = View.GONE
+            mBinding.btnLast.visibility = View.GONE
+            mainPagination.visibility = View.GONE
+            return
+        }
         mHomePaginationAdapter = PaginationAdapter(context, pageCount.toInt(), object : PaginationAdapter.OnPageSelectCallback {
             override fun onPageSelected(page: Int) {
                 Log.d(TAG, "Page $page is selected")
                 mHomePresenter.jumpToPage(page)
             }
         })
-        val mainPagination = mBinding.rvPagination
+        mainPagination.visibility = View.VISIBLE
         mainPagination.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         mainPagination.adapter = mHomePaginationAdapter
+        mainPagination.viewTreeObserver.addOnGlobalLayoutListener {
+            if (mHomePaginationAdapter.maxVisible >= pageCount - 1) {
+                mBinding.btnFirst.visibility = View.GONE
+                mBinding.btnLast.visibility = View.GONE
+            } else {
+                mBinding.btnFirst.visibility = View.VISIBLE
+                mBinding.btnLast.visibility = View.VISIBLE
+            }
+        }
     }
 
     override fun showLastBookListRefreshTime(lastRefreshTimeStamp: String) {
@@ -229,6 +245,10 @@ class HomeFragment : Fragment(), HomeContract.View, PtrUIHandler {
 
     override fun showRecentBooks(recentList: List<Int>) {
         mHomeListAdapter.setRecentList(recentList)
+    }
+
+    override fun changeSearchInputted(data: String) {
+        mHomePresenter.updateSearchData(data)
     }
 
     override fun showLoading() {

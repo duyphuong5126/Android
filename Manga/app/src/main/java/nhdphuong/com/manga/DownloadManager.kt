@@ -17,7 +17,7 @@ class DownloadManager {
 
         private var mTotal: Int = 0
             set(value) {
-                if (!isDownloading) {
+                if (value >= 0) {
                     field = value
                 }
             }
@@ -26,7 +26,7 @@ class DownloadManager {
 
         private var mProgress: Int = 0
             set(value) {
-                if (isDownloading) {
+                if (value >= 0) {
                     field = value
                 }
             }

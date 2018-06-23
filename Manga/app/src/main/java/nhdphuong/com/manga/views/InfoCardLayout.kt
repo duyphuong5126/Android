@@ -57,17 +57,19 @@ class InfoCardLayout(private val layoutInflater: LayoutInflater, private val tag
         }
     }
 
-    private inner class InfoCardViewHolder(val view: View, tag: Tag) : View.OnClickListener {
+    private inner class InfoCardViewHolder(val view: View, private val tag: Tag) : View.OnClickListener {
         private val mTvLabel: TextView = view.findViewById(R.id.tvLabel)
         private val mTvCount: TextView = view.findViewById(R.id.tvCount)
 
         init {
             mTvLabel.text = tag.name
             mTvCount.text = String.format(mContext.getString(R.string.count), SupportUtils.formatBigNumber(tag.count))
+            mTvLabel.setOnClickListener(this)
+            mTvCount.setOnClickListener(this)
         }
 
         override fun onClick(p0: View?) {
-
+            mTagSelectedListener.onTagSelected(tag)
         }
     }
 
@@ -98,5 +100,15 @@ class InfoCardLayout(private val layoutInflater: LayoutInflater, private val tag
                 anchorId += suitableViews.size + 1
             }
         }
+    }
+
+    interface TagSelectedListener {
+        fun onTagSelected(tag: Tag)
+    }
+
+    private lateinit var mTagSelectedListener: TagSelectedListener
+
+    fun setTagSelectedListener(tagSelectedListener: TagSelectedListener) {
+        mTagSelectedListener = tagSelectedListener
     }
 }

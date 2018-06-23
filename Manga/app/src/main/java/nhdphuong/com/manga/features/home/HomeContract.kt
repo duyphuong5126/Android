@@ -7,6 +7,8 @@ import nhdphuong.com.manga.data.entity.book.Book
  * Created by nhdphuong on 3/18/18.
  */
 interface HomeContract {
+    fun onSearchInputted(data: String)
+
     interface View : Base.View<Presenter> {
         fun setUpHomeBookList(homeBookList: List<Book>)
         fun refreshHomeBookList()
@@ -16,6 +18,7 @@ interface HomeContract {
         fun showRefreshingDialog()
         fun showRecentBooks(recentList: List<Int>)
         fun showFavoriteBooks(favoriteList: List<Int>)
+        fun changeSearchInputted(data: String)
     }
 
     interface Presenter : Base.Presenter {
@@ -26,5 +29,6 @@ interface HomeContract {
         fun reloadLastBookListRefreshTime()
         fun reloadRecentBooks()
         fun saveLastBookListRefreshTime()
+        fun updateSearchData(data: String)
     }
 }

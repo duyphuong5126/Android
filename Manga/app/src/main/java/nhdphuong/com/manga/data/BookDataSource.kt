@@ -12,6 +12,7 @@ import java.util.*
 interface BookDataSource {
     interface Remote {
         suspend fun getBookByPage(page: Int): RemoteBook?
+        suspend fun getBookByPage(searchContent: String, page: Int): RemoteBook?
         suspend fun getBookDetails(bookId: String): Book?
         suspend fun getRecommendBook(bookId: String): RecommendBook?
     }

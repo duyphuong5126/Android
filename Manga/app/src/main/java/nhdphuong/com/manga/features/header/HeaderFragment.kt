@@ -13,6 +13,7 @@ import nhdphuong.com.manga.Constants
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.data.Tab
 import nhdphuong.com.manga.databinding.FragmentHeaderBinding
+import nhdphuong.com.manga.features.home.HomeContract
 import nhdphuong.com.manga.features.recent.RecentActivity
 import nhdphuong.com.manga.features.tags.TagsContract
 import nhdphuong.com.manga.supports.SpaceItemDecoration
@@ -27,6 +28,7 @@ class HeaderFragment : Fragment(), HeaderContract.View {
     private lateinit var mBinding: FragmentHeaderBinding
     private lateinit var mTabAdapter: TabAdapter
     private lateinit var mTagChangeListener: TagsContract
+    private lateinit var mHomeContract: HomeContract
     override fun setPresenter(presenter: HeaderContract.Presenter) {
         mPresenter = presenter
     }
@@ -85,6 +87,9 @@ class HeaderFragment : Fragment(), HeaderContract.View {
         mBinding.ibHamburger.setOnClickListener {
             toggleTagsLayout()
         }
+        mBinding.ibSearch.setOnClickListener {
+            mHomeContract.onSearchInputted(mBinding.edtSearch.text.toString())
+        }
     }
 
     override fun onResume() {
@@ -103,6 +108,14 @@ class HeaderFragment : Fragment(), HeaderContract.View {
 
     override fun setTagChangeListener(tagsContract: TagsContract) {
         mTagChangeListener = tagsContract
+    }
+
+    override fun setSearchInputListener(homeContract: HomeContract) {
+        mHomeContract = homeContract
+    }
+
+    override fun updateSearchBar(searchContent: String) {
+        mBinding.edtSearch.setText(searchContent)
     }
 
     override fun showLoading() {

@@ -3,6 +3,7 @@ package nhdphuong.com.manga.features.preview
 import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.databinding.DataBindingUtil
 import android.graphics.drawable.Drawable
@@ -12,6 +13,7 @@ import android.os.Handler
 import android.support.annotation.RequiresApi
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
+import android.support.v4.content.LocalBroadcastManager
 import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -41,7 +43,7 @@ import nhdphuong.com.manga.views.adapters.PreviewAdapter
 /*
  * Created by nhdphuong on 4/14/18.
  */
-class BookPreviewFragment : Fragment(), BookPreviewContract.View {
+class BookPreviewFragment : Fragment(), BookPreviewContract.View, InfoCardLayout.TagSelectedListener {
     companion object {
         private val TAG = BookPreviewFragment::class.java.simpleName
         private const val NUM_OF_ROWS = 2
@@ -300,7 +302,7 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
     override fun updateDownloadProgress(progress: Int, total: Int) {
         mBinding.clDownloadProgress.visibility = View.VISIBLE
         mBinding.pbDownloading.max = total
-        mBinding.pbDownloading.progressDrawable = ActivityCompat.getDrawable(context, getProgressDrawableId(progress, total))
+        mBinding.pbDownloading.progressDrawable = getProgressDrawableId(progress, total)
         mBinding.pbDownloading.progress = progress
         mBinding.mtvDownloaded.text = String.format(getString(R.string.preview_download_progress), progress, total)
     }
@@ -309,6 +311,7 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
         mBinding.mtvDownloaded.text = getString(R.string.done)
         val handler = Handler()
         handler.postDelayed({
+            mBinding.pbDownloading.progressDrawable = getProgressDrawableId(0, mBinding.pbDownloading.max)
             mBinding.pbDownloading.max = 0
             mBinding.clDownloadProgress.visibility = View.GONE
             mBinding.mtvDownloaded.text = getString(R.string.preview_download_progress)
@@ -357,9 +360,17 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
 
     override fun isActive() = isAdded
 
+    override fun onTagSelected(tag: Tag) {
+        val intent = Intent(Constants.TAG_SELECTED_ACTION)
+        intent.putExtra(Constants.SELECTED_TAG, tag.name)
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+        activity.onBackPressed()
+    }
+
     private fun loadInfoList(layout: ViewGroup, infoList: List<Tag>) {
         val infoCardLayout = InfoCardLayout(activity.layoutInflater, infoList, context)
         infoCardLayout.loadInfoList(layout)
+        infoCardLayout.setTagSelectedListener(this)
     }
 
     private fun getAnimationListener(callOnEndingObject: ObjectAnimator) = object : Animator.AnimatorListener {
@@ -385,12 +396,12 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View {
         requestPermissions(storagePermission, REQUEST_STORAGE_PERMISSION)
     }
 
-    private fun getProgressDrawableId(progress: Int, max: Int): Int {
+    private fun getProgressDrawableId(progress: Int, max: Int): Drawable {
         val percentage = (progress * 1f) / (max * 1f)
-        return when {
+        return ActivityCompat.getDrawable(context, when {
             percentage >= Constants.DOWNLOAD_GREEN_LEVEL -> R.drawable.bg_download_green
             percentage >= Constants.DOWNLOAD_YELLOW_LEVEL -> R.drawable.bg_download_yellow
             else -> R.drawable.bg_download_red
-        }
+        })
     }
 }

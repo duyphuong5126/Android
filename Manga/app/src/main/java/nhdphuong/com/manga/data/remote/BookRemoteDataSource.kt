@@ -24,13 +24,32 @@ class BookRemoteDataSource(private val mBookApiService: BookApiService) : BookDa
         var remoteBook: RemoteBook? = null
         mBookApiService.getBookListByPage(page).enqueue(object : Callback<RemoteBook> {
             override fun onResponse(call: Call<RemoteBook>?, response: Response<RemoteBook>?) {
-                Log.d(TAG, "get all remote book of page $page successfully")
+                Log.d(TAG, "get all remote books of page $page successfully")
                 remoteBook = response?.body()
                 countDownLatch.countDown()
             }
 
             override fun onFailure(call: Call<RemoteBook>?, t: Throwable?) {
-                Log.d(TAG, "get all remote book of page $page fail")
+                Log.d(TAG, "get all remote books of page $page fail")
+                countDownLatch.countDown()
+            }
+        })
+        countDownLatch.await()
+        return remoteBook
+    }
+
+    override suspend fun getBookByPage(searchContent: String, page: Int): RemoteBook? {
+        val countDownLatch = CountDownLatch(1)
+        var remoteBook: RemoteBook? = null
+        mBookApiService.searchByPage(searchContent.replace(" ", "+"), page).enqueue(object : Callback<RemoteBook> {
+            override fun onResponse(call: Call<RemoteBook>?, response: Response<RemoteBook>?) {
+                Log.d(TAG, "search books by $searchContent of page $page successfully")
+                remoteBook = response?.body()
+                countDownLatch.countDown()
+            }
+
+            override fun onFailure(call: Call<RemoteBook>?, t: Throwable?) {
+                Log.d(TAG, "search books by $searchContent of page $page fail")
                 countDownLatch.countDown()
             }
         })
@@ -43,13 +62,13 @@ class BookRemoteDataSource(private val mBookApiService: BookApiService) : BookDa
         val countDownLatch = CountDownLatch(1)
         mBookApiService.getRecommendBook(bookId).enqueue(object : Callback<RecommendBook> {
             override fun onResponse(call: Call<RecommendBook>?, response: Response<RecommendBook>?) {
-                Log.d(TAG, "get recommend book of $bookId successfully")
+                Log.d(TAG, "get recommend books of $bookId successfully")
                 recommendBook = response?.body()
                 countDownLatch.countDown()
             }
 
             override fun onFailure(call: Call<RecommendBook>?, t: Throwable?) {
-                Log.d(TAG, "get recommend book of $bookId fail")
+                Log.d(TAG, "get recommend books of $bookId fail")
                 countDownLatch.countDown()
             }
         })
