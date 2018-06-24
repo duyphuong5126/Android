@@ -12,8 +12,6 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.ortiz.touchview.TouchImageView
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import nhdphuong.com.manga.R
 import nhdphuong.com.manga.supports.GlideUtils
 import nhdphuong.com.manga.views.customs.MyTextView

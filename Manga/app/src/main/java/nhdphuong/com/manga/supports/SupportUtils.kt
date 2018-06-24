@@ -11,15 +11,17 @@ import java.io.FileOutputStream
 import java.text.NumberFormat
 import java.util.*
 import android.graphics.BitmapFactory
+import android.util.Log
 import nhdphuong.com.manga.NHentaiApp
 import nhdphuong.com.manga.R
 import java.io.BufferedInputStream
-import java.io.IOException
 import java.net.URL
 
 
 class SupportUtils {
     companion object {
+        private val TAG = SupportUtils::class.java.simpleName
+
         private const val MILLISECOND: Long = 1000
         private const val MINUTE: Long = MILLISECOND * 60
         private const val HOUR: Long = MINUTE * 60
@@ -107,21 +109,24 @@ class SupportUtils {
             return resultPath
         }
 
-        fun getImageBitmap(urlString: String): Bitmap? {
+        fun downloadImageBitmap(urlString: String, simulateDownloadFail: Boolean): Bitmap? {
             var bitmap: Bitmap? = null
+            val downloadingUrl = if (simulateDownloadFail) urlString + "idghfhidu" else urlString
+            val connectTimeOut = if (simulateDownloadFail) 5000 else 10000
+            val readTimeOut = if (simulateDownloadFail) 10000 else 20000
             try {
-                val url = URL(urlString)
+                val url = URL(downloadingUrl)
                 val conn = url.openConnection()
-                conn.connectTimeout = 10000
-                conn.readTimeout = 20000
+                conn.connectTimeout = connectTimeOut
+                conn.readTimeout = readTimeOut
                 conn.connect()
                 val inputStream = conn.getInputStream()
                 val bufferedInputStream = BufferedInputStream(inputStream)
                 bitmap = BitmapFactory.decodeStream(bufferedInputStream)
                 bufferedInputStream.close()
                 inputStream.close()
-            } catch (e: IOException) {
-
+            } catch (e: Exception) {
+                Log.d(TAG, "Downloading $urlString causes exception: $e")
             }
 
             return bitmap

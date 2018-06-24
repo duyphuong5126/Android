@@ -34,6 +34,7 @@ interface BookPreviewContract {
         fun initDownloading(total: Int)
         fun updateDownloadProgress(progress: Int, total: Int)
         fun finishDownloading()
+        fun finishDownloading(downloadFailedCount: Int, total: Int)
         fun showThisBookBeingDownloaded()
         fun showBookBeingDownloaded(bookId: String)
         fun showFavoriteBookSaved(isFavorite: Boolean)

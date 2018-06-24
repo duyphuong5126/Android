@@ -231,37 +231,41 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
                                     val countDownLatch = CountDownLatch(lastPage - currentPage)
                                     for (downloadPage in currentPage until lastPage) {
                                         async {
-                                            mBook.bookImages.pages[downloadPage].let { page ->
-                                                val result = SupportUtils.getImageBitmap(bookPages[downloadPage])!!
+                                            try {
+                                                mBook.bookImages.pages[downloadPage].let { page ->
+                                                    val result = SupportUtils.downloadImageBitmap(bookPages[downloadPage], false)!!
 
-                                                val resultFilePath = nHentaiApp.getImageDirectory(mBook.mediaId)
+                                                    val resultFilePath = nHentaiApp.getImageDirectory(mBook.mediaId)
 
-                                                val format = if (page.imageType == Constants.PNG_TYPE) {
-                                                    Bitmap.CompressFormat.PNG
-                                                } else {
-                                                    Bitmap.CompressFormat.JPEG
+                                                    val format = if (page.imageType == Constants.PNG_TYPE) {
+                                                        Bitmap.CompressFormat.PNG
+                                                    } else {
+                                                        Bitmap.CompressFormat.JPEG
+                                                    }
+                                                    val fileName = String.format("%0${mPrefixNumber}d", downloadPage + 1)
+                                                    val resultPath = SupportUtils.compressBitmap(result, resultFilePath, fileName, format)
+                                                    resultList.add(resultPath)
+                                                    Log.d(TAG, "$fileName is saved successfully")
+                                                    countDownLatch.countDown()
                                                 }
-                                                val fileName = String.format("%0${mPrefixNumber}d", downloadPage + 1)
-                                                val resultPath = SupportUtils.compressBitmap(result, resultFilePath, fileName, format)
-                                                resultList.add(resultPath)
-                                                Log.d(TAG, "$fileName is saved successfully")
+                                                launch(UI) {
+                                                    progress++
+                                                    DownloadManager.updateProgress(mBook.bookId, progress)
+                                                }
+                                                Log.d(TAG, "Download page ${downloadPage + 1} completed")
+                                            } catch (exception: Exception) {
                                                 countDownLatch.countDown()
                                             }
-                                            launch(UI) {
-                                                progress++
-                                                DownloadManager.updateProgress(mBook.bookId, progress)
-                                                if (resultList.size == total) {
-                                                    delay(1000)
-                                                    nHentaiApp.refreshGallery(*resultList.toTypedArray())
-                                                    DownloadManager.endDownloading()
-                                                }
-                                            }
-                                            Log.d(TAG, "Download page ${downloadPage + 1} completed")
                                         }
                                     }
                                     countDownLatch.await()
                                 }
                                 currentPage += BATCH_COUNT
+                            }
+                            delay(1000)
+                            launch(UI) {
+                                nHentaiApp.refreshGallery(*resultList.toTypedArray())
+                                DownloadManager.endDownloading(progress, total)
                             }
                         }
                     }
@@ -313,9 +317,13 @@ class BookPreviewPresenter @Inject constructor(private val mView: BookPreviewCon
         }
     }
 
-    override fun onDownloadingEnded() {
+    override fun onDownloadingEnded(downloaded: Int, total: Int) {
         if (mView.isActive()) {
-            mView.finishDownloading()
+            if (downloaded == total) {
+                mView.finishDownloading()
+            } else {
+                mView.finishDownloading(total - downloaded, total)
+            }
         }
     }
 

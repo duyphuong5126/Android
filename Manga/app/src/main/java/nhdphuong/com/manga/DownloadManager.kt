@@ -53,11 +53,11 @@ class DownloadManager {
             }
         }
 
-        fun endDownloading() {
-            mBookId = ""
+        fun endDownloading(downloaded: Int, total: Int) {
             mTotal = 0
             mProgress = 0
-            mDownloadCallback?.onDownloadingEnded()
+            mBookId = ""
+            mDownloadCallback?.onDownloadingEnded(downloaded, total)
             mDownloadCallback = null
         }
 
@@ -69,6 +69,6 @@ class DownloadManager {
     interface DownloadCallback {
         fun onDownloadingStarted(bookId: String, total: Int)
         fun onProgressUpdated(bookId: String, progress: Int, total: Int)
-        fun onDownloadingEnded()
+        fun onDownloadingEnded(downloaded: Int, total: Int)
     }
 }

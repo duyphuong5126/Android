@@ -318,6 +318,17 @@ class BookPreviewFragment : Fragment(), BookPreviewContract.View, InfoCardLayout
         }, 2000)
     }
 
+    override fun finishDownloading(downloadFailedCount: Int, total: Int) {
+        mBinding.mtvDownloaded.text = String.format(getString(R.string.fail_to_download), downloadFailedCount)
+        val handler = Handler()
+        handler.postDelayed({
+            mBinding.pbDownloading.progressDrawable = getProgressDrawableId(0, mBinding.pbDownloading.max)
+            mBinding.pbDownloading.max = 0
+            mBinding.clDownloadProgress.visibility = View.GONE
+            mBinding.mtvDownloaded.text = getString(R.string.preview_download_progress)
+        }, 2000)
+    }
+
     override fun showBookBeingDownloaded(bookId: String) {
         DialogHelper.showBookDownloadingDialog(activity, bookId, onOk = {
             mPresenter.restartBookPreview(bookId)
